@@ -52,6 +52,30 @@ NAP (use this EXACT format everywhere — consistency matters):
 
 ---
 
+---
+
+## Ready-to-paste Google Business Profile content
+
+**Business name:** Tuned Yota
+**Primary category:** Auto tuning service  *(if unavailable: Auto repair shop)*
+**Additional categories:** Car repair and maintenance service · Auto parts store
+**Business type:** Service-area business (hide address)
+**Phone:** (612) 406-7117  **Website:** https://tunedyota.com  **Hours:** By appointment
+
+**Service areas:** Twin Cities MN, Duluth MN, Rochester MN, Mankato MN, Eau Claire WI,
+Madison WI, Green Bay WI, Milwaukee WI, Des Moines IA, Cedar Rapids IA, Davenport IA,
+Fargo ND, Sioux Falls SD, Rapid City SD, Omaha NE
+
+**Description (paste as-is — under Google's 750-char limit):**
+> Tuned Yota delivers Toyota & Lexus performance tuning across the Upper Midwest. As an authorized OTT (Overland Tailor Tune) installer and the region's authorized Magnuson Supercharger dealer, we calibrate for real-world drivability — smoother shifting, less gear hunting, sharper throttle, stronger towing, and better performance on larger tires. Calibrations are built by a licensed VFTuner PRO Tuner, with factory emissions fully intact, 5-gas-analyzer verified, and EPA-compliant in every state. We tune in person at events across MN, IA, WI, ND, SD & NE, and drop-ship Magnuson supercharger kits anywhere in the lower 48. Call or text (612) 406-7117.
+
+**Services to add:** OTT Tune calibration · Custom ECU calibration · Transmission tuning ·
+Towing & overland calibration · Magnuson supercharger sales · Supercharger installation ·
+Supercharger calibration · Turbo performance calibration
+
+**Photos to upload:** installs in progress, 5-gas analyzer, dyno, trucks before/after,
+event setups, team headshots (Aaron, Noah, Cody). Add a few every month.
+
 ### Honest expectations
 No one can guarantee #1 rankings. This list raises your probability steadily over
 weeks–months. Reviews + GBP + consistent NAP + a few real backlinks will do more than
