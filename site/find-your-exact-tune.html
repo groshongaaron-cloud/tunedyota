@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Exact Tune | Tuned Yota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+/* ============================================================
+   TUNED YOTA — TUNE FINDER  ·  Undeniable Performance
+   Palette + type from the official brand guide.
+   Vehicle data from tunedyota.com/services (verified fitment).
+   ============================================================ */
+:root{
+  --bg:#EDECEB; --ink:#3A2E26; --brown:#5B4B42; --brown2:#5D4B40;
+  --sage:#99A08E; --sage-d:#7c8472; --blue:#B3D0D9; --sand:#DFC4B5;
+  --card:#FAF9F7; --white:#FFFFFF;
+  --line:rgba(91,75,66,.16); --ring:rgba(179,208,217,.55);
+  --shadow:0 14px 50px -12px rgba(58,46,38,.22);
+  --shadow-sm:0 6px 22px -10px rgba(58,46,38,.20);
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
+.tf{font-family:'Lato',sans-serif;color:var(--brown2);max-width:780px;margin:0 auto;
+  padding:30px 18px 48px;position:relative;overflow:hidden}
+/* terrain / contour atmosphere */
+.tf::before{content:"";position:absolute;inset:-40% -20% auto -20%;height:560px;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(60% 50% at 78% 8%, rgba(179,208,217,.34), transparent 60%),
+    radial-gradient(55% 45% at 12% 26%, rgba(153,160,142,.26), transparent 60%);}
+.tf::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cg fill='none' stroke='%235B4B42' stroke-opacity='0.05' stroke-width='1.2'%3E%3Cpath d='M0 120 Q150 60 300 120 T600 120'/%3E%3Cpath d='M0 200 Q150 140 300 200 T600 200'/%3E%3Cpath d='M0 280 Q150 220 300 280 T600 280'/%3E%3Cpath d='M0 360 Q150 300 300 360 T600 360'/%3E%3Cpath d='M0 440 Q150 380 300 440 T600 440'/%3E%3Cpath d='M0 520 Q150 460 300 520 T600 520'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:600px 600px;}
+.tf>*{position:relative;z-index:1}
+
+/* ---------- header ---------- */
+.tf-top{text-align:center;margin-bottom:20px}
+.tf-logo{display:block;height:clamp(94px,17vw,134px);width:auto;margin:0 auto}
+.tf-mark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  font-size:clamp(23px,5.4vw,32px);color:var(--brown)}
+.tf-tag{font-family:'Lato',sans-serif;font-weight:700;letter-spacing:.34em;font-size:10.5px;
+  text-transform:uppercase;color:var(--brown2);margin-top:7px;opacity:.85}
+
+/* ---------- breadcrumb build-bar ---------- */
+.tf-crumb{display:none;flex-wrap:wrap;gap:7px;justify-content:center;align-items:center;
+  margin:14px auto 4px;font-size:12.5px}
+.tf-crumb.show{display:flex}
+.tf-crumb button{border:1px solid var(--line);background:var(--white);border-radius:99px;
+  padding:6px 13px;cursor:pointer;font-family:inherit;font-weight:700;color:var(--brown);transition:.18s}
+.tf-crumb button:hover{border-color:var(--sage);color:var(--ink)}
+.tf-crumb .sep{opacity:.4}
+
+/* ---------- progress ---------- */
+.tf-prog{display:flex;gap:6px;justify-content:center;margin:18px auto 30px;max-width:380px}
+.tf-prog i{height:4px;flex:1;border-radius:99px;background:var(--line);transition:.45s}
+.tf-prog i.on{background:var(--sage)}
+.tf-prog i.done{background:var(--brown)}
+
+/* ---------- steps ---------- */
+.tf-step{display:none}
+.tf-step.active{display:block;animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.tf-eyebrow{font-family:'Spectral SC',serif;letter-spacing:.18em;text-transform:uppercase;
+  font-size:12px;color:var(--sage-d);font-weight:600;text-align:center;margin-bottom:10px}
+.tf-h{font-family:'Spectral',serif;font-weight:600;font-size:clamp(26px,5.6vw,38px);line-height:1.1;
+  color:var(--ink);text-align:center;margin-bottom:8px;letter-spacing:-.01em}
+.tf-sub{text-align:center;font-size:15.5px;line-height:1.55;opacity:.75;margin:0 auto 28px;max-width:480px}
+
+/* ---------- option grids ---------- */
+.tf-grid{display:grid;gap:13px}
+.tf-grid.two{grid-template-columns:1fr 1fr}
+.tf-grid.auto{grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}
+.tf-opt{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:22px 16px;text-align:center;cursor:pointer;transition:.2s;box-shadow:var(--shadow-sm);
+  font-weight:700;font-size:16.5px;color:var(--brown);position:relative;overflow:hidden}
+.tf-opt:hover{border-color:var(--sage);transform:translateY(-3px);box-shadow:var(--shadow)}
+.tf-opt small{display:block;font-weight:400;font-size:12.5px;opacity:.62;margin-top:6px;line-height:1.35}
+.tf-opt.sel{border-color:var(--brown);background:var(--white);box-shadow:0 0 0 3px var(--ring),var(--shadow)}
+.tf-opt .fi{display:inline-block;margin-top:8px;font-size:10.5px;font-weight:900;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--sage-d);background:rgba(153,160,142,.16);border-radius:99px;padding:3px 9px}
+
+/* chips */
+.tf-chips{display:flex;flex-wrap:wrap;gap:11px;justify-content:center}
+.tf-chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:12px 20px;
+  cursor:pointer;font-weight:700;font-size:14.5px;color:var(--brown);transition:.18s;box-shadow:var(--shadow-sm)}
+.tf-chip:hover{border-color:var(--sage)}
+.tf-chip.sel{background:var(--brown);color:var(--white);border-color:var(--brown)}
+
+/* nav */
+.tf-nav{display:flex;justify-content:space-between;align-items:center;margin-top:30px;gap:12px}
+.tf-back{background:none;border:none;color:var(--brown2);cursor:pointer;font-family:inherit;
+  font-weight:700;font-size:14px;opacity:.7;padding:10px 2px}
+.tf-back:hover{opacity:1}
+.btn{font-family:'Lato',sans-serif;font-weight:900;letter-spacing:.03em;border:none;border-radius:99px;
+  padding:15px 28px;cursor:pointer;font-size:15px;transition:.2s;text-decoration:none;display:inline-flex;
+  align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--ink);color:#F3EFEA;box-shadow:var(--shadow)}
+.btn.primary:hover{background:var(--brown);transform:translateY(-1px)}
+.btn.sage{background:var(--sage);color:#fff;box-shadow:var(--shadow-sm)}
+.btn.sage:hover{background:var(--sage-d)}
+.btn.outline{background:transparent;border:1.6px solid var(--brown);color:var(--brown)}
+.btn.outline:hover{background:var(--brown);color:#fff}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ---------- result ---------- */
+.tf-confirm{background:linear-gradient(135deg,rgba(153,160,142,.16),rgba(179,208,217,.16));
+  border:1.5px solid var(--line);border-radius:var(--r);padding:22px 20px;text-align:center;margin-bottom:16px}
+.tf-confirm .tick{width:44px;height:44px;border-radius:50%;background:var(--sage);color:#fff;
+  display:grid;place-items:center;margin:0 auto 12px;font-size:22px;font-weight:900}
+.tf-confirm h3{font-family:'Spectral',serif;font-weight:600;font-size:21px;color:var(--ink);margin-bottom:4px}
+.tf-confirm .veh{font-weight:700;color:var(--brown)}
+.tf-confirm .note{font-size:13.5px;opacity:.75;margin-top:8px;line-height:1.5}
+.card{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);
+  padding:24px;box-shadow:var(--shadow-sm);margin-bottom:14px}
+.card .kicker{font-size:12px;color:var(--sage-d);font-weight:900;letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:7px}
+.card h3{font-family:'Spectral',serif;font-weight:600;font-size:23px;color:var(--ink);margin-bottom:8px}
+.card p{font-size:15px;line-height:1.6;margin-bottom:10px}
+.tf-bul{list-style:none;display:grid;gap:10px;margin:14px 0 4px}
+.tf-bul li{position:relative;padding-left:26px;font-size:14.5px;line-height:1.5}
+.tf-bul li::before{content:"";position:absolute;left:0;top:5px;width:12px;height:12px;border-radius:4px;
+  background:var(--sage);box-shadow:0 0 0 3px rgba(153,160,142,.2)}
+.pill{display:inline-block;background:var(--sand);color:var(--ink);font-weight:800;font-size:11.5px;
+  letter-spacing:.03em;border-radius:99px;padding:6px 13px;margin:4px 5px 4px 0}
+.pricebox{margin-top:16px;border-top:1px solid var(--line)}
+.price{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px;color:var(--brown2)}
+.price:last-child{border-bottom:none}
+.price em{font-style:normal;opacity:.6;font-size:12px;display:block}
+.price b{font-family:'Spectral',serif;font-weight:600;font-size:19px;color:var(--ink);white-space:nowrap}
+/* trust strip */
+.tf-trust{background:var(--ink);color:#E9E2D9;border-radius:var(--r);padding:20px 22px;margin-bottom:14px}
+.tf-trust .lead{font-family:'Spectral',serif;font-size:17px;color:#fff;margin-bottom:12px;line-height:1.4}
+.tf-trust ul{list-style:none;display:grid;gap:9px}
+.tf-trust li{position:relative;padding-left:24px;font-size:13.5px;line-height:1.45;opacity:.92}
+.tf-trust li::before{content:"\2713";position:absolute;left:0;top:0;color:var(--blue);font-weight:900}
+.tf-cta-row{display:grid;gap:11px;margin-top:6px}
+@media(min-width:540px){.tf-cta-row{grid-template-columns:1fr 1fr}}
+
+/* ---------- booking ---------- */
+.tf-field{margin-bottom:14px;text-align:left}
+.tf-field label{display:block;font-weight:700;font-size:13px;color:var(--brown);margin-bottom:6px;
+  letter-spacing:.02em}
+.tf-field input,.tf-field select,.tf-field textarea{width:100%;font-family:inherit;font-size:15px;
+  color:var(--ink);background:var(--white);border:1.5px solid var(--line);border-radius:11px;
+  padding:13px 14px;transition:.18s}
+.tf-field input:focus,.tf-field select:focus,.tf-field textarea:focus{outline:none;border-color:var(--sage);
+  box-shadow:0 0 0 3px var(--ring)}
+.tf-field textarea{resize:vertical;min-height:74px}
+.tf-row2{display:grid;gap:14px}
+@media(min-width:480px){.tf-row2{grid-template-columns:1fr 1fr}}
+.tf-call{display:grid;gap:11px;margin:18px 0 8px}
+@media(min-width:480px){.tf-call{grid-template-columns:1fr 1fr}}
+.tf-or{text-align:center;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.55;
+  margin:18px 0;position:relative}
+.tf-or::before,.tf-or::after{content:"";position:absolute;top:50%;width:34%;height:1px;background:var(--line)}
+.tf-or::before{left:0}.tf-or::after{right:0}
+.tf-success{display:none;text-align:center;background:var(--white);border:1.5px solid var(--sage);
+  border-radius:var(--r);padding:30px 22px;box-shadow:var(--shadow)}
+.tf-success.show{display:block;animation:rise .4s both}
+.tf-success .tick{width:52px;height:52px;border-radius:50%;background:var(--sage);color:#fff;
+  display:grid;place-items:center;margin:0 auto 14px;font-size:26px;font-weight:900}
+.tf-success h3{font-family:'Spectral',serif;font-size:23px;color:var(--ink);margin-bottom:8px}
+#tyMapWrap{border:1.5px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:14px;background:var(--card)}
+#tyMap{height:340px;width:100%;z-index:0}
+@media(max-width:480px){#tyMap{height:270px}}
+.leaflet-container{font-family:'Lato',sans-serif}
+.tf-mktbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px}
+.tf-mktbar button{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:7px 15px;cursor:pointer;font-family:inherit;font-weight:800;font-size:12.5px;letter-spacing:.05em;color:var(--brown);transition:.18s}
+.tf-mktbar button:hover{border-color:var(--sage)}
+.tf-mktbar button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tf-mktlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px;margin-bottom:10px}
+.tf-mkt{border:1.5px solid var(--line);background:var(--card);border-radius:11px;padding:12px 9px;cursor:pointer;text-align:center;font-weight:800;font-size:12.5px;letter-spacing:.04em;color:var(--brown);transition:.18s;text-transform:uppercase;box-shadow:var(--shadow-sm)}
+.tf-mkt:hover{border-color:var(--sage);transform:translateY(-2px)}
+.tf-mkt.sel{background:var(--brown);color:#fff;border-color:var(--brown)}
+.tf-mkt small{display:block;font-weight:700;font-size:10px;opacity:.55;margin-top:3px;letter-spacing:.08em}
+.tf-mkt.sel small{opacity:.85}
+.tf-mapcap{font-size:12px;opacity:.7;text-align:center;line-height:1.5;margin:4px 0 22px}
+.tf-inst{display:none;background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin:4px 0 18px;gap:16px;align-items:center}
+.tf-inst.show{display:flex;animation:rise .4s both}
+.tf-inst img{width:90px;height:112px;object-fit:cover;border-radius:12px;flex:0 0 auto;background:var(--card)}
+.tf-inst .ibody{flex:1;min-width:0;text-align:left}
+.tf-inst .ieyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-d)}
+.tf-inst h4{font-family:'Spectral',serif;font-weight:600;font-size:22px;color:var(--ink);margin:3px 0 1px}
+.tf-inst .ireg{font-size:12px;color:var(--sage-d);font-weight:700;margin-bottom:9px}
+.tf-inst p{font-size:13.5px;line-height:1.55;margin-bottom:13px}
+.tf-inst .iacts{display:flex;flex-wrap:wrap;gap:8px}
+.tf-inst .iacts a{font-size:13px;font-weight:800;text-decoration:none;border-radius:99px;padding:9px 15px;transition:.18s}
+.tf-iphone{background:var(--ink);color:#F3EFEA}.tf-iphone:hover{background:var(--brown)}
+.tf-itext{background:var(--sage);color:#fff}.tf-itext:hover{background:var(--sage-d)}
+.tf-iemail{border:1.5px solid var(--brown);color:var(--brown)}.tf-iemail:hover{background:var(--brown);color:#fff}
+@media(max-width:480px){.tf-inst{flex-direction:column;text-align:center}.tf-inst .ibody{text-align:center}.tf-inst .iacts{justify-content:center}}
+.tf-social{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;margin:16px 0}
+.tf-social h4{font-family:'Spectral',serif;font-size:18px;color:var(--ink);margin-bottom:3px}
+.tf-social p{font-size:13px;opacity:.75;margin-bottom:12px}
+.tf-social .srow{display:grid;gap:9px}
+@media(min-width:480px){.tf-social .srow{grid-template-columns:1fr 1fr}}
+.tf-disc{font-size:11.5px;opacity:.6;text-align:center;margin-top:18px;line-height:1.55}
+.tf-foot{text-align:center;font-size:13px;opacity:.75;margin-top:24px}
+.tf-link{color:var(--brown);font-weight:700;text-decoration:none}
+.tf-link:hover{text-decoration:underline}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Service","serviceType":"Toyota & Lexus OTT Tune Calibration","provider":{"@id":"https://www.tunedyota.com/#business"},"areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"}],"description":"OTT Tune calibration for supported Toyota and Lexus platforms, with base, custom, and supercharger or turbo calibrations where supported.","offers":{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":"400","highPrice":"950"}}
+</script>
+<style id="site-chrome">
+:root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20)}
+.snav{position:sticky;top:0;z-index:1000;background:rgba(237,236,235,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;padding:11px 18px;font-family:'Lato',sans-serif}
+.snav-logo{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:17px;color:#5B4B42;text-decoration:none;margin-right:auto}
+.snav-links{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.snav-links a{font-weight:800;font-size:13px;letter-spacing:.02em;color:#5D4B40;text-decoration:none;padding:8px 11px;border-radius:99px;transition:.18s}
+.snav-links a:hover{background:rgba(153,160,142,.18);color:#3A2E26}
+.snav-call{font-family:'Lato';font-weight:900;font-size:13px;background:#3A2E26;color:#F3EFEA;text-decoration:none;border-radius:99px;padding:9px 16px;margin-left:6px}
+.snav-call:hover{background:#5B4B42}
+.sfoot{font-family:'Lato',sans-serif;background:#3A2E26;color:#D8CFC4;margin-top:46px;padding:34px 20px 28px;text-align:center}
+.sfoot .fmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:18px;color:#fff}
+.sfoot .ftag{font-weight:700;letter-spacing:.28em;text-transform:uppercase;font-size:10px;color:#B3D0D9;margin:6px 0 16px}
+.sfoot a{color:#EDE6DD;text-decoration:none;font-weight:700}.sfoot a:hover{text-decoration:underline}
+.sfoot .frow{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:13.5px;margin-bottom:14px}
+.sfoot .fcon{font-size:13.5px;line-height:1.9;opacity:.9}
+.sfoot .fcopy{font-size:11.5px;opacity:.55;margin-top:16px}
+@media(max-width:560px){.snav-logo{margin-right:0;width:100%;text-align:center}.snav{justify-content:center}}
+</style>
+</head>
+<body>
+<header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>
+<div class="tf" id="tf">
+
+  <div class="tf-top" role="img" aria-label="Tuned Yota — Undeniable Performance">
+    <svg class="tf-logo" viewBox="425.6764 113.8 294.6473 380" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet"><defs></defs><style>.companyName {fill:#5B4B42;fill-opacity:1;}.icon1 {fill:#B3D0D9;fill-opacity:1;}.icon2 {fill:#99A08E;fill-opacity:1;}.icon3 {fill:#DFC4B5;fill-opacity:1;}.icon3-str {stroke:#DFC4B5;stroke-opacity:1;}.text {fill:#5D4B40;fill-opacity:1;}</style><g opacity="1" transform="rotate(0 425.6764 113.8)">
+<svg width="294.6473" height="289.5943" x="425.6764" y="113.8" version="1.1" preserveAspectRatio="none" viewBox="3.878999948501587 5.0980000495910645 40.00199890136719 39.31600189208984">
+  <g transform="matrix(1 0 0 1 0 0)" class="icon1"><g><path d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z    M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"></path></g></g>
+</svg>
+</g><g opacity="1" transform="rotate(0 441.3789 476.9447)">
+<svg width="263.2423" height="16.8553" x="441.3789" y="476.9447" version="1.1" preserveAspectRatio="none" viewBox="3.2 -29.46 465.34000000000003 29.8">
+  <g transform="matrix(1 0 0 1 0 0)" class="text"><path id="id-6izo4zJp22" d="M14.62-3.08L14.62-3.08Q16.40-3.08 17.80-3.68Q19.20-4.28 20.17-5.36Q21.14-6.44 21.65-7.94Q22.16-9.44 22.16-11.24L22.16-11.24L22.16-28.66L26.02-28.66L26.02-11.24Q26.02-8.76 25.23-6.64Q24.44-4.52 22.97-2.97Q21.50-1.42 19.38-0.54Q17.26 0.34 14.62 0.34L14.62 0.34Q11.98 0.34 9.86-0.54Q7.74-1.42 6.26-2.97Q4.78-4.52 3.99-6.64Q3.20-8.76 3.20-11.24L3.20-11.24L3.20-28.66L7.06-28.66L7.06-11.26Q7.06-9.46 7.57-7.96Q8.08-6.46 9.05-5.38Q10.02-4.30 11.43-3.69Q12.84-3.08 14.62-3.08Z M37.28 0L33.72 0L33.72-20.26L35.84-20.26Q36.60-20.26 36.80-19.52L36.80-19.52L37.08-17.32Q38.40-18.78 40.03-19.68Q41.66-20.58 43.80-20.58L43.80-20.58Q45.46-20.58 46.73-20.03Q48-19.48 48.85-18.47Q49.70-17.46 50.14-16.04Q50.58-14.62 50.58-12.90L50.58-12.90L50.58 0L47.02 0L47.02-12.90Q47.02-15.20 45.97-16.47Q44.92-17.74 42.76-17.74L42.76-17.74Q41.18-17.74 39.81-16.98Q38.44-16.22 37.28-14.92L37.28-14.92L37.28 0Z M73.94 0L71.82 0Q71.06 0 70.86-0.74L70.86-0.74L70.54-3.20Q69.24-1.62 67.57-0.67Q65.90 0.28 63.74 0.28L63.74 0.28Q62.00 0.28 60.58-0.39Q59.16-1.06 58.16-2.36Q57.16-3.66 56.62-5.60Q56.08-7.54 56.08-10.06L56.08-10.06Q56.08-12.30 56.68-14.23Q57.28-16.16 58.41-17.58Q59.54-19 61.16-19.81Q62.78-20.62 64.84-20.62L64.84-20.62Q66.70-20.62 68.02-19.99Q69.34-19.36 70.38-18.22L70.38-18.22L70.38-29.46L73.94-29.46L73.94 0ZM64.92-2.60L64.92-2.60Q66.66-2.60 67.97-3.40Q69.28-4.20 70.38-5.66L70.38-5.66L70.38-15.46Q69.40-16.78 68.23-17.31Q67.06-17.84 65.64-17.84L65.64-17.84Q62.80-17.84 61.28-15.82Q59.76-13.80 59.76-10.06L59.76-10.06Q59.76-8.08 60.10-6.67Q60.44-5.26 61.10-4.35Q61.76-3.44 62.72-3.02Q63.68-2.60 64.92-2.60Z M89.54-20.58L89.54-20.58Q91.36-20.58 92.90-19.97Q94.44-19.36 95.56-18.21Q96.68-17.06 97.31-15.37Q97.94-13.68 97.94-11.52L97.94-11.52Q97.94-10.68 97.76-10.40Q97.58-10.12 97.08-10.12L97.08-10.12L83.60-10.12Q83.64-8.20 84.12-6.78Q84.60-5.36 85.44-4.41Q86.28-3.46 87.44-2.99Q88.60-2.52 90.04-2.52L90.04-2.52Q91.38-2.52 92.35-2.83Q93.32-3.14 94.02-3.50Q94.72-3.86 95.19-4.17Q95.66-4.48 96-4.48L96-4.48Q96.44-4.48 96.68-4.14L96.68-4.14L97.68-2.84Q97.02-2.04 96.10-1.45Q95.18-0.86 94.13-0.48Q93.08-0.10 91.96 0.09Q90.84 0.28 89.74 0.28L89.74 0.28Q87.64 0.28 85.87-0.43Q84.10-1.14 82.81-2.51Q81.52-3.88 80.80-5.90Q80.08-7.92 80.08-10.54L80.08-10.54Q80.08-12.66 80.73-14.50Q81.38-16.34 82.60-17.69Q83.82-19.04 85.58-19.81Q87.34-20.58 89.54-20.58ZM89.62-17.96L89.62-17.96Q87.04-17.96 85.56-16.47Q84.08-14.98 83.72-12.34L83.72-12.34L94.74-12.34Q94.74-13.58 94.40-14.61Q94.06-15.64 93.40-16.39Q92.74-17.14 91.79-17.55Q90.84-17.96 89.62-17.96Z M107.64 0L104.08 0L104.08-20.26L106.20-20.26Q106.96-20.26 107.16-19.52L107.16-19.52L107.44-17.32Q108.76-18.78 110.39-19.68Q112.02-20.58 114.16-20.58L114.16-20.58Q115.82-20.58 117.09-20.03Q118.36-19.48 119.21-18.47Q120.06-17.46 120.50-16.04Q120.94-14.62 120.94-12.90L120.94-12.90L120.94 0L117.38 0L117.38-12.90Q117.38-15.20 116.33-16.47Q115.28-17.74 113.12-17.74L113.12-17.74Q111.54-17.74 110.17-16.98Q108.80-16.22 107.64-14.92L107.64-14.92L107.64 0Z M128.32-20.26L131.88-20.26L131.88 0L128.32 0L128.32-20.26ZM132.68-26.62L132.68-26.62Q132.68-26.10 132.47-25.65Q132.26-25.20 131.91-24.85Q131.56-24.50 131.10-24.30Q130.64-24.10 130.12-24.10L130.12-24.10Q129.60-24.10 129.15-24.30Q128.70-24.50 128.35-24.85Q128-25.20 127.80-25.65Q127.60-26.10 127.60-26.62L127.60-26.62Q127.60-27.14 127.80-27.61Q128-28.08 128.35-28.43Q128.70-28.78 129.15-28.98Q129.60-29.18 130.12-29.18L130.12-29.18Q130.64-29.18 131.10-28.98Q131.56-28.78 131.91-28.43Q132.26-28.08 132.47-27.61Q132.68-27.14 132.68-26.62Z M154.64-12.96L154.64 0L153.06 0Q152.54 0 152.22-0.16Q151.90-0.32 151.80-0.84L151.80-0.84L151.40-2.72Q150.60-2 149.84-1.43Q149.08-0.86 148.24-0.47Q147.40-0.08 146.45 0.12Q145.50 0.32 144.34 0.32L144.34 0.32Q143.16 0.32 142.13-0.01Q141.10-0.34 140.34-1Q139.58-1.66 139.13-2.67Q138.68-3.68 138.68-5.06L138.68-5.06Q138.68-6.26 139.34-7.37Q140-8.48 141.47-9.34Q142.94-10.20 145.32-10.75Q147.70-11.30 151.14-11.38L151.14-11.38L151.14-12.96Q151.14-15.32 150.13-16.53Q149.12-17.74 147.14-17.74L147.14-17.74Q145.84-17.74 144.95-17.41Q144.06-17.08 143.41-16.67Q142.76-16.26 142.29-15.93Q141.82-15.60 141.36-15.60L141.36-15.60Q141-15.60 140.73-15.79Q140.46-15.98 140.30-16.26L140.30-16.26L139.66-17.40Q141.34-19.02 143.28-19.82Q145.22-20.62 147.58-20.62L147.58-20.62Q149.28-20.62 150.60-20.06Q151.92-19.50 152.82-18.50Q153.72-17.50 154.18-16.08Q154.64-14.66 154.64-12.96L154.64-12.96ZM145.40-2.18L145.40-2.18Q146.34-2.18 147.12-2.37Q147.90-2.56 148.59-2.91Q149.28-3.26 149.91-3.76Q150.54-4.26 151.14-4.90L151.14-4.90L151.14-9.12Q148.68-9.04 146.96-8.73Q145.24-8.42 144.16-7.92Q143.08-7.42 142.59-6.74Q142.10-6.06 142.10-5.22L142.10-5.22Q142.10-4.42 142.36-3.84Q142.62-3.26 143.06-2.89Q143.50-2.52 144.10-2.35Q144.70-2.18 145.40-2.18Z M164.06 0L161.76 0L161.76-29.46L165.34-29.46L165.34-17.34Q166.60-18.80 168.23-19.69Q169.86-20.58 171.96-20.58L171.96-20.58Q173.72-20.58 175.14-19.92Q176.56-19.26 177.56-17.95Q178.56-16.64 179.10-14.71Q179.64-12.78 179.64-10.26L179.64-10.26Q179.64-8.02 179.04-6.09Q178.44-4.16 177.31-2.75Q176.18-1.34 174.55-0.53Q172.92 0.28 170.88 0.28L170.88 0.28Q168.92 0.28 167.55-0.48Q166.18-1.24 165.16-2.60L165.16-2.60L164.98-0.76Q164.82 0 164.06 0L164.06 0ZM170.80-17.74L170.80-17.74Q169.06-17.74 167.75-16.94Q166.44-16.14 165.34-14.68L165.34-14.68L165.34-4.88Q166.30-3.56 167.47-3.02Q168.64-2.48 170.08-2.48L170.08-2.48Q172.92-2.48 174.44-4.50Q175.96-6.52 175.96-10.26L175.96-10.26Q175.96-12.24 175.61-13.66Q175.26-15.08 174.60-15.99Q173.94-16.90 172.98-17.32Q172.02-17.74 170.80-17.74Z M186.00-29.46L189.56-29.46L189.56 0L186.00 0L186.00-29.46Z M205.46-20.58L205.46-20.58Q207.28-20.58 208.82-19.97Q210.36-19.36 211.48-18.21Q212.60-17.06 213.23-15.37Q213.86-13.68 213.86-11.52L213.86-11.52Q213.86-10.68 213.68-10.40Q213.50-10.12 213.00-10.12L213.00-10.12L199.52-10.12Q199.56-8.20 200.04-6.78Q200.52-5.36 201.36-4.41Q202.20-3.46 203.36-2.99Q204.52-2.52 205.96-2.52L205.96-2.52Q207.30-2.52 208.27-2.83Q209.24-3.14 209.94-3.50Q210.64-3.86 211.11-4.17Q211.58-4.48 211.92-4.48L211.92-4.48Q212.36-4.48 212.60-4.14L212.60-4.14L213.60-2.84Q212.94-2.04 212.02-1.45Q211.10-0.86 210.05-0.48Q209.00-0.10 207.88 0.09Q206.76 0.28 205.66 0.28L205.66 0.28Q203.56 0.28 201.79-0.43Q200.02-1.14 198.73-2.51Q197.44-3.88 196.72-5.90Q196.00-7.92 196.00-10.54L196.00-10.54Q196.00-12.66 196.65-14.50Q197.30-16.34 198.52-17.69Q199.74-19.04 201.50-19.81Q203.26-20.58 205.46-20.58ZM205.54-17.96L205.54-17.96Q202.96-17.96 201.48-16.47Q200.00-14.98 199.64-12.34L199.64-12.34L210.66-12.34Q210.66-13.58 210.32-14.61Q209.98-15.64 209.32-16.39Q208.66-17.14 207.71-17.55Q206.76-17.96 205.54-17.96Z M238.74-10.72L234.14-10.72L234.14 0L230.28 0L230.28-28.66L238.74-28.66Q241.46-28.66 243.47-28.03Q245.48-27.40 246.80-26.24Q248.12-25.08 248.77-23.44Q249.42-21.80 249.42-19.78L249.42-19.78Q249.42-17.78 248.72-16.12Q248.02-14.46 246.67-13.26Q245.32-12.06 243.32-11.39Q241.32-10.72 238.74-10.72L238.74-10.72ZM234.14-25.60L234.14-13.80L238.74-13.80Q240.40-13.80 241.67-14.24Q242.94-14.68 243.80-15.47Q244.66-16.26 245.10-17.36Q245.54-18.46 245.54-19.78L245.54-19.78Q245.54-22.52 243.85-24.06Q242.16-25.60 238.74-25.60L238.74-25.60L234.14-25.60Z M262.78-20.58L262.78-20.58Q264.60-20.58 266.14-19.97Q267.68-19.36 268.80-18.21Q269.92-17.06 270.55-15.37Q271.18-13.68 271.18-11.52L271.18-11.52Q271.18-10.68 271-10.40Q270.82-10.12 270.32-10.12L270.32-10.12L256.84-10.12Q256.88-8.20 257.36-6.78Q257.84-5.36 258.68-4.41Q259.52-3.46 260.68-2.99Q261.84-2.52 263.28-2.52L263.28-2.52Q264.62-2.52 265.59-2.83Q266.56-3.14 267.26-3.50Q267.96-3.86 268.43-4.17Q268.90-4.48 269.24-4.48L269.24-4.48Q269.68-4.48 269.92-4.14L269.92-4.14L270.92-2.84Q270.26-2.04 269.34-1.45Q268.42-0.86 267.37-0.48Q266.32-0.10 265.20 0.09Q264.08 0.28 262.98 0.28L262.98 0.28Q260.88 0.28 259.11-0.43Q257.34-1.14 256.05-2.51Q254.76-3.88 254.04-5.90Q253.32-7.92 253.32-10.54L253.32-10.54Q253.32-12.66 253.97-14.50Q254.62-16.34 255.84-17.69Q257.06-19.04 258.82-19.81Q260.58-20.58 262.78-20.58ZM262.86-17.96L262.86-17.96Q260.28-17.96 258.80-16.47Q257.32-14.98 256.96-12.34L256.96-12.34L267.98-12.34Q267.98-13.58 267.64-14.61Q267.30-15.64 266.64-16.39Q265.98-17.14 265.03-17.55Q264.08-17.96 262.86-17.96Z M280.88 0L277.32 0L277.32-20.26L279.36-20.26Q279.94-20.26 280.16-20.04Q280.38-19.82 280.46-19.28L280.46-19.28L280.70-16.12Q281.74-18.24 283.27-19.43Q284.80-20.62 286.86-20.62L286.86-20.62Q287.70-20.62 288.38-20.43Q289.06-20.24 289.64-19.90L289.64-19.90L289.18-17.24Q289.04-16.74 288.56-16.74L288.56-16.74Q288.28-16.74 287.70-16.93Q287.12-17.12 286.08-17.12L286.08-17.12Q284.22-17.12 282.97-16.04Q281.72-14.96 280.88-12.90L280.88-12.90L280.88 0Z M299.42 0L295.84 0L295.84-17.22L293.60-17.48Q293.18-17.58 292.91-17.79Q292.64-18 292.64-18.40L292.64-18.40L292.64-19.86L295.84-19.86L295.84-21.82Q295.84-23.56 296.33-24.91Q296.82-26.26 297.73-27.19Q298.64-28.12 299.92-28.60Q301.20-29.08 302.80-29.08L302.80-29.08Q304.16-29.08 305.32-28.68L305.32-28.68L305.24-26.90Q305.22-26.50 304.90-26.42Q304.58-26.34 304-26.34L304-26.34L303.38-26.34Q302.46-26.34 301.71-26.10Q300.96-25.86 300.42-25.32Q299.88-24.78 299.59-23.90Q299.30-23.02 299.30-21.72L299.30-21.72L299.30-19.86L305.16-19.86L305.16-17.28L299.42-17.28L299.42 0Z M318.32-20.58L318.32-20.58Q320.54-20.58 322.33-19.84Q324.12-19.10 325.37-17.74Q326.62-16.38 327.29-14.45Q327.96-12.52 327.96-10.14L327.96-10.14Q327.96-7.74 327.29-5.82Q326.62-3.90 325.37-2.54Q324.12-1.18 322.33-0.45Q320.54 0.28 318.32 0.28L318.32 0.28Q316.10 0.28 314.31-0.45Q312.52-1.18 311.26-2.54Q310.00-3.90 309.32-5.82Q308.64-7.74 308.64-10.14L308.64-10.14Q308.64-12.52 309.32-14.45Q310.00-16.38 311.26-17.74Q312.52-19.10 314.31-19.84Q316.10-20.58 318.32-20.58ZM318.32-2.50L318.32-2.50Q321.32-2.50 322.80-4.51Q324.28-6.52 324.28-10.12L324.28-10.12Q324.28-13.74 322.80-15.76Q321.32-17.78 318.32-17.78L318.32-17.78Q316.80-17.78 315.68-17.26Q314.56-16.74 313.81-15.76Q313.06-14.78 312.69-13.35Q312.32-11.92 312.32-10.12L312.32-10.12Q312.32-8.32 312.69-6.90Q313.06-5.48 313.81-4.51Q314.56-3.54 315.68-3.02Q316.80-2.50 318.32-2.50Z M337.52 0L333.96 0L333.96-20.26L336.00-20.26Q336.58-20.26 336.80-20.04Q337.02-19.82 337.10-19.28L337.10-19.28L337.34-16.12Q338.38-18.24 339.91-19.43Q341.44-20.62 343.50-20.62L343.50-20.62Q344.34-20.62 345.02-20.43Q345.70-20.24 346.28-19.90L346.28-19.90L345.82-17.24Q345.68-16.74 345.20-16.74L345.20-16.74Q344.92-16.74 344.34-16.93Q343.76-17.12 342.72-17.12L342.72-17.12Q340.86-17.12 339.61-16.04Q338.36-14.96 337.52-12.90L337.52-12.90L337.52 0Z M355.24 0L351.68 0L351.68-20.26L353.80-20.26Q354.56-20.26 354.76-19.52L354.76-19.52L355.02-17.44Q356.14-18.82 357.53-19.70Q358.92-20.58 360.76-20.58L360.76-20.58Q362.82-20.58 364.09-19.44Q365.36-18.30 365.92-16.36L365.92-16.36Q366.34-17.46 367.03-18.26Q367.72-19.06 368.58-19.58Q369.44-20.10 370.41-20.34Q371.38-20.58 372.38-20.58L372.38-20.58Q373.98-20.58 375.23-20.07Q376.48-19.56 377.35-18.58Q378.22-17.60 378.68-16.17Q379.14-14.74 379.14-12.90L379.14-12.90L379.14 0L375.58 0L375.58-12.90Q375.58-15.28 374.54-16.51Q373.50-17.74 371.52-17.74L371.52-17.74Q370.64-17.74 369.85-17.43Q369.06-17.12 368.46-16.52Q367.86-15.92 367.51-15.01Q367.16-14.10 367.16-12.90L367.16-12.90L367.16 0L363.60 0L363.60-12.90Q363.60-15.34 362.62-16.54Q361.64-17.74 359.76-17.74L359.76-17.74Q358.44-17.74 357.31-17.03Q356.18-16.32 355.24-15.10L355.24-15.10L355.24 0Z M401.00-12.96L401.00 0L399.42 0Q398.90 0 398.58-0.16Q398.26-0.32 398.16-0.84L398.16-0.84L397.76-2.72Q396.96-2 396.20-1.43Q395.44-0.86 394.60-0.47Q393.76-0.08 392.81 0.12Q391.86 0.32 390.70 0.32L390.70 0.32Q389.52 0.32 388.49-0.01Q387.46-0.34 386.70-1Q385.94-1.66 385.49-2.67Q385.04-3.68 385.04-5.06L385.04-5.06Q385.04-6.26 385.70-7.37Q386.36-8.48 387.83-9.34Q389.30-10.20 391.68-10.75Q394.06-11.30 397.50-11.38L397.50-11.38L397.50-12.96Q397.50-15.32 396.49-16.53Q395.48-17.74 393.50-17.74L393.50-17.74Q392.20-17.74 391.31-17.41Q390.42-17.08 389.77-16.67Q389.12-16.26 388.65-15.93Q388.18-15.60 387.72-15.60L387.72-15.60Q387.36-15.60 387.09-15.79Q386.82-15.98 386.66-16.26L386.66-16.26L386.02-17.40Q387.70-19.02 389.64-19.82Q391.58-20.62 393.94-20.62L393.94-20.62Q395.64-20.62 396.96-20.06Q398.28-19.50 399.18-18.50Q400.08-17.50 400.54-16.08Q401.00-14.66 401.00-12.96L401.00-12.96ZM391.76-2.18L391.76-2.18Q392.70-2.18 393.48-2.37Q394.26-2.56 394.95-2.91Q395.64-3.26 396.27-3.76Q396.90-4.26 397.50-4.90L397.50-4.90L397.50-9.12Q395.04-9.04 393.32-8.73Q391.60-8.42 390.52-7.92Q389.44-7.42 388.95-6.74Q388.46-6.06 388.46-5.22L388.46-5.22Q388.46-4.42 388.72-3.84Q388.98-3.26 389.42-2.89Q389.86-2.52 390.46-2.35Q391.06-2.18 391.76-2.18Z M411.56 0L408.00 0L408.00-20.26L410.12-20.26Q410.88-20.26 411.08-19.52L411.08-19.52L411.36-17.32Q412.68-18.78 414.31-19.68Q415.94-20.58 418.08-20.58L418.08-20.58Q419.74-20.58 421.01-20.03Q422.28-19.48 423.13-18.47Q423.98-17.46 424.42-16.04Q424.86-14.62 424.86-12.90L424.86-12.90L424.86 0L421.30 0L421.30-12.90Q421.30-15.20 420.25-16.47Q419.20-17.74 417.04-17.74L417.04-17.74Q415.46-17.74 414.09-16.98Q412.72-16.22 411.56-14.92L411.56-14.92L411.56 0Z M446.60-17.94L445.66-16.66Q445.50-16.44 445.34-16.32Q445.18-16.20 444.88-16.20L444.88-16.20Q444.58-16.20 444.23-16.45Q443.88-16.70 443.34-17Q442.80-17.30 442.03-17.55Q441.26-17.80 440.14-17.80L440.14-17.80Q438.66-17.80 437.52-17.27Q436.38-16.74 435.61-15.74Q434.84-14.74 434.45-13.32Q434.06-11.90 434.06-10.14L434.06-10.14Q434.06-8.30 434.48-6.87Q434.90-5.44 435.66-4.47Q436.42-3.50 437.51-2.99Q438.60-2.48 439.96-2.48L439.96-2.48Q441.26-2.48 442.10-2.79Q442.94-3.10 443.50-3.48Q444.06-3.86 444.42-4.17Q444.78-4.48 445.14-4.48L445.14-4.48Q445.60-4.48 445.82-4.14L445.82-4.14L446.82-2.84Q445.50-1.22 443.52-0.47Q441.54 0.28 439.34 0.28L439.34 0.28Q437.44 0.28 435.81-0.42Q434.18-1.12 432.98-2.45Q431.78-3.78 431.09-5.72Q430.40-7.66 430.40-10.14L430.40-10.14Q430.40-12.40 431.03-14.32Q431.66-16.24 432.87-17.63Q434.08-19.02 435.86-19.80Q437.64-20.58 439.94-20.58L439.94-20.58Q442.06-20.58 443.70-19.89Q445.34-19.20 446.60-17.94L446.60-17.94Z M460.14-20.58L460.14-20.58Q461.96-20.58 463.50-19.97Q465.04-19.36 466.16-18.21Q467.28-17.06 467.91-15.37Q468.54-13.68 468.54-11.52L468.54-11.52Q468.54-10.68 468.36-10.40Q468.18-10.12 467.68-10.12L467.68-10.12L454.20-10.12Q454.24-8.20 454.72-6.78Q455.20-5.36 456.04-4.41Q456.88-3.46 458.04-2.99Q459.20-2.52 460.64-2.52L460.64-2.52Q461.98-2.52 462.95-2.83Q463.92-3.14 464.62-3.50Q465.32-3.86 465.79-4.17Q466.26-4.48 466.60-4.48L466.60-4.48Q467.04-4.48 467.28-4.14L467.28-4.14L468.28-2.84Q467.62-2.04 466.70-1.45Q465.78-0.86 464.73-0.48Q463.68-0.10 462.56 0.09Q461.44 0.28 460.34 0.28L460.34 0.28Q458.24 0.28 456.47-0.43Q454.70-1.14 453.41-2.51Q452.12-3.88 451.40-5.90Q450.68-7.92 450.68-10.54L450.68-10.54Q450.68-12.66 451.33-14.50Q451.98-16.34 453.20-17.69Q454.42-19.04 456.18-19.81Q457.94-20.58 460.14-20.58ZM460.22-17.96L460.22-17.96Q457.64-17.96 456.16-16.47Q454.68-14.98 454.32-12.34L454.32-12.34L465.34-12.34Q465.34-13.58 465.00-14.61Q464.66-15.64 464.00-16.39Q463.34-17.14 462.39-17.55Q461.44-17.96 460.22-17.96Z"/></g>
+</svg>
+</g><g opacity="1" transform="rotate(0 425.6764 434.0403)">
+<svg width="294.6473" height="29.1137" x="425.6764" y="434.0403" version="1.1" preserveAspectRatio="none" viewBox="1.72 -26.8 275.28 27.200000000000003">
+  <g transform="matrix(1 0 0 1 0 0)" class="companyName"><path id="id-D6z1nYkh10" d="M19.76 0L7.48 0L7.48-0.64L11.52-2.24L11.52-24.20L5.20-24.20L2.36-18.16L1.72-18.16L1.72-26.40L25.48-26.40L25.48-18.16L24.84-18.16L22.04-24.20L15.68-24.20L15.68-2.24L19.76-0.64L19.76 0Z M43.56 0.40L43.56 0.40Q40.48 0.40 38.04-0.72Q35.60-1.84 34.22-4.24Q32.84-6.64 32.84-10.52L32.84-10.52L32.84-24.16L29.60-25.76L29.60-26.40L40.28-26.40L40.28-25.76L37.04-24.16L37.04-10.96Q37.04-7.64 38.08-5.70Q39.12-3.76 40.88-2.92Q42.64-2.08 44.84-2.08L44.84-2.08Q46.60-2.08 48.10-2.82Q49.60-3.56 50.50-5.22Q51.40-6.88 51.40-9.56L51.40-9.56L51.40-24.24L47.48-25.76L47.48-26.40L57.44-26.40L57.44-25.76L54.20-24.20L54.20-10.52Q54.20-6.64 52.82-4.24Q51.44-1.84 49.04-0.72Q46.64 0.40 43.56 0.40Z M72.24 0L62.08 0L62.08-0.64L65.32-2.24L65.32-24.08L62.12-25.76L62.12-26.40L68.40-26.40L83.72-7.56L83.72-24.20L79.60-25.76L79.60-26.40L89.72-26.40L89.72-25.76L86.52-24.20L86.52 0.20L84.80 0.20L68.12-20.28L68.12-2.20L72.24-0.64L72.24 0Z M115.56 0L94.36 0L94.36-0.64L97.60-2.24L97.60-24.16L94.36-25.76L94.36-26.40L114.44-26.40L114.44-19.52L113.80-19.52L111.20-24.20L101.80-24.20L101.80-14.72L108.44-14.72L110.48-18.08L111.12-18.08L111.12-9.24L110.48-9.24L108.44-12.52L101.80-12.52L101.80-2.20L112.28-2.20L114.92-7.48L115.56-7.48L115.56 0Z M132.60 0L120.72 0L120.72-0.64L123.96-2.24L123.96-24.16L120.72-25.76L120.72-26.40L132.88-26.40Q137.36-26.40 140.52-24.84Q143.68-23.28 145.34-20.56Q147-17.84 147-14.40L147-14.40Q147-11.28 145.92-8.64Q144.84-6 142.90-4.08Q140.96-2.16 138.34-1.08Q135.72 0 132.60 0L132.60 0ZM131.80-24.20L131.80-24.20L128.16-24.20L128.16-2.20L132.40-2.20Q135.60-2.20 137.88-3.54Q140.16-4.88 141.40-7.34Q142.64-9.80 142.64-13.16L142.64-13.16Q142.64-16.48 141.38-18.98Q140.12-21.48 137.70-22.84Q135.28-24.20 131.80-24.20Z M179.92 0L168.56 0L168.56-0.64L172.16-2.24L172.16-12.32L163.32-24.36L160.80-25.76L160.80-26.40L171.12-26.40L171.12-25.76L168.20-24.32L168.20-24.16L175.28-14.52L181.68-24.12L181.68-24.28L178.72-25.76L178.72-26.40L187.36-26.40L187.36-25.76L184.76-24.44L176.32-12.36L176.32-2.24L179.92-0.64L179.92 0Z M204.68 0.40L204.68 0.40Q201.80 0.40 199.34-0.62Q196.88-1.64 195.06-3.46Q193.24-5.28 192.24-7.76Q191.24-10.24 191.24-13.20L191.24-13.20Q191.24-16.16 192.24-18.64Q193.24-21.12 195.06-22.94Q196.88-24.76 199.34-25.78Q201.80-26.80 204.68-26.80L204.68-26.80Q207.56-26.80 210.02-25.78Q212.48-24.76 214.30-22.94Q216.12-21.12 217.14-18.64Q218.16-16.16 218.16-13.20L218.16-13.20Q218.16-10.24 217.14-7.76Q216.12-5.28 214.30-3.46Q212.48-1.64 210.02-0.62Q207.56 0.40 204.68 0.40ZM205.48-1.60L205.48-1.60Q207.92-1.60 209.76-2.88Q211.60-4.16 212.64-6.48Q213.68-8.80 213.68-11.96L213.68-11.96Q213.68-15.84 212.40-18.74Q211.12-21.64 208.92-23.24Q206.72-24.84 204.04-24.84L204.04-24.84Q201.60-24.84 199.72-23.58Q197.84-22.32 196.78-20Q195.72-17.68 195.72-14.52L195.72-14.52Q195.72-10.64 197.02-7.72Q198.32-4.80 200.54-3.20Q202.76-1.60 205.48-1.60Z M240.52 0L228.24 0L228.24-0.64L232.28-2.24L232.28-24.20L225.96-24.20L223.12-18.16L222.48-18.16L222.48-26.40L246.24-26.40L246.24-18.16L245.60-18.16L242.80-24.20L236.44-24.20L236.44-2.24L240.52-0.64L240.52 0Z M257.80 0L249.16 0L249.16-0.64L251.68-1.96L261.96-26.60L264.16-26.60L274.32-2.08L277-0.64L277 0L266.44 0L266.44-0.64L269.96-2.04L267-9.24L257.36-9.24L254.44-2L257.80-0.64L257.80 0ZM262.20-21.08L258.28-11.44L266.12-11.44L262.20-21.08Z"/></g>
+</svg>
+</g></svg>
+  </div>
+
+  <div class="tf-crumb" id="crumb"></div>
+  <div class="tf-prog" id="prog"></div>
+
+  <!-- 0 · MAKE -->
+  <section class="tf-step active" data-step="0">
+    <div class="tf-eyebrow">Find Your Exact Tune</div>
+    <h2 class="tf-h">Let's match your build.</h2>
+    <p class="tf-sub">A few quick taps and we'll confirm the exact calibration for your Toyota or Lexus — then get you booked at an event near you.</p>
+    <div class="tf-grid two">
+      <div class="tf-opt" data-make="Toyota">Toyota</div>
+      <div class="tf-opt" data-make="Lexus">Lexus</div>
+    </div>
+    <p class="tf-foot">Already know what you need? <a class="tf-link" href="tel:+16124067117">Call or text (612)&nbsp;406-7117</a></p>
+  </section>
+
+  <!-- 1 · MODEL -->
+  <section class="tf-step" data-step="1">
+    <div class="tf-eyebrow" id="eb1">Toyota</div>
+    <h2 class="tf-h">Which model?</h2>
+    <div class="tf-grid auto" id="modelGrid"></div>
+    <div class="tf-nav"><button class="tf-back" data-goto="0">← Back</button></div>
+  </section>
+
+  <!-- 2 · CONFIG (year/engine) -->
+  <section class="tf-step" data-step="2">
+    <div class="tf-eyebrow" id="eb2"></div>
+    <h2 class="tf-h">Year &amp; engine?</h2>
+    <p class="tf-sub">Only configurations we actually calibrate are shown.</p>
+    <div class="tf-grid auto" id="cfgGrid"></div>
+    <div class="tf-nav"><button class="tf-back" data-goto="1">← Back</button></div>
+  </section>
+
+  <!-- 3 · GOALS -->
+  <section class="tf-step" data-step="3">
+    <div class="tf-eyebrow">Your priorities</div>
+    <h2 class="tf-h">What are you after?</h2>
+    <p class="tf-sub">Tap anything that fits — or skip ahead.</p>
+    <div class="tf-chips" id="goalChips"></div>
+    <div class="tf-nav">
+      <button class="tf-back" data-goto="2">← Back</button>
+      <button class="btn primary" id="toResult">See my recommendation →</button>
+    </div>
+  </section>
+
+  <!-- 4 · RESULT -->
+  <section class="tf-step" data-step="4">
+    <div class="tf-confirm">
+      <div class="tick">✓</div>
+      <h3>Yes — we calibrate your <span class="veh" id="cVeh"></span>.</h3>
+      <div class="note" id="cNote"></div>
+    </div>
+    <div id="resultCards"></div>
+    <div class="tf-trust">
+      <div class="lead">No one has calibrated more forced-induction Toyota applications than OTT.</div>
+      <ul>
+        <li>Factory emissions systems stay fully intact — EPA-compliant in every state.</li>
+        <li>Every calibration is verified with a 5-gas analyzer during drive-cycle testing.</li>
+        <li>Tuned by a licensed VFTuner PRO Tuner using the full Toyota/Lexus toolset.</li>
+        <li>We never disable check-engine lights, and we don't tune off-road-only vehicles.</li>
+      </ul>
+    </div>
+    <div class="tf-cta-row">
+      <button class="btn primary" id="toBook">Book at an Event →</button>
+      <a class="btn sage" href="tel:+16124067117">Call / Text (612) 406-7117</a>
+    </div>
+    <p class="tf-disc">Prices shown are suggested starting prices; your final quote is confirmed at booking. CARB-compliant options are available where applicable, and 2003\u20132004 ECUs are supported via K-Line from $400. All vehicles must retain fully intact, federally compliant emissions systems.</p>
+    <div class="tf-nav"><button class="tf-back" data-goto="3">← Adjust priorities</button></div>
+  </section>
+
+  <!-- 5 · BOOK / LEAD -->
+  <section class="tf-step" data-step="5">
+    <div class="tf-eyebrow">Reserve your spot</div>
+    <h2 class="tf-h">Book at an event.</h2>
+    <p class="tf-sub">Pick your market on the map to meet your installer, then send your details and we'll confirm your event date and calibration. Prefer to talk? Reach your installer directly below.</p>
+
+    <div id="tyMapWrap"><div id="tyMap"></div></div>
+    <div class="tf-mktbar" id="mktBar"></div>
+    <div class="tf-mktlist" id="mktList"></div>
+    <p class="tf-mapcap">Select a market, then send your request. Tuned Yota confirms platform, model year, engine, tire size, modifications, event availability, and final calibration support.</p>
+
+    <div class="tf-inst" id="instCard">
+      <img id="instPhoto" alt="" src="">
+      <div class="ibody">
+        <div class="ieyebrow">Meet your installer</div>
+        <h4 id="instName"></h4>
+        <div class="ireg" id="instReg"></div>
+        <p id="instBio"></p>
+        <div class="iacts">
+          <a class="tf-iphone" id="instCall">Call</a>
+          <a class="tf-itext" id="instText">Text</a>
+          <a class="tf-iemail" id="instEmail">Email</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="tf-call">
+      <a class="btn primary" href="tel:+16124067117">📞 Call (612) 406-7117</a>
+      <a class="btn outline" href="sms:+16124067117">💬 Text us</a>
+    </div>
+
+    <div class="tf-or">or send a request</div>
+
+    <div id="leadForm">
+      <div class="tf-field">
+        <label>Selected market</label>
+        <input id="fLoc" type="text" readonly placeholder="Select a market on the map above">
+      </div>
+      <div class="tf-row2">
+        <div class="tf-field"><label>Name</label><input id="fName" type="text" autocomplete="name" placeholder="Your name"></div>
+        <div class="tf-field"><label>Phone</label><input id="fPhone" type="tel" autocomplete="tel" placeholder="(___) ___-____"></div>
+      </div>
+      <div class="tf-field"><label>Email</label><input id="fEmail" type="email" autocomplete="email" placeholder="you@email.com"></div>
+      <div class="tf-field"><label>Your vehicle</label><input id="fVeh" type="text" readonly></div>
+      <div class="tf-field"><label>Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
+      <button class="btn primary" id="fSubmit" style="width:100%">Send My Request →</button>
+      <p id="fErr" style="color:#9b4a3a;font-size:13px;text-align:center;margin-top:10px;display:none">Please add your name and a phone or email so we can reach you.</p>
+    </div>
+
+    <div class="tf-success" id="leadSuccess">
+      <div class="tick">✓</div>
+      <h3>Request sent.</h3>
+      <p id="successMsg">We'll be in touch shortly to confirm your appointment.</p>
+      <a class="btn sage" href="tel:+16124067117" style="margin-top:14px">Call now to book faster</a>
+      <div class="srow" style="margin-top:14px;display:grid;gap:9px">
+        <a class="btn primary" href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Follow our Facebook</a>
+        <a class="btn outline" href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Join the Midwest Tuning Group</a>
+      </div>
+    </div>
+
+    <div class="tf-social">
+      <h4>Stay in the loop</h4>
+      <p>Follow along for event dates, builds, and Q&amp;A with the team.</p>
+      <div class="srow">
+        <a class="btn primary" href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Follow our Facebook</a>
+        <a class="btn outline" href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Join the Midwest Tuning Group</a>
+      </div>
+    </div>
+    <p class="tf-foot">Questions? <a class="tf-link" href="mailto:info@tunedyota.com">info@tunedyota.com</a></p>
+    <div class="tf-nav"><button class="tf-back" data-goto="4">← Back</button></div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   ▼▼▼  EDIT YOUR DATA HERE — nothing else needs to change  ▼▼▼
+   ============================================================ */
+
+/* (1) LEAD DELIVERY ------------------------------------------------
+   Leave blank to use the e-mail fallback (opens the customer's mail
+   app addressed to info@tunedyota.com).  For real lead capture into
+   a dashboard + auto-email, paste a free Formspree endpoint here, e.g.
+   "https://formspree.io/f/abcdwxyz".  (Setup: formspree.io → new form.) */
+const LEAD_ENDPOINT = "";
+const LEAD_EMAIL    = "info@tunedyota.com";
+
+/* (2) INSTALLERS — bio, photo, and direct contact. Edit freely. */
+const INSTALLERS = {
+  aaron:{name:"Aaron Groshong", phone:"612-406-7117", email:"info@tunedyota.com",
+    region:"Minnesota, Iowa, Fargo, Eau Claire & Madison",
+    photo:"images/aaron-groshong.jpg",
+    bio:"Founder of Tuned Yota and a licensed VFTuner PRO Tuner. People-first and detail-obsessed \u2014 he gets to know you and your truck before tailoring the calibration. A lifelong builder, from award-winning Mitsubishi builds and competition car audio to the Toyota Supra, Tacoma, and Tundra."},
+  noah:{name:"Noah Kreis", phone:"920-860-7050", email:"noah@tunedyota.com",
+    region:"Wisconsin (except Eau Claire & Madison)",
+    photo:"images/noah-kreis.jpg",
+    bio:"Licensed VFTuner PRO Tuner with 8 years across EcoBoost, LS, and BMW platforms. An electrical background gives him an edge in EFI tuning and troubleshooting \u2014 and he'll happily walk you through exactly how your truck performs after the tune."},
+  cody:{name:"Cody Star", phone:"605-214-1335", email:"cody@tunedyota.com",
+    region:"Sioux Falls, Rapid City & Omaha",
+    photo:"images/cody-star.jpg",
+    bio:"Toyota master technician and licensed VFTuner PRO Tuner who works the Toyota platform exclusively. Known for prompt, efficient service and meticulous attention to detail that protects your vehicle's longevity and performance."}
+};
+
+/* (3) EVENT MARKETS — map + list. `inst` ties each market to an installer above.
+   Optional: add a `date` field (e.g. date:"Apr 11") to show it in the list. */
+const MARKETS = [
+  {city:"Duluth",       state:"MN", lat:46.7867, lng:-92.1005,  inst:"aaron"},
+  {city:"Twin Cities",  state:"MN", lat:44.9778, lng:-93.2650,  inst:"aaron"},
+  {city:"Mankato",      state:"MN", lat:44.1636, lng:-93.9994,  inst:"aaron"},
+  {city:"Rochester",    state:"MN", lat:44.0121, lng:-92.4802,  inst:"aaron"},
+  {city:"Eau Claire",   state:"WI", lat:44.8113, lng:-91.4985,  inst:"aaron"},
+  {city:"Green Bay",    state:"WI", lat:44.5133, lng:-88.0133,  inst:"noah"},
+  {city:"Madison",      state:"WI", lat:43.0731, lng:-89.4012,  inst:"aaron"},
+  {city:"Milwaukee",    state:"WI", lat:43.0389, lng:-87.9065,  inst:"noah"},
+  {city:"Des Moines",   state:"IA", lat:41.5868, lng:-93.6250,  inst:"aaron"},
+  {city:"Cedar Rapids", state:"IA", lat:41.9779, lng:-91.6656,  inst:"aaron"},
+  {city:"Davenport",    state:"IA", lat:41.5236, lng:-90.5776,  inst:"aaron"},
+  {city:"Fargo",        state:"ND", lat:46.8772, lng:-96.7898,  inst:"aaron"},
+  {city:"Rapid City",   state:"SD", lat:44.0805, lng:-103.2310, inst:"cody"},
+  {city:"Sioux Falls",  state:"SD", lat:43.5446, lng:-96.7311,  inst:"cody"},
+  {city:"Omaha",        state:"NE", lat:41.2565, lng:-95.9345,  inst:"cody"}
+];
+const STATE_ORDER=["All","MN","WI","IA","ND","SD","NE"];
+
+/* (4) SOCIAL — Facebook page + group invites. */
+const FB_PAGE="https://www.facebook.com/TunedYota/";
+const FB_GROUP="https://www.facebook.com/groups/501008078456222";
+
+/* (3) VEHICLES — verified from tunedyota.com/services.
+   Pricing from the OTT price sheet (Suggested Price). Each config:
+   {y, e, base, custom?, sc?, turbo?, fi, carb?}.  Edit prices here. */
+const VEHICLES = {"Toyota":{"Tacoma":[{"y":"2025+","e":"2.4L-T I4","base":650,"fi":true,"custom":800,"sc":950,"turbo":true},{"y":"2016-2023","e":"3.5L V6","base":500,"fi":true,"custom":550,"sc":600,"turbo":false,"carb":"Naturally-aspirated calibration carries CARB EO D-883."},{"y":"2016-2023","e":"2.7L I4","base":450,"fi":false,"custom":500},{"y":"2005-2015","e":"4.0L V6","base":450,"fi":true,"custom":500,"sc":550,"turbo":false},{"y":"2005-2015","e":"2.7L I4","base":450,"fi":false,"custom":500}],"4Runner":[{"y":"2025+","e":"2.4L-T I4","base":650,"fi":true,"custom":800,"sc":950,"turbo":true},{"y":"2020-2024","e":"4.0L V6","base":600,"fi":true,"custom":700,"sc":750,"turbo":false},{"y":"2010-2019","e":"4.0L V6","base":500,"fi":true,"custom":600,"sc":750,"turbo":false},{"y":"2005-2009","e":"4.0L V6 / 4.7L V8","base":400,"fi":true,"custom":550,"sc":650,"turbo":false}],"FJ Cruiser":[{"y":"2010-2014","e":"4.0L V6","base":450,"fi":true,"custom":600,"sc":600,"turbo":false},{"y":"2007-2009","e":"4.0L V6","base":450,"fi":true,"custom":500,"sc":600,"turbo":false},{"y":"2007-2008","e":"4.0L V6","base":450,"fi":true,"custom":550,"sc":600,"turbo":false}],"Tundra":[{"y":"All years","e":"4.0L V6","base":500,"fi":false,"custom":550},{"y":"All years","e":"4.7L V8","base":500,"fi":false,"custom":550},{"y":"All years","e":"4.6L V8","base":500,"fi":false,"custom":550},{"y":"2007-2021","e":"5.7L V8","base":500,"fi":true,"custom":550,"sc":850,"turbo":false}],"Sequoia":[{"y":"All years","e":"4.7L V8","base":500,"fi":false,"custom":550},{"y":"All years","e":"4.6L V8","base":500,"fi":false,"custom":550},{"y":"2008-2022","e":"5.7L V8","base":500,"fi":true,"custom":550,"sc":850,"turbo":false}],"Land Cruiser":[{"y":"2025+","e":"2.4L-T I4","base":650,"fi":true,"custom":800,"sc":950,"turbo":true},{"y":"2016-2021","e":"5.7L V8","base":550,"fi":true,"custom":700,"sc":850,"turbo":false},{"y":"2008-2015","e":"5.7L V8","base":550,"fi":true,"sc":850,"turbo":false},{"y":"2006-2007","e":"4.7L V8","base":550,"fi":false}],"RAV4":[{"y":"2006-2012","e":"3.5L V6","base":450,"fi":false,"custom":550}],"Highlander":[{"y":"2017-2019","e":"3.5L V6","base":450,"fi":false},{"y":"2008-2016","e":"3.5L V6","base":450,"fi":false,"custom":550}],"Camry":[{"y":"2018-2024","e":"3.5L V6","base":450,"fi":false},{"y":"2007-2017","e":"3.5L V6","base":450,"fi":false,"custom":550}]},"Lexus":{"GX":[{"y":"2019+","e":"4.6L V8","base":600,"fi":false,"custom":750},{"y":"2010-2018","e":"4.6L V8","base":500,"fi":false,"custom":550},{"y":"2005-2009","e":"4.7L V8","base":500,"fi":false,"custom":550}],"RX350":[{"y":"2015-2022","e":"3.5L V6","base":450,"fi":false},{"y":"2006-2012","e":"3.5L V6","base":450,"fi":false,"custom":550}],"LS460":[{"y":"2007-2017","e":"4.6L V8","base":450,"fi":false,"custom":550}],"LX570":[{"y":"2008-2021","e":"5.7L V8","base":500,"fi":false}]}};
+
+/* (4) GOALS — chip → benefit line on the result screen. */
+const GOALS=[
+  {id:"power", l:"More power & torque",          b:"Stronger, more usable power and torque across the rev range."},
+  {id:"shift", l:"Better shifting / rev-hang",   b:"Improved shift behavior, reduced gear hunting, and rev-hang delete where supported."},
+  {id:"tow",   l:"Towing confidence",            b:"Steadier power delivery and smarter shift logic under load."},
+  {id:"tires", l:"Larger tires / overland",      b:"Restored drivability after larger tires, lift, armor, and added weight."},
+  {id:"daily", l:"Sharper daily response",       b:"Crisper throttle response for everyday driving."},
+  {id:"max",   l:"Maximum power (supercharger)", b:"Forced-induction power with a calibration matched to the system."}
+];
+
+/* ============================================================
+   ▲▲▲  END EDITABLE DATA  ▲▲▲
+   ============================================================ */
+
+const S={make:null,model:null,cfg:null,goals:new Set(),market:"",marketIndex:null,installer:""};
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const prog=$("#prog"); for(let i=0;i<6;i++){let e=document.createElement("i");prog.appendChild(e);}
+
+function go(n){
+  $$(".tf-step").forEach(el=>el.classList.toggle("active",+el.dataset.step===n));
+  [...prog.children].forEach((d,i)=>d.className=i<n?"done":(i===n?"on":""));
+  renderCrumb(n);
+  $("#tf").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function renderCrumb(n){
+  const c=$("#crumb");
+  if(n===0||!S.make){c.classList.remove("show");c.innerHTML="";return;}
+  c.classList.add("show");let h="";
+  h+=`<button data-goto="1">${S.make}</button>`;
+  if(S.model){h+=`<span class="sep">›</span><button data-goto="2">${S.model}</button>`;}
+  if(S.cfg){h+=`<span class="sep">›</span><button data-goto="2">${S.cfg.y} · ${S.cfg.e}</button>`;}
+  c.innerHTML=h;
+  c.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>go(+b.dataset.goto));
+}
+
+/* make */
+$$("[data-make]").forEach(el=>el.onclick=()=>{
+  S.make=el.dataset.make;S.model=null;S.cfg=null;
+  $("#eb1").textContent=S.make;renderModels();go(1);
+});
+
+/* models */
+function renderModels(){
+  const g=$("#modelGrid");g.innerHTML="";
+  Object.keys(VEHICLES[S.make]).forEach(m=>{
+    const d=document.createElement("div");d.className="tf-opt";d.textContent=m;
+    d.onclick=()=>{S.model=m;S.cfg=null;$("#eb2").textContent=S.make+" "+m;renderCfg();go(2);};
+    g.appendChild(d);
+  });
+}
+
+/* configs */
+function renderCfg(){
+  const g=$("#cfgGrid");g.innerHTML="";
+  VEHICLES[S.make][S.model].forEach(cfg=>{
+    const d=document.createElement("div");d.className="tf-opt";
+    const badge=cfg.turbo?`<span class="fi">Turbo \u2713</span>`:(cfg.fi?`<span class="fi">Supercharger \u2713</span>`:"");
+    d.innerHTML=`${cfg.y}<small>${cfg.e} \u00b7 from $${cfg.base}</small>`+badge;
+    d.onclick=()=>{S.cfg=cfg;renderGoals();go(3);};
+    g.appendChild(d);
+  });
+}
+
+/* goals */
+function renderGoals(){
+  const w=$("#goalChips");w.innerHTML="";
+  GOALS.forEach(gl=>{
+    const c=document.createElement("div");
+    c.className="tf-chip"+(S.goals.has(gl.id)?" sel":"");c.textContent=gl.l;
+    c.onclick=()=>{S.goals.has(gl.id)?S.goals.delete(gl.id):S.goals.add(gl.id);c.classList.toggle("sel");};
+    w.appendChild(c);
+  });
+}
+$("#toResult").onclick=()=>{renderResult();go(4);};
+
+/* result */
+function vehStr(){return `${S.cfg.y} ${S.make} ${S.model} ${S.cfg.e}`.replace(/\s+\(KLine\)/,"").trim();}
+function renderResult(){
+  $("#cVeh").textContent=`${S.cfg.y} ${S.make} ${S.model}`;
+  $("#cNote").textContent=`${S.cfg.e}\u2002\u00b7\u2002OTT calibration`+(S.cfg.carb?`\u2002\u00b7\u2002${S.cfg.carb}`:"");
+
+  let chosen=[...S.goals]; if(!chosen.length) chosen=["power","shift","tires"];
+  const benefits=GOALS.filter(g=>chosen.includes(g.id)&&g.id!=="max").map(g=>g.b);
+
+  let rows=`<div class="price"><span>OTT Calibration</span><b>from $${S.cfg.base}</b></div>`;
+  if(S.cfg.custom) rows+=`<div class="price"><span>Custom Calibration <em>multiple log reviews</em></span><b>$${S.cfg.custom}</b></div>`;
+  if(S.cfg.sc) rows+=`<div class="price"><span>${S.cfg.turbo?"Turbo Performance Calibration":"Supercharger Calibration"}</span><b>from $${S.cfg.sc}</b></div>`;
+
+  const cards=$("#resultCards");
+  cards.innerHTML=`
+    <div class="card">
+      <div class="kicker">Recommended Calibration</div>
+      <h3>OTT Tune \u2014 ${S.make} ${S.model}</h3>
+      <p>A platform-specific calibration tuned for real-world drivability and delivered by a licensed VFTuner PRO Tuner \u2014 matched to your ${S.cfg.e} and how you actually drive.</p>
+      <ul class="tf-bul">${benefits.map(b=>`<li>${b}</li>`).join("")}</ul>
+      <div class="pricebox">${rows}</div>
+    </div>`;
+  if(S.cfg.fi){
+    const scTitle=S.cfg.turbo?"Turbo Performance Calibration":"Magnuson Supercharger + Calibration";
+    const scBody=S.cfg.turbo
+      ? `Your ${S.cfg.e} ${S.model} is factory turbocharged \u2014 a turbo performance calibration unlocks the biggest gains, dialed in by the most experienced forced-induction Toyota calibrator in the industry.`
+      : `Your ${S.model} supports forced induction. Pair a supercharger with a calibration built for the system to unlock the biggest gains \u2014 installed and calibrated in-house.`;
+    cards.innerHTML+=`
+    <div class="card">
+      <div class="kicker">Maximum Power Path</div>
+      <h3>${scTitle}</h3>
+      <p>${scBody}</p>
+      <div class="pricebox"><div class="price"><span>${S.cfg.turbo?"Turbo Performance":"Supercharger Calibration"}</span><b>from $${S.cfg.sc}</b></div></div>
+      ${S.cfg.turbo?"":'<div style="margin-top:12px"><span class="pill">Authorized Magnuson Retailer</span><span class="pill">Installer</span><span class="pill">Servicer</span><span class="pill">Calibrator</span></div>'}
+    </div>`;
+  }
+}
+$("#toBook").onclick=()=>{prepBooking();go(5);};
+$("#findInstaller")&&($("#findInstaller").onclick=()=>{prepBooking();go(5);});
+
+/* booking */
+let MAP=null,MARKERS={},mapInit=false,mktFilter="All";
+function pinIcon(active){
+  const f=active?"#3A2E26":"#99A08E";
+  return L.divIcon({className:"",iconSize:[26,34],iconAnchor:[13,34],
+    html:`<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg"><path d="M13 0C5.8 0 0 5.8 0 13c0 9.2 13 21 13 21s13-11.8 13-21C26 5.8 20.2 0 13 0z" fill="${f}" stroke="#fff" stroke-width="2"/><circle cx="13" cy="13" r="4.6" fill="#fff"/></svg>`});
+}
+function initMap(){
+  if(mapInit) return;
+  if(typeof L==="undefined"){ $("#tyMapWrap").style.display="none"; mapInit=true; return; }
+  mapInit=true;
+  MAP=L.map("tyMap",{scrollWheelZoom:false}).setView([44.4,-93.5],5.3);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"\u00a9 OpenStreetMap contributors"}).addTo(MAP);
+  MARKETS.forEach((m,i)=>{
+    const mk=L.marker([m.lat,m.lng],{icon:pinIcon(false)}).addTo(MAP);
+    mk.bindTooltip(`${m.city}, ${m.state}`,{direction:"top",offset:[0,-30]});
+    mk.on("click",()=>selectMarket(i));
+    MARKERS[i]=mk;
+  });
+  setTimeout(()=>MAP.invalidateSize(),250);
+}
+function renderBar(){
+  const states=STATE_ORDER.filter(s=>s==="All"||MARKETS.some(m=>m.state===s));
+  const bar=$("#mktBar"); bar.innerHTML="";
+  states.forEach(s=>{
+    const b=document.createElement("button"); b.textContent=s; if(s===mktFilter)b.className="on";
+    b.onclick=()=>{mktFilter=s;renderBar();renderList();};
+    bar.appendChild(b);
+  });
+}
+function renderList(){
+  const l=$("#mktList"); l.innerHTML="";
+  MARKETS.forEach((m,i)=>{
+    if(mktFilter!=="All"&&m.state!==mktFilter) return;
+    const b=document.createElement("div");
+    b.className="tf-mkt"+(S.marketIndex===i?" sel":""); b.dataset.i=i;
+    b.innerHTML=`${m.city}<small>${m.state}${m.date?" \u00b7 "+m.date:""}</small>`;
+    b.onclick=()=>selectMarket(i);
+    l.appendChild(b);
+  });
+}
+function selectMarket(i){
+  S.marketIndex=i; const m=MARKETS[i]; S.market=`${m.city}, ${m.state}`+(m.date?` (${m.date})`:"");
+  if(MAP){ Object.entries(MARKERS).forEach(([k,mk])=>mk.setIcon(pinIcon(+k===i))); MAP.flyTo([m.lat,m.lng],7,{duration:.6}); MARKERS[i].openTooltip(); }
+  $$("#mktList .tf-mkt").forEach(b=>b.classList.toggle("sel",+b.dataset.i===i));
+  $("#fLoc").value=S.market;
+  const inst=INSTALLERS[m.inst];
+  if(inst){
+    S.installer=inst.name;
+    const first=inst.name.split(" ")[0], tel="+1"+inst.phone.replace(/\D/g,"");
+    $("#instPhoto").src=inst.photo; $("#instPhoto").alt=inst.name;
+    $("#instName").textContent=inst.name;
+    $("#instReg").textContent="Covers "+inst.region;
+    $("#instBio").textContent=inst.bio;
+    $("#instCall").href="tel:"+tel; $("#instCall").textContent="Call "+first;
+    $("#instText").href="sms:"+tel; $("#instText").textContent="Text "+first;
+    $("#instEmail").href="mailto:"+inst.email;
+    $("#instCard").classList.add("show");
+  }
+}
+function prepBooking(){
+  initMap(); renderBar(); renderList();
+  $("#fVeh").value=vehStr()+(S.goals.size?`  \u00b7  ${[...S.goals].map(id=>GOALS.find(g=>g.id===id).l).join(", ")}`:"");
+  setTimeout(()=>{ if(MAP) MAP.invalidateSize(); },300);
+}
+$("#fSubmit").onclick=async()=>{
+  const name=$("#fName").value.trim(), phone=$("#fPhone").value.trim(), email=$("#fEmail").value.trim();
+  if(!name||(!phone&&!email)){$("#fErr").style.display="block";return;}
+  $("#fErr").style.display="none";
+  const payload={
+    name, phone, email,
+    location:$("#fLoc").value||S.market||"Not selected",
+    installer:S.installer||"",
+    vehicle:$("#fVeh").value,
+    message:$("#fMsg").value.trim(),
+    source:"Tune Finder"
+  };
+  const btn=$("#fSubmit"); btn.textContent="Sending…"; btn.disabled=true;
+
+  if(LEAD_ENDPOINT){
+    try{
+      const r=await fetch(LEAD_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(payload)});
+      if(!r.ok) throw 0;
+      showSuccess(false);
+    }catch(e){ openMail(payload); showSuccess(true); }
+  }else{
+    openMail(payload); showSuccess(true);
+  }
+}
+function openMail(p){
+  const subj=encodeURIComponent(`Tune Finder request — ${p.vehicle}`);
+  const body=encodeURIComponent(
+    `Name: ${p.name}\nPhone: ${p.phone}\nEmail: ${p.email}\nMarket: ${p.location}\nInstaller: ${p.installer}\nVehicle: ${p.vehicle}\n\nMessage:\n${p.message}`
+  );
+  window.location.href=`mailto:${LEAD_EMAIL}?subject=${subj}&body=${body}`;
+}
+function showSuccess(viaMail){
+  $("#leadForm").style.display="none";
+  $("#successMsg").textContent = viaMail
+    ? "We've opened your email so you can hit send — or call us now to lock in your spot faster."
+    : "We'll be in touch shortly to confirm your appointment. Want it sooner? Call or text us.";
+  $("#leadSuccess").classList.add("show");
+}
+
+/* back buttons */
+$$("[data-goto]").forEach(b=>{ if(!b.closest("#crumb")) b.onclick=()=>go(+b.dataset.goto); });
+
+go(0);
+</script>
+<footer class="sfoot">
+  <div class="fmark">Tuned Yota</div>
+  <div class="ftag">Undeniable Performance</div>
+  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></div>
+  <div class="fcon">Call or text <a href="tel:+16124067117">(612) 406-7117</a> &nbsp;·&nbsp; <a href="mailto:info@tunedyota.com">info@tunedyota.com</a><br>
+  Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
+  <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
+  <div class="fcopy">© Tuned Yota · Toyota &amp; Lexus Performance Tuning · Authorized OTT Installer</div>
+</footer>
+</body>
+</html>

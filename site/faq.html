@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ | Tuned Yota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--ring:rgba(179,208,217,.55);--shadow:0 14px 50px -12px rgba(58,46,38,.22);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20);--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
+.fq{font-family:'Lato',sans-serif;color:var(--brown2);max-width:760px;margin:0 auto;padding:32px 18px 46px}
+.fq-head{text-align:center;margin-bottom:22px}
+.fq-eyebrow{font-family:'Spectral SC',serif;letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:var(--sage-d);font-weight:600;margin-bottom:8px}
+.fq-h{font-family:'Spectral',serif;font-weight:600;font-size:clamp(28px,6vw,40px);line-height:1.1;color:var(--ink);letter-spacing:-.01em}
+.fq-sub{font-size:15.5px;line-height:1.55;opacity:.75;margin:8px auto 0;max-width:480px}
+.fq-hero{background:var(--ink);color:#EDE6DD;border-radius:var(--r);padding:20px 22px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin:22px 0 24px;box-shadow:var(--shadow)}
+.fq-hero p{font-family:'Spectral',serif;font-size:17px;line-height:1.35;color:#fff;flex:1;min-width:220px}
+.btn{font-family:'Lato',sans-serif;font-weight:900;letter-spacing:.03em;border:none;border-radius:99px;padding:14px 24px;cursor:pointer;font-size:14.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:.2s;white-space:nowrap}
+.btn.primary{background:var(--white);color:var(--ink)}
+.btn.primary:hover{background:var(--sand)}
+.btn.sage{background:var(--sage);color:#fff}.btn.sage:hover{background:var(--sage-d)}
+.fq-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px}
+.fq-chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:8px 16px;cursor:pointer;font-family:inherit;font-weight:800;font-size:12.5px;letter-spacing:.03em;color:var(--brown);transition:.18s}
+.fq-chip:hover{border-color:var(--sage)}
+.fq-chip.on{background:var(--brown);color:#fff;border-color:var(--brown)}
+.fq-list{display:flex;flex-direction:column;gap:11px}
+.fq-item{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;transition:.2s}
+.fq-item.open{box-shadow:0 0 0 3px var(--ring),var(--shadow-sm);border-color:var(--brown)}
+.fq-q{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:'Spectral',serif;font-weight:600;font-size:17px;color:var(--ink);padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.fq-ico{font-family:'Lato',sans-serif;font-weight:400;font-size:24px;color:var(--sage-d);transition:.25s;line-height:1;flex:0 0 auto}
+.fq-item.open .fq-ico{transform:rotate(45deg)}
+.fq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.fq-a p{font-size:14.5px;line-height:1.6;padding:0 20px 4px}
+.fq-cta{display:inline-block;margin:8px 20px 20px;font-weight:900;font-size:13.5px;color:var(--brown);text-decoration:none;border-bottom:2px solid var(--sage);padding-bottom:2px;transition:.18s}
+.fq-cta:hover{color:var(--ink);border-color:var(--ink)}
+.fq-foot{background:linear-gradient(135deg,rgba(153,160,142,.16),rgba(179,208,217,.16));border:1.5px solid var(--line);border-radius:var(--r);padding:24px 22px;text-align:center;margin-top:26px}
+.fq-foot h3{font-family:'Spectral',serif;font-weight:600;font-size:22px;color:var(--ink);margin-bottom:6px}
+.fq-foot p{font-size:14px;opacity:.8;margin-bottom:16px}
+.fq-foot .row{display:grid;gap:10px}
+@media(min-width:480px){.fq-foot .row{grid-template-columns:1fr 1fr;max-width:440px;margin:0 auto}}
+.btn.ink{background:var(--ink);color:#F3EFEA}.btn.ink:hover{background:var(--brown)}
+.btn.outline{background:transparent;border:1.6px solid var(--brown);color:var(--brown)}.btn.outline:hover{background:var(--brown);color:#fff}
+</style>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is an OTT Tune?", "acceptedAnswer": {"@type": "Answer", "text": "An OTT Tune is a custom Toyota and Lexus calibration focused on real-world drivability — sharper throttle response, smoother shifting, less gear hunting, better drivability on larger tires, more towing confidence, and more usable power where the platform supports it. Every tune is built by a licensed VFTuner PRO Tuner."}}, {"@type": "Question", "name": "Will a tune fix gear hunting or rough shifting?", "acceptedAnswer": {"@type": "Answer", "text": "On supported platforms, yes — calibration can improve shift behavior and reduce gear hunting, which is common after larger tires, added weight, towing, or hilly driving."}}, {"@type": "Question", "name": "Will it help after larger tires or an overland build?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Lifts, armor, roof racks, and recovery gear make a rig feel heavier and lazier. The calibration is designed to restore drivability and response after those modifications, where supported."}}, {"@type": "Question", "name": "Will I gain horsepower?", "acceptedAnswer": {"@type": "Answer", "text": "You'll gain more usable power and torque where your platform supports it. The focus is on real-world power delivery and drivability rather than peak dyno numbers — results are platform dependent."}}, {"@type": "Question", "name": "Which vehicles do you tune?", "acceptedAnswer": {"@type": "Answer", "text": "Toyota Tacoma, 4Runner, Tundra, Sequoia, Land Cruiser, FJ Cruiser, RAV4, Highlander, and Camry; and Lexus GX, LX570, RX350, and LS460. Supported years and engines vary by platform."}}, {"@type": "Question", "name": "How much does a tune cost?", "acceptedAnswer": {"@type": "Answer", "text": "Most calibrations start around $450 (some platforms from $400), with supercharger and turbo calibrations priced higher. Your exact price depends on year, engine, and setup — the Find Your Exact Tune tool shows it instantly."}}, {"@type": "Question", "name": "Do you support superchargers or forced induction?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Tuned Yota is an authorized Magnuson Supercharger retailer, installer, servicer, and calibrator, and also supports Harrop and ProCharger systems. Factory-turbo platforms receive a dedicated turbo performance calibration."}}, {"@type": "Question", "name": "How do I book a tune?", "acceptedAnswer": {"@type": "Answer", "text": "Call or text (612) 406-7117, or use Find Your Exact Tune to send a request tied to your nearest event market. Calling or texting is the fastest way to lock in your appointment."}}, {"@type": "Question", "name": "Where do you tune? Do you have a shop?", "acceptedAnswer": {"@type": "Answer", "text": "We tune in person at events across the Upper Midwest — Minnesota, Iowa, Wisconsin, North Dakota, South Dakota, and Nebraska. Pick your market on the map in Find Your Exact Tune and we'll confirm the event date."}}, {"@type": "Question", "name": "Who will tune my vehicle?", "acceptedAnswer": {"@type": "Answer", "text": "A regional OTT installer. Aaron Groshong covers Minnesota, Iowa, Fargo, Eau Claire, and Madison; Noah Kreis covers the rest of Wisconsin; and Cody Star covers Sioux Falls, Rapid City, and Omaha. You'll meet your installer when you select your market."}}, {"@type": "Question", "name": "Is the tune emissions legal? Will it disable my check-engine light?", "acceptedAnswer": {"@type": "Answer", "text": "Your factory emissions systems stay fully intact, and every calibration is verified with a 5-gas analyzer during drive-cycle testing — EPA-compliant in every state. We never disable check-engine lights, and we do not tune off-road-only vehicles."}}, {"@type": "Question", "name": "How long does it take?", "acceptedAnswer": {"@type": "Answer", "text": "Most calibrations are completed during your appointment. Custom calibrations are dialed in over multiple log reviews for the best result on your specific build."}}]}
+</script>
+<style id="site-chrome">
+:root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20)}
+.snav{position:sticky;top:0;z-index:1000;background:rgba(237,236,235,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;padding:11px 18px;font-family:'Lato',sans-serif}
+.snav-logo{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:17px;color:#5B4B42;text-decoration:none;margin-right:auto}
+.snav-links{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.snav-links a{font-weight:800;font-size:13px;letter-spacing:.02em;color:#5D4B40;text-decoration:none;padding:8px 11px;border-radius:99px;transition:.18s}
+.snav-links a:hover{background:rgba(153,160,142,.18);color:#3A2E26}
+.snav-call{font-family:'Lato';font-weight:900;font-size:13px;background:#3A2E26;color:#F3EFEA;text-decoration:none;border-radius:99px;padding:9px 16px;margin-left:6px}
+.snav-call:hover{background:#5B4B42}
+.sfoot{font-family:'Lato',sans-serif;background:#3A2E26;color:#D8CFC4;margin-top:46px;padding:34px 20px 28px;text-align:center}
+.sfoot .fmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:18px;color:#fff}
+.sfoot .ftag{font-weight:700;letter-spacing:.28em;text-transform:uppercase;font-size:10px;color:#B3D0D9;margin:6px 0 16px}
+.sfoot a{color:#EDE6DD;text-decoration:none;font-weight:700}.sfoot a:hover{text-decoration:underline}
+.sfoot .frow{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:13.5px;margin-bottom:14px}
+.sfoot .fcon{font-size:13.5px;line-height:1.9;opacity:.9}
+.sfoot .fcopy{font-size:11.5px;opacity:.55;margin-top:16px}
+@media(max-width:560px){.snav-logo{margin-right:0;width:100%;text-align:center}.snav{justify-content:center}}
+</style>
+</head>
+<body>
+<header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>
+<div class="fq">
+  <div class="fq-head">
+    <div class="fq-eyebrow">Questions, Answered</div>
+    <h1 class="fq-h">Tuned Yota FAQ</h1>
+    <p class="fq-sub">Straight answers about OTT Tuning for your Toyota or Lexus — and how to get yours dialed in.</p>
+  </div>
+
+  <div class="fq-hero">
+    <p>Not sure what your truck needs? Get your exact calibration and price in under a minute.</p>
+    <a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a>
+  </div>
+
+  <div class="fq-chips"><button class="fq-chip on" data-cat="All">All</button><button class="fq-chip" data-cat="Tuning">Tuning & Drivability</button><button class="fq-chip" data-cat="Vehicles">Vehicles & Pricing</button><button class="fq-chip" data-cat="Booking">Booking & Events</button><button class="fq-chip" data-cat="Compliance">Emissions & Compliance</button></div>
+  <div class="fq-list" id="fqList">
+      <div class="fq-item" data-cat="Tuning">
+        <button class="fq-q" aria-expanded="false">What is an OTT Tune?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>An OTT Tune is a custom Toyota and Lexus calibration focused on real-world drivability — sharper throttle response, smoother shifting, less gear hunting, better drivability on larger tires, more towing confidence, and more usable power where the platform supports it. Every tune is built by a licensed VFTuner PRO Tuner.</p></div>
+      </div>
+      <div class="fq-item" data-cat="Tuning">
+        <button class="fq-q" aria-expanded="false">Will a tune fix gear hunting or rough shifting?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>On supported platforms, yes — calibration can improve shift behavior and reduce gear hunting, which is common after larger tires, added weight, towing, or hilly driving.</p></div>
+      </div>
+      <div class="fq-item" data-cat="Tuning">
+        <button class="fq-q" aria-expanded="false">Will it help after larger tires or an overland build?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>Yes. Lifts, armor, roof racks, and recovery gear make a rig feel heavier and lazier. The calibration is designed to restore drivability and response after those modifications, where supported.</p></div>
+      </div>
+      <div class="fq-item" data-cat="Tuning">
+        <button class="fq-q" aria-expanded="false">Will I gain horsepower?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>You'll gain more usable power and torque where your platform supports it. The focus is on real-world power delivery and drivability rather than peak dyno numbers — results are platform dependent.</p></div>
+      </div>
+      <div class="fq-item" data-cat="Vehicles">
+        <button class="fq-q" aria-expanded="false">Which vehicles do you tune?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>Toyota Tacoma, 4Runner, Tundra, Sequoia, Land Cruiser, FJ Cruiser, RAV4, Highlander, and Camry; and Lexus GX, LX570, RX350, and LS460. Supported years and engines vary by platform.</p><a class="fq-cta" href="find-your-exact-tune.html">Find Your Exact Tune →</a></div>
+      </div>
+      <div class="fq-item" data-cat="Vehicles">
+        <button class="fq-q" aria-expanded="false">How much does a tune cost?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>Most calibrations start around $450 (some platforms from $400), with supercharger and turbo calibrations priced higher. Your exact price depends on year, engine, and setup — the Find Your Exact Tune tool shows it instantly.</p><a class="fq-cta" href="find-your-exact-tune.html">Find Your Exact Tune →</a></div>
+      </div>
+      <div class="fq-item" data-cat="Vehicles">
+        <button class="fq-q" aria-expanded="false">Do you support superchargers or forced induction?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>Yes. Tuned Yota is an authorized Magnuson Supercharger retailer, installer, servicer, and calibrator, and also supports Harrop and ProCharger systems. Factory-turbo platforms receive a dedicated turbo performance calibration.</p></div>
+      </div>
+      <div class="fq-item" data-cat="Booking">
+        <button class="fq-q" aria-expanded="false">How do I book a tune?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>Call or text (612) 406-7117, or use Find Your Exact Tune to send a request tied to your nearest event market. Calling or texting is the fastest way to lock in your appointment.</p><a class="fq-cta" href="find-your-exact-tune.html">Find Your Exact Tune →</a></div>
+      </div>
+      <div class="fq-item" data-cat="Booking">
+        <button class="fq-q" aria-expanded="false">Where do you tune? Do you have a shop?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>We tune in person at events across the Upper Midwest — Minnesota, Iowa, Wisconsin, North Dakota, South Dakota, and Nebraska. Pick your market on the map in Find Your Exact Tune and we'll confirm the event date.</p><a class="fq-cta" href="find-your-exact-tune.html">Find Your Exact Tune →</a></div>
+      </div>
+      <div class="fq-item" data-cat="Booking">
+        <button class="fq-q" aria-expanded="false">Who will tune my vehicle?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>A regional OTT installer. Aaron Groshong covers Minnesota, Iowa, Fargo, Eau Claire, and Madison; Noah Kreis covers the rest of Wisconsin; and Cody Star covers Sioux Falls, Rapid City, and Omaha. You'll meet your installer when you select your market.</p></div>
+      </div>
+      <div class="fq-item" data-cat="Compliance">
+        <button class="fq-q" aria-expanded="false">Is the tune emissions legal? Will it disable my check-engine light?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>Your factory emissions systems stay fully intact, and every calibration is verified with a 5-gas analyzer during drive-cycle testing — EPA-compliant in every state. We never disable check-engine lights, and we do not tune off-road-only vehicles.</p></div>
+      </div>
+      <div class="fq-item" data-cat="Compliance">
+        <button class="fq-q" aria-expanded="false">How long does it take?<span class="fq-ico">+</span></button>
+        <div class="fq-a"><p>Most calibrations are completed during your appointment. Custom calibrations are dialed in over multiple log reviews for the best result on your specific build.</p></div>
+      </div>
+  </div>
+
+  <div class="fq-foot">
+    <h3>Ready when you are.</h3>
+    <p>Find your exact calibration online, or reach us directly — we tune across the Upper Midwest.</p>
+    <div class="row">
+      <a class="btn ink" href="find-your-exact-tune.html">Find Your Exact Tune</a>
+      <a class="btn outline" href="tel:+16124067117">Call / Text (612) 406-7117</a>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.fq-q').forEach(q=>q.addEventListener('click',()=>{
+  const it=q.closest('.fq-item'),a=it.querySelector('.fq-a'),open=it.classList.contains('open');
+  document.querySelectorAll('.fq-item.open').forEach(o=>{o.classList.remove('open');o.querySelector('.fq-a').style.maxHeight=null;o.querySelector('.fq-q').setAttribute('aria-expanded','false');});
+  if(!open){it.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';q.setAttribute('aria-expanded','true');}
+}));
+document.querySelectorAll('.fq-chip').forEach(c=>c.addEventListener('click',()=>{
+  const cat=c.dataset.cat;
+  document.querySelectorAll('.fq-chip').forEach(x=>x.classList.toggle('on',x===c));
+  document.querySelectorAll('.fq-item').forEach(it=>{
+    const show=cat==='All'||it.dataset.cat===cat; it.style.display=show?'':'none';
+    if(it.classList.contains('open')){it.classList.remove('open');it.querySelector('.fq-a').style.maxHeight=null;}
+  });
+}));
+</script>
+<footer class="sfoot">
+  <div class="fmark">Tuned Yota</div>
+  <div class="ftag">Undeniable Performance</div>
+  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></div>
+  <div class="fcon">Call or text <a href="tel:+16124067117">(612) 406-7117</a> &nbsp;·&nbsp; <a href="mailto:info@tunedyota.com">info@tunedyota.com</a><br>
+  Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
+  <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
+  <div class="fcopy">© Tuned Yota · Toyota &amp; Lexus Performance Tuning · Authorized OTT Installer</div>
+</footer>
+</body>
+</html>

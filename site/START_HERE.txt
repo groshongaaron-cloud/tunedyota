@@ -1,0 +1,25 @@
+TUNED YOTA — FRESH WEBSITE
+==========================
+This folder is your complete website. Every page is here and already linked
+together (Home, Find Your Tune, FAQ, OTT, Team, and all 13 vehicle pages).
+"index.html" is your home page.
+
+HOW TO PUT IT LIVE (easiest method — no coding):
+1. Go to  app.netlify.com/drop
+2. Drag this ENTIRE folder onto that page.
+3. Wait ~30 seconds. You get a live web address you can open and share.
+   (This is a private preview — it is NOT your real domain yet.)
+4. Click around and test everything on your phone and computer.
+
+CONNECT YOUR DOMAIN (when you're happy):
+5. In Netlify: Site settings > Domain management > Add a custom domain >
+   enter  tunedyota.com  and follow the DNS steps it shows you.
+   NOTE: pointing the domain here REPLACES the current Wix site at that address.
+   Do this only when you're ready to switch over.
+
+THINGS TO KNOW:
+- The team/installer photos are bundled in the "images" folder, so the
+  site no longer depends on Wix for anything. Keep that folder with the rest
+  of the files when you upload.
+- To preview locally first, just double-click index.html (most things work;
+  the map and YouTube load best on the live Netlify address).
