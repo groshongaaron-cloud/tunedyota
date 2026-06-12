@@ -441,6 +441,64 @@ const MARKETS = [
 ];
 const STATE_ORDER=["All","MN","WI","IA","ND","SD","NE"];
 
+/* (3b) LIVE EVENTS — optional Google Sheet overlay onto MARKETS.
+   Paste the sheet ID (it's link-shared "anyone with the link can view").
+   Sheet columns: Market | Date | Active | Event | Details
+   Falls back silently to any dates baked into MARKETS above. */
+const EVENTS_SHEET_ID = "";
+function parseCSV(t){
+  const rows=[]; let row=[],val="",q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){ if(c==='"'){ if(t[i+1]==='"'){val+='"';i++;} else q=false; } else val+=c; }
+    else{ if(c==='"')q=true; else if(c===',') {row.push(val);val="";}
+      else if(c==='\n'){row.push(val);rows.push(row);row=[];val="";}
+      else if(c!=='\r')val+=c; }
+  }
+  if(val.length||row.length){row.push(val);rows.push(row);}
+  return rows;
+}
+function marketPopup(m){
+  if(!m.date&&!m.event) return "";
+  let h=`<strong>${m.city}, ${m.state}</strong>`;
+  if(m.event) h+=`<br>${m.event}`;
+  if(m.date)  h+=`<br>📅 ${m.date}`;
+  if(m.details) h+=`<br><small>${m.details}</small>`;
+  return h;
+}
+function applyEventsToUI(){
+  if(typeof renderList==="function") renderList();
+  MARKETS.forEach((m,i)=>{
+    const mk=MARKERS[i]; if(!mk) return;
+    mk.setTooltipContent(`${m.city}, ${m.state}`+(m.date?` · ${m.date}`:""));
+    const pop=marketPopup(m);
+    if(pop) mk.bindPopup(pop); else if(mk.getPopup()) mk.unbindPopup();
+  });
+}
+async function loadEvents(){
+  if(!EVENTS_SHEET_ID) return;            // not configured → use baked-in dates
+  const url=`https://docs.google.com/spreadsheets/d/${EVENTS_SHEET_ID}/gviz/tq?tqx=out:csv`;
+  let rows;
+  try{ const r=await fetch(url,{cache:"no-store"}); if(!r.ok) throw 0; rows=parseCSV(await r.text()); }
+  catch(e){ return; }                     // network/sheet error → silent fallback
+  if(!rows||rows.length<2) return;
+  const head=rows[0].map(h=>h.trim().toLowerCase()), ci=n=>head.indexOf(n);
+  const iM=ci("market"),iD=ci("date"),iA=ci("active"),iE=ci("event"),iX=ci("details");
+  if(iM<0||iD<0) return;
+  const byCity={}; MARKETS.forEach(m=>byCity[m.city.toLowerCase()]=m);
+  for(let r=1;r<rows.length;r++){
+    const c=rows[r]; if(!c||!c[iM]) continue;
+    const active=iA>=0?String(c[iA]||"").trim().toLowerCase():"";
+    if(["no","false","0","n"].includes(active)) continue;
+    const date=String(c[iD]||"").trim(); if(!date) continue;
+    const m=byCity[String(c[iM]).trim().toLowerCase()];
+    if(!m){ console.warn("Event row references unknown market:",c[iM]); continue; }
+    m.date=date;
+    if(iE>=0&&c[iE]) m.event=String(c[iE]).trim();
+    if(iX>=0&&c[iX]) m.details=String(c[iX]).trim();
+  }
+  applyEventsToUI();
+}
+
 /* (4) SOCIAL — Facebook page + group invites. */
 const FB_PAGE="https://www.facebook.com/TunedYota/";
 const FB_GROUP="https://www.facebook.com/groups/501008078456222";
@@ -580,7 +638,8 @@ function initMap(){
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"\u00a9 OpenStreetMap contributors"}).addTo(MAP);
   MARKETS.forEach((m,i)=>{
     const mk=L.marker([m.lat,m.lng],{icon:pinIcon(false)}).addTo(MAP);
-    mk.bindTooltip(`${m.city}, ${m.state}`,{direction:"top",offset:[0,-30]});
+    mk.bindTooltip(`${m.city}, ${m.state}`+(m.date?` · ${m.date}`:""),{direction:"top",offset:[0,-30]});
+    const pop=marketPopup(m); if(pop) mk.bindPopup(pop);
     mk.on("click",()=>selectMarket(i));
     MARKERS[i]=mk;
   });
@@ -673,6 +732,7 @@ function showSuccess(viaMail){
 $$("[data-goto]").forEach(b=>{ if(!b.closest("#crumb")) b.onclick=()=>go(+b.dataset.goto); });
 
 go(0);
+loadEvents();   // overlay live event dates from the Google Sheet (no-op until configured)
 </script>
 <footer class="sfoot">
   <div class="fmark">Tuned Yota</div>
