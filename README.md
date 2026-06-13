@@ -8,9 +8,11 @@ Static HTML — no build step. The deployable site lives in [`site/`](site/);
 - **Self-contained:** installer photos are bundled in `site/images/`. The only
   external dependencies are Google Fonts, the Leaflet map library + OpenStreetMap
   tiles, YouTube review embeds, and social links — nothing depends on Wix.
-- **Lead capture:** the tune finder opens the customer's email app to
-  info@tunedyota.com (`LEAD_ENDPOINT` in `site/find-your-exact-tune.html` is blank).
-  Paste a Formspree endpoint there later for dashboard capture.
+- **Lead capture:** the tune finder submits to the Netlify `tune-lead` form,
+  which routes each lead to the assigned installer (CC info@) and auto-replies
+  to the customer via Resend. If the submit fails it falls back to opening the
+  customer's email app to info@tunedyota.com. See
+  [Lead capture](#lead-capture-one-time-setup) below for one-time setup.
 
 ## Contact
 (612) 406-7117 · info@tunedyota.com
