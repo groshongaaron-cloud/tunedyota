@@ -423,12 +423,14 @@ src="https://www.facebook.com/tr?id=1664417963939672&ev=PageView&noscript=1"/></
    ============================================================ */
 
 /* (1) LEAD DELIVERY ------------------------------------------------
-   Leave blank to use the e-mail fallback (opens the customer's mail
-   app addressed to info@tunedyota.com).  For real lead capture into
-   a dashboard + auto-email, paste a free Formspree endpoint here, e.g.
-   "https://formspree.io/f/abcdwxyz".  (Setup: formspree.io → new form.) */
-const LEAD_ENDPOINT = "";
-const LEAD_EMAIL    = "info@tunedyota.com";
+   Leads POST to the Netlify form "tune-lead" (see the hidden <form> after
+   <body>). Netlify stores them in the dashboard and fires the
+   netlify/functions/submission-created function, which routes to the
+   assigned installer + auto-replies to the customer via Resend.
+   If the POST fails (offline / not on Netlify), we fall back to opening
+   the customer's mail app addressed to LEAD_EMAIL so no lead is lost. */
+const LEAD_FORM_NAME = "tune-lead";
+const LEAD_EMAIL     = "info@tunedyota.com";
 
 /* (2) INSTALLERS — bio, photo, and direct contact. Edit freely. */
 const INSTALLERS = {
@@ -548,7 +550,19 @@ const GOALS=[
    ▲▲▲  END EDITABLE DATA  ▲▲▲
    ============================================================ */
 
-const S={make:null,model:null,cfg:null,goals:new Set(),market:"",marketIndex:null,installer:""};
+const S={make:null,model:null,cfg:null,goals:new Set(),market:"",marketIndex:null,installer:"",installerKey:""};
+
+/* Marketing attribution — captured once on load, persisted across steps. */
+const ATTR=(function(){
+  let store={}; try{ store=JSON.parse(sessionStorage.getItem("ty_attr")||"{}"); }catch(e){}
+  const qs=new URLSearchParams(location.search); let changed=false;
+  ["utm_source","utm_medium","utm_campaign"].forEach(k=>{
+    const v=qs.get(k); if(v){ store[k]=v; changed=true; }
+  });
+  if(!store.referrer && document.referrer){ store.referrer=document.referrer; changed=true; }
+  if(changed){ try{ sessionStorage.setItem("ty_attr",JSON.stringify(store)); }catch(e){} }
+  return store;
+})();
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const prog=$("#prog"); for(let i=0;i<6;i++){let e=document.createElement("i");prog.appendChild(e);}
 
@@ -699,6 +713,7 @@ function selectMarket(i){
   const inst=INSTALLERS[m.inst];
   if(inst){
     S.installer=inst.name;
+    S.installerKey=m.inst;
     const first=inst.name.split(" ")[0], tel="+1"+inst.phone.replace(/\D/g,"");
     $("#instPhoto").src=inst.photo; $("#instPhoto").alt=inst.name;
     $("#instName").textContent=inst.name;
@@ -719,25 +734,30 @@ $("#fSubmit").onclick=async()=>{
   const name=$("#fName").value.trim(), phone=$("#fPhone").value.trim(), email=$("#fEmail").value.trim();
   if(!name||(!phone&&!email)){$("#fErr").style.display="block";return;}
   $("#fErr").style.display="none";
-  const payload={
-    name, phone, email,
-    location:$("#fLoc").value||S.market||"Not selected",
-    installer:S.installer||"",
-    vehicle:$("#fVeh").value,
-    message:$("#fMsg").value.trim(),
-    source:"Tune Finder"
+  const cfg=S.cfg||{};
+  const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
+  const market=$("#fLoc").value||S.market||"Not selected";
+  const message=$("#fMsg").value.trim();
+  const vehicle=$("#fVeh").value;
+  const payload={ name, phone, email, location:market, installer:S.installer||"", vehicle, message, source:"Tune Finder" };
+  const fields={
+    "form-name":LEAD_FORM_NAME, "bot-field":"",
+    name, phone, email, market,
+    installer_key:S.installerKey||"", installer_name:S.installer||"",
+    vehicle, goals:goalsStr,
+    quote_base:cfg.base!=null?String(cfg.base):"",
+    quote_custom:cfg.custom!=null?String(cfg.custom):"",
+    quote_sc:cfg.sc!=null?String(cfg.sc):"",
+    message, source:"Tune Finder",
+    referrer:ATTR.referrer||"",
+    utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||""
   };
   const btn=$("#fSubmit"); btn.textContent="Sending…"; btn.disabled=true;
-
-  if(LEAD_ENDPOINT){
-    try{
-      const r=await fetch(LEAD_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(payload)});
-      if(!r.ok) throw 0;
-      showSuccess(false);
-    }catch(e){ openMail(payload); showSuccess(true); }
-  }else{
-    openMail(payload); showSuccess(true);
-  }
+  try{
+    const r=await fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(fields).toString()});
+    if(!r.ok) throw 0;
+    showSuccess(false);
+  }catch(e){ openMail(payload); showSuccess(true); }
 }
 function openMail(p){
   const subj=encodeURIComponent(`Tune Finder request — ${p.vehicle}`);
