@@ -21,7 +21,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 
 | File | Responsibility | Action |
 |---|---|---|
-| `package.json` | Test script only (`node --test tests/`); `private`, no deps, CommonJS default | Create |
+| `package.json` | Test script only (`node --test`); `private`, no deps, CommonJS default | Create |
 | `netlify.toml` | Root config: `publish = "site"`, `functions = "netlify/functions"` | Create |
 | `netlify/functions/lib/routing.js` | Pure: `keyToInstaller(key)` → `{key,name,email,phone}`, fallback to Aaron/info@ | Create |
 | `netlify/functions/lib/templates.js` | Pure: `buildInstallerEmail(d,inst)`, `buildCustomerEmail(d,inst)` → `{subject,html,text}` | Create |
@@ -53,7 +53,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
   "version": "1.0.0",
   "description": "Tuned Yota marketing site + Netlify lead-routing functions",
   "scripts": {
-    "test": "node --test tests/"
+    "test": "node --test"
   }
 }
 ```
@@ -515,7 +515,7 @@ test("unknown installer_key routes to Aaron / info@", async () => {
 });
 
 test("no API key → sends nothing, returns reason", async () => {
-  const d = spyDeps(undefined);
+  const d = spyDeps(null);  // null bypasses the apiKey default; undefined would trigger it
   const r = await processSubmission({ form_name: "tune-lead", data }, d);
   assert.equal(r.sent, 0);
   assert.equal(r.reason, "no-api-key");
