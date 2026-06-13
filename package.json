@@ -1,0 +1,9 @@
+{
+  "name": "tunedyota-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Tuned Yota marketing site + Netlify lead-routing functions",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}
