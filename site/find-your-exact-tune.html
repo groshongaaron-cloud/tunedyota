@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -228,6 +229,12 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 .sfoot .fcon{font-size:13.5px;line-height:1.9;opacity:.9}
 .sfoot .fcopy{font-size:11.5px;opacity:.55;margin-top:16px}
 @media(max-width:560px){.snav-logo{margin-right:0;width:100%;text-align:center}.snav{justify-content:center}}
+/* ── brand fox icon ── */
+.snav-logo{display:inline-flex;align-items:center;gap:9px}
+.snav-logo::before{content:"";width:27px;height:27px;flex:0 0 auto;background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E") center/contain no-repeat}
+@media(max-width:560px){.snav-logo{justify-content:center}}
+.sfoot .fmark{display:flex;flex-direction:column;align-items:center;gap:11px}
+.sfoot .fmark::before{content:"";width:44px;height:44px;background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E") center/contain no-repeat}
 /* ── motion polish · craft pass ───────────────────────── */
 .btn,.btn.primary,.btn.sage,.btn.outline,.btn.ink,.tf-opt,.tf-chip,.tf-back,.tf-mkt,.tf-mktbar button,.tf-crumb button,.v-card,.fq-chip,.fq-item,.fq-cta,.lh a.link,.snav-links a,.snav-call,.tf-inst .iacts a{transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,color var(--dur-fast) ease,box-shadow var(--dur-base) var(--ease-out)}
 .btn:active,.btn.primary:active,.btn.sage:active,.btn.outline:active,.btn.ink:active,.tf-opt:active,.tf-chip:active,.tf-back:active,.tf-mkt:active,.tf-mktbar button:active,.tf-crumb button:active,.v-card:active,.fq-chip:active,.lh a.link:active,.snav-call:active,.tf-inst .iacts a:active{transform:scale(.97)}
