@@ -410,6 +410,13 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
         <div class="tf-field"><label>Phone</label><input id="fPhone" type="tel" autocomplete="tel" placeholder="(___) ___-____"></div>
       </div>
       <div class="tf-field"><label>Email</label><input id="fEmail" type="email" autocomplete="email" placeholder="you@email.com"></div>
+      <div class="tf-field"><label>How should we confirm?</label>
+        <div class="tf-slotgrid" id="fPref" role="radiogroup" aria-label="Preferred confirmation method" style="margin:6px 0 0">
+          <button type="button" class="tf-slot" data-pref="email" role="radio" aria-checked="false">Email</button>
+          <button type="button" class="tf-slot" data-pref="text" role="radio" aria-checked="false">Text</button>
+          <button type="button" class="tf-slot sel" data-pref="either" role="radio" aria-checked="true">Either</button>
+        </div>
+      </div>
       <div class="tf-field"><label>Your vehicle</label><input id="fVeh" type="text" readonly></div>
       <div class="tf-field"><label>Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
       <button class="btn primary" id="fSubmit" style="width:100%">Send My Request →</button>
@@ -756,7 +763,14 @@ function prepBooking(){
   setTimeout(()=>{ if(MAP) MAP.invalidateSize(); },300);
 }
 /* ---- live booking: slots + priority list ---- */
-const BOOK={avail:null,slot:null,reason:null};
+const BOOK={avail:null,slot:null,reason:null,pref:"either"};
+// Preferred-confirmation picker: Email / Text / Either (default Either).
+document.querySelectorAll("#fPref .tf-slot").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("#fPref .tf-slot").forEach(x=>{x.classList.remove("sel");x.setAttribute("aria-checked","false");});
+    b.classList.add("sel"); b.setAttribute("aria-checked","true"); BOOK.pref=b.dataset.pref;
+  };
+});
 async function loadAvailability(city){
   BOOK.avail=null;BOOK.slot=null;BOOK.reason=null;
   const box=$("#tfSlots"); if(!box) return; box.style.display="block";
@@ -823,7 +837,7 @@ $("#fSubmit").onclick=async()=>{
   const btn=$("#fSubmit"), prev=btn.textContent; btn.textContent="Submitting…"; btn.disabled=true;
   const payload={
     city:S.marketCity, slot:BOOK.slot||undefined,
-    name, phone, email, vehicle:$("#fVeh").value,
+    name, phone, email, vehicle:$("#fVeh").value, contact_pref:BOOK.pref||"either",
     goals: goalsStr + (msg?` · Note: ${msg}`:""),
     installer_key:S.installerKey||"", bot_field:"",
     utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||""

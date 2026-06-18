@@ -72,3 +72,41 @@ test("happy path booked -> creates booking + sends email + sms", async () => {
   assert.equal(h.texts.length, 1);
   assert.ok(h.emails.some((e) => e.attachments));
 });
+
+const isCustomer = (e) => e.to === base.email;
+
+test("pref email -> customer email, no sms", async () => {
+  const h = harness({ events: EV });
+  await processBooking({ ...base, slot: "9:20", contact_pref: "email" }, h.deps);
+  assert.ok(h.emails.some(isCustomer));   // customer email sent
+  assert.equal(h.texts.length, 0);        // no text
+});
+
+test("pref text -> sms only, no customer email", async () => {
+  const h = harness({ events: EV });
+  await processBooking({ ...base, slot: "9:20", contact_pref: "text" }, h.deps);
+  assert.equal(h.texts.length, 1);
+  assert.ok(!h.emails.some(isCustomer));  // customer not emailed (installer still is)
+});
+
+test("pref text but SMS disabled -> falls back to customer email", async () => {
+  const h = harness({ events: EV });
+  h.deps.sms = async (a) => { h.texts.push(a); return { skipped: true }; };  // Twilio off
+  await processBooking({ ...base, slot: "9:20", contact_pref: "text" }, h.deps);
+  assert.equal(h.texts.length, 1);        // SMS was attempted
+  assert.ok(h.emails.some(isCustomer));   // ...but email still reached them
+});
+
+test("pref text but no phone -> falls back to customer email", async () => {
+  const h = harness({ events: EV });
+  await processBooking({ ...base, phone: "", slot: "9:20", contact_pref: "text" }, h.deps);
+  assert.equal(h.texts.length, 0);        // no phone, nothing attempted
+  assert.ok(h.emails.some(isCustomer));   // email fallback fired
+});
+
+test("booking installer email shows preferred contact", async () => {
+  const h = harness({ events: EV });
+  await processBooking({ ...base, slot: "9:20", contact_pref: "text" }, h.deps);
+  const inst = h.emails.find((e) => !isCustomer(e));
+  assert.match(inst.text, /Preferred contact: Text/);
+});

@@ -27,6 +27,29 @@ async function processBooking(body, deps) {
   const c = cfg(env);
   const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
 
+  // Customer's preferred confirmation channel (from the booking form).
+  const pref = (d.contact_pref === "email" || d.contact_pref === "text") ? d.contact_pref : "either";
+
+  // Send the customer's confirmation on their preferred channel(s), with a
+  // safety net: if their pick can't actually deliver right now (e.g. they chose
+  // "text" but SMS is disabled, or gave no phone) we fall back to email so no
+  // booking ever goes unconfirmed. emailThunk/smsThunk encapsulate the per-path
+  // template + send; smsThunk should resolve to the sendSms result ({ sent }).
+  async function notifyCustomer(emailThunk, smsThunk) {
+    const wantEmail = pref !== "text";
+    const wantText = pref !== "email";
+    let emailSent = false, smsOk = false;
+    if (wantEmail && d.email) {
+      try { await emailThunk(); emailSent = true; } catch (e) { if (log.error) log.error("cust email", e.message); }
+    }
+    if (wantText && d.phone) {
+      try { const r = await smsThunk(); smsOk = !!(r && r.sent); } catch (e) { if (log.error) log.error("cust sms", e.message); }
+    }
+    if (!emailSent && !smsOk && d.email) {
+      try { await emailThunk(); } catch (e) { if (log.error) log.error("cust email fallback", e.message); }
+    }
+  }
+
   async function priority(reason) {
     const pfields = {
       City: market.city, Name: d.name, Phone: d.phone || "", Email: d.email || "",
@@ -39,8 +62,10 @@ async function processBooking(body, deps) {
       await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields });
     } catch (e) { if (log.error) log.error("priority create", e.message); return { status: "error", error: "store-unavailable" }; }
     try { const m = tpl.buildPriorityInstallerEmail(d, inst, market, reason); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { if (log.error) log.error("prio inst email", e.message); }
-    if (d.email) { try { const m = tpl.buildPriorityCustomerEmail(d, inst, market, reason); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: d.email, replyTo: OWNER, subject: m.subject, html: m.html, text: m.text }); } catch (e) { if (log.error) log.error("prio cust email", e.message); } }
-    if (d.phone) { try { await sms({ fetchImpl, to: normalizePhone(d.phone), body: tpl.buildPrioritySms(d, market), env }); } catch (e) { if (log.error) log.error("prio sms", e.message); } }
+    await notifyCustomer(
+      async () => { const m = tpl.buildPriorityCustomerEmail(d, inst, market, reason); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: d.email, replyTo: OWNER, subject: m.subject, html: m.html, text: m.text }); },
+      () => sms({ fetchImpl, to: normalizePhone(d.phone), body: tpl.buildPrioritySms(d, market), env }),
+    );
     return { status: "priority", reason };
   }
 
@@ -68,14 +93,14 @@ async function processBooking(body, deps) {
   } catch (e) { if (log.error) log.error("create", e.message); return { status: "error", error: "store-unavailable" }; }
 
   try { const m = tpl.buildBookingInstallerEmail(d, inst, market, event); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { if (log.error) log.error("inst email", e.message); }
-  if (d.email) {
-    try {
+  await notifyCustomer(
+    async () => {
       const ics = buildIcs({ uid: `${event.dateISO}-${d.slot}-${now()}@tunedyota.com`, dateISO: event.dateISO, slot: d.slot, summary: `Tuned Yota — ${market.city} OTT Tune`, location: `${market.city}, ${market.state}`, description: `Your ${d.vehicle || "vehicle"} tune with ${inst.name}. Questions: ${inst.phone}`, stamp: now() });
       const m = tpl.buildBookingCustomerEmail(d, inst, market, event);
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: d.email, replyTo: OWNER, subject: m.subject, html: m.html, text: m.text, attachments: [{ filename: "tuned-yota-booking.ics", content: Buffer.from(ics).toString("base64") }] });
-    } catch (e) { if (log.error) log.error("cust email", e.message); }
-  }
-  if (d.phone) { try { await sms({ fetchImpl, to: normalizePhone(d.phone), body: tpl.buildBookingSms(d, inst, market, event), env }); } catch (e) { if (log.error) log.error("sms", e.message); } }
+    },
+    () => sms({ fetchImpl, to: normalizePhone(d.phone), body: tpl.buildBookingSms(d, inst, market, event), env }),
+  );
 
   return { status: "booked", city: market.city, eventDateISO: event.dateISO, eventLabel: event.label, slot: d.slot };
 }
