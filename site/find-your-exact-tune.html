@@ -185,6 +185,15 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 .tf-mkt small{display:block;font-weight:700;font-size:10px;opacity:.55;margin-top:3px;letter-spacing:.08em}
 .tf-mkt.sel small{opacity:.85}
 .tf-mapcap{font-size:12px;opacity:.7;text-align:center;line-height:1.5;margin:4px 0 22px}
+.tf-slotgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 4px}
+@media(max-width:480px){.tf-slotgrid{grid-template-columns:repeat(2,1fr)}}
+.tf-slot{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:13px 8px;font-weight:800;font-size:14.5px;color:var(--brown);cursor:pointer;text-align:center;box-shadow:var(--shadow-sm);transition:transform var(--dur-fast,140ms) var(--ease-out,ease),border-color .15s ease}
+.tf-slot:hover{border-color:var(--sage)}
+.tf-slot:active{transform:scale(.97)}
+.tf-slot.sel{background:var(--brown);color:#fff;border-color:var(--brown)}
+.tf-slot[disabled]{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+.tf-slot-day{text-align:center;font-family:'Spectral',serif;font-weight:600;font-size:17px;color:var(--ink);margin:6px 0 10px}
+.tf-prio{background:linear-gradient(135deg,rgba(153,160,142,.16),rgba(179,208,217,.16));border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.5;margin:6px 0}
 .tf-inst{display:none;background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin:4px 0 18px;gap:16px;align-items:center}
 .tf-inst.show{display:flex;animation:rise .4s both}
 .tf-inst img{width:90px;height:112px;object-fit:cover;border-radius:12px;flex:0 0 auto;background:var(--card)}
@@ -395,6 +404,7 @@ src="https://www.facebook.com/tr?id=1664417963939672&ev=PageView&noscript=1"/></
         <label>Selected market</label>
         <input id="fLoc" type="text" readonly placeholder="Select a market on the map above">
       </div>
+      <div id="tfSlots" style="display:none"></div>
       <div class="tf-row2">
         <div class="tf-field"><label>Name</label><input id="fName" type="text" autocomplete="name" placeholder="Your name"></div>
         <div class="tf-field"><label>Phone</label><input id="fPhone" type="tel" autocomplete="tel" placeholder="(___) ___-____"></div>
@@ -720,7 +730,7 @@ function renderList(){
   });
 }
 function selectMarket(i){
-  S.marketIndex=i; const m=MARKETS[i]; S.market=`${m.city}, ${m.state}`+(m.date?` (${m.date})`:"");
+  S.marketIndex=i; const m=MARKETS[i]; S.market=`${m.city}, ${m.state}`+(m.date?` (${m.date})`:""); S.marketCity=m.city;
   if(MAP){ Object.entries(MARKERS).forEach(([k,mk])=>mk.setIcon(pinIcon(+k===i))); MAP.flyTo([m.lat,m.lng],7,{duration:.6}); MARKERS[i].openTooltip(); }
   $$("#mktList .tf-mkt").forEach(b=>b.classList.toggle("sel",+b.dataset.i===i));
   $("#fLoc").value=S.market;
@@ -738,16 +748,90 @@ function selectMarket(i){
     $("#instEmail").href="mailto:"+inst.email;
     $("#instCard").classList.add("show");
   }
+  loadAvailability(m.city);
 }
 function prepBooking(){
   initMap(); renderBar(); renderList();
   $("#fVeh").value=vehStr()+(S.goals.size?`  \u00b7  ${[...S.goals].map(id=>GOALS.find(g=>g.id===id).l).join(", ")}`:"");
   setTimeout(()=>{ if(MAP) MAP.invalidateSize(); },300);
 }
+/* ---- live booking: slots + priority list ---- */
+const BOOK={avail:null,slot:null,reason:null};
+async function loadAvailability(city){
+  BOOK.avail=null;BOOK.slot=null;BOOK.reason=null;
+  const box=$("#tfSlots"); if(!box) return; box.style.display="block";
+  box.innerHTML='<p class="tf-foot" style="margin:8px 0">Loading available times…</p>';
+  try{
+    const r=await fetch(`/.netlify/functions/availability?city=${encodeURIComponent(city)}`);
+    const a=await r.json(); BOOK.avail=a;
+    if(a.hasEvent && !a.full && !a.error) renderSlots(a);
+    else renderPriority(a.full?"full":"no-event");
+  }catch(e){ renderPriority("no-event"); }
+  updateBookCta();
+}
+function renderSlots(a){
+  const box=$("#tfSlots"); const day=a.eventLabel||a.eventDateISO;
+  const lab=s=>(a.slotLabels&&a.slotLabels[s])||s;
+  const open=(a.openSlots||[]).map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
+  const taken=(a.takenSlots||[]).map(s=>`<button type="button" class="tf-slot" disabled>${lab(s)}</button>`).join("");
+  box.innerHTML=`<div class="tf-slot-day">${a.city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
+  box.querySelectorAll(".tf-slot:not([disabled])").forEach(b=>b.onclick=()=>{
+    box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
+  });
+}
+function renderPriority(reason){
+  BOOK.slot=null; BOOK.reason=reason; const box=$("#tfSlots");
+  const line=reason==="full"?"This event is currently full.":"No event is scheduled here yet.";
+  box.innerHTML=`<div class="tf-prio"><strong>${line}</strong> Join the Priority Event List below — we'll tell you the moment a slot opens.</div>`;
+}
+function updateBookCta(){
+  const btn=$("#fSubmit"), a=BOOK.avail;
+  if(a && a.hasEvent && !a.full && !a.error) btn.textContent=BOOK.slot?"Confirm Booking →":"Pick a time above";
+  else btn.textContent="Join the Priority Event List →";
+}
+function bookSuccess(title,text){
+  try{ const h=$("#leadSuccess h3"); if(h) h.textContent=title; }catch(e){}
+  $("#leadForm").style.display="none";
+  const sb=$("#tfSlots"); if(sb) sb.style.display="none";
+  $("#successMsg").textContent=text;
+  $("#leadSuccess").classList.add("show");
+  $("#leadSuccess").scrollIntoView({behavior:"smooth",block:"center"});
+}
 $("#fSubmit").onclick=async()=>{
   const name=$("#fName").value.trim(), phone=$("#fPhone").value.trim(), email=$("#fEmail").value.trim();
-  if(!name||(!phone&&!email)){$("#fErr").style.display="block";return;}
+  if(!name||(!phone&&!email)){$("#fErr").textContent="Please add your name and a phone or email so we can reach you.";$("#fErr").style.display="block";return;}
   $("#fErr").style.display="none";
+  if(!S.marketCity){ return submitNetlifyLead(); }   // no market selected → legacy lead path
+  const a=BOOK.avail, needSlot=!!(a && a.hasEvent && !a.full && !a.error);
+  if(needSlot && !BOOK.slot){ $("#fErr").textContent="Please pick a time above."; $("#fErr").style.display="block"; return; }
+  const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
+  const msg=$("#fMsg").value.trim();
+  const btn=$("#fSubmit"), prev=btn.textContent; btn.textContent="Submitting…"; btn.disabled=true;
+  const payload={
+    city:S.marketCity, slot:needSlot?BOOK.slot:undefined,
+    name, phone, email, vehicle:$("#fVeh").value,
+    goals: goalsStr + (msg?` · Note: ${msg}`:""),
+    installer_key:S.installerKey||"", bot_field:"",
+    utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||""
+  };
+  try{
+    const r=await fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    const out=await r.json();
+    if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. Check your email for a calendar invite.`); }
+    else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority List'});}catch(e){} bookSuccess("You're on the Priority Event List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}.`); }
+    else if(out.status==="conflict"){
+      if(BOOK.avail){ const all=Object.keys(BOOK.avail.slotLabels||{}); BOOK.avail.openSlots=out.openSlots||[]; BOOK.avail.takenSlots=all.filter(s=>!BOOK.avail.openSlots.includes(s)); BOOK.slot=null;
+        if(BOOK.avail.openSlots.length){ renderSlots(BOOK.avail); } else { BOOK.avail.full=true; renderPriority("full"); } }
+      $("#fErr").textContent="That time was just taken — please pick another."; $("#fErr").style.display="block";
+      btn.textContent=(BOOK.avail&&BOOK.avail.openSlots&&BOOK.avail.openSlots.length)?"Pick a time above":"Join the Priority Event List →"; btn.disabled=false;
+    }
+    else { throw new Error(out.error||"book-failed"); }
+  }catch(e){ btn.disabled=false; btn.textContent=prev; submitNetlifyLead(); }
+};
+function submitNetlifyLead(){
+  const name=$("#fName").value.trim(), phone=$("#fPhone").value.trim(), email=$("#fEmail").value.trim();
+  if(!name||(!phone&&!email)){$("#fErr").style.display="block";return;}
   const cfg=S.cfg||{};
   const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
   const market=$("#fLoc").value||S.market||"Not selected";
@@ -767,11 +851,9 @@ $("#fSubmit").onclick=async()=>{
     utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||""
   };
   const btn=$("#fSubmit"); btn.textContent="Sending…"; btn.disabled=true;
-  try{
-    const r=await fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(fields).toString()});
-    if(!r.ok) throw 0;
-    showSuccess(false);
-  }catch(e){ openMail(payload); showSuccess(true); }
+  fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(fields).toString()})
+    .then(r=>{ if(!r.ok) throw 0; showSuccess(false); })
+    .catch(()=>{ openMail(payload); showSuccess(true); });
 }
 function openMail(p){
   const subj=encodeURIComponent(`Tune Finder request, ${p.vehicle}`);
