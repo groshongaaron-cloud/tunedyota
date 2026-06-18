@@ -59,7 +59,9 @@ A Node test (node:test, matching the repo) that, for every `site/*.html`:
   `FAQPage` → ≥1 Question with acceptedAnswer; `AutomotiveBusiness` →
   name/url/telephone);
 - asserts every breadcrumb `item` URL maps to a real page file (no `/services`);
-- asserts every page has a `<link rel="canonical">`;
+- asserts every page has a `<link rel="canonical">` and the required OG/Twitter
+  tags (`og:title`/`description`/`url`/`type`/`image`, `twitter:card`), with
+  `og:image` resolving to a real asset;
 - asserts `sitemap.xml` covers every indexable page (all `site/*.html` except
   `links.html` and the Google-verification file) and excludes non-indexable ones;
 - asserts the `Event` JSON-LD on `find-your-exact-tune.html` matches what the
@@ -96,13 +98,15 @@ Idempotent, marker-based, run manually before deploy (no CI build step added):
 - **BreadcrumbList coverage** — ensure `faq`, `team`, `supercharger`,
   `find-your-exact-tune` each carry a breadcrumb (add where missing).
 
-### 4. Scope fork — Open Graph / Twitter Cards (owner decides at review)
+### 4. Open Graph / Twitter Cards (in scope — owner approved)
 
-No social-card tags exist sitewide. Recommendation: **include** — add
-`og:*`/`twitter:*` tags to every page (title, description, url, type, image) and
-a `sharp`-generated `og-image.png`. Alternative: **defer** the share-image visual
-to Track B (design) and add only the tags now, or skip entirely. This is the one
-open scope item; the rest of the pass proceeds regardless.
+No social-card tags exist sitewide. This pass adds `og:*` + `twitter:*` tags to
+every content page (title, description, url, type, `image`) and a
+`sharp`-generated `site/og-image.png` (1200×630) built from the brand SVG (§2).
+A future branded share-card visual can replace the generated image in Track B
+without touching the tags. The validator (§1) asserts each page carries the
+required OG/Twitter tags and that `og:image`/`twitter:image` resolve to a real
+asset.
 
 ### 5. GSC-readiness checklist — `docs/seo/gsc-checklist.md`
 
@@ -129,9 +133,9 @@ the committed HTML/sitemap match the source, so `npm test` fails on drift.
 ## Files
 
 - New: `tests/seo.test.js`, `scripts/build-seo.mjs`, `docs/seo/gsc-checklist.md`,
-  `site/logo.png` (+ `site/og-image.png` if OG in scope).
+  `site/logo.png`, `site/og-image.png`.
 - Edit: all `site/*.html` content pages (business stub, breadcrumb fix, offerCount,
-  canonical/OG as scoped), `site/sitemap.xml`, `package.json` (`build:seo` script).
+  OG/Twitter tags), `site/sitemap.xml`, `package.json` (`build:seo` script).
 
 ## Risks
 
