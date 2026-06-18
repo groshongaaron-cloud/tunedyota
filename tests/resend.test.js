@@ -52,3 +52,10 @@ test("throws on non-ok response", async () => {
     /Resend 422/,
   );
 });
+
+test("sendEmail forwards attachments", async () => {
+  let body;
+  const fetchImpl = async (url, opts) => { body = JSON.parse(opts.body); return { ok: true, json: async () => ({ id: "e1" }) }; };
+  await sendEmail({ fetchImpl, apiKey: "k", from: "a", to: "b", subject: "s", html: "h", text: "t", attachments: [{ filename: "x.ics", content: "Zm9v" }] });
+  assert.equal(body.attachments[0].filename, "x.ics");
+});

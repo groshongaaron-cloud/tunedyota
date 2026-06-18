@@ -1,7 +1,7 @@
 // Thin wrapper over the Resend REST API. fetchImpl is injectable for tests;
 // defaults to the global fetch (Node 18+).
 async function sendEmail({
-  fetchImpl = fetch, apiKey, from, to, cc, replyTo, subject, html, text,
+  fetchImpl = fetch, apiKey, from, to, cc, replyTo, subject, html, text, attachments,
 }) {
   const body = {
     from,
@@ -10,6 +10,7 @@ async function sendEmail({
   };
   if (cc) body.cc = [].concat(cc);
   if (replyTo) body.reply_to = [].concat(replyTo);
+  if (attachments && attachments.length) body.attachments = attachments;
 
   const res = await fetchImpl("https://api.resend.com/emails", {
     method: "POST",

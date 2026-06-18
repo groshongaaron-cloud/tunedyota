@@ -113,7 +113,7 @@ deps** (`fetchImpl`, airtable client, `sendEmail`, `sendSms`, `now`), tested wit
 | Field | Type | Notes |
 |---|---|---|
 | City | single line | from `markets.js` |
-| Event Date | date | `eventDateISO` |
+| Event Date | single-line text (ISO `YYYY-MM-DD`) | `eventDateISO` |
 | Slot | single select | one of the 12 times |
 | Name / Phone / Email | text | |
 | Vehicle / Goals | text | from funnel |
@@ -134,7 +134,7 @@ Airtable.
 | Vehicle / Goals | text | |
 | Installer | single select | |
 | Reason | single select | No event scheduled / Event full |
-| Event Date | date | set when Reason = full |
+| Event Date | single-line text (ISO `YYYY-MM-DD`) | set when Reason = full |
 | Notified | checkbox | business workflow |
 | Created | created time | |
 

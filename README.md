@@ -63,3 +63,28 @@ All site data lives in the `<script>` block of `site/find-your-exact-tune.html`:
 `VEHICLES` (years/engines/prices), `INSTALLERS` (bios/photos/contact),
 `MARKETS` (event cities + coordinates; add a `date:` field for event dates).
 Lead delivery is handled by the Netlify form + function described above.
+
+## Event booking (time slots + Priority List)
+The tune finder's booking step offers **live time slots** (12 per city per event
+date: 9:00–12:40, 3/hour) and rolls overflow / unscheduled cities to a **Priority
+Event List**. See the design + plan in
+[`docs/superpowers/specs/2026-06-17-event-booking-slots-design.md`](docs/superpowers/specs/2026-06-17-event-booking-slots-design.md)
+and [`docs/superpowers/plans/2026-06-17-event-booking-slots.md`](docs/superpowers/plans/2026-06-17-event-booking-slots.md).
+
+**Functions:** `netlify/functions/availability.js` (live open slots) and
+`netlify/functions/book.js` (reserve a slot or add to the Priority List, then send
+email + `.ics` calendar invite + optional SMS). Shared logic is in
+`netlify/functions/lib/` and unit-tested with `npm test`.
+
+**Setup (one-time):**
+1. **Event dates:** set `EVENTS_SHEET_ID` to your published event sheet and give at
+   least one active city a parseable ISO date (e.g. `2026-07-12`). Until then every
+   city falls back to the Priority List.
+2. **Airtable:** create the base per
+   [`docs/superpowers/specs/airtable-schema.md`](docs/superpowers/specs/airtable-schema.md),
+   then set `AIRTABLE_TOKEN` + `AIRTABLE_BASE_ID`.
+3. **SMS (optional):** set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`
+   after completing A2P 10DLC registration. SMS is skipped (no error) until then.
+
+See [`.env.example`](.env.example) for the full variable list. A booked slot is one
+with `Status` ≠ `Cancelled`; free a slot by setting its Airtable row to `Cancelled`.
