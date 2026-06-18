@@ -40,3 +40,35 @@ test("templates tolerate missing optional fields", () => {
   assert.doesNotThrow(() => buildInstallerEmail(bare, inst));
   assert.doesNotThrow(() => buildCustomerEmail(bare, inst));
 });
+
+const tB = require("../netlify/functions/lib/templates.js");
+
+const dB = { name: "Jane Doe", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "2025+ Toyota Tacoma", goals: "Power" };
+const instB = { key: "cody", name: "Cody Star", email: "cody@tunedyota.com", phone: "(605) 214-1335" };
+const marketB = { city: "Sioux Falls", state: "SD" };
+const eventB = { dateISO: "2026-07-12", label: "Jul 12, 2026" };
+
+test("booking customer email names slot + date", () => {
+  const m = tB.buildBookingCustomerEmail({ ...dB, slot: "9:20" }, instB, marketB, eventB);
+  assert.ok(m.subject.toLowerCase().includes("booked"));
+  assert.ok(m.text.includes("9:20"));
+  assert.ok(m.text.includes("Sioux Falls"));
+});
+test("booking installer email lists details", () => {
+  const m = tB.buildBookingInstallerEmail({ ...dB, slot: "9:20" }, instB, marketB, eventB);
+  assert.ok(m.subject.includes("Sioux Falls"));
+  assert.ok(m.text.includes("Jane Doe"));
+  assert.ok(m.text.includes("9:20"));
+});
+test("priority emails reflect reason", () => {
+  const full = tB.buildPriorityCustomerEmail(dB, instB, marketB, "full");
+  assert.ok(full.text.toLowerCase().includes("priority"));
+  const inE = tB.buildPriorityInstallerEmail(dB, instB, marketB, "no-event");
+  assert.ok(inE.subject.toLowerCase().includes("priority"));
+});
+test("sms bodies are short and include key info", () => {
+  const s = tB.buildBookingSms({ ...dB, slot: "9:20" }, instB, marketB, eventB);
+  assert.ok(s.includes("Sioux Falls") && s.includes("9:20"));
+  assert.ok(s.length <= 320);
+  assert.ok(tB.buildPrioritySms(dB, marketB).toLowerCase().includes("priority"));
+});
