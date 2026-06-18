@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "Tuned Yota marketing site + Netlify lead-routing functions",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "build:seo": "node scripts/build-seo.mjs"
   }
 }
