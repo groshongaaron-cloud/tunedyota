@@ -77,11 +77,19 @@ function fixBreadcrumbs() {
   }
 }
 
+function writeSitemap() {
+  const entries = SD.HEAD_PAGES
+    .filter((f) => !SD.SITEMAP_EXCLUDE.has(f))
+    .map((f) => ({ loc: SD.locFor(f), priority: SD.PRIORITY[f] || "0.8" }));
+  fs.writeFileSync(path.join(SITE_DIR, "sitemap.xml"), SD.buildSitemap(entries, today()));
+}
+
 async function main() {
   await writeImages();
   for (const f of SD.HEAD_PAGES) processHead(f);
   fixBreadcrumbs();
   processEvents();
+  writeSitemap();
   console.log("seo build complete");
 }
 main().catch((e) => { console.error(e); process.exit(1); });
