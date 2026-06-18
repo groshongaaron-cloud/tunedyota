@@ -1,0 +1,117 @@
+// scripts/lib/seo-data.mjs
+// Pure, side-effect-free builders for the SEO generator. No fs, no network.
+
+export const SITE = "https://tunedyota.com";
+export const BIZ_ID = `${SITE}/#business`;
+
+// Brand mark (decoded from the inline SVG favicon used sitewide) + palette.
+export const BRAND = {
+  ink: "#3A2E26", blue: "#B3D0D9", bg: "#EDECEB", cream: "#F3EFEA",
+  viewBox: "3.879 5.098 40.002 39.316",
+  path: "M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z",
+};
+
+// Pages whose <head> the generator manages. Google Search Console verification
+// file is excluded. (Filenames only; the generator resolves to site/.)
+export const HEAD_PAGES = [
+  "index.html","faq.html","ott-tune.html","supercharger.html","team.html",
+  "links.html","find-your-exact-tune.html",
+  "toyota-4runner-ott-tune.html","toyota-camry-ott-tune.html","toyota-fj-cruiser-ott-tune.html",
+  "toyota-highlander-ott-tune.html","toyota-land-cruiser-ott-tune.html","toyota-rav4-ott-tune.html",
+  "toyota-sequoia-ott-tune.html","toyota-tacoma-ott-tune.html","toyota-tundra-ott-tune.html",
+  "lexus-gx-ott-tune.html","lexus-ls460-ott-tune.html","lexus-lx570-ott-tune.html","lexus-rx350-ott-tune.html",
+];
+export const SITEMAP_EXCLUDE = new Set(["links.html"]);
+
+// Sitemap priority by filename (preserves the existing sitemap's weighting).
+export const PRIORITY = {
+  "index.html": "1.0", "find-your-exact-tune.html": "0.9", "supercharger.html": "0.9",
+  "faq.html": "0.7", "ott-tune.html": "0.7", "team.html": "0.7",
+};
+// loc path for a filename (index -> "/", others -> "/name" without .html).
+export function locFor(file) {
+  if (file === "index.html") return `${SITE}/`;
+  return `${SITE}/${file.replace(/\.html$/, "")}`;
+}
+
+const ESC = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+export function extractMeta(html) {
+  const title = (html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]?.trim() || "";
+  const description = (html.match(/<meta\s+name="description"\s+content="([\s\S]*?)"\s*\/?>/i) || [])[1]?.trim() || "";
+  const canonical = (html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i) || [])[1]?.trim() || "";
+  return { title, description, canonical };
+}
+
+export function buildOgTags({ title, description, canonical }) {
+  const img = `${SITE}/og-image.png`;
+  const lines = [
+    `<meta property="og:title" content="${ESC(title)}">`,
+    `<meta property="og:description" content="${ESC(description)}">`,
+    `<meta property="og:url" content="${ESC(canonical)}">`,
+    `<meta property="og:type" content="website">`,
+    `<meta property="og:image" content="${img}">`,
+    `<meta property="og:site_name" content="Tuned Yota">`,
+    `<meta name="twitter:card" content="summary_large_image">`,
+    `<meta name="twitter:title" content="${ESC(title)}">`,
+    `<meta name="twitter:description" content="${ESC(description)}">`,
+    `<meta name="twitter:image" content="${img}">`,
+  ];
+  return lines.join("\n");
+}
+
+// Compact business node embedded on every page so cross-page provider @id
+// resolves per-page. Full reviews/aggregateRating stay only on index.html.
+export const BUSINESS_STUB = JSON.stringify({
+  "@context": "https://schema.org", "@type": "AutomotiveBusiness", "@id": BIZ_ID,
+  name: "Tuned Yota", url: `${SITE}/`, telephone: "+1-612-406-7117", email: "info@tunedyota.com",
+  priceRange: "$$", slogan: "Undeniable Performance",
+  logo: { "@type": "ImageObject", url: `${SITE}/logo.png`, width: 512, height: 512 },
+  image: `${SITE}/og-image.png`,
+  areaServed: ["Minnesota","Iowa","Wisconsin","North Dakota","South Dakota","Nebraska"].map((n) => ({ "@type": "State", name: n })),
+  sameAs: ["https://www.facebook.com/TunedYota/","https://www.instagram.com/tunedyota/","https://www.facebook.com/groups/501008078456222"],
+});
+
+export function buildEventsJsonLd(events, states) {
+  const items = Object.entries(events)
+    .filter(([, e]) => e && e.active && e.dateISO)
+    .sort((a, b) => a[1].dateISO.localeCompare(b[1].dateISO))
+    .map(([city, e], i) => {
+      const region = states[city] || "";
+      const cityName = city.replace(/\b\w/g, (c) => c.toUpperCase());
+      return {
+        "@type": "ListItem", position: i + 1,
+        item: {
+          "@type": "Event",
+          name: e.event || `Tuned Yota OTT Tuning Event — ${cityName}`,
+          startDate: e.dateISO,
+          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+          eventStatus: "https://schema.org/EventScheduled",
+          location: { "@type": "Place", name: `${cityName}, ${region}`,
+            address: { "@type": "PostalAddress", addressLocality: cityName, addressRegion: region, addressCountry: "US" } },
+          organizer: { "@id": BIZ_ID },
+          offers: { "@type": "Offer", url: `${SITE}/find-your-exact-tune`, availability: "https://schema.org/InStock", price: "450", priceCurrency: "USD" },
+        },
+      };
+    });
+  return JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", name: "Tuned Yota 2026 OTT Tuning Events", itemListElement: items });
+}
+
+// installers: [{name, jobTitle, areaServed:[state...]}]
+export function buildPeopleJsonLd(installers) {
+  const items = installers.map((p, i) => ({
+    "@type": "ListItem", position: i + 1,
+    item: { "@type": "Person", name: p.name, jobTitle: p.jobTitle,
+      worksFor: { "@id": BIZ_ID },
+      areaServed: (p.areaServed || []).map((n) => ({ "@type": "State", name: n })) },
+  }));
+  return JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", name: "Tuned Yota Installers", itemListElement: items });
+}
+
+export function buildSitemap(entries, lastmod) {
+  const urls = entries.map((e) =>
+    `  <url>\n    <loc>${e.loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${e.priority || "0.8"}</priority>\n  </url>`
+  ).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
