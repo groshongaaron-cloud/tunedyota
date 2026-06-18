@@ -51,9 +51,37 @@ function processHead(file) {
   fs.writeFileSync(p, html);
 }
 
+function processEvents() {
+  const events = require("../netlify/functions/lib/events-data.js");
+  const { MARKETS } = require("../netlify/functions/lib/markets.js");
+  const states = Object.fromEntries(MARKETS.map((m) => [m.city.toLowerCase(), m.state]));
+  const p = path.join(SITE_DIR, "find-your-exact-tune.html");
+  let html = fs.readFileSync(p, "utf8");
+  html = injectMarked(html, "EVENTS",
+    `<script type="application/ld+json">\n${SD.buildEventsJsonLd(events, states)}\n</script>`);
+  fs.writeFileSync(p, html);
+}
+
+// Repoint the broken Services breadcrumb to the real OTT Tune hub. Whitespace-
+// insensitive so it catches both spaced (vehicle pages) and compact (ott-tune)
+// JSON formatting. team.html already ships its own Person schema, so no Person
+// injection is needed here.
+function fixBreadcrumbs() {
+  for (const f of SD.HEAD_PAGES) {
+    const p = path.join(SITE_DIR, f);
+    let html = fs.readFileSync(p, "utf8");
+    const next = html
+      .replace(/("item"\s*:\s*)"https:\/\/tunedyota\.com\/services"/g, `$1"${SD.SITE}/ott-tune"`)
+      .replace(/("name"\s*:\s*)"Services"/g, `$1"OTT Tune"`);
+    if (next !== html) fs.writeFileSync(p, next);
+  }
+}
+
 async function main() {
   await writeImages();
   for (const f of SD.HEAD_PAGES) processHead(f);
-  console.log(`head injected: ${SD.HEAD_PAGES.length} pages`);
+  fixBreadcrumbs();
+  processEvents();
+  console.log("seo build complete");
 }
 main().catch((e) => { console.error(e); process.exit(1); });

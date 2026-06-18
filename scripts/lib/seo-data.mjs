@@ -98,17 +98,6 @@ export function buildEventsJsonLd(events, states) {
   return JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", name: "Tuned Yota 2026 OTT Tuning Events", itemListElement: items });
 }
 
-// installers: [{name, jobTitle, areaServed:[state...]}]
-export function buildPeopleJsonLd(installers) {
-  const items = installers.map((p, i) => ({
-    "@type": "ListItem", position: i + 1,
-    item: { "@type": "Person", name: p.name, jobTitle: p.jobTitle,
-      worksFor: { "@id": BIZ_ID },
-      areaServed: (p.areaServed || []).map((n) => ({ "@type": "State", name: n })) },
-  }));
-  return JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", name: "Tuned Yota Installers", itemListElement: items });
-}
-
 export function buildSitemap(entries, lastmod) {
   const urls = entries.map((e) =>
     `  <url>\n    <loc>${e.loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${e.priority || "0.8"}</priority>\n  </url>`
