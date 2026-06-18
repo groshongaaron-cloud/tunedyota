@@ -42,7 +42,7 @@ async function processBooking(body, deps) {
 
   let taken = [];
   try {
-    const formula = `AND({City}='${market.city}',{Event Date}='${event.dateISO}',{Status}!='Cancelled')`;
+    const formula = `AND({City}="${market.city}",{Event Date}="${event.dateISO}",{Status}!="Cancelled")`;
     const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula: formula, fields: ["Slot"] });
     taken = recs.map((r) => r.fields.Slot).filter(Boolean);
   } catch (e) { if (log.error) log.error("list", e.message); return { status: "error", error: "store-unavailable" }; }

@@ -14,7 +14,7 @@ async function getAvailability(city, deps) {
   const base = { city: market.city, hasEvent: true, eventDateISO: event.dateISO, eventLabel: event.label, details: event.details || "", capacity: CAPACITY };
   let taken = [];
   try {
-    const formula = `AND({City}='${market.city}',{Event Date}='${event.dateISO}',{Status}!='Cancelled')`;
+    const formula = `AND({City}="${market.city}",{Event Date}="${event.dateISO}",{Status}!="Cancelled")`;
     const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula: formula, fields: ["Slot"] });
     taken = recs.map((r) => r.fields.Slot).filter(Boolean);
   } catch (e) { if (log.error) log.error("availability list failed", e.message); return { ...base, error: "store-unavailable" }; }
