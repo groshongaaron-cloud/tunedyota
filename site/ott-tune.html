@@ -49,7 +49,7 @@ h2{font-family:'Spectral',serif;font-weight:600;font-size:25px;color:var(--ink);
 .ott-disc{font-size:11.5px;opacity:.55;text-align:center;margin-top:22px;line-height:1.55}
 </style>
 <style id="site-chrome">
-:root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20)}
+:root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20);--ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);--dur-fast:140ms;--dur-base:200ms}
 .snav{position:sticky;top:0;z-index:1000;background:rgba(237,236,235,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;padding:11px 18px;font-family:'Lato',sans-serif}
 .snav-logo{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:17px;color:#5B4B42;text-decoration:none;margin-right:auto}
 .snav-links{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
@@ -65,6 +65,11 @@ h2{font-family:'Spectral',serif;font-weight:600;font-size:25px;color:var(--ink);
 .sfoot .fcon{font-size:13.5px;line-height:1.9;opacity:.9}
 .sfoot .fcopy{font-size:11.5px;opacity:.55;margin-top:16px}
 @media(max-width:560px){.snav-logo{margin-right:0;width:100%;text-align:center}.snav{justify-content:center}}
+/* ── motion polish · craft pass ───────────────────────── */
+.btn,.btn.primary,.btn.sage,.btn.outline,.btn.ink,.tf-opt,.tf-chip,.tf-back,.tf-mkt,.tf-mktbar button,.tf-crumb button,.v-card,.fq-chip,.fq-item,.fq-cta,.lh a.link,.snav-links a,.snav-call,.tf-inst .iacts a{transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,color var(--dur-fast) ease,box-shadow var(--dur-base) var(--ease-out)}
+.btn:active,.btn.primary:active,.btn.sage:active,.btn.outline:active,.btn.ink:active,.tf-opt:active,.tf-chip:active,.tf-back:active,.tf-mkt:active,.tf-mktbar button:active,.tf-crumb button:active,.v-card:active,.fq-chip:active,.lh a.link:active,.snav-call:active,.tf-inst .iacts a:active{transform:scale(.97)}
+@media (hover:none){.btn.primary:hover,.tf-opt:hover,.v-card:hover,.tf-mkt:hover,.lh a.link:hover{transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}.btn:hover,.btn.primary:hover,.tf-opt:hover,.v-card:hover,.tf-mkt:hover,.lh a.link:hover,.btn:active,.btn.primary:active,.tf-opt:active,.tf-chip:active,.tf-mkt:active,.tf-back:active,.v-card:active,.snav-call:active,.lh a.link:active,.fq-chip:active,.tf-mktbar button:active,.tf-crumb button:active,.tf-inst .iacts a:active{transform:none}}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -88,7 +93,7 @@ src="https://www.facebook.com/tr?id=1664417963939672&ev=PageView&noscript=1"/></
 <div class="ott">
   <div class="ott-eyebrow">Authorized OTT Installer · Tuned Yota</div>
   <h1>What Is the OTT Tune?</h1>
-  <div class="ott-answer"><b>OTT — Overland Tailor Tuning</b> builds custom ECU and transmission calibrations for Toyota and Lexus that fix gear hunting, throttle lag, and lazy shifting while unlocking usable power. <b>Tuned Yota is an authorized OTT installer</b> for the Upper Midwest, calibrating your vehicle in person at events across Minnesota, Iowa, Wisconsin, North Dakota, South Dakota, and Nebraska.</div>
+  <div class="ott-answer"><b>OTT, Overland Tailor Tuning</b> builds custom ECU and transmission calibrations for Toyota and Lexus that fix gear hunting, throttle lag, and lazy shifting while unlocking usable power. <b>Tuned Yota is an authorized OTT installer</b> for the Upper Midwest, calibrating your vehicle in person at events across Minnesota, Iowa, Wisconsin, North Dakota, South Dakota, and Nebraska.</div>
   <div class="ott-cta">
     <a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a>
     <a class="btn outline" href="tel:+16124067117">Call / Text (612) 406-7117</a>
@@ -109,9 +114,9 @@ src="https://www.facebook.com/tr?id=1664417963939672&ev=PageView&noscript=1"/></
     <h2>Why get your OTT tune through Tuned Yota</h2>
     <ul>
       <li>Authorized OTT retailer, installer, and calibrator for the Upper Midwest.</li>
-      <li>Installed and dialed in person at events across MN, IA, WI, ND, SD, and NE — never blind, remote guesswork.</li>
+      <li>Installed and dialed in person at events across MN, IA, WI, ND, SD, and NE, never blind, remote guesswork.</li>
       <li>Regional installers who know your platform: Aaron, Noah, and Cody.</li>
-      <li>Factory emissions systems stay fully intact, verified with a 5-gas analyzer — EPA-compliant in every state. We never disable check-engine lights.</li>
+      <li>Factory emissions systems stay fully intact, verified with a 5-gas analyzer, EPA-compliant in every state. We never disable check-engine lights.</li>
     </ul>
   </div>
 
