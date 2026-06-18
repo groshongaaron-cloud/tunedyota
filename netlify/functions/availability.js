@@ -3,12 +3,13 @@ const { getMarket } = require("./lib/markets.js");
 const { getEventForCity } = require("./lib/events.js");
 const { cfg, listRecords } = require("./lib/airtable.js");
 const { SLOT_TIMES, CAPACITY, computeOpen, formatSlot } = require("./lib/slots.js");
+const EVENTS = require("./lib/events-data.js");
 
 async function getAvailability(city, deps) {
   const { fetchImpl = fetch, env = process.env, log = console } = deps;
   const market = getMarket(city);
   if (!market) return { city, hasEvent: false, error: "unknown-city" };
-  const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, log });
+  const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
   if (!event) return { city: market.city, hasEvent: false };
   const c = cfg(env);
   const base = { city: market.city, hasEvent: true, eventDateISO: event.dateISO, eventLabel: event.label, details: event.details || "", capacity: CAPACITY };

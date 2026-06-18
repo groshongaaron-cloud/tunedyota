@@ -2,6 +2,7 @@
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const { getEventForCity } = require("./lib/events.js");
+const EVENTS = require("./lib/events-data.js");
 const { cfg, listRecords, createRecord } = require("./lib/airtable.js");
 const { isValidSlot, computeOpen } = require("./lib/slots.js");
 const { sendEmail } = require("./lib/resend.js");
@@ -21,7 +22,7 @@ async function processBooking(body, deps) {
   if (!d.name || (!d.phone && !d.email)) return { status: "error", error: "missing-contact" };
   const inst = keyToInstaller(market.inst);
   const c = cfg(env);
-  const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, log });
+  const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
 
   async function priority(reason) {
     try {

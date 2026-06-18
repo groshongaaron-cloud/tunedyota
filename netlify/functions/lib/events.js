@@ -49,14 +49,17 @@ function parseEvents(csv) {
   }
   return out;
 }
-async function fetchEvents({ fetchImpl, sheetId, log = console }) {
-  if (!sheetId) return {};
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
-  try {
-    const res = await fetchImpl(url);
-    if (!res.ok) { if (log.warn) log.warn("events fetch status", res.status); return {}; }
-    return parseEvents(await res.text());
-  } catch (e) { if (log.warn) log.warn("events fetch failed", e.message); return {}; }
+async function fetchEvents({ fetchImpl, sheetId, baked = {}, log = console }) {
+  let fromSheet = {};
+  if (sheetId) {
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+    try {
+      const res = await fetchImpl(url);
+      if (res.ok) fromSheet = parseEvents(await res.text());
+      else if (log.warn) log.warn("events fetch status", res.status);
+    } catch (e) { if (log.warn) log.warn("events fetch failed", e.message); }
+  }
+  return { ...baked, ...fromSheet }; // a configured sheet overrides baked
 }
 async function getEventForCity(city, deps) {
   const map = await fetchEvents(deps);

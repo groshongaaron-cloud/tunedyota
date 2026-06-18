@@ -2,6 +2,14 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { parseCsv, toISO, parseEvents, getEventForCity } = require("../netlify/functions/lib/events.js");
 
+test("baked fallback used when no sheet; sheet overrides baked", async () => {
+  const baked = { fargo: { city: "Fargo", dateISO: "2026-07-03", label: "July 3, 2026", active: true } };
+  const e1 = await getEventForCity("Fargo", { fetchImpl: async () => ({ ok: false }), sheetId: "", baked });
+  assert.equal(e1.dateISO, "2026-07-03");
+  const fetchImpl = async () => ({ ok: true, text: async () => "Market,Date,Active\nFargo,2026-08-01,yes\n" });
+  const e2 = await getEventForCity("Fargo", { fetchImpl, sheetId: "x", baked });
+  assert.equal(e2.dateISO, "2026-08-01");
+});
 test("parseCsv handles quoted commas", () => {
   const rows = parseCsv('Market,Date\n"Sioux Falls","Jul 12, 2026"\n');
   assert.deepEqual(rows[1], ["Sioux Falls", "Jul 12, 2026"]);
