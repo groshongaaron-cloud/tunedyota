@@ -59,6 +59,7 @@ test("full -> priority (full)", async () => {
   const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
   assert.equal(r.status, "priority");
   assert.equal(r.reason, "full");
+  assert.equal(h.created[0].fields["Requested Slot"], "9:00");
 });
 test("happy path booked -> creates booking + sends email + sms", async () => {
   const h = harness({ events: EV });

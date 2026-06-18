@@ -41,6 +41,7 @@ A slot counts as taken when a row exists for `City + Event Date + Slot` with
 | Installer  | Single select    | `aaron` / `noah` / `cody` |
 | Reason     | Single select    | `No event scheduled` / `Event full` |
 | Event Date | Single line text | set when Reason = Event full |
+| Requested Slot | Single select | preferred time picked on a full event (one of the 12 times); blank for no-event |
 | Notified   | Checkbox         | your workflow: tick when you've reached out |
 | Created    | Created time     | auto |
 

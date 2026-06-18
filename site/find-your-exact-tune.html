@@ -765,7 +765,8 @@ async function loadAvailability(city){
     const r=await fetch(`/.netlify/functions/availability?city=${encodeURIComponent(city)}`);
     const a=await r.json(); BOOK.avail=a;
     if(a.hasEvent && !a.full && !a.error) renderSlots(a);
-    else renderPriority(a.full?"full":"no-event");
+    else if(a.hasEvent && a.full && !a.error) renderWaitlistFull(a);
+    else renderPriority("no-event");
   }catch(e){ renderPriority("no-event"); }
   updateBookCta();
 }
@@ -780,15 +781,27 @@ function renderSlots(a){
     b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
   });
 }
+function renderWaitlistFull(a){
+  BOOK.slot=null; BOOK.reason="full"; const box=$("#tfSlots");
+  const day=a.eventLabel||a.eventDateISO;
+  const lab=s=>(a.slotLabels&&a.slotLabels[s])||s;
+  const times=Object.keys(a.slotLabels||{});
+  const list=times.length?times:(a.openSlots||[]).concat(a.takenSlots||[]);
+  const btns=list.map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
+  box.innerHTML=`<div class="tf-prio" style="margin-bottom:10px"><strong>${a.city} on ${day} is full.</strong> Pick your preferred time to join the Priority Wait List, and we'll reach out the moment a slot opens.</div><div class="tf-slot-day">Preferred time</div><div class="tf-slotgrid">${btns}</div>`;
+  box.querySelectorAll(".tf-slot").forEach(b=>b.onclick=()=>{
+    box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
+  });
+}
 function renderPriority(reason){
   BOOK.slot=null; BOOK.reason=reason; const box=$("#tfSlots");
-  const line=reason==="full"?"This event is currently full.":"No event is scheduled here yet.";
-  box.innerHTML=`<div class="tf-prio"><strong>${line}</strong> Join the Priority Event List below, and we'll tell you the moment a slot opens.</div>`;
+  box.innerHTML=`<div class="tf-prio"><strong>No event is scheduled here yet.</strong> Join the Priority Wait List below, and we'll tell you the moment a slot opens.</div>`;
 }
 function updateBookCta(){
   const btn=$("#fSubmit"), a=BOOK.avail;
   if(a && a.hasEvent && !a.full && !a.error) btn.textContent=BOOK.slot?"Confirm Booking →":"Pick a time above";
-  else btn.textContent="Join the Priority Event List →";
+  else btn.textContent="Join the Priority Wait List →";
 }
 function bookSuccess(title,text){
   try{ const h=$("#leadSuccess h3"); if(h) h.textContent=title; }catch(e){}
@@ -809,7 +822,7 @@ $("#fSubmit").onclick=async()=>{
   const msg=$("#fMsg").value.trim();
   const btn=$("#fSubmit"), prev=btn.textContent; btn.textContent="Submitting…"; btn.disabled=true;
   const payload={
-    city:S.marketCity, slot:needSlot?BOOK.slot:undefined,
+    city:S.marketCity, slot:BOOK.slot||undefined,
     name, phone, email, vehicle:$("#fVeh").value,
     goals: goalsStr + (msg?` · Note: ${msg}`:""),
     installer_key:S.installerKey||"", bot_field:"",
@@ -819,12 +832,12 @@ $("#fSubmit").onclick=async()=>{
     const r=await fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
     const out=await r.json();
     if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. Check your email for a calendar invite.`); }
-    else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority List'});}catch(e){} bookSuccess("You're on the Priority Event List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}.`); }
+    else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority Wait List'});}catch(e){} bookSuccess("You're on the Priority Wait List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}${BOOK.slot?` for your preferred time, ${BOOK.slot}`:""}.`); }
     else if(out.status==="conflict"){
       if(BOOK.avail){ const all=Object.keys(BOOK.avail.slotLabels||{}); BOOK.avail.openSlots=out.openSlots||[]; BOOK.avail.takenSlots=all.filter(s=>!BOOK.avail.openSlots.includes(s)); BOOK.slot=null;
-        if(BOOK.avail.openSlots.length){ renderSlots(BOOK.avail); } else { BOOK.avail.full=true; renderPriority("full"); } }
+        if(BOOK.avail.openSlots.length){ renderSlots(BOOK.avail); } else { BOOK.avail.full=true; renderWaitlistFull(BOOK.avail); } }
       $("#fErr").textContent="That time was just taken. Please pick another."; $("#fErr").style.display="block";
-      btn.textContent=(BOOK.avail&&BOOK.avail.openSlots&&BOOK.avail.openSlots.length)?"Pick a time above":"Join the Priority Event List →"; btn.disabled=false;
+      btn.textContent=(BOOK.avail&&BOOK.avail.openSlots&&BOOK.avail.openSlots.length)?"Pick a time above":"Join the Priority Wait List →"; btn.disabled=false;
     }
     else { throw new Error(out.error||"book-failed"); }
   }catch(e){ btn.disabled=false; btn.textContent=prev; submitNetlifyLead(); }

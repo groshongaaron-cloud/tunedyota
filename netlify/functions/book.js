@@ -25,13 +25,15 @@ async function processBooking(body, deps) {
   const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
 
   async function priority(reason) {
+    const pfields = {
+      City: market.city, Name: d.name, Phone: d.phone || "", Email: d.email || "",
+      Vehicle: d.vehicle || "", Goals: d.goals || "", Installer: inst.key,
+      Reason: reason === "full" ? "Event full" : "No event scheduled",
+      "Event Date": event ? event.dateISO : "",
+    };
+    if (reason === "full" && isValidSlot(d.slot)) pfields["Requested Slot"] = d.slot; // only set when a preference was picked
     try {
-      await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: {
-        City: market.city, Name: d.name, Phone: d.phone || "", Email: d.email || "",
-        Vehicle: d.vehicle || "", Goals: d.goals || "", Installer: inst.key,
-        Reason: reason === "full" ? "Event full" : "No event scheduled",
-        "Event Date": event ? event.dateISO : "",
-      } });
+      await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields });
     } catch (e) { if (log.error) log.error("priority create", e.message); return { status: "error", error: "store-unavailable" }; }
     try { const m = tpl.buildPriorityInstallerEmail(d, inst, market, reason); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { if (log.error) log.error("prio inst email", e.message); }
     if (d.email) { try { const m = tpl.buildPriorityCustomerEmail(d, inst, market, reason); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: d.email, replyTo: OWNER, subject: m.subject, html: m.html, text: m.text }); } catch (e) { if (log.error) log.error("prio cust email", e.message); } }
