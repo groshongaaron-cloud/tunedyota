@@ -23,13 +23,6 @@ function quoteLine(d) {
   return parts.join(" · ");
 }
 
-function prefLabel(d) {
-  const p = d && d.contact_pref;
-  if (p === "email") return "Email";
-  if (p === "text") return "Text";
-  return "Email or text";
-}
-
 function attribution(d) {
   const parts = [];
   if (d.utm_source) parts.push(`source=${d.utm_source}`);
@@ -105,8 +98,7 @@ function buildBookingInstallerEmail(d, inst, market, event) {
   const rows = [
     row("Name", d.name), row("Phone", d.phone), row("Email", d.email),
     row("City", `${market.city}, ${market.state}`), row("Date", event.label || event.dateISO),
-    row("Time", d.slot), row("Vehicle", d.vehicle), row("Goals", d.goals),
-    row("Preferred contact", prefLabel(d)), row("Attribution", attribution(d)),
+    row("Time", d.slot), row("Vehicle", d.vehicle), row("Goals", d.goals), row("Attribution", attribution(d)),
   ];
   const subject = `New booking — ${market.city} ${event.label || event.dateISO} @ ${d.slot}`;
   const text = `New booking routed to ${inst.name}.\n\n` + rows.map((r) => r.text).join("") + `\nReply to reach the customer.\n`;
@@ -129,24 +121,15 @@ function buildPriorityCustomerEmail(d, inst, market, reason) {
   return { subject, html, text };
 }
 function buildPriorityInstallerEmail(d, inst, market, reason) {
-  const rows = [row("Name", d.name), row("Phone", d.phone), row("Email", d.email), row("City", market.city), row("Requested time", reason === "full" ? (d.slot || "") : ""), row("Vehicle", d.vehicle), row("Goals", d.goals), row("Preferred contact", prefLabel(d)), row("Reason", reason === "full" ? "Event full" : "No event scheduled"), row("Attribution", attribution(d))];
+  const rows = [row("Name", d.name), row("Phone", d.phone), row("Email", d.email), row("City", market.city), row("Requested time", reason === "full" ? (d.slot || "") : ""), row("Vehicle", d.vehicle), row("Goals", d.goals), row("Reason", reason === "full" ? "Event full" : "No event scheduled"), row("Attribution", attribution(d))];
   const subject = `New Priority Wait List signup, ${market.city}`;
   const text = `New Priority Wait List signup routed to ${inst.name}.\n\n` + rows.map((r) => r.text).join("");
   const html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px"><h2 style="color:#5B4B42;margin:0 0 4px">Priority Wait List signup</h2>` +
     `<table style="border-collapse:collapse;font-size:14px">${rows.map((r) => r.html).join("")}</table></div>`;
   return { subject, html, text };
 }
-function buildBookingSms(d, inst, market, event) {
-  return `Tuned Yota: you're booked in ${market.city} on ${event.label || event.dateISO} at ${d.slot}. Questions: ${inst.phone}`;
-}
-function buildPrioritySms(d, market) {
-  const pref = d.slot ? ` (preferred ${d.slot})` : "";
-  return `Tuned Yota: you're on the Priority Wait List for ${market.city}${pref}. We'll text you the moment a slot opens.`;
-}
-
 module.exports = {
   buildInstallerEmail, buildCustomerEmail,
   buildBookingCustomerEmail, buildBookingInstallerEmail,
   buildPriorityCustomerEmail, buildPriorityInstallerEmail,
-  buildBookingSms, buildPrioritySms,
 };

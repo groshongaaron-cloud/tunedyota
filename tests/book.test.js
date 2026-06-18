@@ -5,7 +5,6 @@ const { processBooking } = require("../netlify/functions/book.js");
 function harness({ events, taken = [] }) {
   const created = [];
   const emails = [];
-  const texts = [];
   const fetchImpl = async (url, opts) => {
     if (url.includes("docs.google.com")) return { ok: true, text: async () => events };
     if (url.includes("api.airtable.com")) {
@@ -18,11 +17,10 @@ function harness({ events, taken = [] }) {
     fetchImpl,
     env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "re" },
     send: async (a) => { emails.push(a); return { id: "e" }; },
-    sms: async (a) => { texts.push(a); return { sent: true }; },
     now: () => "20260101T000000Z",
     log: { warn() {}, error() {} },
   };
-  return { deps, created, emails, texts };
+  return { deps, created, emails };
 }
 const base = { city: "Sioux Falls", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "Tacoma", goals: "Power" };
 const EV = "Market,Date,Active\nSioux Falls,2026-07-12,yes\n";
@@ -61,52 +59,21 @@ test("full -> priority (full)", async () => {
   assert.equal(r.reason, "full");
   assert.equal(h.created[0].fields["Requested Slot"], "9:00");
 });
-test("happy path booked -> creates booking + sends email + sms", async () => {
+test("happy path booked -> creates booking + emails installer + customer", async () => {
   const h = harness({ events: EV });
   const r = await processBooking({ ...base, slot: "9:20" }, h.deps);
   assert.equal(r.status, "booked");
   assert.equal(r.slot, "9:20");
   assert.equal(h.created[0].fields.Slot, "9:20");
   assert.equal(h.created[0].fields.Installer, "cody");
-  assert.ok(h.emails.length >= 2);
-  assert.equal(h.texts.length, 1);
-  assert.ok(h.emails.some((e) => e.attachments));
+  assert.ok(h.emails.some((e) => e.to === "cody@tunedyota.com"));  // installer
+  assert.ok(h.emails.some((e) => e.to === base.email));            // customer
+  assert.ok(h.emails.some((e) => e.attachments));                  // calendar invite
 });
-
-const isCustomer = (e) => e.to === base.email;
-
-test("pref email -> customer email, no sms", async () => {
+test("no email given -> books without sending a customer email", async () => {
   const h = harness({ events: EV });
-  await processBooking({ ...base, slot: "9:20", contact_pref: "email" }, h.deps);
-  assert.ok(h.emails.some(isCustomer));   // customer email sent
-  assert.equal(h.texts.length, 0);        // no text
-});
-
-test("pref text -> sms only, no customer email", async () => {
-  const h = harness({ events: EV });
-  await processBooking({ ...base, slot: "9:20", contact_pref: "text" }, h.deps);
-  assert.equal(h.texts.length, 1);
-  assert.ok(!h.emails.some(isCustomer));  // customer not emailed (installer still is)
-});
-
-test("pref text but SMS disabled -> falls back to customer email", async () => {
-  const h = harness({ events: EV });
-  h.deps.sms = async (a) => { h.texts.push(a); return { skipped: true }; };  // Twilio off
-  await processBooking({ ...base, slot: "9:20", contact_pref: "text" }, h.deps);
-  assert.equal(h.texts.length, 1);        // SMS was attempted
-  assert.ok(h.emails.some(isCustomer));   // ...but email still reached them
-});
-
-test("pref text but no phone -> falls back to customer email", async () => {
-  const h = harness({ events: EV });
-  await processBooking({ ...base, phone: "", slot: "9:20", contact_pref: "text" }, h.deps);
-  assert.equal(h.texts.length, 0);        // no phone, nothing attempted
-  assert.ok(h.emails.some(isCustomer));   // email fallback fired
-});
-
-test("booking installer email shows preferred contact", async () => {
-  const h = harness({ events: EV });
-  await processBooking({ ...base, slot: "9:20", contact_pref: "text" }, h.deps);
-  const inst = h.emails.find((e) => !isCustomer(e));
-  assert.match(inst.text, /Preferred contact: Text/);
+  const r = await processBooking({ ...base, email: "", slot: "9:20" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.ok(!h.emails.some((e) => e.to === base.email));           // no customer email
+  assert.ok(h.emails.some((e) => e.to === "cody@tunedyota.com"));  // installer still notified
 });

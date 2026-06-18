@@ -68,11 +68,4 @@ test("priority emails reflect reason", () => {
   // full-event wait list carries the requested time
   assert.ok(tB.buildPriorityCustomerEmail({ ...dB, slot: "9:20" }, instB, marketB, "full").text.includes("9:20"));
   assert.ok(tB.buildPriorityInstallerEmail({ ...dB, slot: "9:20" }, instB, marketB, "full").text.includes("9:20"));
-  assert.ok(tB.buildPrioritySms({ ...dB, slot: "9:20" }, marketB).includes("9:20"));
-});
-test("sms bodies are short and include key info", () => {
-  const s = tB.buildBookingSms({ ...dB, slot: "9:20" }, instB, marketB, eventB);
-  assert.ok(s.includes("Sioux Falls") && s.includes("9:20"));
-  assert.ok(s.length <= 320);
-  assert.ok(tB.buildPrioritySms(dB, marketB).toLowerCase().includes("priority"));
 });
