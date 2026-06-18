@@ -33,20 +33,40 @@ async function writeImages() {
 }
 
 // Replace content between <!-- SEO:KEY:START/END -->, or insert a fresh marked
-// block right after the canonical link. Returns the new html.
+// block right after the canonical link. Returns the new html. Replacement
+// FUNCTIONS are used so `$$`/`$&` inside the injected JSON aren't interpreted as
+// String.replace special patterns (which would corrupt e.g. priceRange "$$").
 function injectMarked(html, key, inner) {
   const block = `<!-- SEO:${key}:START -->\n${inner}\n<!-- SEO:${key}:END -->`;
   const re = new RegExp(`<!-- SEO:${key}:START -->[\\s\\S]*?<!-- SEO:${key}:END -->`);
-  if (re.test(html)) return html.replace(re, block);
-  return html.replace(/(<link rel="canonical"[^>]*>)/i, `$1\n${block}`);
+  if (re.test(html)) return html.replace(re, () => block);
+  return html.replace(/<link rel="canonical"[^>]*>/i, (m) => `${m}\n${block}`);
+}
+
+// True if the page already defines the #business entity (not just references it
+// via provider/organizer). Such pages (index, ott-tune, team, supercharger,
+// find-your-exact-tune) must NOT get the stub, or the @id would be duplicated.
+function definesBusiness(html) {
+  const stripped = html.replace(/<!-- SEO:BUSINESS:START -->[\s\S]*?<!-- SEO:BUSINESS:END -->/g, "");
+  const blocks = [...stripped.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  for (const b of blocks) {
+    try {
+      const j = JSON.parse(b);
+      const nodes = Array.isArray(j) ? j : (j["@graph"] || [j]);
+      if (nodes.some((n) => n && n["@id"] === SD.BIZ_ID && /Business|Organization/.test(n["@type"] || ""))) return true;
+    } catch { /* ignore unparseable block */ }
+  }
+  return false;
 }
 
 function processHead(file) {
   const p = path.join(SITE_DIR, file);
   let html = fs.readFileSync(p, "utf8");
   const meta = SD.extractMeta(html);
-  html = injectMarked(html, "BUSINESS",
-    `<script type="application/ld+json">\n${SD.BUSINESS_STUB}\n</script>`);
+  if (!definesBusiness(html)) {
+    html = injectMarked(html, "BUSINESS",
+      `<script type="application/ld+json">\n${SD.BUSINESS_STUB}\n</script>`);
+  }
   html = injectMarked(html, "OG", SD.buildOgTags(meta));
   fs.writeFileSync(p, html);
 }

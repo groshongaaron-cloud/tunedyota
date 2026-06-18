@@ -26,6 +26,20 @@ test("every managed page: JSON-LD parses, has canonical + OG + business stub", (
   }
 });
 
+test("each page defines #business exactly once (no duplicate @id)", () => {
+  for (const f of SD.HEAD_PAGES) {
+    let defs = 0;
+    for (const b of ldBlocks(read(f))) {
+      let j; try { j = JSON.parse(b); } catch { continue; }
+      const nodes = Array.isArray(j) ? j : (j["@graph"] || [j]);
+      for (const n of nodes) {
+        if (n && n["@id"] === SD.BIZ_ID && /Business|Organization/.test(n["@type"] || "")) defs++;
+      }
+    }
+    assert.equal(defs, 1, `${f} has ${defs} #business definitions (want exactly 1)`);
+  }
+});
+
 test("no breadcrumb points at a non-existent page", () => {
   for (const f of SD.HEAD_PAGES) {
     for (const b of ldBlocks(read(f))) {
