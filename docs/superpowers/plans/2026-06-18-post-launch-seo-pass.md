@@ -300,10 +300,8 @@ test("no breadcrumb points at a non-existent page", () => {
 });
 
 test("find-your-exact-tune carries Event schema matching events-data.js", async () => {
-  const { createRequire } = await import("module");
-  const require2 = createRequire(import.meta.url);
-  const events = require2("../netlify/functions/lib/events-data.js");
-  const { MARKETS } = require2("../netlify/functions/lib/markets.js");
+  const events = require("../netlify/functions/lib/events-data.js");
+  const { MARKETS } = require("../netlify/functions/lib/markets.js");
   const states = Object.fromEntries(MARKETS.map((m) => [m.city.toLowerCase(), m.state]));
   const expected = JSON.parse(SD.buildEventsJsonLd(events, states));
   const blocks = ldBlocks(read("find-your-exact-tune.html")).map((b) => JSON.parse(b));
