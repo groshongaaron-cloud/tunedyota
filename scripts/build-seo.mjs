@@ -32,7 +32,28 @@ async function writeImages() {
   console.log("images: logo.png, og-image.png");
 }
 
+// Replace content between <!-- SEO:KEY:START/END -->, or insert a fresh marked
+// block right after the canonical link. Returns the new html.
+function injectMarked(html, key, inner) {
+  const block = `<!-- SEO:${key}:START -->\n${inner}\n<!-- SEO:${key}:END -->`;
+  const re = new RegExp(`<!-- SEO:${key}:START -->[\\s\\S]*?<!-- SEO:${key}:END -->`);
+  if (re.test(html)) return html.replace(re, block);
+  return html.replace(/(<link rel="canonical"[^>]*>)/i, `$1\n${block}`);
+}
+
+function processHead(file) {
+  const p = path.join(SITE_DIR, file);
+  let html = fs.readFileSync(p, "utf8");
+  const meta = SD.extractMeta(html);
+  html = injectMarked(html, "BUSINESS",
+    `<script type="application/ld+json">\n${SD.BUSINESS_STUB}\n</script>`);
+  html = injectMarked(html, "OG", SD.buildOgTags(meta));
+  fs.writeFileSync(p, html);
+}
+
 async function main() {
   await writeImages();
+  for (const f of SD.HEAD_PAGES) processHead(f);
+  console.log(`head injected: ${SD.HEAD_PAGES.length} pages`);
 }
 main().catch((e) => { console.error(e); process.exit(1); });
