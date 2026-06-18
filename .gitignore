@@ -8,3 +8,6 @@ desktop.ini
 
 # Node (if tooling is added later)
 node_modules/
+
+# Claude Code local machine settings (per-machine, not for the repo)
+.claude/settings.local.json
