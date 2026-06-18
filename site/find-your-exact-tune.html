@@ -783,7 +783,7 @@ function renderSlots(a){
 function renderPriority(reason){
   BOOK.slot=null; BOOK.reason=reason; const box=$("#tfSlots");
   const line=reason==="full"?"This event is currently full.":"No event is scheduled here yet.";
-  box.innerHTML=`<div class="tf-prio"><strong>${line}</strong> Join the Priority Event List below — we'll tell you the moment a slot opens.</div>`;
+  box.innerHTML=`<div class="tf-prio"><strong>${line}</strong> Join the Priority Event List below, and we'll tell you the moment a slot opens.</div>`;
 }
 function updateBookCta(){
   const btn=$("#fSubmit"), a=BOOK.avail;
@@ -823,7 +823,7 @@ $("#fSubmit").onclick=async()=>{
     else if(out.status==="conflict"){
       if(BOOK.avail){ const all=Object.keys(BOOK.avail.slotLabels||{}); BOOK.avail.openSlots=out.openSlots||[]; BOOK.avail.takenSlots=all.filter(s=>!BOOK.avail.openSlots.includes(s)); BOOK.slot=null;
         if(BOOK.avail.openSlots.length){ renderSlots(BOOK.avail); } else { BOOK.avail.full=true; renderPriority("full"); } }
-      $("#fErr").textContent="That time was just taken — please pick another."; $("#fErr").style.display="block";
+      $("#fErr").textContent="That time was just taken. Please pick another."; $("#fErr").style.display="block";
       btn.textContent=(BOOK.avail&&BOOK.avail.openSlots&&BOOK.avail.openSlots.length)?"Pick a time above":"Join the Priority Event List →"; btn.disabled=false;
     }
     else { throw new Error(out.error||"book-failed"); }
