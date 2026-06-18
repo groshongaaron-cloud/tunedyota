@@ -5,7 +5,10 @@ const { keyToInstaller } = require("./lib/routing.js");
 const { buildInstallerEmail, buildCustomerEmail } = require("./lib/templates.js");
 const { sendEmail } = require("./lib/resend.js");
 
-const FROM = "Tuned Yota <info@tunedyota.com>";
+// Sender must be on the Resend-verified domain (send.tunedyota.events).
+// The mailbox (events@) is arbitrary — Resend sends from it without an inbox.
+// Replies still route to the real info@ inbox via replyTo/OWNER below.
+const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
 
 async function processSubmission(payload, deps) {

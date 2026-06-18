@@ -10,7 +10,10 @@ const { sendSms, normalizePhone } = require("./lib/sms.js");
 const { buildIcs } = require("./lib/ics.js");
 const tpl = require("./lib/templates.js");
 
-const FROM = "Tuned Yota <info@tunedyota.com>";
+// Sender must be on the Resend-verified domain (send.tunedyota.events).
+// The mailbox (events@) is arbitrary — Resend sends from it without an inbox.
+// Replies still route to the real info@ inbox via replyTo/OWNER below.
+const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
 
 async function processBooking(body, deps) {
