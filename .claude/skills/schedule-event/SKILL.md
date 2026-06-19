@@ -37,7 +37,8 @@ An event's existence is defined in **three files that must agree**, plus a serve
 If the event is in a state Tuned Yota hasn't served before (e.g. first-ever Kansas event), also:
 
 - **`STATE_ORDER`** in `site/find-your-exact-tune.html` — append the 2-letter code (e.g. `"KS"`) or the market gets no filter tab.
-- **`areaServed`** — add the state (`{"@type":"State","name":"Kansas"}`) to the business `areaServed`. The per-page business stub's list lives in `scripts/lib/seo-data.mjs` (`BUSINESS_STUB.areaServed`) — edit it there and `npm run build:seo` propagates it; the homepage `index.html` `AutomotiveBusiness` node and the `Service` blocks carry their own hand-written `areaServed` arrays to update too. Then re-run `build:seo` + `npm test`.
+- **`areaServed`** — add the state (`{"@type":"State","name":"Kansas"}`) to the business `areaServed`. The per-page business stub's list lives in `scripts/lib/seo-data.mjs` (`BUSINESS_STUB.areaServed`) — edit it there and `npm run build:seo` propagates it; the homepage `index.html` `AutomotiveBusiness` node and the `Service` blocks (e.g. `ott-tune.html`) carry their own hand-written `areaServed` arrays to update too. Then re-run `build:seo` + `npm test`.
+- **Service-area copy** — a newly-served state also appears in human-readable text: the sitewide footer "Serving Minnesota · Iowa · …" line (hand-written in every `site/*.html`) and the service-area sentence in `site/llms.txt`. `grep -rl "Serving Minnesota" site/` to find them all.
 
 (For a new city in an already-served state, skip this section.)
 
