@@ -17,6 +17,7 @@ export const HEAD_PAGES = [
   "index.html","faq.html","ott-tune.html","supercharger.html","team.html",
   "links.html","find-your-exact-tune.html",
   "ott-tune-cost.html","is-the-ott-tune-worth-it.html","magnuson-supercharger-guide.html","tune-warranty-emissions-legality.html",
+  "toyota-lexus-tuning-minnesota.html","toyota-lexus-tuning-iowa.html","toyota-lexus-tuning-wisconsin.html","toyota-lexus-tuning-north-dakota.html","toyota-lexus-tuning-south-dakota.html","toyota-lexus-tuning-nebraska.html",
   "toyota-4runner-ott-tune.html","toyota-camry-ott-tune.html","toyota-fj-cruiser-ott-tune.html",
   "toyota-highlander-ott-tune.html","toyota-land-cruiser-ott-tune.html","toyota-rav4-ott-tune.html",
   "toyota-sequoia-ott-tune.html","toyota-tacoma-ott-tune.html","toyota-tundra-ott-tune.html",
