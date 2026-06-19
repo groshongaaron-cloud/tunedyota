@@ -7,7 +7,9 @@ description: Use when deploying Tuned Yota changes to production — the correct
 
 ## Overview
 
-Deploy = **push to `master`**; Netlify auto-builds from `site/`. There is **no CI step that regenerates the SEO assets** — you generate them locally first — and a push doesn't guarantee a publish (this site has silently skipped deploys before). So the flow is regenerate → test → push → **confirm published** → verify live.
+Deploy = **push to `master`**; the repo is GitHub-connected and Netlify auto-builds from `site/`. There is **no CI step that regenerates the SEO assets** — you generate them locally first — and a push doesn't guarantee a publish (this site has silently skipped deploys before). So the flow is regenerate → test → push → **confirm published** → verify live.
+
+> **Ignore the stale manual-deploy docs.** `README.md` (and the 2026-06-12 spec/plan) say to run `netlify deploy` / `netlify deploy --prod`. That is NOT how this site publishes today — **pushing `master` is the deploy** (verified: every push this project makes triggers a Netlify production build). Do not run `netlify deploy` manually; it's unnecessary and creates a confusing parallel deploy path.
 
 ## Steps
 
