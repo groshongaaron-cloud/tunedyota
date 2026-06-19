@@ -458,7 +458,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
     </div>
 
     <div class="tf-success" id="leadSuccess">
-      <div class="tick">✓</div>
+      <div class="tf-success-check" aria-hidden="true">✓</div>
       <h3>Request sent.</h3>
       <p id="successMsg">We'll be in touch shortly to confirm your appointment.</p>
       <a class="btn sage" href="tel:+16124067117" style="margin-top:14px">Call now to book faster</a>
@@ -870,8 +870,10 @@ function renderPriority(reason){
 }
 function updateBookCta(){
   const btn=$("#fSubmit"), a=BOOK.avail;
-  if(a && a.hasEvent && !a.full && !a.error) btn.textContent=BOOK.slot?"Confirm Booking →":"Pick a time above";
+  const ready=!!(a && a.hasEvent && !a.full && !a.error);
+  if(ready) btn.textContent=BOOK.slot?"Confirm Booking →":"Pick a time above";
   else btn.textContent="Join the Priority Wait List →";
+  btn.classList.toggle("ready", ready && !!BOOK.slot);
 }
 function bookSuccess(title,text){
   try{ const h=$("#leadSuccess h3"); if(h) h.textContent=title; }catch(e){}
