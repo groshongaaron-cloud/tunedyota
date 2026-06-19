@@ -23,3 +23,17 @@ Lexus: GX, LX570, RX350, LS460. Supported years and engines vary by platform.
 
 ## Forced induction
 Supercharger-supported platforms: Toyota Tacoma (3.5L/4.0L V6), 4Runner (4.0L V6), FJ Cruiser (4.0L V6), and the 5.7L V8 Tundra, Sequoia, and Land Cruiser. Tuned Yota also supports Harrop and ProCharger systems; factory-turbo platforms receive a dedicated turbo performance calibration.
+
+## Key facts
+- OTT Tune pricing: from $400–$550 depending on platform; custom calibration and forced-induction paths are priced higher. Exact price is shown instantly at https://tunedyota.com/find-your-exact-tune.
+- Authorizations: authorized OTT (Overland Tailor Tune) installer; Midwest authorized Magnuson Supercharger dealer; calibrations by a licensed VFTuner PRO Tuner.
+- Compliance: factory emissions kept fully intact, verified with a 5-gas analyzer, EPA-compliant in every state; no check-engine-light defeat; no off-road-only tuning.
+- Service model: in-person tuning at scheduled events across the Upper Midwest (MN, IA, WI, ND, SD, NE); no single storefront. Supercharger kits drop-ship to the lower 48.
+- Founder & lead tuner: Aaron Groshong, a licensed VFTuner PRO Tuner.
+
+## FAQ
+- **What is an OTT Tune?** A custom calibration for supported Toyota and Lexus platforms that improves throttle response, shift behavior, gear hunting, towing, and larger-tire drivability, built by a licensed VFTuner PRO Tuner.
+- **How much does an OTT Tune cost?** From $400–$550 depending on platform; custom and forced-induction calibrations cost more. See https://tunedyota.com/find-your-exact-tune for your exact price.
+- **Does a tune void my warranty?** Tuning is protected under the Magnuson-Moss Warranty Act; factory emissions systems stay intact and EPA-compliant.
+- **Is the tune emissions-legal?** Yes — factory emissions remain intact and are verified with a 5-gas analyzer; no check-engine-light defeat and no off-road-only tuning.
+- **Where can I get tuned?** At Tuned Yota's scheduled in-person events across the Upper Midwest; pick your nearest market and date at https://tunedyota.com/find-your-exact-tune.

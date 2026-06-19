@@ -15,3 +15,11 @@ test("homepage business schema names the founder as a Person", () => {
   assert.equal(biz.founder.name, "Aaron Groshong");
   assert.ok(/VFTuner/.test(biz.founder.jobTitle || ""), "founder jobTitle mentions VFTuner");
 });
+
+test("llms.txt carries citable Key Facts + FAQ", () => {
+  const t = read("llms.txt");
+  assert.ok(/## Key facts/i.test(t), "Key facts section");
+  assert.ok(/## FAQ/i.test(t), "FAQ section");
+  assert.ok(/from \$\d/i.test(t), "a 'from $' price appears");
+  assert.ok(/VFTuner PRO/.test(t), "authorization mentioned");
+});
