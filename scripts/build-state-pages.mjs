@@ -131,6 +131,7 @@ function page({ name, slug, cities, instKeys }) {
   const installers = [...instKeys].map((k) => INSTALLER[k]);
   const instNames = installers.map((i) => i.name);
   const instLabel = instNames.length === 1 ? instNames[0] : instNames.slice(0, -1).join(", ") + " and " + instNames[instNames.length - 1];
+  const instWord = instNames.length === 1 ? "installer is" : "installers are";
   const instLine = installers.map((i) => `<strong>${i.name}</strong> — ${i.bio}`).join("<br>");
 
   const faqs = [
@@ -171,7 +172,7 @@ ${NAV}
 <div class="lp">
   <div class="lp-eyebrow">Toyota &amp; Lexus Tuning · ${name}</div>
   <h1>Toyota &amp; Lexus Engine Tuning in ${name}</h1>
-  <div class="lp-answer">Tuned Yota brings professional Toyota and Lexus engine tuning to ${name} — in person at events in ${ESC(cityTxt)}. Every OTT calibration is built by a licensed VFTuner PRO Tuner, keeps factory emissions fully intact, and starts from $400. Your ${name} installer is ${instLabel}.</div>
+  <div class="lp-answer">Tuned Yota brings professional Toyota and Lexus engine tuning to ${name} — in person at events in ${ESC(cityTxt)}. Every OTT calibration is built by a licensed VFTuner PRO Tuner, keeps factory emissions fully intact, and starts from $400. Your ${name} ${instWord} ${instLabel}.</div>
   <div class="lp-cta">
     <a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a>
     <a class="btn outline" href="tel:+16124067117">Call / Text (612) 406-7117</a>
