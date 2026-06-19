@@ -5,6 +5,14 @@ const assert = require("node:assert/strict");
 let M;
 test.before(async () => { M = await import("../scripts/lib/seo-data.mjs"); });
 
+test("extractMeta decodes entities so OG tags aren't double-encoded", () => {
+  const m = M.extractMeta('<title>Cost &amp; Pricing</title>\n<meta name="description" content="A &amp; B">\n<link rel="canonical" href="https://tunedyota.com/x">');
+  assert.equal(m.title, "Cost & Pricing");
+  const og = M.buildOgTags(m);
+  assert.ok(og.includes('og:title" content="Cost &amp; Pricing"'), "single-encoded");
+  assert.ok(!og.includes("&amp;amp;"), "no double-encoding");
+});
+
 test("extractMeta pulls title, description, canonical", () => {
   const html = `<title>Foo | Tuned Yota</title>
 <meta name="description" content="Bar baz.">

@@ -16,6 +16,7 @@ export const BRAND = {
 export const HEAD_PAGES = [
   "index.html","faq.html","ott-tune.html","supercharger.html","team.html",
   "links.html","find-your-exact-tune.html",
+  "ott-tune-cost.html","is-the-ott-tune-worth-it.html","magnuson-supercharger-guide.html","tune-warranty-emissions-legality.html",
   "toyota-4runner-ott-tune.html","toyota-camry-ott-tune.html","toyota-fj-cruiser-ott-tune.html",
   "toyota-highlander-ott-tune.html","toyota-land-cruiser-ott-tune.html","toyota-rav4-ott-tune.html",
   "toyota-sequoia-ott-tune.html","toyota-tacoma-ott-tune.html","toyota-tundra-ott-tune.html",
@@ -37,9 +38,14 @@ export function locFor(file) {
 const ESC = (s) => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// Decode the few HTML entities a title/description may already carry, so the OG
+// builder re-encodes them exactly once (avoids `&amp;` -> `&amp;amp;`).
+const UNESC = (s) => String(s == null ? "" : s)
+  .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+
 export function extractMeta(html) {
-  const title = (html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]?.trim() || "";
-  const description = (html.match(/<meta\s+name="description"\s+content="([\s\S]*?)"\s*\/?>/i) || [])[1]?.trim() || "";
+  const title = UNESC((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1]?.trim() || "");
+  const description = UNESC((html.match(/<meta\s+name="description"\s+content="([\s\S]*?)"\s*\/?>/i) || [])[1]?.trim() || "");
   const canonical = (html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i) || [])[1]?.trim() || "";
   return { title, description, canonical };
 }
