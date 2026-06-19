@@ -844,7 +844,8 @@ function renderSlots(a){
   const lab=s=>(a.slotLabels&&a.slotLabels[s])||s;
   const open=(a.openSlots||[]).map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
   const taken=(a.takenSlots||[]).map(s=>`<button type="button" class="tf-slot" disabled>${lab(s)}</button>`).join("");
-  box.innerHTML=`<div class="tf-slot-day">${a.city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
+  const sc=scarcityLine((a.openSlots||[]).length, Object.keys(a.slotLabels||{}).length||12, a.city, day);
+  box.innerHTML=`${sc}<div class="tf-slot-day">${a.city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
   box.querySelectorAll(".tf-slot:not([disabled])").forEach(b=>b.onclick=()=>{
     box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
     b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
