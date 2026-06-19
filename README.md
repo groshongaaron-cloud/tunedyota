@@ -17,25 +17,28 @@ Static HTML — no build step. The deployable site lives in [`site/`](site/);
 ## Contact
 (612) 406-7117 · info@tunedyota.com
 
-## Deploy (Netlify CLI)
+## Deploy
 
-Deploys are driven by `netlify.toml` (publish dir `site/`, functions in
-`netlify/functions/`) — no `--dir` flag needed.
+`tunedyota.com` is live on Netlify, and the repo is **GitHub-connected: every push
+to `master` auto-builds and publishes.** `git push origin master` *is* the deploy —
+you do not run `netlify deploy` manually.
+
+There is no Netlify build command (`netlify.toml` just sets publish dir `site/` and
+functions in `netlify/functions/`), so the SEO assets are generated **locally before
+you push** if you changed any SEO input:
 
 ```sh
-# one-time
-npm i -g netlify-cli
-netlify login
-
-# preview deploy (private URL, safe to test — includes functions)
-netlify deploy
-
-# go live on the Netlify subdomain
-netlify deploy --prod
+npm run build:seo   # only if you changed events, page title/description, the page set, or reviews
+npm test            # must pass — includes the SEO/structure checks
+git push origin master
 ```
 
-Connect `tunedyota.com` in **Netlify → Site settings → Domain management**
-only when ready — that cutover replaces the current live Wix site.
+Then confirm the Netlify dashboard shows the latest commit **Published** (deploys have
+occasionally been skipped on account billing limits — don't assume), and spot-check the
+live page. The full procedure is captured in the `ship` skill (`.claude/skills/ship/`).
+
+The Netlify CLI (`netlify deploy` / `netlify deploy --prod`) still works as a manual
+preview/fallback, but it is **not** the normal workflow.
 
 ## Lead capture (one-time setup)
 Tune-finder leads POST to the Netlify form **`tune-lead`** (stored under
