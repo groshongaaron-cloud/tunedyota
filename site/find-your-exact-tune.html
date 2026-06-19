@@ -215,6 +215,22 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 .tf-slot.sel{background:var(--brown);color:#fff;border-color:var(--brown)}
 .tf-slot[disabled]{opacity:.4;cursor:not-allowed;text-decoration:line-through}
 .tf-slot-day{text-align:center;font-family:'Spectral',serif;font-weight:600;font-size:17px;color:var(--ink);margin:6px 0 10px}
+.tf-proof{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow-sm);margin:14px 0}
+.tf-proof .stars{color:#E3B341;font-size:14px;letter-spacing:2px;margin-bottom:6px}
+.tf-proof blockquote{font-family:'Spectral',serif;font-size:15.5px;line-height:1.5;color:var(--ink);margin:0 0 10px}
+.tf-proof figcaption{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--brown)}
+.tf-proof .av{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--sage);color:#fff;font-size:12px;font-weight:900}
+.tf-proof .vf{margin-left:auto;font-family:'Lato';font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--sage-d)}
+.tf-scarcity{text-align:center;font-family:'Lato';font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--sage-d);margin:0 0 10px}
+.tf-scarcity.low{color:#9b4a3a}
+.tf-scarcity.low::before{content:"●";margin-right:7px;color:#c2603f;font-size:10px;vertical-align:middle}
+.tf-slot.sel{position:relative}
+.tf-slot.sel::after{content:"✓";position:absolute;top:4px;right:6px;font-size:11px;font-weight:900;color:#fff;opacity:.9}
+.btn.ready{animation:ctaPulse 1.6s var(--ease-out) 2}
+@keyframes ctaPulse{0%,100%{box-shadow:var(--shadow-sm)}50%{box-shadow:0 0 0 4px var(--ring)}}
+.tf-success-check{width:54px;height:54px;border-radius:50%;background:var(--sage);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;animation:popCheck .45s var(--ease-out) both}
+@keyframes popCheck{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.btn.ready{animation:none}.tf-success-check{animation:none}}
 .tf-prio{background:linear-gradient(135deg,rgba(153,160,142,.16),rgba(179,208,217,.16));border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.5;margin:6px 0}
 .tf-inst{display:none;background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin:4px 0 18px;gap:16px;align-items:center}
 .tf-inst.show{display:flex;animation:rise .4s both}
@@ -380,6 +396,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
         <li>We never disable check-engine lights, and we don't tune off-road-only vehicles.</li>
       </ul>
     </div>
+    <div id="proofResult"></div>
     <div class="tf-cta-row">
       <button class="btn primary" id="toBook">Book at an Event →</button>
       <a class="btn sage" href="tel:+16124067117">Call / Text (612) 406-7117</a>
@@ -420,6 +437,8 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
     </div>
 
     <div class="tf-or">or send a request</div>
+
+    <div id="proofBook"></div>
 
     <div id="leadForm">
       <div class="tf-field">
@@ -691,6 +710,8 @@ function renderResult(){
       <ul class="tf-bul">${benefits.map(b=>`<li>${b}</li>`).join("")}</ul>
       <div class="pricebox">${rows}</div>
     </div>`;
+  const rr=pickReview(S.make,[]); proofResultName=rr.name;
+  $("#proofResult").innerHTML=proofCard(rr);
   if(S.cfg.fi){
     const scTitle=S.cfg.turbo?"Turbo Performance Calibration":"Magnuson Supercharger + Calibration";
     const scBody=S.cfg.turbo
@@ -775,10 +796,36 @@ function selectMarket(i){
 function prepBooking(){
   initMap(); renderBar(); renderList();
   $("#fVeh").value=vehStr()+(S.goals.size?`  \u00b7  ${[...S.goals].map(id=>GOALS.find(g=>g.id===id).l).join(", ")}`:"");
+  $("#proofBook").innerHTML=proofCard(pickReview(S.make,[proofResultName]));
   setTimeout(()=>{ if(MAP) MAP.invalidateSize(); },300);
 }
 /* ---- live booking: slots + priority list ---- */
 const BOOK={avail:null,slot:null,reason:null};
+/* verified reviews — mirrors index.html AutomotiveBusiness schema; keep in sync */
+const REVIEWS=[
+  {name:"S. Berry",make:"toyota",text:"Dropped in to a scheduled local tuning event for the latest OTT calibration on my Tacoma — trans up/down shifts and power delivery is the smoothest it's ever been."},
+  {name:"H. Aguirre",make:"toyota",text:"We recently had our Toyota Tacoma TRD Pro tuned, and the difference is fantastic. You'll notice improvements in throttle control and smoother gear shifts."},
+  {name:"C. Vang",make:"lexus",text:"Had my 2020 Lexus GX 460 tuned by Noah — knowledgeable, professional, and it actually feels like a v8 now. Should have done it sooner."},
+  {name:"J. Mayer",make:"any",text:"Very classy operation. Had my OTT tune without issues for years, with free support and updates."}
+];
+let proofResultName="";
+function pickReview(make,used){
+  const m=String(make||"").toLowerCase();
+  const pool=REVIEWS.filter(r=>!used||used.indexOf(r.name)<0);
+  return pool.find(r=>r.make===m)||pool.find(r=>r.make==="any")||pool[0]||REVIEWS[0];
+}
+function proofCard(r){
+  const init=r.name.replace(/[^A-Za-z]/g,"").slice(0,1).toUpperCase();
+  return `<figure class="tf-proof"><div class="stars" aria-hidden="true">★★★★★</div>`+
+    `<blockquote>"${r.text}"</blockquote>`+
+    `<figcaption><span class="av">${init}</span>${r.name}<span class="vf">5.0 ★ verified</span></figcaption></figure>`;
+}
+function scarcityLine(openCount,total,city,label){
+  if(!openCount) return "";
+  const low=openCount<=4;
+  const txt=low?`Only ${openCount} spot${openCount===1?"":"s"} left`:`${openCount} of ${total} times open`;
+  return `<div class="tf-scarcity${low?" low":""}">${txt} — ${city}, ${label}</div>`;
+}
 async function loadAvailability(city){
   BOOK.avail=null;BOOK.slot=null;BOOK.reason=null;
   const box=$("#tfSlots"); if(!box) return; box.style.display="block";
