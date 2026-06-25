@@ -1,3 +1,7 @@
 [build]
   publish = "site"
   functions = "netlify/functions"
+
+# Daily Certificate of Authenticity dispatch (netlify/functions/certificate-dispatch.js).
+[functions."certificate-dispatch"]
+  schedule = "0 14 * * *"
