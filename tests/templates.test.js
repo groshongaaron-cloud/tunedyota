@@ -60,6 +60,15 @@ test("booking installer email lists details", () => {
   assert.ok(m.text.includes("Jane Doe"));
   assert.ok(m.text.includes("9:20"));
 });
+test("installer emails surface Free OTT Update request type when source set", () => {
+  const b = tB.buildBookingInstallerEmail({ ...dB, slot: "9:20", source: "OTT Update" }, instB, marketB, eventB);
+  assert.ok(b.text.includes("Free OTT Update"), "booking text row missing");
+  assert.ok(b.html.includes("Free OTT Update"), "booking html row missing");
+  const p = tB.buildPriorityInstallerEmail({ ...dB, source: "OTT Update" }, instB, marketB, "no-event");
+  assert.ok(p.text.includes("Free OTT Update"), "priority text row missing");
+  const plain = tB.buildBookingInstallerEmail({ ...dB, slot: "9:20" }, instB, marketB, eventB);
+  assert.ok(!plain.text.includes("Free OTT Update"), "no row when source absent");
+});
 test("priority emails reflect reason", () => {
   const full = tB.buildPriorityCustomerEmail(dB, instB, marketB, "full");
   assert.ok(full.text.toLowerCase().includes("priority"));

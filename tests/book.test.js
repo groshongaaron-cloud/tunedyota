@@ -77,3 +77,16 @@ test("no email given -> books without sending a customer email", async () => {
   assert.ok(!h.emails.some((e) => e.to === base.email));           // no customer email
   assert.ok(h.emails.some((e) => e.to === "cody@tunedyota.com"));  // installer still notified
 });
+test("source flag tags the booking record + installer email", async () => {
+  const h = harness({ events: EV });
+  const r = await processBooking({ ...base, slot: "9:20", source: "OTT Update" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal(h.created[0].fields.Source, "OTT Update");
+  const inst = h.emails.find((e) => e.to === "cody@tunedyota.com");
+  assert.ok(inst && /Free OTT Update/.test(inst.text), "installer email should flag the re-flash");
+});
+test("booking source defaults when flag absent", async () => {
+  const h = harness({ events: EV });
+  await processBooking({ ...base, slot: "9:40" }, h.deps);
+  assert.equal(h.created[0].fields.Source, "find-your-exact-tune");
+});
