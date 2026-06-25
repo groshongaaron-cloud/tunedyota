@@ -27,4 +27,14 @@ async function createRecord({ fetchImpl = fetch, token, baseId, table, fields })
   if (!res.ok) throw new Error(`airtable create ${res.status}: ${await res.text().catch(() => "")}`);
   return res.json();
 }
-module.exports = { cfg, listRecords, createRecord };
+async function updateRecord({ fetchImpl = fetch, token, baseId, table, id, fields }) {
+  const url = `${API}/${baseId}/${encodeURIComponent(table)}/${id}`;
+  const res = await fetchImpl(url, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields, typecast: true }),
+  });
+  if (!res.ok) throw new Error(`airtable update ${res.status}: ${await res.text().catch(() => "")}`);
+  return res.json();
+}
+module.exports = { cfg, listRecords, createRecord, updateRecord };

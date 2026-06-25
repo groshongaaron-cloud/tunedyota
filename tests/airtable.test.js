@@ -24,3 +24,13 @@ test("createRecord posts fields, throws on non-ok", async () => {
   const bad = async () => ({ ok: false, status: 422, text: async () => "bad" });
   await assert.rejects(() => createRecord({ fetchImpl: bad, token: "t", baseId: "b", table: "Bookings", fields: {} }));
 });
+test("updateRecord PATCHes by id with typecast", async () => {
+  let seen;
+  const fetchImpl = async (url, opts) => { seen = { url, opts }; return { ok: true, json: async () => ({ id: "r1" }) }; };
+  const { updateRecord } = require("../netlify/functions/lib/airtable.js");
+  const r = await updateRecord({ fetchImpl, token: "t", baseId: "b", table: "Bookings", id: "r1", fields: { "Certificate Sent": true } });
+  assert.equal(r.id, "r1");
+  assert.equal(seen.opts.method, "PATCH");
+  assert.ok(seen.url.endsWith("/b/Bookings/r1"));
+  assert.equal(JSON.parse(seen.opts.body).fields["Certificate Sent"], true);
+});
