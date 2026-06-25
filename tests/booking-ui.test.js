@@ -21,3 +21,8 @@ test("conversion-polish hooks exist", () => {
     assert.ok(HTML.includes(hook), `missing hook: ${hook}`);
   }
 });
+
+test("booking success copy softens when email delivery fails", () => {
+  assert.ok(HTML.includes("out.emailFailed"), "missing emailFailed branch");
+  assert.ok(/confirm the details by phone\/text/i.test(HTML), "missing softened fallback copy");
+});
