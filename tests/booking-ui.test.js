@@ -44,3 +44,8 @@ test("intent=update reframes step 0 and tags source", () => {
   assert.ok(HTML.includes("Free OTT Update"), "update reframe copy missing");
   assert.ok(/["']OTT Update["']/.test(HTML), "OTT Update source tag missing");
 });
+
+test("booking success copy softens when email delivery fails", () => {
+  assert.ok(HTML.includes("out.emailFailed"), "missing emailFailed branch");
+  assert.ok(/confirm the details by phone\/text/i.test(HTML), "missing softened fallback copy");
+});

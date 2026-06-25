@@ -938,7 +938,7 @@ $("#fSubmit").onclick=async()=>{
   try{
     const r=await fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
     const out=await r.json();
-    if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} track(6,"booked"); bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. Check your email for a calendar invite.`); }
+    if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} track(6,"booked"); const tail=out.emailFailed?"We'll confirm the details by phone/text shortly.":"Check your email for a calendar invite."; bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. ${tail}`); }
     else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority Wait List'});}catch(e){} track(6,"priority"); bookSuccess("You're on the Priority Wait List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}${BOOK.slot?` for your preferred time, ${BOOK.slot}`:""}.`); }
     else if(out.status==="conflict"){
       if(BOOK.avail){ const all=Object.keys(BOOK.avail.slotLabels||{}); BOOK.avail.openSlots=out.openSlots||[]; BOOK.avail.takenSlots=all.filter(s=>!BOOK.avail.openSlots.includes(s)); BOOK.slot=null;

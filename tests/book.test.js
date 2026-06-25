@@ -13,14 +13,18 @@ function harness({ events, taken = [] }) {
     }
     throw new Error("unexpected " + url);
   };
+  const notifies = [];
+  const updates = [];
   const deps = {
     fetchImpl,
-    env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "re" },
+    env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "re", SLACK_WEBHOOK_URL: "https://hooks.slack.test/x" },
     send: async (a) => { emails.push(a); return { id: "e" }; },
+    notify: async (a) => { notifies.push(a); return { ok: true }; },
+    update: async (a) => { updates.push(a); return { id: a.id }; },
     now: () => "20260101T000000Z",
     log: { warn() {}, error() {} },
   };
-  return { deps, created, emails };
+  return { deps, created, emails, notifies, updates };
 }
 const base = { city: "Sioux Falls", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "Tacoma", goals: "Power" };
 const EV = "Market,Date,Active\nSioux Falls,2026-07-12,yes\n";
@@ -89,4 +93,33 @@ test("booking source defaults when flag absent", async () => {
   const h = harness({ events: EV });
   await processBooking({ ...base, slot: "9:40" }, h.deps);
   assert.equal(h.created[0].fields.Source, "find-your-exact-tune");
+});
+test("failed customer email -> alert + Airtable flag + emailFailed", async () => {
+  const h = harness({ events: EV });
+  h.deps.send = async (a) => {                 // installer ok, customer throws
+    if (a.to === base.email) throw new Error("Resend 403: domain not verified");
+    return { id: "e" };
+  };
+  const r = await processBooking({ ...base, slot: "9:20" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal(r.emailFailed, true);
+  assert.equal(h.notifies.length, 1);
+  assert.match(h.notifies[0].text, /Booking email FAILED/);
+  assert.equal(h.updates.length, 1);
+  assert.equal(h.updates[0].fields["Email Status"], "FAILED");
+});
+test("all emails succeed -> no alert, no flag, emailFailed falsy", async () => {
+  const h = harness({ events: EV });
+  const r = await processBooking({ ...base, slot: "9:40" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.ok(!r.emailFailed);
+  assert.equal(h.notifies.length, 0);
+  assert.equal(h.updates.length, 0);
+});
+test("priority email failure -> alert (no throw into flow)", async () => {
+  const h = harness({ events: "Market,Date,Active\nSioux Falls,nope,yes\n" }); // no event -> priority
+  h.deps.send = async () => { throw new Error("Resend 403"); };
+  const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
+  assert.equal(r.status, "priority");
+  assert.equal(h.notifies.length, 1);
 });

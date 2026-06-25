@@ -68,6 +68,19 @@ test("no API key → sends nothing, returns reason", async () => {
   assert.equal(d.calls.length, 0);
 });
 
+test("alerts owner when a lead email send fails", async () => {
+  const notifies = [];
+  const deps = {
+    apiKey: "re_test", log: { warn() {}, error() {} },
+    webhookUrl: "https://hooks.slack.test/x",
+    notify: async (a) => { notifies.push(a); return { ok: true }; },
+    sendEmail: async () => { throw new Error("Resend 403: domain not verified"); },
+  };
+  const r = await processSubmission({ form_name: "tune-lead", data }, deps);
+  assert.equal(r.sent, 0);
+  assert.equal(notifies.length, 1);
+  assert.match(notifies[0].text, /lead email FAILED/i);
+});
 test("a failing send is caught and does not abort the other send", async () => {
   const calls = [];
   let first = true;
