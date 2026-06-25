@@ -31,6 +31,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -94,6 +95,7 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
   font-size:12px;color:var(--sage-d);font-weight:600;text-align:center;margin-bottom:10px}
 .tf-h{font-family:'Spectral',serif;font-weight:600;font-size:clamp(26px,5.6vw,38px);line-height:1.1;
   color:var(--ink);text-align:center;margin-bottom:8px;letter-spacing:-.01em}
+.tf-h:focus{outline:none}
 .tf-sub{text-align:center;font-size:15.5px;line-height:1.55;opacity:.75;margin:0 auto 28px;max-width:480px}
 
 /* ---------- option grids ---------- */
@@ -261,35 +263,7 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Service","serviceType":"Toyota & Lexus OTT Tune Calibration","provider":{"@id":"https://tunedyota.com/#business"},"areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"}],"description":"OTT Tune calibration for supported Toyota and Lexus platforms, with base, custom, and supercharger or turbo calibrations where supported.","offers":{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":"400","highPrice":"950"}}
 </script>
-<style id="site-chrome">
-:root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20);--ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);--dur-fast:140ms;--dur-base:200ms}
-.snav{position:sticky;top:0;z-index:1000;background:rgba(237,236,235,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;padding:11px 18px;font-family:'Lato',sans-serif}
-.snav-logo{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:17px;color:#5B4B42;text-decoration:none;margin-right:auto}
-.snav-links{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
-.snav-links a{font-weight:800;font-size:13px;letter-spacing:.02em;color:#5D4B40;text-decoration:none;padding:8px 11px;border-radius:99px;transition:.18s}
-.snav-links a:hover{background:rgba(153,160,142,.18);color:#3A2E26}
-.snav-call{font-family:'Lato';font-weight:900;font-size:13px;background:#3A2E26;color:#F3EFEA;text-decoration:none;border-radius:99px;padding:9px 16px;margin-left:6px}
-.snav-call:hover{background:#5B4B42}
-.sfoot{font-family:'Lato',sans-serif;background:#3A2E26;color:#D8CFC4;margin-top:46px;padding:34px 20px 28px;text-align:center}
-.sfoot .fmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:18px;color:#fff}
-.sfoot .ftag{font-weight:700;letter-spacing:.28em;text-transform:uppercase;font-size:10px;color:#B3D0D9;margin:6px 0 16px}
-.sfoot a{color:#EDE6DD;text-decoration:none;font-weight:700}.sfoot a:hover{text-decoration:underline}
-.sfoot .frow{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:13.5px;margin-bottom:14px}
-.sfoot .fcon{font-size:13.5px;line-height:1.9;opacity:.9}
-.sfoot .fcopy{font-size:11.5px;opacity:.55;margin-top:16px}
-@media(max-width:560px){.snav-logo{margin-right:0;width:100%;text-align:center}.snav{justify-content:center}}
-/* ── brand fox icon ── */
-.snav-logo{display:inline-flex;align-items:center;gap:9px}
-.snav-logo::before{content:"";width:27px;height:27px;flex:0 0 auto;background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E") center/contain no-repeat}
-@media(max-width:560px){.snav-logo{justify-content:center}}
-.sfoot .fmark{display:flex;flex-direction:column;align-items:center;gap:11px}
-.sfoot .fmark::before{content:"";width:44px;height:44px;background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E") center/contain no-repeat}
-/* ── motion polish · craft pass ───────────────────────── */
-.btn,.btn.primary,.btn.sage,.btn.outline,.btn.ink,.tf-opt,.tf-chip,.tf-back,.tf-mkt,.tf-mktbar button,.tf-crumb button,.v-card,.fq-chip,.fq-item,.fq-cta,.lh a.link,.snav-links a,.snav-call,.tf-inst .iacts a{transition:transform var(--dur-fast) var(--ease-out),background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,color var(--dur-fast) ease,box-shadow var(--dur-base) var(--ease-out)}
-.btn:active,.btn.primary:active,.btn.sage:active,.btn.outline:active,.btn.ink:active,.tf-opt:active,.tf-chip:active,.tf-back:active,.tf-mkt:active,.tf-mktbar button:active,.tf-crumb button:active,.v-card:active,.fq-chip:active,.lh a.link:active,.snav-call:active,.tf-inst .iacts a:active{transform:scale(.97)}
-@media (hover:none){.btn.primary:hover,.tf-opt:hover,.v-card:hover,.tf-mkt:hover,.lh a.link:hover{transform:none}}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}.btn:hover,.btn.primary:hover,.tf-opt:hover,.v-card:hover,.tf-mkt:hover,.lh a.link:hover,.btn:active,.btn.primary:active,.tf-opt:active,.tf-chip:active,.tf-mkt:active,.tf-back:active,.v-card:active,.snav-call:active,.lh a.link:active,.fq-chip:active,.tf-mktbar button:active,.tf-crumb button:active,.tf-inst .iacts a:active{transform:none}}
-</style>
+
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -308,6 +282,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
 <!-- End Meta Pixel Code -->
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <form name="tune-lead" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
   <input type="text" name="name"><input type="tel" name="phone"><input type="email" name="email">
   <input type="text" name="market"><input type="text" name="installer_key"><input type="text" name="installer_name">
@@ -319,6 +294,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
   <input type="text" name="bot-field">
 </form>
 <header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>
+<a id="main" tabindex="-1"></a>
 <div class="tf" id="tf">
 
   <div class="tf-top" role="img" aria-label="Tuned Yota, Undeniable Performance">
@@ -444,19 +420,19 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
 
     <div id="leadForm">
       <div class="tf-field">
-        <label>Selected market</label>
+        <label for="fLoc">Selected market</label>
         <input id="fLoc" type="text" readonly placeholder="Select a market on the map above">
       </div>
       <div id="tfSlots" style="display:none"></div>
       <div class="tf-row2">
-        <div class="tf-field"><label>Name</label><input id="fName" type="text" autocomplete="name" placeholder="Your name"></div>
-        <div class="tf-field"><label>Phone</label><input id="fPhone" type="tel" autocomplete="tel" placeholder="(___) ___-____"></div>
+        <div class="tf-field"><label for="fName">Name</label><input id="fName" type="text" autocomplete="name" placeholder="Your name"></div>
+        <div class="tf-field"><label for="fPhone">Phone</label><input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(___) ___-____"></div>
       </div>
-      <div class="tf-field"><label>Email</label><input id="fEmail" type="email" autocomplete="email" placeholder="you@email.com"></div>
-      <div class="tf-field"><label>Your vehicle</label><input id="fVeh" type="text" readonly></div>
-      <div class="tf-field"><label>Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
+      <div class="tf-field"><label for="fEmail">Email</label><input id="fEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
+      <div class="tf-field"><label for="fVeh">Your vehicle</label><input id="fVeh" type="text" readonly></div>
+      <div class="tf-field"><label for="fMsg">Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
       <button class="btn primary" id="fSubmit" style="width:100%">Send My Request →</button>
-      <p id="fErr" style="color:#9b4a3a;font-size:13px;text-align:center;margin-top:10px;display:none">Please add your name and a phone or email so we can reach you.</p>
+      <p id="fErr" role="alert" style="color:#9b4a3a;font-size:13px;text-align:center;margin-top:10px;display:none">Please add your name and a phone or email so we can reach you.</p>
     </div>
 
     <div class="tf-success" id="leadSuccess">
@@ -652,6 +628,9 @@ function go(n){
   [...prog.children].forEach((d,i)=>d.className=i<n?"done":(i===n?"on":""));
   renderCrumb(n);
   $("#tf").scrollIntoView({behavior:"smooth",block:"start"});
+  // move keyboard / screen-reader focus to the new step's heading
+  const sh=document.querySelector(".tf-step.active .tf-h");
+  if(sh){ sh.setAttribute("tabindex","-1"); sh.focus({preventScroll:true}); }
   track(n);
 }
 function renderCrumb(n){
@@ -919,11 +898,11 @@ function bookSuccess(title,text){
 }
 $("#fSubmit").onclick=async()=>{
   const name=$("#fName").value.trim(), phone=$("#fPhone").value.trim(), email=$("#fEmail").value.trim();
-  if(!name||(!phone&&!email)){$("#fErr").textContent="Please add your name and a phone or email so we can reach you.";$("#fErr").style.display="block";return;}
+  if(!name||(!phone&&!email)){$("#fErr").textContent="Please add your name and a phone or email so we can reach you.";$("#fErr").style.display="block";(!name?$("#fName"):$("#fPhone")).focus();return;}
   $("#fErr").style.display="none";
   if(!S.marketCity){ return submitNetlifyLead(); }   // no market selected → legacy lead path
   const a=BOOK.avail, needSlot=!!(a && a.hasEvent && !a.full && !a.error);
-  if(needSlot && !BOOK.slot){ $("#fErr").textContent="Please pick a time above."; $("#fErr").style.display="block"; return; }
+  if(needSlot && !BOOK.slot){ $("#fErr").textContent="Please pick a time above."; $("#fErr").style.display="block"; const sl=document.querySelector("#tfSlots button,#tfSlots [tabindex]"); if(sl) sl.focus(); else $("#fErr").scrollIntoView({behavior:"smooth",block:"center"}); return; }
   const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
   const msg=$("#fMsg").value.trim();
   const btn=$("#fSubmit"), prev=btn.textContent; btn.textContent="Submitting…"; btn.disabled=true;
@@ -951,7 +930,7 @@ $("#fSubmit").onclick=async()=>{
 };
 function submitNetlifyLead(){
   const name=$("#fName").value.trim(), phone=$("#fPhone").value.trim(), email=$("#fEmail").value.trim();
-  if(!name||(!phone&&!email)){$("#fErr").style.display="block";return;}
+  if(!name||(!phone&&!email)){$("#fErr").style.display="block";(!name?$("#fName"):$("#fPhone")).focus();return;}
   const cfg=S.cfg||{};
   const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
   const market=$("#fLoc").value||S.market||"Not selected";
