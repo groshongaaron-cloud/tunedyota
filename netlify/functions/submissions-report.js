@@ -3,6 +3,7 @@ const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { eventsList, flattenRecords } = require("./lib/report-sources.js");
 const { buildReport } = require("./lib/report-metrics.js");
+const { aggregateFunnel } = require("./lib/funnel.js");
 const { renderSlack, renderEmailHtml, renderContactsCsv } = require("./lib/report-render.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
@@ -20,6 +21,14 @@ async function runReport(deps) {
     bookings: flattenRecords(bRecs), priority: flattenRecords(pRecs), leads: [],
     events: eventsList(), capacity: 12, now,
   });
+
+  try {
+    const fRecs = await listAll({ token: c.token, baseId: c.baseId, table: env.AIRTABLE_FUNNEL_TABLE || "Funnel Events" });
+    const monthStart = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1);
+    const fEvents = flattenRecords(fRecs).filter((e) => e.createdTime && new Date(e.createdTime).getTime() >= monthStart);
+    const f = aggregateFunnel(fEvents);
+    if (f.totalSessions > 0) report.funnel = f;
+  } catch (e) { if (log.error) log.error("funnel fetch", e.message); }
 
   const csv = renderContactsCsv(report);
   let emailFailed = false;

@@ -34,3 +34,21 @@ test("email failure appends a Slack note and does not throw", async () => {
   assert.equal(d._notifies.length, 1);
   assert.match(d._notifies[0].text, /email failed/i);
 });
+test("attaches a month-to-date funnel when Funnel Events exist", async () => {
+  const booking = { id: "b1", createdTime: "2026-06-24T00:00:00Z", fields: { City: "Omaha", "Event Date": "2026-06-28", Slot: "9:00", Name: "A", Email: "a@x.com", Installer: "noah", Status: "Booked", Vehicle: "Tacoma" } };
+  const funnelRows = [
+    { id: "f1", createdTime: "2026-06-20T00:00:00Z", fields: { Session: "a", Step: 0, "Step Name": "make" } },
+    { id: "f2", createdTime: "2026-06-20T00:00:00Z", fields: { Session: "a", Step: 1, "Step Name": "model" } },
+    { id: "f3", createdTime: "2026-06-20T00:00:00Z", fields: { Session: "b", Step: 0, "Step Name": "make" } },
+    { id: "f4", createdTime: "2026-05-01T00:00:00Z", fields: { Session: "old", Step: 0, "Step Name": "make" } },
+  ];
+  const d = deps({ listAll: async ({ table }) => table === "Funnel Events" ? funnelRows : table === "Bookings" ? [booking] : [] });
+  await runReport(d);
+  assert.match(d._notifies[0].text, /Funnel \(MTD\): Make 2 → Model 1/);
+  assert.ok(d._sends[0].html.includes("Funnel (month-to-date)"));
+});
+test("no funnel section when Funnel Events empty", async () => {
+  const d = deps();
+  await runReport(d);
+  assert.ok(!/Funnel \(MTD\)/.test(d._notifies[0].text));
+});
