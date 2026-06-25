@@ -9,3 +9,7 @@
 # Weekly submissions digest (netlify/functions/submissions-report.js).
 [functions."submissions-report"]
   schedule = "0 13 * * 1"
+
+# Daily Certificate of Authenticity dispatch (netlify/functions/certificate-dispatch.js).
+[functions."certificate-dispatch"]
+  schedule = "0 14 * * *"
