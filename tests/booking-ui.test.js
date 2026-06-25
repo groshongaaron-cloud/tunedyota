@@ -21,3 +21,12 @@ test("conversion-polish hooks exist", () => {
     assert.ok(HTML.includes(hook), `missing hook: ${hook}`);
   }
 });
+
+test("event-date urgency: hooks + tier phrases present", () => {
+  assert.ok(HTML.includes("tf-urgency"), "missing tf-urgency class");
+  assert.ok(/function eventUrgency/.test(HTML), "missing eventUrgency() helper");
+  assert.ok(/function urgencyLine/.test(HTML), "missing urgencyLine() renderer");
+  for (const phrase of ["Lock in your spot", "days left", "event is in", "Tomorrow —"]) {
+    assert.ok(HTML.includes(phrase), `missing tier phrase: ${phrase}`);
+  }
+});

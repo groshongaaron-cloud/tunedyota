@@ -224,6 +224,8 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 .tf-scarcity{text-align:center;font-family:'Lato';font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--sage-d);margin:0 0 10px}
 .tf-scarcity.low{color:#9b4a3a}
 .tf-scarcity.low::before{content:"●";margin-right:7px;color:#c2603f;font-size:10px;vertical-align:middle}
+.tf-urgency{text-align:center;font-family:'Lato';font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--sage-d);margin:0 0 6px}
+.tf-urgency.hot{color:#9b4a3a}
 .tf-slot.sel{position:relative}
 .tf-slot.sel::after{content:"✓";position:absolute;top:4px;right:6px;font-size:11px;font-weight:900;color:#fff;opacity:.9}
 .btn.ready{animation:ctaPulse 1.6s var(--ease-out) 2}
@@ -826,6 +828,23 @@ function scarcityLine(openCount,total,city,label){
   const txt=low?`Only ${openCount} spot${openCount===1?"":"s"} left`:`${openCount} of ${total} times open`;
   return `<div class="tf-scarcity${low?" low":""}">${txt} — ${city}, ${label}</div>`;
 }
+function eventUrgency(o){
+  const dateISO=o&&o.dateISO; if(!dateISO) return null;
+  const label=(o&&o.label)||dateISO, city=(o&&o.city)||"", now=(o&&o.now)||new Date();
+  const ev=new Date(dateISO+"T00:00:00"); if(isNaN(ev)) return null;
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const days=Math.round((ev-today)/86400000);
+  if(days<0) return null;
+  if(days===0) return {tier:"now",text:`⏱ Today — ${city}, ${label}. Lock in your spot.`};
+  if(days===1) return {tier:"now",text:`⏱ Tomorrow — ${city}, ${label}. Lock in your spot.`};
+  if(days<=3) return {tier:"soon",text:`⏱ Just ${days} days left — ${city}, ${label}.`};
+  if(days<=14) return {tier:"approaching",text:`⏱ ${city} event is in ${days} days — ${label}. Lock in your spot.`};
+  return {tier:"upcoming",text:`Next ${city} event · ${label} (in ${days} days)`};
+}
+function urgencyLine(a){
+  const u=eventUrgency({dateISO:a&&a.eventDateISO,label:a&&a.eventLabel,city:a&&a.city,now:new Date()});
+  return u?`<div class="tf-urgency${u.tier==="now"||u.tier==="soon"?" hot":""}">${u.text}</div>`:"";
+}
 async function loadAvailability(city){
   BOOK.avail=null;BOOK.slot=null;BOOK.reason=null;
   const box=$("#tfSlots"); if(!box) return; box.style.display="block";
@@ -845,7 +864,7 @@ function renderSlots(a){
   const open=(a.openSlots||[]).map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
   const taken=(a.takenSlots||[]).map(s=>`<button type="button" class="tf-slot" disabled>${lab(s)}</button>`).join("");
   const sc=scarcityLine((a.openSlots||[]).length, Object.keys(a.slotLabels||{}).length||12, a.city, day);
-  box.innerHTML=`${sc}<div class="tf-slot-day">${a.city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
+  box.innerHTML=`${urgencyLine(a)}${sc}<div class="tf-slot-day">${a.city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
   box.querySelectorAll(".tf-slot:not([disabled])").forEach(b=>b.onclick=()=>{
     box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
     b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
