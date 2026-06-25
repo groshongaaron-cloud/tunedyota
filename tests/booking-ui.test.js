@@ -38,3 +38,9 @@ test("funnel measurement: sid + beacon hooks present", () => {
   assert.ok(HTML.includes("STEP_NAMES"), "missing STEP_NAMES");
   assert.ok(/track\(6,\s*["']booked["']\)/.test(HTML), "missing terminal booked beacon");
 });
+
+test("intent=update reframes step 0 and tags source", () => {
+  assert.ok(/["']intent["']/.test(HTML), "intent parse missing");
+  assert.ok(HTML.includes("Free OTT Update"), "update reframe copy missing");
+  assert.ok(/["']OTT Update["']/.test(HTML), "OTT Update source tag missing");
+});

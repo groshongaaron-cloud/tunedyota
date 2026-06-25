@@ -631,6 +631,15 @@ const ATTR=(function(){
   return store;
 })();
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+/* Existing-customer free re-flash entry: ?intent=update reframes step 0 and
+   tags the lead/booking Source so installers can spot a re-flash. */
+S.intent=new URLSearchParams(location.search).get("intent")||"";
+if(S.intent==="update"){
+  const eb=$('[data-step="0"] .tf-eyebrow'), h=$('[data-step="0"] .tf-h'), sub=$('[data-step="0"] .tf-sub');
+  if(eb) eb.textContent="Free OTT Update";
+  if(h) h.textContent="Schedule your free OTT update.";
+  if(sub) sub.textContent="Already running a Tuned Yota calibration? Pick your vehicle and we'll get you re-flashed to the latest at an event near you.";
+}
 const prog=$("#prog"); for(let i=0;i<6;i++){let e=document.createElement("i");prog.appendChild(e);}
 
 /* First-party funnel measurement: anonymous session id + step beacons. */
@@ -923,6 +932,7 @@ $("#fSubmit").onclick=async()=>{
     name, phone, email, vehicle:$("#fVeh").value,
     goals: goalsStr + (msg?` · Note: ${msg}`:""),
     installer_key:S.installerKey||"", bot_field:"",
+    source: S.intent==="update" ? "OTT Update" : "find-your-exact-tune",
     utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||""
   };
   try{
@@ -956,7 +966,7 @@ function submitNetlifyLead(){
     quote_base:cfg.base!=null?String(cfg.base):"",
     quote_custom:cfg.custom!=null?String(cfg.custom):"",
     quote_sc:cfg.sc!=null?String(cfg.sc):"",
-    message, source:"Tune Finder",
+    message, source: S.intent==="update" ? "OTT Update" : "Tune Finder",
     referrer:ATTR.referrer||"",
     utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||""
   };

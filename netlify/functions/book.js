@@ -60,7 +60,7 @@ async function processBooking(body, deps) {
       City: market.city, "Event Date": event.dateISO, Slot: d.slot,
       Name: d.name, Phone: d.phone || "", Email: d.email || "",
       Vehicle: d.vehicle || "", Goals: d.goals || "", Installer: inst.key,
-      Status: "Booked", Source: "find-your-exact-tune",
+      Status: "Booked", Source: d.source || "find-your-exact-tune",
       "UTM Source": d.utm_source || "", "UTM Medium": d.utm_medium || "", "UTM Campaign": d.utm_campaign || "",
     } });
   } catch (e) { if (log.error) log.error("create", e.message); return { status: "error", error: "store-unavailable" }; }
