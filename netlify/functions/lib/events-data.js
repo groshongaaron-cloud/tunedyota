@@ -10,6 +10,6 @@ module.exports = {
   "twin cities":  { dateISO: "2026-06-20", label: "June 20, 2026", active: true, event: "Zeus Off-Road Event", details: "" },
   "rapid city":   { dateISO: "2026-07-16", label: "July 16, 2026", active: true, event: "Rapid City, South Dakota Summer 2026 OTT Event", details: "" },
   "fargo":        { dateISO: "2026-07-03", label: "July 3, 2026",  active: true, event: "Fargo, North Dakota Summer 2026 OTT Event", details: "" },
-  "madison":      { dateISO: "2026-07-18", label: "July 18, 2026", active: true, event: "Madison, Wisconsin Summer 2026 OTT Event", details: "" },
+  "madison":      { dateISO: "2026-08-01", label: "August 1, 2026", active: true, event: "Madison, Wisconsin Summer 2026 OTT Event", details: "" },
   "duluth":       { dateISO: "2026-07-25", label: "July 25, 2026", active: true, event: "Duluth, Minnesota Summer 2026 OTT Event", details: "" },
 };
