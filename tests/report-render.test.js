@@ -35,3 +35,29 @@ test("contacts csv has header, dedup row, and escapes commas", () => {
   assert.equal(lines.length, 2);
   assert.match(lines[1], /"Jane, Jr."/);
 });
+
+const funnelReport = {
+  ...report,
+  funnel: { totalSessions: 4, steps: [
+    { step: 0, name: "make", sessions: 4, dropPct: 0, overallPct: 100 },
+    { step: 1, name: "model", sessions: 3, dropPct: 25, overallPct: 75 },
+    { step: 2, name: "config", sessions: 1, dropPct: 67, overallPct: 25 },
+    { step: 3, name: "goals", sessions: 1, dropPct: 0, overallPct: 25 },
+    { step: 4, name: "result", sessions: 1, dropPct: 0, overallPct: 25 },
+    { step: 5, name: "book", sessions: 1, dropPct: 0, overallPct: 25 },
+    { step: 6, name: "outcome", sessions: 1, dropPct: 0, overallPct: 25 },
+  ] },
+};
+
+test("renders funnel section in email + slack when present, biggest drop called out", () => {
+  const h = renderEmailHtml(funnelReport);
+  assert.ok(h.includes("Funnel (month-to-date)"), "email funnel heading");
+  assert.ok(h.includes("Config") && h.includes("67%"), "email shows a drop");
+  const s = renderSlack(funnelReport);
+  assert.match(s, /Funnel \(MTD\): Make 4 → Model 3/);
+  assert.match(s, /biggest drop Config −67%/);
+});
+test("omits funnel section when absent", () => {
+  assert.ok(!renderEmailHtml(report).includes("Funnel (month-to-date)"));
+  assert.ok(!/Funnel \(MTD\)/.test(renderSlack(report)));
+});

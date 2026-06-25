@@ -1,6 +1,7 @@
 function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 function bar(pct) { const n = Math.round(pct / 100 * 12); return "▓".repeat(n) + "░".repeat(12 - n); }
 function sign(n) { return (n > 0 ? "+" : "") + n; }
+function cap(s) { return String(s || "").charAt(0).toUpperCase() + String(s || "").slice(1); }
 
 function renderSlack(r) {
   const ro = r.rollup;
@@ -9,6 +10,11 @@ function renderSlack(r) {
   lines.push(`MTD submissions: *${ro.mtdTotal}* (Δwk ${sign(ro.deltaVsPriorWeek)}, Δmo ${sign(ro.deltaVsLastMonth)}) · Slots ${ro.slotsFilled}/${ro.totalCapacity} · Won ${ro.won} / Lost ${ro.lost} / Open ${ro.open} (${ro.conversionPct}% conv)`);
   for (const e of r.events) {
     lines.push(`• ${e.city} ${e.label} [${bar(e.fillPct)}] ${e.booked}/${e.capacity} (${e.fillPct}%) ${e.past ? "past" : e.daysUntil + "d"} ${e.pace.toUpperCase()}${e.waitlist ? ` · wl ${e.waitlist}` : ""}${e.newThisWeek ? ` · +${e.newThisWeek} wk` : ""}`);
+  }
+  if (r.funnel && r.funnel.totalSessions > 0) {
+    const chain = r.funnel.steps.map((s) => `${cap(s.name)} ${s.sessions}`).join(" → ");
+    const big = r.funnel.steps.filter((s) => s.step > 0).reduce((m, s) => (s.dropPct > (m ? m.dropPct : 0) ? s : m), null);
+    lines.push(`Funnel (MTD): ${chain}` + (big && big.dropPct > 0 ? ` · biggest drop ${cap(big.name)} −${big.dropPct}%` : ""));
   }
   if (r.actionItems.length) { lines.push("*Action items:*"); for (const a of r.actionItems.slice(0, 5)) lines.push(`  – ${a}`); }
   lines.push(`Contacts on file: ${r.contacts.length}${r.contactsEmailFailed ? " (CSV email failed — domain pending)" : " (full report + contacts.csv emailed)"}`);
@@ -50,6 +56,13 @@ function renderEmailHtml(r) {
   ]);
   html += h2("Latent demand");
   html += r.latentDemand.length ? table(r.latentDemand.map((x) => [esc(x.city), `${x.count} waiting`])) : "<p>—</p>";
+  if (r.funnel && r.funnel.totalSessions > 0) {
+    html += h2("Funnel (month-to-date)");
+    html += table([
+      ["Step", "Sessions", "Drop", "Overall"],
+      ...r.funnel.steps.map((s) => [cap(s.name), String(s.sessions), s.step ? `−${s.dropPct}%` : "—", `${s.overallPct}%`]),
+    ]);
+  }
   html += h2("Action items");
   html += r.actionItems.length ? `<ul>${r.actionItems.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>` : "<p>None 🎉</p>";
   html += `<p style="color:#7c8472;margin-top:18px">Contacts attached: contacts.csv (${r.contacts.length} rows).</p>`;
