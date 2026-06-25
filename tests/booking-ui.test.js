@@ -30,3 +30,11 @@ test("event-date urgency: hooks + tier phrases present", () => {
     assert.ok(HTML.includes(phrase), `missing tier phrase: ${phrase}`);
   }
 });
+
+test("funnel measurement: sid + beacon hooks present", () => {
+  assert.ok(/function track\(/.test(HTML), "missing track() helper");
+  assert.ok(HTML.includes("sendBeacon"), "missing sendBeacon");
+  assert.ok(HTML.includes("ty_sid"), "missing session id key");
+  assert.ok(HTML.includes("STEP_NAMES"), "missing STEP_NAMES");
+  assert.ok(/track\(6,\s*["']booked["']\)/.test(HTML), "missing terminal booked beacon");
+});

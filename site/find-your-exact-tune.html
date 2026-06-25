@@ -633,11 +633,17 @@ const ATTR=(function(){
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const prog=$("#prog"); for(let i=0;i<6;i++){let e=document.createElement("i");prog.appendChild(e);}
 
+/* First-party funnel measurement: anonymous session id + step beacons. */
+const SID=(function(){ let s=""; try{ s=sessionStorage.getItem("ty_sid")||""; }catch(e){} if(!s){ s="s_"+Math.random().toString(36).slice(2)+Date.now().toString(36); try{ sessionStorage.setItem("ty_sid",s); }catch(e){} } return s; })();
+const STEP_NAMES=["make","model","config","goals","result","book"];
+function track(step,name){ try{ const p=JSON.stringify({sid:SID,step,name:name||STEP_NAMES[step]||"",utm_source:ATTR.utm_source||"",utm_medium:ATTR.utm_medium||"",utm_campaign:ATTR.utm_campaign||""}); if(navigator.sendBeacon){ navigator.sendBeacon("/.netlify/functions/track",p); } else { fetch("/.netlify/functions/track",{method:"POST",body:p,keepalive:true}); } }catch(e){} }
+
 function go(n){
   $$(".tf-step").forEach(el=>el.classList.toggle("active",+el.dataset.step===n));
   [...prog.children].forEach((d,i)=>d.className=i<n?"done":(i===n?"on":""));
   renderCrumb(n);
   $("#tf").scrollIntoView({behavior:"smooth",block:"start"});
+  track(n);
 }
 function renderCrumb(n){
   const c=$("#crumb");
@@ -922,8 +928,8 @@ $("#fSubmit").onclick=async()=>{
   try{
     const r=await fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
     const out=await r.json();
-    if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. Check your email for a calendar invite.`); }
-    else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority Wait List'});}catch(e){} bookSuccess("You're on the Priority Wait List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}${BOOK.slot?` for your preferred time, ${BOOK.slot}`:""}.`); }
+    if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} track(6,"booked"); bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. Check your email for a calendar invite.`); }
+    else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority Wait List'});}catch(e){} track(6,"priority"); bookSuccess("You're on the Priority Wait List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}${BOOK.slot?` for your preferred time, ${BOOK.slot}`:""}.`); }
     else if(out.status==="conflict"){
       if(BOOK.avail){ const all=Object.keys(BOOK.avail.slotLabels||{}); BOOK.avail.openSlots=out.openSlots||[]; BOOK.avail.takenSlots=all.filter(s=>!BOOK.avail.openSlots.includes(s)); BOOK.slot=null;
         if(BOOK.avail.openSlots.length){ renderSlots(BOOK.avail); } else { BOOK.avail.full=true; renderWaitlistFull(BOOK.avail); } }
@@ -967,6 +973,7 @@ function openMail(p){
   window.location.href=`mailto:${LEAD_EMAIL}?subject=${subj}&body=${body}`;
 }
 function showSuccess(viaMail){
+  track(6,"lead");
   try{ if(window.fbq) fbq('track','Lead',{content_name:'Tune Finder'}); }catch(e){}
   $("#leadForm").style.display="none";
   $("#successMsg").textContent = viaMail
