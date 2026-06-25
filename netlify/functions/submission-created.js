@@ -4,6 +4,7 @@
 const { keyToInstaller } = require("./lib/routing.js");
 const { buildInstallerEmail, buildCustomerEmail } = require("./lib/templates.js");
 const { sendEmail } = require("./lib/resend.js");
+const { notifyOwner } = require("./lib/alert.js");
 
 // Sender must be on the Resend-verified domain (send.tunedyota.events).
 // The mailbox (events@) is arbitrary — Resend sends from it without an inbox.
@@ -12,7 +13,7 @@ const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
 
 async function processSubmission(payload, deps) {
-  const { sendEmail: send, apiKey, log = console } = deps;
+  const { sendEmail: send, apiKey, log = console, notify = notifyOwner, webhookUrl = process.env.SLACK_WEBHOOK_URL } = deps;
   if (!payload || payload.form_name !== "tune-lead") return { skipped: true };
 
   const d = payload.data || {};
@@ -24,6 +25,7 @@ async function processSubmission(payload, deps) {
   }
 
   let sent = 0;
+  let failed = false, why = "";
 
   // 1. Installer notification (CC owner unless the installer already is owner).
   try {
@@ -37,6 +39,7 @@ async function processSubmission(payload, deps) {
     });
     sent++;
   } catch (e) {
+    failed = true; why = why || e.message;
     log.error("installer email failed:", e.message);
   }
 
@@ -51,8 +54,17 @@ async function processSubmission(payload, deps) {
       });
       sent++;
     } catch (e) {
+      failed = true; why = why || e.message;
       log.error("customer email failed:", e.message);
     }
+  }
+
+  // 3. On any failure, alert the owner via the Resend-independent Slack channel.
+  if (failed) {
+    try {
+      await notify({ fetchImpl: deps.fetchImpl, webhookUrl,
+        text: `⚠️ Tune lead email FAILED — ${d.name || "?"} · ${d.market || "?"} · ${d.phone || d.email || "no contact"} · reason: ${why}`, log });
+    } catch (e) { if (log.error) log.error("notify", e.message); }
   }
 
   return { sent };
@@ -68,6 +80,7 @@ async function handler(event) {
   await processSubmission(body.payload, {
     sendEmail,
     apiKey: process.env.RESEND_API_KEY,
+    webhookUrl: process.env.SLACK_WEBHOOK_URL,
   });
   return { statusCode: 200, body: "ok" };
 }
