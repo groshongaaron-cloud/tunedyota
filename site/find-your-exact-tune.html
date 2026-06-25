@@ -628,9 +628,11 @@ function go(n){
   [...prog.children].forEach((d,i)=>d.className=i<n?"done":(i===n?"on":""));
   renderCrumb(n);
   $("#tf").scrollIntoView({behavior:"smooth",block:"start"});
-  // move keyboard / screen-reader focus to the new step's heading
-  const sh=document.querySelector(".tf-step.active .tf-h");
-  if(sh){ sh.setAttribute("tabindex","-1"); sh.focus({preventScroll:true}); }
+  // move keyboard / screen-reader focus to the new step's heading — only on
+  // user-initiated navigation, never the initial page-load render (which would
+  // strand focus mid-page, past the skip-link and nav).
+  if(go._started){ const sh=document.querySelector(".tf-step.active .tf-h"); if(sh){ sh.setAttribute("tabindex","-1"); sh.focus({preventScroll:true}); } }
+  go._started=true;
   track(n);
 }
 function renderCrumb(n){
