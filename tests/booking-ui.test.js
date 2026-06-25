@@ -21,3 +21,9 @@ test("conversion-polish hooks exist", () => {
     assert.ok(HTML.includes(hook), `missing hook: ${hook}`);
   }
 });
+
+test("intent=update reframes step 0 and tags source", () => {
+  assert.ok(/["']intent["']/.test(HTML), "intent parse missing");
+  assert.ok(HTML.includes("Free OTT Update"), "update reframe copy missing");
+  assert.ok(/["']OTT Update["']/.test(HTML), "OTT Update source tag missing");
+});
