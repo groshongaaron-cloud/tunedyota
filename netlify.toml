@@ -1,3 +1,7 @@
 [build]
   publish = "site"
   functions = "netlify/functions"
+
+# Daily email-path canary (netlify/functions/email-health.js).
+[functions."email-health"]
+  schedule = "@daily"
