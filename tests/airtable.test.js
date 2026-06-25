@@ -36,3 +36,17 @@ test("updateRecord PATCHes the record by id with typecast", async () => {
   assert.equal(body.fields["Email Status"], "FAILED");
   assert.equal(body.typecast, true);
 });
+test("listAllRecords follows offset across pages", async () => {
+  const pages = [
+    { records: [{ id: "a", fields: { Name: "A" } }], offset: "p2" },
+    { records: [{ id: "b", fields: { Name: "B" } }] },
+  ];
+  let call = 0;
+  const fetchImpl = async () => { const body = pages[call++]; return { ok: true, json: async () => body }; };
+  const { listAllRecords } = require("../netlify/functions/lib/airtable.js");
+  const recs = await listAllRecords({ fetchImpl, token: "t", baseId: "b", table: "Bookings" });
+  assert.equal(recs.length, 2);
+  assert.equal(recs[0].id, "a");
+  assert.equal(recs[1].fields.Name, "B");
+  assert.equal(call, 2);
+});

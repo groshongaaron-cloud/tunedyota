@@ -37,4 +37,19 @@ async function updateRecord({ fetchImpl = fetch, token, baseId, table, id, field
   if (!res.ok) throw new Error(`airtable update ${res.status}: ${await res.text().catch(() => "")}`);
   return res.json();
 }
-module.exports = { cfg, listRecords, createRecord, updateRecord };
+async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSize = 100 }) {
+  const out = [];
+  let offset;
+  do {
+    const params = new URLSearchParams({ pageSize: String(pageSize) });
+    if (offset) params.set("offset", offset);
+    const url = `${API}/${baseId}/${encodeURIComponent(table)}?${params.toString()}`;
+    const res = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) throw new Error(`airtable listAll ${res.status}`);
+    const j = await res.json();
+    out.push(...(j.records || []));
+    offset = j.offset;
+  } while (offset);
+  return out;
+}
+module.exports = { cfg, listRecords, createRecord, updateRecord, listAllRecords };

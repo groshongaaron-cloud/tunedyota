@@ -5,3 +5,7 @@
 # Daily email-path canary (netlify/functions/email-health.js).
 [functions."email-health"]
   schedule = "@daily"
+
+# Weekly submissions digest (netlify/functions/submissions-report.js).
+[functions."submissions-report"]
+  schedule = "0 13 * * 1"
