@@ -988,5 +988,39 @@ loadEvents();   // overlay live event dates from the Google Sheet (no-op until c
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
   <div class="fcopy">© Tuned Yota · Toyota &amp; Lexus Performance Tuning · Authorized OTT Installer</div>
 </footer>
+<script>
+/* Keyboard a11y for the tune-finder's custom widgets. The make/model/config
+   options (.tf-opt), goal toggles (.tf-chip) and market rows (.tf-mkt) are
+   clickable <div>s rendered dynamically across steps. Give each one button
+   semantics + focusability and activate it on Enter/Space — via a
+   MutationObserver so every re-render is covered without touching the render
+   code. Native <button> widgets (.tf-slot, market bar, breadcrumbs) already
+   work and are intentionally excluded. */
+(function(){
+  var SEL=".tf-opt,.tf-chip,.tf-mkt";
+  function mark(el){
+    if(el.getAttribute("role")!=="button"){ el.setAttribute("role","button"); el.setAttribute("tabindex","0"); }
+    el.setAttribute("aria-pressed", el.classList.contains("sel")?"true":"false");
+  }
+  function scan(node){
+    if(node.nodeType!==1) return;
+    if(node.matches&&node.matches(SEL)) mark(node);
+    if(node.querySelectorAll) [].forEach.call(node.querySelectorAll(SEL), mark);
+  }
+  scan(document.body);
+  var root=document.getElementById("tf")||document.body;
+  new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      if(m.type==="childList") [].forEach.call(m.addedNodes, scan);
+      else if(m.type==="attributes" && m.target.matches && m.target.matches(SEL)) mark(m.target);
+    });
+  }).observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["class"]});
+  document.addEventListener("keydown",function(e){
+    if(e.key!=="Enter" && e.key!==" " && e.key!=="Spacebar") return;
+    var t=e.target;
+    if(t && t.matches && t.matches(SEL)){ e.preventDefault(); t.click(); }
+  });
+})();
+</script>
 </body>
 </html>
