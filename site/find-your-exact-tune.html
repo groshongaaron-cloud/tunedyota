@@ -430,6 +430,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
       </div>
       <div class="tf-field"><label for="fEmail">Email</label><input id="fEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
       <div class="tf-field"><label for="fVeh">Your vehicle</label><input id="fVeh" type="text" readonly></div>
+      <div class="tf-field"><label for="fMods">Modifications</label><input id="fMods" type="text" placeholder="Lift, tires, exhaust, intake, supercharger…"></div>
       <div class="tf-field"><label for="fMsg">Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
       <button class="btn primary" id="fSubmit" style="width:100%">Send My Request →</button>
       <p id="fErr" role="alert" style="color:#9b4a3a;font-size:13px;text-align:center;margin-top:10px;display:none">Please add your name and a phone or email so we can reach you.</p>
@@ -907,10 +908,11 @@ $("#fSubmit").onclick=async()=>{
   if(needSlot && !BOOK.slot){ $("#fErr").textContent="Please pick a time above."; $("#fErr").style.display="block"; const sl=document.querySelector("#tfSlots button,#tfSlots [tabindex]"); if(sl) sl.focus(); else $("#fErr").scrollIntoView({behavior:"smooth",block:"center"}); return; }
   const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
   const msg=$("#fMsg").value.trim();
+  const mods=$("#fMods").value.trim();
   const btn=$("#fSubmit"), prev=btn.textContent; btn.textContent="Submitting…"; btn.disabled=true;
   const payload={
     city:S.marketCity, slot:BOOK.slot||undefined,
-    name, phone, email, vehicle:$("#fVeh").value,
+    name, phone, email, vehicle:$("#fVeh").value, mods,
     goals: goalsStr + (msg?` · Note: ${msg}`:""),
     installer_key:S.installerKey||"", bot_field:"",
     source: S.intent==="update" ? "OTT Update" : "find-your-exact-tune",
