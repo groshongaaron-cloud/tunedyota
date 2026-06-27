@@ -15,7 +15,7 @@ function spyDeps(apiKey = "re_test") {
 const data = {
   name: "Jane", phone: "555", email: "jane@example.com", market: "Green Bay, WI",
   installer_key: "noah", installer_name: "Noah Kreis",
-  vehicle: "2025+ Toyota Tacoma", goals: "Power", quote_base: "650",
+  vehicle: "2024+ Toyota Tacoma", goals: "Power", quote_base: "650",
   quote_custom: "", quote_sc: "950", message: "hi",
   referrer: "", utm_source: "ig", utm_medium: "", utm_campaign: "",
 };
