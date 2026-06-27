@@ -18,6 +18,7 @@ Default table names are `Bookings` and `Priority List` (override with
 | Email        | Single line text   | |
 | Vehicle      | Single line text   | from the funnel |
 | Goals        | Single line text   | from the funnel (may include a "· Note:" suffix) |
+| Modifications | Single line text  | customer mods from the booking form (lift, tires, exhaust…) |
 | Installer    | Single select      | `aaron` / `noah` / `cody` |
 | Status       | Single select      | `Booked` (default), `Completed`, `No-show`, `Cancelled` |
 | Source       | Single line text   | `find-your-exact-tune` |
@@ -38,8 +39,9 @@ A slot counts as taken when a row exists for `City + Event Date + Slot` with
 | Email      | Single line text | |
 | Vehicle    | Single line text | |
 | Goals      | Single line text | |
+| Modifications | Single line text | customer mods; also set by the post-event rebook sweep |
 | Installer  | Single select    | `aaron` / `noah` / `cody` |
-| Reason     | Single select    | `No event scheduled` / `Event full` |
+| Reason     | Single select    | `No event scheduled` / `Event full` / `Rebook — not completed` |
 | Event Date | Single line text | set when Reason = Event full |
 | Requested Slot | Single select | preferred time picked on a full event (one of the 12 times); blank for no-event |
 | Notified   | Checkbox         | your workflow: tick when you've reached out |

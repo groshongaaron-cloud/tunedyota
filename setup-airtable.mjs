@@ -28,12 +28,12 @@ const INSTALLERS = ["aaron", "noah", "cody"];
 const SCHEMA = {
   "Bookings": [
     txt("Name"), txt("City"), txt("Event Date"), sel("Slot", SLOTS),
-    txt("Phone"), txt("Email"), txt("Vehicle"), txt("Goals"),
+    txt("Phone"), txt("Email"), txt("Vehicle"), txt("Goals"), txt("Modifications"),
     sel("Installer", INSTALLERS), sel("Status", ["Booked", "Completed", "No-show", "Cancelled"]),
     txt("Source"), txt("UTM Source"), txt("UTM Medium"), txt("UTM Campaign"),
   ],
   "Priority List": [
-    txt("Name"), txt("City"), txt("Phone"), txt("Email"), txt("Vehicle"), txt("Goals"),
+    txt("Name"), txt("City"), txt("Phone"), txt("Email"), txt("Vehicle"), txt("Goals"), txt("Modifications"),
     sel("Installer", INSTALLERS), sel("Reason", ["No event scheduled", "Event full"]),
     txt("Event Date"), sel("Requested Slot", SLOTS), chk("Notified"),
   ],
