@@ -21,3 +21,8 @@ test("escapes HTML and tolerates a blank calibration date", () => {
   assert.ok(html.includes("V&amp;V"));
   assert.ok(!/undefined/.test(html));
 });
+test("certificate shows the OTT Calibration when provided", () => {
+  const { html } = buildCertificate({ name: "Jane Driver", retailer: "Cody Star", vehicle: "2024+ Toyota Tacoma", calibration: "spicy", calibrationDate: "2026-06-28" });
+  assert.ok(/OTT Calibration/.test(html));
+  assert.ok(/spicy/.test(html));
+});

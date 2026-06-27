@@ -12,11 +12,12 @@ function fieldRow(label, value, editable) {
   return `<tr><td style="padding:8px 16px 8px 0;color:#7c8472;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:12px;vertical-align:top">${esc(label)}</td><td style="padding:8px 0">${cell}</td></tr>`;
 }
 
-function buildCertificate({ name, retailer, vehicle, calibrationDate }) {
+function buildCertificate({ name, retailer, vehicle, calibration, calibrationDate }) {
   const subject = `Certificate of Authenticity — ${name || "Customer"}${vehicle ? ` · ${vehicle}` : ""}`;
   const rows = [
     fieldRow("Date Calibration Applied", calibrationDate || "", true),
     fieldRow("OTT Retailer", retailer || "", false),
+    fieldRow("OTT Calibration", calibration || "", false),
     fieldRow("Customer Name", name || "", false),
     fieldRow("VIN", "", true),
     fieldRow("Vehicle Year", "", true),
