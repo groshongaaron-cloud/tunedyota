@@ -32,7 +32,7 @@ function parseEvents(csv) {
   const ci = {
     market: header.indexOf("market"), date: header.indexOf("date"),
     active: header.indexOf("active"), event: header.indexOf("event"),
-    details: header.indexOf("details"),
+    details: header.indexOf("details"), address: header.indexOf("address"),
   };
   const out = {};
   for (let r = 1; r < rows.length; r++) {
@@ -45,6 +45,7 @@ function parseEvents(csv) {
       active: !["no", "false", "0"].includes(activeRaw),
       event: ci.event >= 0 ? (row[ci.event] || "").trim() : "",
       details: ci.details >= 0 ? (row[ci.details] || "").trim() : "",
+      address: ci.address >= 0 ? (row[ci.address] || "").trim() : "",
     };
   }
   return out;

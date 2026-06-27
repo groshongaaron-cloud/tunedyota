@@ -39,3 +39,12 @@ test("getEventForCity returns active dated event", async () => {
   assert.equal(e.dateISO, "2026-07-12");
   assert.equal(e.details, "At the shop");
 });
+test("parseEvents reads an Address column", () => {
+  const csv = "Market,Date,Active,Event,Details,Address\nGreen Bay,2026-09-12,yes,Fall OTT,,\"123 Dyno Rd, Green Bay WI\"\n";
+  const map = parseEvents(csv);
+  assert.equal(map["green bay"].address, "123 Dyno Rd, Green Bay WI");
+});
+test("parseEvents address defaults to empty when column absent", () => {
+  const csv = "Market,Date,Active\nOmaha,2026-06-28,yes\n";
+  assert.equal(parseEvents(csv)["omaha"].address, "");
+});
