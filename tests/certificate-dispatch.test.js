@@ -4,7 +4,7 @@ const { dispatchCertificates } = require("../netlify/functions/certificate-dispa
 
 function deps(overrides = {}) {
   const sends = [], updates = [], notifies = [];
-  const rows = [{ id: "b1", fields: { Name: "Jane", Vehicle: "Tacoma", Installer: "cody", "Calibration Date": "2026-06-28", Status: "Completed" } }];
+  const rows = [{ id: "b1", fields: { Name: "Jane", Vehicle: "Tacoma", Installer: "cody", "Calibration Date": "2026-06-28", Status: "Completed", "OTT Calibration": "Medium" } }];
   return {
     env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "re", SLACK_WEBHOOK_URL: "https://hooks.slack.test/x" },
     list: async () => rows,
@@ -36,10 +36,19 @@ test("email failure -> Slack alert AND row left unmarked", async () => {
   assert.match(d._notifies[0].text, /Certificate email FAILED/i);
 });
 test("installer IS owner (aaron) -> no CC", async () => {
-  const d = deps({ list: async () => [{ id: "b2", fields: { Name: "Sam", Vehicle: "4Runner", Installer: "aaron", Status: "Completed" } }] });
+  const d = deps({ list: async () => [{ id: "b2", fields: { Name: "Sam", Vehicle: "4Runner", Installer: "aaron", Status: "Completed", "OTT Calibration": "Spicy" } }] });
   await dispatchCertificates(d);
   assert.equal(d._sends[0].to, "info@tunedyota.com");
   assert.equal(d._sends[0].cc, undefined);
+});
+test("holds the certificate when OTT Calibration is empty (no send, retries next run)", async () => {
+  const d = deps({ list: async () => [{ id: "b9", fields: { Name: "Pat", Vehicle: "Tundra", Installer: "noah", "Calibration Date": "2026-06-28", Status: "Completed" } }] });
+  const r = await dispatchCertificates(d);
+  assert.equal(d._sends.length, 0);        // nothing emailed
+  assert.equal(d._updates.length, 0);      // left unmarked → eligible next run
+  assert.equal(r.held, 1);
+  assert.equal(d._notifies.length, 1);     // owner nudged once
+  assert.match(d._notifies[0].text, /held/i);
 });
 test("OTT Calibration field from Airtable appears in the certificate attachment", async () => {
   const d = deps({ list: async () => [{ id: "b3", fields: { Name: "Jane", Vehicle: "Tacoma", Installer: "cody", "Calibration Date": "2026-06-28", Status: "Completed", "OTT Calibration": "SS" } }] });

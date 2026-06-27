@@ -21,12 +21,17 @@ async function dispatchCertificates(deps) {
   } catch (e) { if (log.error) log.error("cert list", e.message); return { ok: false, error: e.message }; }
 
   let sent = 0;
+  const held = [];
   for (const row of rows) {
     const f = row.fields || {};
+    const calibration = String(f["OTT Calibration"] || "").trim();
+    // Hold the certificate until the installer records the calibration, rather
+    // than send a blank one. Left unmarked, so a later run sends it once set.
+    if (!calibration) { held.push(f.Name || row.id); continue; }
     const inst = keyToInstaller(f.Installer);
     const certNo = certSerial(row.id, f["Calibration Date"], issueDate);
     const { subject, html } = buildCertificate({
-      name: f.Name, vehicle: f.Vehicle, calibration: f["OTT Calibration"],
+      name: f.Name, vehicle: f.Vehicle, calibration,
       installer: inst.name, installerRegion: inst.region,
       calibrationDate: f["Calibration Date"], certNo, issueDate,
     });
@@ -44,7 +49,11 @@ async function dispatchCertificates(deps) {
       catch (e2) { if (log.error) log.error("cert notify", e2.message); }
     }
   }
-  return { ok: true, sent, found: rows.length };
+  if (held.length) {
+    try { await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL, text: `⚠️ ${held.length} certificate(s) held — set the OTT Calibration to release: ${held.join(", ")}`, log }); }
+    catch (e) { if (log.error) log.error("cert held notify", e.message); }
+  }
+  return { ok: true, sent, held: held.length, found: rows.length };
 }
 
 async function handler() { const r = await dispatchCertificates({}); return { statusCode: 200, body: JSON.stringify(r) }; }
