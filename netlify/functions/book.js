@@ -46,7 +46,7 @@ async function processBooking(body, deps) {
   async function priority(reason) {
     const pfields = {
       City: market.city, Name: d.name, Phone: d.phone || "", Email: d.email || "",
-      Vehicle: d.vehicle || "", Goals: d.goals || "", Installer: inst.key,
+      Vehicle: d.vehicle || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
       Reason: reason === "full" ? "Event full" : "No event scheduled",
       "Event Date": event ? event.dateISO : "",
     };
@@ -81,7 +81,7 @@ async function processBooking(body, deps) {
     const rec = await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, fields: {
       City: market.city, "Event Date": event.dateISO, Slot: d.slot,
       Name: d.name, Phone: d.phone || "", Email: d.email || "",
-      Vehicle: d.vehicle || "", Goals: d.goals || "", Installer: inst.key,
+      Vehicle: d.vehicle || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
       Status: "Booked", Source: d.source || "find-your-exact-tune",
       "UTM Source": d.utm_source || "", "UTM Medium": d.utm_medium || "", "UTM Campaign": d.utm_campaign || "",
     } });

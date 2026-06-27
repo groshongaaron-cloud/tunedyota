@@ -123,3 +123,10 @@ test("priority email failure -> alert (no throw into flow)", async () => {
   assert.equal(r.status, "priority");
   assert.equal(h.notifies.length, 1);
 });
+test("mods field persisted on booking record", async () => {
+  const EV_OMAHA = "Market,Date,Active\nOmaha,2026-08-15,yes\n";
+  const h = harness({ events: EV_OMAHA });
+  const r = await processBooking({ city: "Omaha", name: "Bob", phone: "(402) 555-1234", email: "bob@x.com", vehicle: "Tundra", goals: "Power", slot: "9:00", mods: "3in lift, 35s" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal(h.created[0].fields.Modifications, "3in lift, 35s");
+});
