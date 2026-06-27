@@ -129,8 +129,35 @@ function buildPriorityInstallerEmail(d, inst, market, reason) {
     `<table style="border-collapse:collapse;font-size:14px">${rows.map((r) => r.html).join("")}</table></div>`;
   return { subject, html, text };
 }
+function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
+  const first = (booking.Name || "there").split(" ")[0];
+  const when = `${event.label || event.dateISO} at 9:00 AM`;
+  const where = `${event.city}, ${event.state || ""}`.trim().replace(/,\s*$/, "");
+  const subject = `Tuned Yota — ${event.city} event ${daysUntil === 2 ? "in 2 days" : "coming up"}`;
+  const addr = event.address ? `\nAddress: ${event.address}` : "";
+  const text =
+    `Hi ${first},\n\nYour Tuned Yota tuning event is ${daysUntil === 2 ? "in 2 days" : "coming up"}.\n\n` +
+    `When: ${when}\nWhere: ${where}${addr}\n\n` +
+    `Please save the address above so you know exactly where to go. ` +
+    `Questions? Call or text ${inst.name} at ${inst.phone}.\n\n— Tuned Yota · Undeniable Performance\n`;
+  const addrHtml = event.address
+    ? `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Address</td><td style="padding:4px 0;color:#3A2E26"><strong>${esc(event.address)}</strong></td></tr>`
+    : "";
+  const html =
+    `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px">` +
+    `<h2 style="color:#5B4B42">See you soon, ${esc(first)}.</h2>` +
+    `<p>Your tuning event is <strong>${daysUntil === 2 ? "in 2 days" : "coming up"}</strong>. Here are the details:</p>` +
+    `<table style="border-collapse:collapse;font-size:14px">` +
+    `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">When</td><td style="padding:4px 0;color:#3A2E26">${esc(when)}</td></tr>` +
+    `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Where</td><td style="padding:4px 0;color:#3A2E26">${esc(where)}</td></tr>` +
+    addrHtml + `</table>` +
+    `<p style="margin-top:12px">Please save the address so you know exactly where to go. Questions? Call or text <strong>${esc(inst.phone)}</strong>.</p>` +
+    `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
+  return { subject, html, text };
+}
 module.exports = {
   buildInstallerEmail, buildCustomerEmail,
   buildBookingCustomerEmail, buildBookingInstallerEmail,
   buildPriorityCustomerEmail, buildPriorityInstallerEmail,
+  buildEventReminderCustomerEmail,
 };

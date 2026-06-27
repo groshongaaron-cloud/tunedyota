@@ -78,3 +78,13 @@ test("priority emails reflect reason", () => {
   assert.ok(tB.buildPriorityCustomerEmail({ ...dB, slot: "9:20" }, instB, marketB, "full").text.includes("9:20"));
   assert.ok(tB.buildPriorityInstallerEmail({ ...dB, slot: "9:20" }, instB, marketB, "full").text.includes("9:20"));
 });
+test("event reminder names date, time, city, and address", () => {
+  const booking = { Name: "Jane Doe", Email: "jane@x.com" };
+  const event = { city: "Green Bay", state: "WI", label: "Sep 12, 2026", dateISO: "2026-09-12", address: "123 Dyno Rd, Green Bay WI" };
+  const inst = { name: "Noah Kreis", phone: "(920) 860-7050" };
+  const m = require("../netlify/functions/lib/templates.js").buildEventReminderCustomerEmail(booking, event, inst, 2);
+  assert.match(m.subject, /Green Bay/);
+  assert.ok(m.html.includes("123 Dyno Rd, Green Bay WI"));
+  assert.ok(m.html.includes("9:00 AM") && m.html.includes("Sep 12, 2026"));
+  assert.ok(m.text.includes("Jane"));
+});
