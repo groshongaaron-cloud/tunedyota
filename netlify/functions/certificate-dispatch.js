@@ -23,7 +23,7 @@ async function dispatchCertificates(deps) {
   for (const row of rows) {
     const f = row.fields || {};
     const inst = keyToInstaller(f.Installer);
-    const { subject, html } = buildCertificate({ name: f.Name, retailer: inst.name, vehicle: f.Vehicle, calibrationDate: f["Calibration Date"] });
+    const { subject, html } = buildCertificate({ name: f.Name, retailer: inst.name, vehicle: f.Vehicle, calibration: f["OTT Calibration"], calibrationDate: f["Calibration Date"] });
     try {
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM,
         to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: OWNER,

@@ -41,3 +41,11 @@ test("installer IS owner (aaron) -> no CC", async () => {
   assert.equal(d._sends[0].to, "info@tunedyota.com");
   assert.equal(d._sends[0].cc, undefined);
 });
+test("OTT Calibration field from Airtable appears in the certificate attachment", async () => {
+  const d = deps({ list: async () => [{ id: "b3", fields: { Name: "Jane", Vehicle: "Tacoma", Installer: "cody", "Calibration Date": "2026-06-28", Status: "Completed", "OTT Calibration": "SS" } }] });
+  await dispatchCertificates(d);
+  assert.equal(d._sends.length, 1);
+  const attachmentHtml = Buffer.from(d._sends[0].attachments[0].content, "base64").toString("utf8");
+  assert.ok(/OTT Calibration/.test(attachmentHtml), "attachment HTML should contain 'OTT Calibration' label");
+  assert.ok(/SS/.test(attachmentHtml), "attachment HTML should contain calibration value 'SS'");
+});
