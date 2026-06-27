@@ -31,6 +31,23 @@ async function reportEmailFailure({ fetchImpl, env, notify, update, c, table, id
   }
 }
 
+// Create a record, tolerating an Airtable base that hasn't added an optional
+// column yet (e.g. "Modifications" before the owner creates it). On an
+// unknown-field error, drop the optional keys and retry once — a booking must
+// never be lost to a missing column.
+async function createTolerant(args, optionalKeys) {
+  try {
+    return await createRecord(args);
+  } catch (e) {
+    if (/unknown[_ ]field/i.test(e.message) && optionalKeys.some((k) => args.fields && k in args.fields)) {
+      const fields = { ...args.fields };
+      for (const k of optionalKeys) delete fields[k];
+      return await createRecord({ ...args, fields });
+    }
+    throw e;
+  }
+}
+
 async function processBooking(body, deps) {
   const { fetchImpl = fetch, env = process.env, send = sendEmail, now, log = console,
           notify = notifyOwner, update = updateRecord } = deps;
@@ -53,7 +70,7 @@ async function processBooking(body, deps) {
     if (reason === "full" && isValidSlot(d.slot)) pfields["Requested Slot"] = d.slot; // only set when a preference was picked
     let pid;
     try {
-      const rec = await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields });
+      const rec = await createTolerant({ fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications"]);
       pid = rec && rec.id;
     } catch (e) { if (log.error) log.error("priority create", e.message); return { status: "error", error: "store-unavailable" }; }
     let ok = true, why = "";
@@ -78,13 +95,13 @@ async function processBooking(body, deps) {
 
   let bid;
   try {
-    const rec = await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, fields: {
+    const rec = await createTolerant({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, fields: {
       City: market.city, "Event Date": event.dateISO, Slot: d.slot,
       Name: d.name, Phone: d.phone || "", Email: d.email || "",
       Vehicle: d.vehicle || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
       Status: "Booked", Source: d.source || "find-your-exact-tune",
       "UTM Source": d.utm_source || "", "UTM Medium": d.utm_medium || "", "UTM Campaign": d.utm_campaign || "",
-    } });
+    } }, ["Modifications"]);
     bid = rec && rec.id;
   } catch (e) { if (log.error) log.error("create", e.message); return { status: "error", error: "store-unavailable" }; }
 

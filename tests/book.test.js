@@ -130,3 +130,25 @@ test("mods field persisted on booking record", async () => {
   assert.equal(r.status, "booked");
   assert.equal(h.created[0].fields.Modifications, "3in lift, 35s");
 });
+
+test("booking survives a missing Modifications column (retries without it)", async () => {
+  const created = [];
+  const fetchImpl = async (url, opts) => {
+    if (url.includes("docs.google.com")) return { ok: true, text: async () => EV };
+    if (url.includes("api.airtable.com")) {
+      if (opts && opts.method === "POST") {
+        const b = JSON.parse(opts.body);
+        if ("Modifications" in b.fields) return { ok: false, status: 422, text: async () => '{"error":{"type":"UNKNOWN_FIELD_NAME","message":"Unknown field name: Modifications"}}' };
+        created.push(b.fields);
+        return { ok: true, json: async () => ({ id: "r1" }) };
+      }
+      return { ok: true, json: async () => ({ records: [] }) };
+    }
+    throw new Error("unexpected " + url);
+  };
+  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "re", SLACK_WEBHOOK_URL: "https://hooks.slack.test/x" }, send: async () => ({ id: "e" }), notify: async () => ({ ok: true }), update: async () => ({}), now: () => "20260101T000000Z", log: { warn() {}, error() {} } };
+  const r = await processBooking({ ...base, slot: "9:00", mods: "lift" }, deps);
+  assert.equal(r.status, "booked");
+  assert.equal(created.length, 1);
+  assert.ok(!("Modifications" in created[0]));
+});
