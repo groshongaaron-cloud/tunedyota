@@ -2,9 +2,9 @@
 // person who should receive the lead. Mirrors INSTALLERS in
 // site/find-your-exact-tune.html. Keep in sync if installer contacts change.
 const INSTALLERS = {
-  aaron: { key: "aaron", name: "Aaron Groshong", email: "info@tunedyota.com", phone: "(612) 406-7117" },
-  noah:  { key: "noah",  name: "Noah Kreis",     email: "noah@tunedyota.com", phone: "(920) 860-7050" },
-  cody:  { key: "cody",  name: "Cody Star",      email: "cody@tunedyota.com", phone: "(605) 214-1335" },
+  aaron: { key: "aaron", name: "Aaron Groshong", email: "info@tunedyota.com", phone: "(612) 406-7117", region: "Minnesota, Iowa, Fargo, Eau Claire & Madison" },
+  noah:  { key: "noah",  name: "Noah Kreis",     email: "noah@tunedyota.com", phone: "(920) 860-7050", region: "Wisconsin (except Eau Claire & Madison)" },
+  cody:  { key: "cody",  name: "Cody Star",      email: "cody@tunedyota.com", phone: "(605) 214-1335", region: "Sioux Falls, Rapid City & Omaha" },
 };
 
 const FALLBACK_KEY = "aaron";

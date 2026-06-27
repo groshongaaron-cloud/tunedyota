@@ -2,17 +2,18 @@ const { cfg, listRecords, updateRecord } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { keyToInstaller } = require("./lib/routing.js");
-const { buildCertificate } = require("./lib/certificate.js");
+const { buildCertificate, certSerial } = require("./lib/certificate.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
 const FORMULA = 'AND({Status}="Completed", NOT({Certificate Sent}))';
 
 async function dispatchCertificates(deps) {
-  const { env = process.env, fetchImpl = fetch,
+  const { env = process.env, fetchImpl = fetch, now = new Date(),
           list = (a) => listRecords({ fetchImpl, ...a }),
           update = (a) => updateRecord({ fetchImpl, ...a }),
           send = sendEmail, notify = notifyOwner, log = console } = deps;
+  const issueDate = now.toISOString().slice(0, 10);
   const c = cfg(env);
   let rows = [];
   try {
@@ -23,12 +24,17 @@ async function dispatchCertificates(deps) {
   for (const row of rows) {
     const f = row.fields || {};
     const inst = keyToInstaller(f.Installer);
-    const { subject, html } = buildCertificate({ name: f.Name, retailer: inst.name, vehicle: f.Vehicle, calibration: f["OTT Calibration"], calibrationDate: f["Calibration Date"] });
+    const certNo = certSerial(row.id, f["Calibration Date"], issueDate);
+    const { subject, html } = buildCertificate({
+      name: f.Name, vehicle: f.Vehicle, calibration: f["OTT Calibration"],
+      installer: inst.name, installerRegion: inst.region,
+      calibrationDate: f["Calibration Date"], certNo, issueDate,
+    });
     try {
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM,
         to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: OWNER,
         subject,
-        text: `Attached is the Certificate of Authenticity for ${f.Name || "your customer"}. Open certificate.html in a browser, fill in VIN, Vehicle Year, Vehicle Type, Engine Size, and Mileage (and the date if blank), then Print → Save as PDF and send it to the customer.`,
+        text: `Attached is the Tuned Yota Certificate of Calibration for ${f.Name || "your customer"}. Open certificate.html in a browser, confirm the OTT Calibration selection, then Print → Save as PDF and send it to the customer.`,
         attachments: [{ filename: "certificate.html", content: Buffer.from(html).toString("base64") }] });
       await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: { "Certificate Sent": true } });
       sent++;
