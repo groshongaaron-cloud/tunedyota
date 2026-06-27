@@ -6,6 +6,10 @@
 [functions."email-health"]
   schedule = "@daily"
 
+# Hourly; acts only at 07:00 America/Chicago (netlify/functions/event-reminders.js).
+[functions."event-reminders"]
+  schedule = "0 * * * *"
+
 # Weekly submissions digest (netlify/functions/submissions-report.js).
 [functions."submissions-report"]
   schedule = "0 13 * * 1"
