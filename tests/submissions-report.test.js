@@ -18,15 +18,30 @@ function deps(overrides = {}) {
   };
 }
 
-test("delivers Slack summary + email with contacts.csv attachment", async () => {
+test("delivers Slack summary + owner digest with contacts.csv attachment", async () => {
   const d = deps();
   await runReport(d);
   assert.equal(d._notifies.length, 1);
   assert.match(d._notifies[0].text, /Submissions Digest/);
-  assert.equal(d._sends.length, 1);
-  const att = d._sends[0].attachments[0];
+  // Owner gets the full month-to-date digest.
+  const master = d._sends.find((s) => s.to === "info@tunedyota.com");
+  assert.ok(master, "owner digest sent to info@tunedyota.com");
+  assert.match(master.subject, /Submissions Digest/);
+  const att = master.attachments[0];
   assert.equal(att.filename, "contacts.csv");
   assert.ok(att.content && att.content.length > 0);
+});
+test("sends a region booking report to the installer for that region", async () => {
+  // The Omaha booking lives in Cody's region (markets.js: Omaha → cody),
+  // so Cody — not the owner box — gets a scoped region report.
+  const d = deps();
+  await runReport(d);
+  const cody = d._sends.find((s) => s.to === "cody@tunedyota.com");
+  assert.ok(cody, "region report sent to cody@tunedyota.com");
+  assert.match(cody.subject, /Region Bookings/);
+  assert.equal(cody.attachments[0].filename, "contacts.csv");
+  // No region report to the owner box — they already have the full digest.
+  assert.ok(!d._sends.some((s) => s.to === "info@tunedyota.com" && /Region Bookings/.test(s.subject)));
 });
 test("email failure appends a Slack note and does not throw", async () => {
   const d = deps({ send: async () => { throw new Error("Resend 403"); } });
