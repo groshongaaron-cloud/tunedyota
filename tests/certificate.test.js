@@ -20,17 +20,21 @@ test("renders the Master Certificate with merged booking data", () => {
   assert.ok(html.includes("2026-09-13"));          // issued date
   assert.ok(html.includes("September 12, 2026"));  // long-formatted calibration date
   assert.match(html, /OTT Calibration/);
-  assert.match(html, /<option selected>Spicy<\/option>/); // pre-selected from Airtable
+  assert.ok(html.includes("Spicy"));   // locked, static value from Airtable
+  assert.ok(!/<select/.test(html));    // not editable once dispatched
 });
 
-test("a calibration value outside the known set becomes a selected custom option", () => {
+test("any calibration value renders as locked static text (no dropdown)", () => {
   const { html } = buildCertificate({ name: "A", vehicle: "V", calibration: "Turbo Performance" });
-  assert.match(html, /<option selected>Turbo Performance<\/option>/);
+  assert.ok(html.includes("Turbo Performance"));
+  assert.ok(!/<select/.test(html));
 });
 
-test("blank calibration leaves the 'Choose calibration' placeholder selected", () => {
+test("blank calibration renders an em-dash, not a picker", () => {
   const { html } = buildCertificate({ name: "A", vehicle: "V" });
-  assert.match(html, /<option value="" disabled selected>Choose calibration/);
+  assert.ok(!/<select/.test(html));
+  assert.match(html, /OTT Calibration/);
+  assert.ok(html.includes("—"));
 });
 
 test("escapes HTML and tolerates blank/missing fields (no 'undefined')", () => {

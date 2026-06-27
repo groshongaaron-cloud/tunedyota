@@ -24,17 +24,9 @@ function certSerial(recordId, dateISO, issueISO) {
   return `TY-${y}-${suffix}`;
 }
 
-// The OTT Calibration row stays choosable so the installer can confirm/adjust
-// before printing; the Airtable value pre-selects the matching option (a value
-// outside the known set is added as a selected custom option).
-function calSelect(value) {
-  const v = String(value == null ? "" : value).trim();
-  const matchIdx = CAL_OPTIONS.findIndex((o) => o.toLowerCase() === v.toLowerCase());
-  const placeholder = `<option value="" disabled${v ? "" : " selected"}>Choose calibration…</option>`;
-  const custom = v && matchIdx < 0 ? `<option selected>${esc(v)}</option>` : "";
-  const opts = CAL_OPTIONS.map((o, i) => `<option${i === matchIdx ? " selected" : ""}>${o}</option>`).join("");
-  return `<select class="cal-select" aria-label="OTT Calibration">${placeholder}${custom}${opts}</select>`;
-}
+// Once dispatched, the OTT Calibration is LOCKED: the value chosen in Airtable
+// renders as static, non-editable text (no dropdown). The choosable picker lives
+// only in the design master, docs/brand/tuned-yota-master-certificate.html.
 
 function buildCertificate({ name, vehicle, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
   const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicle ? ` · ${vehicle}` : ""}`;
@@ -192,24 +184,6 @@ function buildCertificate({ name, vehicle, calibration, installer, installerRegi
     display:flex; align-items:center;
   }
   .row .value.hot{ color:var(--ember); font-weight:600; letter-spacing:.01em; }
-  .cal-select{
-    font-family:var(--mono);
-    font-size:14px;
-    font-weight:600;
-    letter-spacing:.01em;
-    color:var(--ember);
-    background:transparent;
-    border:none;
-    border-bottom:1px dashed var(--ember);
-    padding:2px 24px 2px 2px;
-    margin:-2px 0;
-    cursor:pointer;
-    -webkit-appearance:none; appearance:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath fill='none' stroke='%23C04A1B' stroke-width='1.6' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;
-    background-position:right center;
-  }
-  .cal-select:focus{ outline:none; }
   .foot{
     display:flex;
     justify-content:flex-end;
@@ -265,7 +239,6 @@ function buildCertificate({ name, vehicle, calibration, installer, installerRegi
   @media print{
     body{ background:#fff; padding:0; }
     .cert{ box-shadow:none; border:none; max-width:none; }
-    .cal-select{ border-bottom:none; background-image:none; padding-right:2px; }
   }
 </style>
 </head>
@@ -314,7 +287,7 @@ function buildCertificate({ name, vehicle, calibration, installer, installerRegi
         </div>
         <div class="row">
           <div class="label">OTT Calibration</div>
-          <div class="value hot">${calSelect(calibration)}</div>
+          <div class="value hot">${esc(calibration) || "—"}</div>
         </div>
         <div class="row">
           <div class="label">Installer</div>
