@@ -37,6 +37,24 @@ async function updateRecord({ fetchImpl = fetch, token, baseId, table, id, field
   if (!res.ok) throw new Error(`airtable update ${res.status}: ${await res.text().catch(() => "")}`);
   return res.json();
 }
+// Create a record, tolerating an Airtable base that hasn't added an optional
+// column yet (e.g. "Modifications" before the owner creates it). On an
+// unknown-field error that names one of `optionalKeys`, drop only that field
+// and retry once — so a write is never lost to a missing optional column, while
+// a genuinely unexpected field error still surfaces. `createFn` is injected so
+// callers can route through their own (stubbable) create dependency.
+async function createTolerant(createFn, args, optionalKeys = []) {
+  try {
+    return await createFn(args);
+  } catch (e) {
+    if (!/unknown[_ ]field/i.test(e.message)) throw e;
+    const offending = optionalKeys.filter((k) => args.fields && k in args.fields && new RegExp(`\\b${k}\\b`, "i").test(e.message));
+    if (!offending.length) throw e;
+    const fields = { ...args.fields };
+    for (const k of offending) delete fields[k];
+    return await createFn({ ...args, fields });
+  }
+}
 async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSize = 100 }) {
   const out = [];
   let offset;
@@ -52,4 +70,4 @@ async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSiz
   } while (offset);
   return out;
 }
-module.exports = { cfg, listRecords, createRecord, updateRecord, listAllRecords };
+module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, listAllRecords };

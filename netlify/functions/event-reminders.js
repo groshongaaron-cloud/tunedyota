@@ -4,7 +4,7 @@
 // notifications (10/2d), and runs the post-event waitlist sweep (-1d).
 const EVENTS = require("./lib/events-data.js");
 const { fetchEvents } = require("./lib/events.js");
-const { cfg, listAllRecords, createRecord } = require("./lib/airtable.js");
+const { cfg, listAllRecords, createRecord, createTolerant } = require("./lib/airtable.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const { sendEmail } = require("./lib/resend.js");
@@ -25,6 +25,11 @@ async function runReminders(deps) {
           listAll = (a) => listAllRecords({ fetchImpl, ...a }),
           create = (a) => createRecord({ fetchImpl, ...a }),
           send = sendEmail, notify = notifyOwner, log = console } = deps;
+  // At-most-once relies on the once-daily 07:00 gate: every reminder offset is an
+  // exact integer-day match, so it fires on a single calendar day, and per-action
+  // try/catch below means this function always resolves (no error → no Netlify
+  // retry of the same tick). The sweep additionally self-dedups against existing
+  // priority records, so a rare double-invocation won't duplicate waitlist rows.
   const nowCentral = centralParts(now);
   if (nowCentral.hour !== 7) return { ok: true, skipped: "off-hour" };
 
@@ -43,7 +48,14 @@ async function runReminders(deps) {
 
   for (const act of actions) {
     const market = getMarket(act.event.city);
-    const inst = keyToInstaller(market && market.inst);
+    if (!market) {
+      // An event city with no markets.js entry would silently route to the
+      // Aaron fallback — surface it instead so routing gaps are visible.
+      failures.push(`unknown-city:${act.event.city}`);
+      if (log.warn) log.warn("reminder: unknown event city", act.event.city);
+      continue;
+    }
+    const inst = keyToInstaller(market.inst);
     try {
       if (act.type === "installer-roster") {
         const m = renderRosterEmail(act.event, act.bookings, act.waitlist);
@@ -55,11 +67,11 @@ async function runReminders(deps) {
           subject: m.subject, html: m.html, text: m.text });
       } else if (act.type === "waitlist-sweep") {
         const b = act.booking;
-        await create({ token: c.token, baseId: c.baseId, table: c.priority, fields: {
+        await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields: {
           City: act.event.city, Name: b.Name || "", Phone: b.Phone || "", Email: b.Email || "",
           Vehicle: b.Vehicle || "", Modifications: b.Modifications || "", Installer: inst.key,
           Reason: SWEEP_REASON, "Event Date": b["Event Date"] || act.event.dateISO,
-        } });
+        } }, ["Modifications"]);
       }
     } catch (e) {
       failures.push(`${act.type}:${act.event.city}:${e.message}`);

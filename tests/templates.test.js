@@ -88,3 +88,10 @@ test("event reminder names date, time, city, and address", () => {
   assert.ok(m.html.includes("9:00 AM") && m.html.includes("Sep 12, 2026"));
   assert.ok(m.text.includes("Jane"));
 });
+test("event reminder uses the customer's booked slot time, not a hardcoded 9 AM", () => {
+  const event = { city: "Green Bay", state: "WI", label: "Sep 12, 2026", dateISO: "2026-09-12", address: "X" };
+  const inst = { name: "Noah Kreis", phone: "(920) 860-7050" };
+  const m = require("../netlify/functions/lib/templates.js").buildEventReminderCustomerEmail({ Name: "Jane", Email: "j@x.com", Slot: "10:20" }, event, inst, 2);
+  assert.ok(m.html.includes("10:20 AM"));
+  assert.ok(!m.html.includes("9:00 AM"));
+});

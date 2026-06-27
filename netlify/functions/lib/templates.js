@@ -1,5 +1,6 @@
 // Pure builders: given form data `d` and the resolved `inst` (from routing),
 // return { subject, html, text }. No I/O.
+const { formatSlot } = require("./slots.js");
 
 function esc(s) {
   return String(s == null ? "" : s)
@@ -131,7 +132,7 @@ function buildPriorityInstallerEmail(d, inst, market, reason) {
 }
 function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
   const first = (booking.Name || "there").split(" ")[0];
-  const when = `${event.label || event.dateISO} at 9:00 AM`;
+  const when = `${event.label || event.dateISO} at ${booking.Slot ? formatSlot(booking.Slot) : "9:00 AM"}`;
   const where = `${event.city}, ${event.state || ""}`.trim().replace(/,\s*$/, "");
   const subject = `Tuned Yota — ${event.city} event ${daysUntil === 2 ? "in 2 days" : "coming up"}`;
   const addr = event.address ? `\nAddress: ${event.address}` : "";
