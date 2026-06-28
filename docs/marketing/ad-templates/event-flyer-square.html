@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Tuned Yota — EVENT FLYER · 1080×1080 (IG/FB feed). data: city, date, photo, installer, QR url. -->
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#B3D0D9;--sand:#DFC4B5;--sage:#99A08E;--sage-d:#7c8472;--paper:#F3EFEA}
+  *{margin:0;box-sizing:border-box}
+  body{background:#cfcdca;display:grid;place-items:center;min-height:100vh;padding:24px;font-family:'Lato',sans-serif}
+  .canvas{width:1080px;height:1080px;position:relative;overflow:hidden;color:var(--paper);background:radial-gradient(110% 70% at 50% -5%,#5B4B42 0%,#3A2E26 52%,#2a221c 100%)}
+  .foxmark{position:absolute;right:-130px;top:-50px;width:560px;height:auto;opacity:.10}
+  .pad{position:absolute;inset:0;padding:60px 64px;display:flex;flex-direction:column}
+  .brand{display:flex;align-items:center;gap:15px}.brand svg{width:74px;height:74px}
+  .wordmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:26px;color:#fff}
+  .eyebrow{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.26em;text-transform:uppercase;font-size:19px;color:var(--sand);margin-top:30px}
+  .city{font-family:'Spectral',serif;font-weight:700;font-size:82px;line-height:.98;color:#fff;margin-top:8px}
+  .date{font-family:'Spectral',serif;font-weight:600;font-size:38px;color:var(--blue);margin-top:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .chip{font-family:'Lato';font-weight:900;font-size:16px;color:var(--paper);border:2px solid rgba(179,208,217,.5);border-radius:999px;padding:9px 16px}
+  .hero{margin-top:20px;border-radius:18px;overflow:hidden;flex:1;border:1.5px solid rgba(179,208,217,.3);box-shadow:0 22px 60px -24px rgba(0,0,0,.6)}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .booking{display:flex;align-items:center;gap:22px;margin-top:22px}
+  .qr{width:128px;height:128px;flex:0 0 auto;background:#fff;border-radius:12px;padding:9px}.qr img{width:100%;height:100%;display:block}
+  .bk-h{font-family:'Spectral',serif;font-weight:700;font-size:30px;color:#fff;line-height:1.05}
+  .bk-s{font-size:18px;color:var(--sage);margin-top:5px;font-weight:700}
+  .bk-u{font-family:'Spectral SC',serif;letter-spacing:.12em;text-transform:uppercase;font-size:15px;color:var(--blue);margin-top:7px}
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <svg class="foxmark" viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+    <div class="pad">
+      <div class="brand">
+        <svg viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+        <span class="wordmark">Tuned Yota</span>
+      </div>
+      <div class="eyebrow">OTT Tuning Event</div>
+      <div class="city">Green Bay, WI</div>
+      <div class="date">September 12, 2026</div>
+      <div class="chips"><span class="chip">Dyno-proven</span><span class="chip">Emissions intact</span><span class="chip">Authorized Magnuson dealer</span></div>
+      <figure class="hero"><img src="../../../site/images/toyota-tundra.jpg" alt=""></figure>
+      <div class="booking">
+        <div class="qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=0&data=https%3A%2F%2Ftunedyota.com%2Ffind-your-exact-tune%3Futm_source%3Dflyer%26utm_campaign%3Dgreen-bay" alt="Scan to book"></div>
+        <div>
+          <div class="bk-h">Find Your Exact Tune — limited slots</div>
+          <div class="bk-s">Pick your rig → see your price → book.</div>
+          <div class="bk-u">tunedyota.com · (612) 406-7117 · Installer: Noah Kreis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

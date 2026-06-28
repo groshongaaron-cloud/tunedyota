@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Tuned Yota — YOUTUBE THUMBNAIL · 1280×720. Big, readable at small size. data: number, title, chart. -->
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#3A2E26;--blue:#B3D0D9;--sand:#DFC4B5;--sage:#99A08E;--paper:#F3EFEA}
+  *{margin:0;box-sizing:border-box}
+  body{background:#cfcdca;display:grid;place-items:center;min-height:100vh;padding:24px;font-family:'Lato',sans-serif}
+  .canvas{width:1280px;height:720px;position:relative;overflow:hidden;color:var(--paper);background:radial-gradient(120% 130% at 15% 0%,#5B4B42 0%,#3A2E26 55%,#2a221c 100%)}
+  .foxmark{position:absolute;right:-120px;top:-90px;width:560px;height:auto;opacity:.13}
+  .pad{position:absolute;inset:0;padding:54px 58px;display:flex;gap:44px;align-items:center}
+  .left{flex:0 0 52%;display:flex;flex-direction:column;justify-content:center}
+  .brand{display:flex;align-items:center;gap:14px}.brand svg{width:64px;height:64px}
+  .wordmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:25px;color:#fff}
+  .kick{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:22px;color:var(--blue);margin-top:30px}
+  .big{font-family:'Spectral',serif;font-weight:700;font-size:150px;line-height:.86;letter-spacing:-.02em;color:#fff;margin-top:8px;text-shadow:0 6px 30px rgba(0,0,0,.4)}
+  .big span{color:var(--sand)}
+  .title{font-family:'Lato';font-weight:900;font-size:40px;color:#fff;margin-top:22px;line-height:1.05}
+  .title b{color:var(--blue)}
+  .chart{flex:1;background:#fff;border-radius:18px;padding:18px;box-shadow:0 22px 60px -18px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+  .chart img{width:100%;height:100%;object-fit:contain}
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <svg class="foxmark" viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+    <div class="pad">
+      <div class="left">
+        <div class="brand">
+          <svg viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+          <span class="wordmark">Tuned Yota</span>
+        </div>
+        <div class="kick">Stock → Magnuson</div>
+        <div class="big">292<span>→</span>450<br>WHP</div>
+        <div class="title">5.7 V8 Tundra · <b>+158 hp</b> on the dyno</div>
+      </div>
+      <div class="chart"><img src="../../../site/images/dyno/tundra-5.7-magnuson-dyno.png" alt="Tundra Magnuson dyno"></div>
+    </div>
+  </div>
+</body>
+</html>

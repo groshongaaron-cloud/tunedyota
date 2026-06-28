@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Tuned Yota — EVENT FLYER · 1080×565 (link preview / FB / website). Horizontal: info left, photo+QR right. -->
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--blue:#B3D0D9;--sand:#DFC4B5;--sage:#99A08E;--sage-d:#7c8472;--paper:#F3EFEA}
+  *{margin:0;box-sizing:border-box}
+  body{background:#cfcdca;display:grid;place-items:center;min-height:100vh;padding:24px;font-family:'Lato',sans-serif}
+  .canvas{width:1080px;height:565px;position:relative;overflow:hidden;color:var(--paper);background:radial-gradient(120% 130% at 12% 0%,#5B4B42 0%,#3A2E26 55%,#2a221c 100%)}
+  .foxmark{position:absolute;left:-90px;bottom:-150px;width:420px;height:auto;opacity:.10}
+  .pad{position:absolute;inset:0;padding:44px 48px;display:flex;gap:36px}
+  .left{flex:1;display:flex;flex-direction:column}
+  .brand{display:flex;align-items:center;gap:13px}.brand svg{width:58px;height:58px}
+  .wordmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:21px;color:#fff}
+  .eyebrow{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.24em;text-transform:uppercase;font-size:15px;color:var(--sand);margin-top:24px}
+  .city{font-family:'Spectral',serif;font-weight:700;font-size:66px;line-height:.96;color:#fff;margin-top:6px}
+  .date{font-family:'Spectral',serif;font-weight:600;font-size:32px;color:var(--blue);margin-top:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+  .chip{font-family:'Lato';font-weight:900;font-size:14px;color:var(--paper);border:2px solid rgba(179,208,217,.5);border-radius:999px;padding:7px 14px}
+  .spacer{flex:1}
+  .slots{font-family:'Lato';font-weight:900;font-size:18px;color:#fff}.slots b{color:var(--sand)}
+  .right{flex:0 0 312px;display:flex;flex-direction:column;gap:14px}
+  .hero{border-radius:16px;overflow:hidden;flex:1;border:1.5px solid rgba(179,208,217,.3);box-shadow:0 18px 50px -20px rgba(0,0,0,.6)}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .bkrow{display:flex;align-items:center;gap:14px}
+  .qr{width:96px;height:96px;flex:0 0 auto;background:#fff;border-radius:11px;padding:7px}.qr img{width:100%;height:100%;display:block}
+  .bk-h{font-family:'Spectral',serif;font-weight:700;font-size:21px;color:#fff;line-height:1.1}
+  .bk-u{font-family:'Spectral SC',serif;letter-spacing:.1em;text-transform:uppercase;font-size:12.5px;color:var(--blue);margin-top:5px}
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <svg class="foxmark" viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+    <div class="pad">
+      <div class="left">
+        <div class="brand">
+          <svg viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+          <span class="wordmark">Tuned Yota</span>
+        </div>
+        <div class="eyebrow">OTT Tuning Event</div>
+        <div class="city">Green Bay, WI</div>
+        <div class="date">September 12, 2026</div>
+        <div class="chips"><span class="chip">Dyno-proven</span><span class="chip">Emissions intact</span><span class="chip">Magnuson dealer</span></div>
+        <div class="spacer"></div>
+        <div class="slots">Limited slots — <b>book before they fill.</b></div>
+      </div>
+      <div class="right">
+        <figure class="hero"><img src="../../../site/images/toyota-tundra.jpg" alt=""></figure>
+        <div class="bkrow">
+          <div class="qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=https%3A%2F%2Ftunedyota.com%2Ffind-your-exact-tune%3Futm_source%3Dflyer%26utm_campaign%3Dgreen-bay" alt="Scan to book"></div>
+          <div><div class="bk-h">Find Your<br>Exact Tune</div><div class="bk-u">tunedyota.com</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
