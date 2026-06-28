@@ -66,7 +66,35 @@ function urgency(days) {
 }
 
 function render(rows, today) {
-  const subject = `Action needed — ${rows.length} event venue${rows.length === 1 ? "" : "s"} still unset (“To Be Released”)`;
+  const subject = `Action needed — ${rows.length} venue${rows.length === 1 ? "" : "s"} to confirm + 2027 anchor-event nominations`;
+
+  const nominateHtml =
+    `<hr style="border:none;border-top:1px solid #e6e1da;margin:26px 0 18px">` +
+    `<h2 style="color:#5B4B42;margin:0 0 4px">Second ask — 2027 anchor-event nominations</h2>` +
+    `<p style="color:#7c8472;margin:0 0 12px;font-size:14px">We're building the 2027 calendar now. The best events are ones we <b>co-locate with a show, meet, or shop</b> you already know — free venue, built-in truck crowd. <b>Please nominate 1–2 events in your territory by <span style="color:#3A2E26">Sep 30, 2026</span></b> so they get first pick of dates.</p>` +
+    `<p style="color:#3A2E26;margin:0 0 6px;font-size:14px">Just reply with, for each:</p>` +
+    `<ul style="color:#3A2E26;font-size:14px;margin:0 0 4px;padding-left:20px">` +
+    `<li>Event name + city/state</li>` +
+    `<li>2027 date or weekend (a guess is fine)</li>` +
+    `<li>Type — overland expo · Toyota/Tacoma/Tundra/4Runner meet · truck show · off-road park · dealer/shop open house</li>` +
+    `<li>Rough attendance</li>` +
+    `<li>Venue offered? (free lot / indoor / none)</li>` +
+    `<li>Our way in — contact, booth cost, or "I know the organizer"</li>` +
+    `<li>Your confidence — would co-host / just attend / unsure</li>` +
+    `</ul>`;
+
+  const nominateText =
+    `\n\n----------------------------------------\n` +
+    `SECOND ASK — 2027 anchor-event nominations (by Sep 30, 2026)\n\n` +
+    `We're building the 2027 calendar. Best events co-locate with a show/meet/shop you\n` +
+    `already know (free venue + truck crowd). Nominate 1-2 in your territory. For each, reply with:\n` +
+    `  - Event name + city/state\n` +
+    `  - 2027 date or weekend (a guess is fine)\n` +
+    `  - Type: overland expo / Toyota-Tacoma-Tundra-4Runner meet / truck show / off-road park / dealer-shop open house\n` +
+    `  - Rough attendance\n` +
+    `  - Venue offered? (free lot / indoor / none)\n` +
+    `  - Our way in (contact, booth cost, or "I know the organizer")\n` +
+    `  - Your confidence (would co-host / just attend / unsure)\n`;
 
   const head = ["Status", "Days out", "Date", "Event", "Owner"];
   const th = head.map((h) => `<th style="text-align:left;padding:6px 14px 6px 0;color:#7c8472;border-bottom:1px solid #ccc;font-size:13px">${h}</th>`).join("");
@@ -88,6 +116,7 @@ function render(rows, today) {
     `Customers booked into these events get an automatic reminder email 10 and 2 days out — until the real address is set, that email reads <b>“Address: To Be Released.”</b></p>` +
     `<p style="color:#3A2E26;margin:0 0 14px;font-size:14px"><b>Please reply to this email with the confirmed venue address for any event you own</b>, and we'll lock it in.</p>` +
     `<table style="border-collapse:collapse">${`<tr>${th}</tr>`}${trs}</table>` +
+    nominateHtml +
     `<p style="color:#7c8472;margin:16px 0 0;font-size:12px">Sent to all installers for shared visibility. Owner column shows who covers each market.</p>` +
     `</div>`;
 
@@ -97,7 +126,7 @@ function render(rows, today) {
     `will read "Address: To Be Released" until the real venue is set. Reply with the confirmed address for any\n` +
     `event you own.\n\n` +
     rows.map((r) => `- [${urgency(r.days)}] ${r.label} (${r.days === 0 ? "TODAY" : r.days + "d"}) — ${r.city}, ${r.state} — ${r.event} — owner: ${r.owner}`).join("\n") +
-    `\n`;
+    nominateText;
 
   return { subject, html, text };
 }

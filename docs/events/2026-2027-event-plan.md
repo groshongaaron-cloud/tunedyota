@@ -196,6 +196,7 @@ Target categories that bring a free venue + a built-in truck audience:
 
 Co-locating turns a cold market into a warm one and removes the venue-address problem
 entirely. Until nominations land, the calendar above assumes self-hosted venues.
+**→ Executable deliverable + process below ("Partnership anchor-event nominations").**
 
 ### Q4 — Geography: hold the 6-state footprint and deepen it.
 **Do not chase Kansas City / Chicago in 2027.** Those mean long unsupported tows, no
@@ -205,4 +206,94 @@ passes on hot metros, southern MN (Rochester/Mankato), and Davenport. **Exceptio
 cheap *adjacent* add off Cody's SD/NE base (Lincoln NE or Sioux City IA) is allowed if
 its waitlist self-nominates. Reassess true expansion for **2028**, and only when a border
 metro's Priority List crosses the promotion threshold on its own — same demand-driven
-rule as every other new city.
+rule as every other new city. **The one approved 2027 adjacent move — Cody's tri-state
+expansion — is spec'd as an executable plan below.**
+
+---
+
+## Cody's tri-state expansion — executable plan (2027 pilot)
+
+**Why Cody, why now.** Cody has the lightest event load of the three installers and the
+most headroom to add days, and two metros sit *cheaply adjacent* to stops he already
+makes — so this is expansion with almost no new windshield time:
+
+- **Lincoln, NE** — ~55 min from Omaha. Run as an **Omaha → Lincoln back-to-back swing**
+  (one tow, two markets).
+- **Sioux City, IA** — the SD/NE/IA tri-state corner, ~90 min from both Sioux Falls and
+  Omaha. Pair with **Sioux Falls**.
+
+This stays inside the demand-driven rule: we **instrument demand first, schedule only if
+it clears the bar.** Numbers below are starting targets — adjust to reality.
+
+### Phase A — Instrument demand (Jul–Dec 2026)
+1. Add **Lincoln, NE** and **Sioux City, IA** to `markets.js` and the booking page
+   `MARKETS` with `inst: cody`, as **waitlist-only entries (no active event date)** so
+   lead intent can register without promising a date. _(Multi-file change — use the
+   `new-vehicle-page`/`schedule-event` pattern + `update-routing` so the page, server
+   routing, schema, and SEO stay in sync; then `ship`.)_
+2. Confirm they feed the **Priority List** so names accrue per city.
+3. Light local push in both metros (Cody's socials + any owner groups) to seed the list.
+4. Watch monthly via `submissions-report` / Funnel Events.
+
+### Phase B — Decision gate (Jan 2027)
+5. **Promote a metro to a real 2027 event when its waitlist hits ~8 names** (a viable
+   half-day of slots) **or** the funnel shows repeat intent. Below the bar → hold and
+   keep collecting; it's free to leave open.
+
+### Phase C — Schedule & execute the swing (target Jun–Jul 2027)
+6. Slot whichever cleared as a **back-to-back pair** with Cody's existing stop:
+   Omaha (Sat) + Lincoln (Sun), and/or Sioux Falls (Sat) + Sioux City (Sun).
+7. **Venue:** prefer a partner shop / co-located event (ties to the nominations process);
+   otherwise a public lot. **Set the real address the moment the date is locked** — don't
+   ship it as "To Be Released."
+8. Build via `schedule-event`, then `ship`.
+
+### Phase D — Measure & graduate
+9. **Success = slot-fill ≥ 60% and the day pencils out on travel.** A pilot metro that
+   fills graduates to a **2027/2028 regular**; one that doesn't reverts to waitlist-only.
+10. Either way, the result is logged so the 2028 calendar inherits a real read, not a guess.
+
+**Owner:** Cody (territory lead) + owner support for scheduling/SEO. **First milestone:**
+Lincoln + Sioux City live as waitlist-only markets before the 2026 season closes.
+
+---
+
+## Partnership anchor-event nominations — deliverable & executable plan
+
+**The deliverable:** a short, structured nomination from **each installer**, returned by
+**Sep 30, 2026**, so anchor events get *first pick of 2027 dates* and we build the
+self-hosted calendar around them. Anchors bring a free venue + a built-in truck audience
+and erase the venue-address problem.
+
+### The nomination (each installer submits 1–2)
+Reply to the installer email (or drop in a shared doc) with, per event:
+
+| Field | What to put |
+|-------|-------------|
+| **Event name** | The show/meet/open-house name |
+| **City, State** | Where it is |
+| **2027 date / weekend** | Best estimate (even "early June") |
+| **Type** | Overland expo · Toyota/Tacoma/Tundra/4Runner meet · truck show · off-road park day · dealer/shop open house |
+| **Est. attendance** | Rough headcount |
+| **Venue offered?** | Free lot · indoor space · none / unknown |
+| **Our way in** | Contact name, booth cost, or "I know the organizer" |
+| **Why it fits** | Overlap with our Toyota/Lexus truck owners |
+| **Your confidence** | Would co-host · just attend/scout · unsure |
+
+### Executable steps
+1. **Now:** send the ask — **folded into the venue-address installer email** so it's one
+   message, not two (see `scripts/send-venue-reminder.cjs`).
+2. **By Sep 30, 2026:** each installer returns 1–2 nominations.
+3. **Early Oct 2026:** owner **scores each** on a simple 1–5 rubric — **Audience fit**,
+   **Venue value**, **Date/territory fit** — and sums:
+   - **≥ 12 → Anchor:** lock it into the 2027 calendar first, confirm the partner,
+     **set the venue address immediately**, build via `schedule-event`, `ship`.
+   - **8–11 → Scout/attend:** show up in 2027 without committing an event; re-evaluate
+     for 2028.
+   - **< 8 → Pass.**
+4. **Oct–Nov 2026:** anchors get priority dates; fill the rest of the 2027 calendar
+   (Phase 2 above) around them so nothing collides.
+
+**Owner:** each installer nominates; owner scores & schedules. **Success:** at least
+**2–3 anchor events** seeded into 2027 by end of Oct 2026 — each one a market that's warm
+on arrival with its venue already locked.
