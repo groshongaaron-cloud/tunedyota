@@ -63,27 +63,12 @@ ul.lp-bul li::before{content:"";position:absolute;left:0;top:5px;width:11px;heig
 .lp-links{margin-top:30px;font-size:14px;line-height:2}.lp-links a{color:var(--brown);font-weight:700;text-decoration:none;margin-right:16px}.lp-links a:hover{text-decoration:underline}
 .lp-final{text-align:center;margin-top:30px}
 .lp-disc{font-size:11.5px;opacity:.55;text-align:center;margin-top:22px;line-height:1.55}
-</style>
-<style id="site-chrome">
-:root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20)}
-.snav{position:sticky;top:0;z-index:1000;background:rgba(237,236,235,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;padding:11px 18px;font-family:'Lato',sans-serif}
-.snav-logo{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:17px;color:#5B4B42;text-decoration:none;margin-right:auto;display:inline-flex;align-items:center;gap:9px}
-.snav-logo::before{content:"";width:27px;height:27px;flex:0 0 auto;background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E") center/contain no-repeat}
-.snav-links{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
-.snav-links a{font-weight:800;font-size:13px;letter-spacing:.02em;color:#5D4B40;text-decoration:none;padding:8px 11px;border-radius:99px;transition:.18s}
-.snav-links a:hover{background:rgba(153,160,142,.18);color:#3A2E26}
-.snav-call{font-family:'Lato';font-weight:900;font-size:13px;background:#3A2E26;color:#F3EFEA;text-decoration:none;border-radius:99px;padding:9px 16px;margin-left:6px}
-.snav-call:hover{background:#5B4B42}
-.sfoot{font-family:'Lato',sans-serif;background:#3A2E26;color:#D8CFC4;margin-top:46px;padding:34px 20px 28px;text-align:center}
-.sfoot .fmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:18px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:11px}
-.sfoot .fmark::before{content:"";width:44px;height:44px;background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='3.879%205.098%2040.002%2039.316'%3E%3Cpath%20fill='%23B3D0D9'%20d='M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z%20M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z'/%3E%3C/svg%3E") center/contain no-repeat}
-.sfoot .ftag{font-weight:700;letter-spacing:.28em;text-transform:uppercase;font-size:10px;color:#B3D0D9;margin:6px 0 16px}
-.sfoot a{color:#EDE6DD;text-decoration:none;font-weight:700}.sfoot a:hover{text-decoration:underline}
-.sfoot .frow{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:13.5px;margin-bottom:14px}
-.sfoot .fcon{font-size:13.5px;line-height:1.9;opacity:.9}.sfoot .fcopy{font-size:11.5px;opacity:.55;margin-top:16px}
-@media(max-width:560px){.snav-logo{margin-right:0;width:100%;text-align:center;justify-content:center}.snav{justify-content:center}}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important}}
 </style>`;
+
+// Shared nav/footer/skip-link chrome + design tokens live in site/site.css (the
+// June 2026 a11y + chrome refactor). Link it rather than inlining a #site-chrome
+// block, so regeneration never re-forks the chrome away from the rest of the site.
+const SITECSS = `<link rel="stylesheet" href="site.css">`;
 
 const PIXEL = `<!-- Meta Pixel Code -->
 <script>
@@ -118,6 +103,9 @@ const FOOTER = `<footer class="sfoot"><div class="fmark">Tuned Yota</div><div cl
   Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
   <div class="fcopy">© Tuned Yota · Toyota &amp; Lexus Performance Tuning · Authorized OTT Installer</div></footer>`;
+
+// a11y: keep each FAQ button's aria-expanded in sync with its open state (June 2026 a11y pass).
+const FQA11Y = `<script>document.querySelectorAll('.lp-fq').forEach(function(it,i){var q=it.querySelector('.lp-fqq'),a=it.querySelector('.lp-fqa');if(!q||!a)return;a.id='lpfqa-'+i;q.setAttribute('aria-controls','lpfqa-'+i);q.addEventListener('click',function(){q.setAttribute('aria-expanded',it.classList.contains('open')?'true':'false');});});</script>`;
 
 function citySentence(cities) {
   if (cities.length === 1) return cities[0];
@@ -163,12 +151,16 @@ function page({ name, slug, cities, instKeys }) {
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tunedyota.com/"},{"@type":"ListItem","position":2,"name":"OTT Tune","item":"https://tunedyota.com/ott-tune"},{"@type":"ListItem","position":3,"name":"Toyota & Lexus Tuning in ${name}","item":"${url}"}]}
 </script>
 ${FONTS}
+${SITECSS}
 ${FAVICON}
 ${STYLE}
+
 ${PIXEL}
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 ${NAV}
+<a id="main" tabindex="-1"></a>
 <div class="lp">
   <div class="lp-eyebrow">Toyota &amp; Lexus Tuning · ${name}</div>
   <h1>Toyota &amp; Lexus Engine Tuning in ${name}</h1>
@@ -209,6 +201,7 @@ ${faqVisible}
 </div>
 ${FQSCRIPT}
 ${FOOTER}
+${FQA11Y}
 </body>
 </html>
 `;
