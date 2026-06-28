@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--
+  Tuned Yota ad template — VEHICLE SPOTLIGHT · 1080×1080 (square: IG/FB feed/ad)
+  Editable: vehicle photo, model, price, proof line — all marked data: below.
+  Real customer-rig photo + dark gradient scrim for legible text (the "mix": real photo, no AI).
+  Swap the <img> src to any site/images/<vehicle>.jpg or a real customer photo.
+  Export: open in Chrome, screenshot the .canvas at 1080×1080 (or recreate in Canva).
+-->
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#3A2E26;--brown:#5B4B42;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--paper:#F3EFEA}
+  *{margin:0;box-sizing:border-box}
+  body{background:#cfcdca;display:grid;place-items:center;min-height:100vh;padding:24px;font-family:'Lato',sans-serif}
+  .canvas{width:1080px;height:1080px;position:relative;overflow:hidden;color:var(--paper)}
+  /* data: vehicle photo (real) */
+  .photo{position:absolute;inset:0}
+  .photo img{width:100%;height:100%;object-fit:cover;display:block}
+  /* scrim for text legibility */
+  .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(36,28,22,.62) 0%,rgba(36,28,22,.12) 34%,rgba(36,28,22,.20) 56%,rgba(30,23,18,.92) 100%)}
+  .pad{position:absolute;inset:0;padding:70px 72px 64px;display:flex;flex-direction:column}
+  .top{display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:15px}
+  .brand svg{width:66px;height:66px;filter:drop-shadow(0 2px 10px rgba(0,0,0,.5))}
+  /* the Tuned Yota fox — brand seal over the dark sky */
+  .foxmark{position:absolute;right:-60px;top:74px;width:420px;height:auto;opacity:.17}
+  .wordmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-size:23px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+  .tag{font-family:'Spectral SC',serif;letter-spacing:.2em;text-transform:uppercase;font-size:13px;color:var(--blue);text-shadow:0 2px 10px rgba(0,0,0,.6)}
+  .spacer{flex:1}
+  .eyebrow{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.24em;text-transform:uppercase;font-size:19px;color:var(--blue);text-shadow:0 2px 10px rgba(0,0,0,.6)}
+  /* data: headline */
+  .headline{font-family:'Spectral',serif;font-weight:700;font-size:92px;line-height:.98;letter-spacing:-.01em;color:#fff;margin-top:10px;text-shadow:0 4px 26px rgba(0,0,0,.55)}
+  /* data: price + proof */
+  .meta{font-family:'Lato';font-weight:900;font-size:27px;letter-spacing:.01em;color:var(--sand);margin-top:20px}
+  .proof{font-size:23px;font-weight:700;color:var(--paper);margin-top:8px;opacity:.95}
+  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:34px;gap:24px}
+  .pill{font-family:'Lato';font-weight:900;font-size:24px;background:var(--blue);color:#23303a;border-radius:999px;padding:18px 30px;white-space:nowrap}
+  .url{font-family:'Spectral SC',serif;letter-spacing:.14em;text-transform:uppercase;font-size:17px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="photo"><img src="../../../site/images/toyota-tundra.jpg" alt="Toyota Tundra"></div>
+    <div class="scrim"></div>
+    <svg class="foxmark" viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+    <div class="pad">
+      <div class="top">
+        <div class="brand">
+          <svg viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+          <span class="wordmark">Tuned Yota</span>
+        </div>
+        <span class="tag">Undeniable Performance</span>
+      </div>
+      <div class="spacer"></div>
+      <!-- data: eyebrow + headline -->
+      <div class="eyebrow">Toyota Tundra · OTT Tune</div>
+      <div class="headline">Sharper. Smoother.<br>Stronger.</div>
+      <!-- data: price + proof -->
+      <div class="meta">From $500 · dyno-proven · emissions intact</div>
+      <div class="proof">Fixes lazy shifting, throttle lag &amp; gear hunting — 5-gas verified.</div>
+      <div class="foot">
+        <span class="pill">Find Your Exact Tune →</span>
+        <span class="url">tunedyota.com</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
