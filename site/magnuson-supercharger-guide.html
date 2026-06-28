@@ -26,7 +26,7 @@
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
 {"@type": "Question", "name": "Which Toyotas does the Magnuson supercharger fit?", "acceptedAnswer": {"@type": "Answer", "text": "Supported platforms include the Toyota Tacoma (3.5L and 4.0L V6), 4Runner (4.0L V6), FJ Cruiser (4.0L V6), and the 5.7L V8 Tundra, Sequoia, and Land Cruiser. Tuned Yota also supports Harrop and ProCharger systems."}},
-{"@type": "Question", "name": "How much power does a Magnuson supercharger add?", "acceptedAnswer": {"@type": "Answer", "text": "Gains depend on the platform and supporting modifications. Contact Tuned Yota for the expected figures for your vehicle."}},
+{"@type": "Question", "name": "How much power does a Magnuson supercharger add?", "acceptedAnswer": {"@type": "Answer", "text": "On a Dynojet, a 5.7L V8 Tundra goes from about 292 to roughly 450 wheel horsepower (about +158 hp, plus ~457 lb-ft) on a Magnuson Stage 1 kit with a matched OTT calibration. The 4.0L V6 4Runner reaches about 334 whp and supported 3.5L V6 Tacomas push past 360 whp. Exact gains depend on platform, fuel, and supporting modifications."}},
 {"@type": "Question", "name": "What is included: kit, install, and calibration?", "acceptedAnswer": {"@type": "Answer", "text": "Tuned Yota is the Midwest's authorized Magnuson Supercharger dealer, installer, and calibrator. Kits can drop-ship to the lower 48, and install plus a matched VFTuner PRO calibration are done in person."}},
 {"@type": "Question", "name": "Is a supercharger emissions-legal and warranty-safe?", "acceptedAnswer": {"@type": "Answer", "text": "Factory emissions systems stay intact and calibrations are 5-gas verified; check-engine lights are never disabled. See our warranty and emissions page for details."}},
 {"@type": "Question", "name": "Magnuson vs ProCharger vs Harrop - which is best?", "acceptedAnswer": {"@type": "Answer", "text": "Tuned Yota is an authorized Magnuson dealer and also supports Harrop and ProCharger systems; the best fit depends on your platform and goals. Reach out and Tuned Yota will recommend the right system."}}
@@ -34,6 +34,13 @@
 </script>
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://tunedyota.com/"}, {"@type": "ListItem", "position": 2, "name": "Supercharger", "item": "https://tunedyota.com/supercharger"}, {"@type": "ListItem", "position": 3, "name": "Magnuson Supercharger Guide", "item": "https://tunedyota.com/magnuson-supercharger-guide"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"ImageObject","contentUrl":"https://tunedyota.com/images/dyno/tundra-5.7-magnuson-dyno.png","caption":"5.7L V8 Toyota Tundra — stock ~292 whp vs ~450 whp / 457 lb-ft on a Magnuson Stage 1 supercharger with an OTT calibration","creditText":"Overland Tailor Tuning"},
+{"@type":"ImageObject","contentUrl":"https://tunedyota.com/images/dyno/4runner-4.0-magnuson-dyno.png","caption":"4.0L V6 Toyota 4Runner — about 334 whp on a Magnuson supercharger with an OTT calibration","creditText":"Overland Tailor Tuning"},
+{"@type":"ImageObject","contentUrl":"https://tunedyota.com/images/dyno/tacoma-3.5-magnuson-dyno.png","caption":"3.5L V6 Toyota Tacoma — stock ~246 whp vs ~362 whp on a Magnuson supercharger with an OTT calibration","creditText":"Overland Tailor Tuning"}
+]}
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
@@ -94,7 +101,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
 <div class="lp">
   <div class="lp-eyebrow">Magnuson Supercharger · Tuned Yota</div>
   <h1>Magnuson Supercharger Buyer's Guide</h1>
-  <div class="lp-answer">Tuned Yota is the Midwest's authorized <strong>Magnuson Supercharger</strong> dealer, installer, and calibrator. A supercharger plus a matched calibration is the biggest power gain for supported Toyota V6 and 5.7L V8 platforms. Kits drop-ship to the lower 48; install and calibration happen in person.</div>
+  <div class="lp-answer">Tuned Yota is the Midwest's authorized <strong>Magnuson Supercharger</strong> dealer, installer, and calibrator. A supercharger plus a matched calibration is the biggest power gain for supported Toyota V6 and 5.7L V8 platforms — a 5.7L V8 Tundra goes from roughly <strong>292 to ~450 wheel horsepower</strong> on a Magnuson Stage 1 kit. Kits drop-ship to the lower 48; install and calibration happen in person.</div>
   <div class="lp-cta">
     <a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a>
     <a class="btn outline" href="supercharger.html">Supercharger services</a>
@@ -102,12 +109,27 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
 
   <h2>Which Toyotas does the Magnuson supercharger fit?</h2>
   <div class="tbl-wrap"><table>
-    <tr><th>Platform / engine</th><th>Est. gain</th><th>Kit + install + cal (from)</th></tr>
-    <tr><td>Tacoma 3.5L V6</td><td>Contact us for an estimate</td><td>Call for pricing</td></tr>
-    <tr><td>Tacoma / 4Runner / FJ Cruiser 4.0L V6</td><td>Contact us for an estimate</td><td>Call for pricing</td></tr>
-    <tr><td>Tundra / Sequoia / Land Cruiser 5.7L V8</td><td>Contact us for an estimate</td><td>Call for pricing</td></tr>
+    <tr><th>Platform / engine</th><th>On the dyno (whp)</th><th>Kit + install + cal (from)</th></tr>
+    <tr><td>Tacoma 3.5L V6</td><td>~246 → ~362 whp (+116)</td><td>Call for pricing</td></tr>
+    <tr><td>Tacoma / 4Runner / FJ Cruiser 4.0L V6</td><td>~334 whp (Magnuson)</td><td>Call for pricing</td></tr>
+    <tr><td>Tundra / Sequoia / Land Cruiser 5.7L V8</td><td>~292 → ~450 whp (+158)</td><td>Call for pricing</td></tr>
   </table></div>
-  <p class="lp-note">Gains and pricing depend on your platform and supporting modifications — contact us for figures specific to your build.</p>
+  <p class="lp-note">Dyno figures are real Dynojet pulls (below); your exact gains and pricing depend on platform, fuel, and supporting modifications — contact us for figures specific to your build.</p>
+
+  <h2>Real dyno results</h2>
+  <p style="font-size:14.5px;line-height:1.6">Every chart below is a real Dynojet pull on an Overland Tailor Tuning (OTT) calibration — the tune Tuned Yota installs. The headline is the 5.7L V8: a Tundra that left the factory around <strong>292 wheel horsepower</strong> put down roughly <strong>450 whp and 457 lb-ft</strong> with a Magnuson Stage 1 supercharger and a matched calibration — about <strong>+158 hp and +138 lb-ft to the wheels</strong>. The 4.0L V6 4Runner climbs to about <strong>334 whp</strong> on a Magnuson kit, and supported 3.5L V6 Tacomas push past <strong>360 whp</strong>. Your numbers depend on platform, fuel, and supporting modifications.</p>
+  <figure style="margin:18px 0">
+    <img src="images/dyno/tundra-5.7-magnuson-dyno.png" alt="Dynojet dyno chart: 5.7L V8 Toyota Tundra stock about 292 wheel horsepower versus roughly 450 whp and 457 lb-ft with a Magnuson Stage 1 supercharger and OTT calibration" loading="lazy" style="width:100%;height:auto;border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);background:#fff">
+    <figcaption style="font-size:12.5px;color:var(--sage-d);margin-top:6px">5.7L V8 Tundra — stock ~292 whp → ~450 whp / 457 lb-ft on a Magnuson Stage 1 + OTT calibration.</figcaption>
+  </figure>
+  <figure style="margin:18px 0">
+    <img src="images/dyno/4runner-4.0-magnuson-dyno.png" alt="Dynojet dyno chart: 4.0L V6 Toyota 4Runner reaching about 334 wheel horsepower with a Magnuson supercharger and OTT calibration" loading="lazy" style="width:100%;height:auto;border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);background:#fff">
+    <figcaption style="font-size:12.5px;color:var(--sage-d);margin-top:6px">4.0L V6 4Runner — about 334 whp on a Magnuson kit with an OTT calibration.</figcaption>
+  </figure>
+  <figure style="margin:18px 0">
+    <img src="images/dyno/tacoma-3.5-magnuson-dyno.png" alt="Dynojet dyno chart: 3.5L V6 Toyota Tacoma stock about 246 wheel horsepower versus roughly 362 whp with a Magnuson supercharger and OTT calibration" loading="lazy" style="width:100%;height:auto;border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);background:#fff">
+    <figcaption style="font-size:12.5px;color:var(--sage-d);margin-top:6px">3.5L V6 Tacoma — stock ~246 whp → ~362 whp on a Magnuson kit with an OTT calibration.</figcaption>
+  </figure>
 
   <h2>What's included: kit, install, and calibration</h2>
   <ul class="lp-bul">
@@ -132,7 +154,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
 
   <h2>Supercharger FAQ</h2>
   <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Which Toyotas does the Magnuson supercharger fit?<span>+</span></button><div class="lp-fqa"><p>Supported platforms include the Toyota Tacoma (3.5L and 4.0L V6), 4Runner (4.0L V6), FJ Cruiser (4.0L V6), and the 5.7L V8 Tundra, Sequoia, and Land Cruiser. Tuned Yota also supports Harrop and ProCharger systems.</p></div></div>
-  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">How much power does a Magnuson supercharger add?<span>+</span></button><div class="lp-fqa"><p>Gains depend on the platform and supporting modifications. Contact Tuned Yota for the expected figures for your vehicle.</p></div></div>
+  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">How much power does a Magnuson supercharger add?<span>+</span></button><div class="lp-fqa"><p>A lot. On a Dynojet, a 5.7L V8 Tundra goes from about 292 to roughly 450 wheel horsepower (and ~457 lb-ft) on a Magnuson Stage 1 kit with a matched OTT calibration — about +158 hp to the wheels. The 4.0L V6 4Runner reaches about 334 whp, and supported 3.5L V6 Tacomas push past 360 whp. Exact gains depend on platform, fuel, and supporting modifications.</p></div></div>
   <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">What is included: kit, install, and calibration?<span>+</span></button><div class="lp-fqa"><p>Tuned Yota is the Midwest's authorized Magnuson Supercharger dealer, installer, and calibrator. Kits can drop-ship to the lower 48, and install plus a matched VFTuner PRO calibration are done in person.</p></div></div>
   <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Is a supercharger emissions-legal and warranty-safe?<span>+</span></button><div class="lp-fqa"><p>Factory emissions systems stay intact and calibrations are 5-gas verified; check-engine lights are never disabled. See our warranty and emissions page for details.</p></div></div>
   <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Magnuson vs ProCharger vs Harrop — which is best?<span>+</span></button><div class="lp-fqa"><p>Tuned Yota is an authorized Magnuson dealer and also supports Harrop and ProCharger systems; the best fit depends on your platform and goals. Reach out and Tuned Yota will recommend the right system.</p></div></div>

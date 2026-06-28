@@ -11,3 +11,7 @@ node_modules/
 
 # Claude Code local machine settings (per-machine, not for the repo)
 .claude/settings.local.json
+
+# Raw media library (dyno sheets, videos, competitor comparisons, ad source files).
+# Kept local + out of the published site/. Only curated images under site/images/ ship.
+assets-source/
