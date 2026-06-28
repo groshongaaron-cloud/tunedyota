@@ -142,7 +142,7 @@ function page({ name, slug, cities, instKeys }) {
 <meta name="description" content="Professional Toyota &amp; Lexus engine tuning across ${name} — ${ESC(cityTxt)}. In-person OTT calibration and Magnuson supercharger work by a licensed VFTuner PRO Tuner. See pricing and book.">
 <link rel="canonical" href="${url}">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Service","@id":"${url}#service","serviceType":"Toyota & Lexus OTT Tune Calibration in ${name}","name":"Toyota & Lexus Engine Tuning in ${name} by Tuned Yota","provider":{"@id":"https://tunedyota.com/#business"},"areaServed":[${areaServed}],"description":"Tuned Yota provides Toyota and Lexus OTT Tune calibration and Magnuson supercharger services at in-person events across ${name} (${cityTxt}), built by a licensed VFTuner PRO Tuner.","offers":{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":"400","highPrice":"950"}}
+{"@context":"https://schema.org","@type":"Service","@id":"${url}#service","serviceType":"Toyota & Lexus OTT Tune Calibration in ${name}","name":"Toyota & Lexus Engine Tuning in ${name} installed by Tuned Yota","provider":{"@id":"https://tunedyota.com/#business"},"areaServed":[${areaServed}],"description":"Tuned Yota provides Toyota and Lexus OTT Tune calibration and Magnuson supercharger services at in-person events across ${name} (${cityTxt}), built by a licensed VFTuner PRO Tuner.","offers":{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":"400","highPrice":"950"}}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[${faqSchema}]}
