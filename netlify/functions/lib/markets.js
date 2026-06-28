@@ -13,10 +13,12 @@ const MARKETS = [
   { city: "Des Moines", state: "IA", inst: "aaron" },
   { city: "Cedar Rapids", state: "IA", inst: "aaron" },
   { city: "Davenport", state: "IA", inst: "aaron" },
+  { city: "Sioux City", state: "IA", inst: "cody" },
   { city: "Fargo", state: "ND", inst: "aaron" },
   { city: "Rapid City", state: "SD", inst: "cody" },
   { city: "Sioux Falls", state: "SD", inst: "cody" },
   { city: "Omaha", state: "NE", inst: "cody" },
+  { city: "Lincoln", state: "NE", inst: "cody" },
 ];
 function getMarket(city) {
   const key = String(city == null ? "" : city).trim().toLowerCase();
