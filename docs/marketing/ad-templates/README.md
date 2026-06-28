@@ -11,6 +11,7 @@ No AI imagery — real charts/photos + the brand's topographic motif.
 | `dyno-card*` | Dyno proof card — the live dyno results as a shareable graphic |
 | `event-flyer*` | Event promo — city, date, slots, live QR to the booking URL |
 | `vehicle-spotlight*` | Vehicle feature — real rig photo + "from $X" + proof |
+| `testimonial*` | Customer review card — quote + stars + name/vehicle/city (real reviews, with permission) |
 | `youtube-thumbnail.html` | 1280×720 YouTube thumbnail |
 
 ## Sizes (suffix → dimensions)
