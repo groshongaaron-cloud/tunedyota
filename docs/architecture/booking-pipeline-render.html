@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Brand render of the book.js booking pipeline (mirrors booking-pipeline.md). -->
+<!-- render: 1500x2420 -->
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@600;700&family=Spectral+SC:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--blue:#B3D0D9;--sage-d:#7c8472}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:'Lato',sans-serif;color:var(--ink)}
+  .wrap{width:1500px;margin:0 auto;padding:54px 60px 70px}
+  .head{display:flex;align-items:center;gap:20px}.head svg{width:64px;height:64px}
+  .mark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:28px;color:var(--brown)}
+  h1{font-family:'Spectral',serif;font-weight:700;font-size:46px;letter-spacing:-.01em;margin:14px 0 4px}
+  .sub{font-size:18px;color:var(--sage-d);font-weight:700;margin-bottom:28px}
+  .mermaid{font-family:'Lato',sans-serif}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <svg viewBox="3.879 5.098 40.002 39.316" xmlns="http://www.w3.org/2000/svg"><path fill="#B3D0D9" stroke="#5B4B42" stroke-width="0.6" d="M23.881,44.414L3.879,29.408l5.022-7.53V5.098L19.837,18.77h8.094L38.86,5.098v16.78l5.021,7.53L23.881,44.414z M7.037,28.869l16.844,12.638l16.85-12.638l-4.189-6.287V11.726l-7.5,9.36H18.72l-7.493-9.36v10.857L7.037,28.869z"/></svg>
+      <span class="mark">Tuned Yota</span>
+    </div>
+    <h1>Booking Pipeline · <code style="font-family:Lato;font-weight:900;font-size:34px">book.js</code></h1>
+    <div class="sub">What happens between a form submit and a booked, emailed slot — with every fallback</div>
+    <pre class="mermaid">
+flowchart TD
+  REQ["Customer submits Find Your Exact Tune"] --> VAL{"Valid payload?<br/>vehicle · year · engine · contact"}
+  VAL -- no --> E400["Return 400 · error shown to customer"]
+  VAL -- yes --> INT{"Booking an event slot?"}
+  INT -- "no event yet" --> PRI["airtable.js → Priority List (waitlist)"]
+  INT -- "yes" --> MKT["getMarket(city) · routing.js → installer"]
+  MKT --> SLOT{"Slot open?<br/>availability.js / slots.js"}
+  SLOT -- "full" --> WAIT["Add to Priority List + waitlist email"]
+  SLOT -- "open" --> WRITE["createTolerant → Airtable Bookings<br/>(retry without optional field on 422)"]
+  WRITE --> MAIL["resend.js → installer + customer email + .ics"]
+  MAIL --> OK{"Email sent?"}
+  OK -- "yes" --> DONE["Return 200 · emailFailed:false"]
+  OK -- "no" --> FAIL["Email Status = FAILED · alert.js → Slack"]
+  FAIL --> DONE2["Return 200 · emailFailed:true"]
+  PRI --> DONE
+  WAIT --> DONE
+  REQ -. parallel client beacon .-> TRACK["track.js → Funnel Events"]
+    </pre>
+  </div>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad:true, theme:'base', securityLevel:'loose',
+      flowchart:{ curve:'basis', nodeSpacing:40, rankSpacing:50, padding:12 },
+      themeVariables:{ fontFamily:'Lato, sans-serif', fontSize:'16px',
+        primaryColor:'#FAF9F7', primaryTextColor:'#3A2E26', primaryBorderColor:'#5B4B42',
+        lineColor:'#7c8472', tertiaryColor:'#EDECEB',
+        clusterBkg:'rgba(153,160,142,.14)', clusterBorder:'#99A08E', edgeLabelBackground:'#EDECEB' } });
+  </script>
+</body>
+</html>

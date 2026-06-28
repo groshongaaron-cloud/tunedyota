@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Render the brand-styled Tuned Yota workflow (workflow-render.html) to a PNG via headless Chrome.
+// Render every architecture diagram (*-render.html in this folder) to a PNG via headless Chrome.
 //   node docs/architecture/render-workflow.js
-// Output → assets-source/diagrams/tuned-yota-workflow.png (gitignored). Needs internet (Mermaid + fonts via CDN).
+// Each *-render.html declares its canvas via:  <!-- render: WIDTHxHEIGHT -->  (default 1500x2200).
+// Output → assets-source/diagrams/<base>.png (gitignored). Needs internet (Mermaid + fonts via CDN).
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
@@ -19,12 +20,23 @@ const CHROMES = [
 const CHROME = CHROMES.find((p) => fs.existsSync(p));
 if (!CHROME) { console.error("No Chrome/Edge found."); process.exit(1); }
 
-const url = "file:///" + path.join(DIR, "workflow-render.html").replace(/\\/g, "/");
-const out = path.join(OUT, "tuned-yota-workflow.png");
-// Generous height; Mermaid sizes the diagram to content. Adjust --window-size if it clips.
-execFileSync(CHROME, [
-  "--headless=new", "--disable-gpu", "--hide-scrollbars",
-  "--force-device-scale-factor=2", "--virtual-time-budget=10000",
-  "--window-size=1500,2760", `--screenshot=${out}`, url,
-], { stdio: "ignore" });
-console.log("✓ wrote", out);
+const files = fs.readdirSync(DIR).filter((f) => f.endsWith("-render.html"));
+let n = 0;
+for (const f of files) {
+  const html = fs.readFileSync(path.join(DIR, f), "utf8");
+  const m = html.match(/<!--\s*render:\s*(\d+)x(\d+)\s*-->/i);
+  const [w, h] = m ? [m[1], m[2]] : ["1500", "2200"];
+  const base = f.replace(/-render\.html$/, "");
+  const out = path.join(OUT, `${base}.png`);
+  const url = "file:///" + path.join(DIR, f).replace(/\\/g, "/");
+  try {
+    execFileSync(CHROME, [
+      "--headless=new", "--disable-gpu", "--hide-scrollbars",
+      "--force-device-scale-factor=2", "--virtual-time-budget=10000",
+      `--window-size=${w},${h}`, `--screenshot=${out}`, url,
+    ], { stdio: "ignore" });
+    console.log(`✓ ${base}.png  (${w}×${h})`);
+    n++;
+  } catch (e) { console.error("✗ failed:", f, e.message); }
+}
+console.log(`\nRendered ${n} diagram(s) → ${OUT}`);
