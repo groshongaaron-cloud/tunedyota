@@ -34,6 +34,13 @@ it with `ImageObject` schema, and ship — without the four traps below.
    pull peak HP/torque for each curve (stock vs OTT, or stock vs supercharged). For
    supercharger charts, **confirm the blower brand** (Magnuson vs other) before labeling —
    the Magnuson guide is Magnuson-specific.
+   - **No `assets-source/` folder for this model?** Do NOT fabricate. Check whether its
+     engine is a **shared platform** with a model that does have a chart (e.g. Sequoia /
+     Land Cruiser **5.7L V8 = 2G Tundra**; the **4.0L V6** is shared across Tacoma / 4Runner
+     / FJ Cruiser). If so, reuse that chart, **label it honestly everywhere** ("5.7L V8 ·
+     Sequoia/Tundra shared platform · pull run on a Tundra"), name the copied file for *this*
+     model (`sequoia-5.7-stock-vs-ott-dyno.png`), and **surface the reuse for owner sign-off**.
+     If no shared chart exists either, skip and tell the owner — never invent a chart.
 2. **Confirm with the owner** the exact numbers and how to frame them. NA OTT tunes show
    *modest peak HP* — lead with **torque / midrange / drivability**, not a small HP delta.
    Apply [[brand-rules-locked]] (no "Stage 2/3"/"MAF"; turbo tier = "Turbo Performance
@@ -42,9 +49,11 @@ it with `ImageObject` schema, and ship — without the four traps below.
    `<vehicle>-<engine>-<na|stock-vs-ott|magnuson|supercharged>-dyno.png` (e.g.
    `tundra-5.7-magnuson-dyno.png`). `cp` it; leave the rest of `assets-source/` untouched.
 4. **Embed** a `<figure>` near the relevant section: `<img src="images/dyno/<name>.png">`
-   with **descriptive alt text** (vehicle + the before→after numbers), a `<figcaption>`
-   (`… Dynojet, SAE5`), and inline brand styles (`border:1.5px solid var(--line)`, radius,
-   shadow). Fill any gain table; lead the answer-first/section with the headline number.
+   with **descriptive alt text** (vehicle + the before→after numbers), a `<figcaption>` that
+   ends with **`· Dynojet, SAE5 · results vary by build, fuel & mods`** (the "results vary"
+   disclaimer is required, not optional), and inline brand styles (`border:1.5px solid
+   var(--line)`, radius, shadow). Fill any gain table; lead the answer-first/section with the
+   headline number.
 5. **Add `ImageObject` JSON-LD** in `<head>` (after the breadcrumb block):
    `{"@context":"https://schema.org","@type":"ImageObject","contentUrl":"https://tunedyota.com/images/dyno/<name>.png","caption":"…","creditText":"Overland Tailor Tuning"}`
    (use a `@graph` array for multiple charts).
@@ -52,7 +61,7 @@ it with `ImageObject` schema, and ship — without the four traps below.
 7. **Preview** (open the page locally or render) before shipping public claims.
 8. **`npm run build:seo`** then confirm it did **not** alter your page beyond your edits
    (no meta change → no OG change). **`npm test`** (must stay green).
-9. **Revert churn** — `git checkout -- site/sitemap.xml site/links.html site/toyota-lexus-tuning-*.html` — then stage only the page + the dyno image. Commit, **push `master`** (see [[ship]]).
+9. **Revert churn** — `git checkout -- site/sitemap.xml site/links.html site/toyota-lexus-tuning-*.html` — then stage only the page + the dyno image. Commit, **push `master`** (see [[ship]]). _(For a preview/validation run that is NOT shipping, leave the churn in place and flag it for the reviewer instead of reverting.)_
 10. **Verify live** — `curl` the page for the new number, and confirm the image serves
     `HTTP 200` at `https://tunedyota.com/images/dyno/<name>.png`.
 
@@ -62,6 +71,7 @@ it with `ImageObject` schema, and ship — without the four traps below.
 - **Copied a whole `assets-source/` subfolder into `site/`** → publishes videos/competitor sheets. Copy one file.
 - **Published numbers without owner sign-off** or without "results vary" → overclaim risk.
 - **Labeled a non-Magnuson supercharger chart "Magnuson"** on the Magnuson guide → inaccurate.
+- **Fabricated a chart/numbers for a model with no `assets-source/` folder** → check for a shared-platform chart (e.g. Sequoia = Tundra 5.7 V8) and label it honestly, or skip. Never invent.
 - **`git add .` after build:seo** → drags in sitemap/state-page churn. Stage only your two files.
 - **Framed a modest NA peak-HP gain as a power claim** → underwhelms; lead with torque/drivability.
 
