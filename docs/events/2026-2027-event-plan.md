@@ -69,9 +69,10 @@ rebooks from the summer events).
 - Run a **winter waitlist campaign** ("lock your spring slot now") off the Priority List.
 - Execute the **Google Business Profile** push (the keystone for geo search — see
   `docs/seo/gbp-setup.md`) and the pending SEO content pages while bookings are quiet.
-- Optionally pilot **one indoor shop-host event** in a partner garage (Twin Cities or
-  Milwaukee) in Feb/Mar as a "cabin-fever" tune day — tests whether winter indoor demand
-  justifies repeating it.
+- **Pilot one indoor shop-host event** (decided — see Q2 below) in a heated partner
+  garage in the densest metro (Twin Cities or Milwaukee), **late Feb / early Mar 2027**,
+  as a "cabin-fever" tune day. Single controlled test; measure conversion before any
+  winter series.
 
 ---
 
@@ -157,12 +158,51 @@ Wausau WI, Lincoln NE.**
 - Avoid scheduling two installers on the same weekend unless owner support can cover one,
   so the rig and hands aren't stretched.
 
-## What I'd want from you to firm this up
-1. **Installer capacity** — is ~one event every 3–4 weeks per installer realistic, or
-   should 2027 be lighter/heavier?
-2. **Winter appetite** — worth piloting an indoor Feb/Mar event, or treat Nov–Mar as a
-   hard off-season?
-3. **Anchor partnerships** — any known 2027 truck shows / off-road meets / dealer or shop
-   partners we should build events around (free venues + audience)?
-4. **Geographic ambition** — hold the current 6-state footprint in 2027, or push into a
-   new metro (e.g., Kansas City, Chicago suburbs) as a deliberate expansion bet?
+## Firmed-up decisions (2026-06-27)
+
+These are my recommended answers as event planner, applying the constraints above. Owner
+overrides anything; Q3 in particular needs real-world input the team holds, not me.
+
+### Q1 — Installer capacity: realistic as a floor, but rebalance Aaron.
+One event every **3–4 weeks per installer is sustainable** across the Apr–Oct season
+(~30 weeks → ~7–8 event-days each). The problem isn't the cadence, it's the **draft's
+distribution**: Aaron's territory (MN + IA + Fargo + Eau Claire & Madison) had him
+carrying ~14 of the 22 events — nearly double a healthy load — while Noah and Cody sat
+near 4 each. **Decision:**
+- Cap any single installer at **~8 event-days** per season.
+- Cut Aaron's load with **two-city weekend swings** (one tow, two tunes — e.g., Cedar
+  Rapids + Davenport; Rochester + Mankato), which add coverage *without* adding weekends.
+- Let **owner support float** to whichever region is heaviest that weekend, and **never
+  schedule Aaron in two regions on the same weekend.**
+- Net 2027 target trimmed to **~18–20 events** (quality cadence over raw count).
+
+### Q2 — Winter: yes, one controlled pilot. Otherwise hard off-season.
+Treat **Nov–Jan as a hard off-season** (holidays + deepest cold + no outdoor tuning).
+But run **one indoor shop-host pilot in late Feb / early Mar 2027** in a heated partner
+garage in the densest metro (Twin Cities or Milwaukee). Low risk, captures Q1 revenue
+when every competitor is dormant, keeps the brand warm, and gives a real read on winter
+demand. **Gate it:** only repeat/expand the winter format in 2028 if the pilot's
+slot-fill and conversion beat a normal shoulder-season event.
+
+### Q3 — Anchor partnerships: pursue, but the team must name them.
+This is the one I can't answer from data — it needs local knowledge the installers hold.
+**Decision = a process, not a list:** each installer **nominates 1–2 anchor events in
+their territory by end of Sep 2026** (so we can build the 2027 calendar around them).
+Target categories that bring a free venue + a built-in truck audience:
+- **Overland / off-road expos** and off-road park days.
+- **Regional Toyota / Tacoma / Tundra / 4Runner owner meets** and clubs.
+- **Truck & accessory shows**, county-fair truck-pull weekends.
+- **Toyota dealer open houses** and performance-shop partner days (co-marketing).
+
+Co-locating turns a cold market into a warm one and removes the venue-address problem
+entirely. Until nominations land, the calendar above assumes self-hosted venues.
+
+### Q4 — Geography: hold the 6-state footprint and deepen it.
+**Do not chase Kansas City / Chicago in 2027.** Those mean long unsupported tows, no
+local installer, and no existing waitlist or local search rank — high cost, unproven
+return. The higher-ROI play is to **saturate the territory we already rank in**: second
+passes on hot metros, southern MN (Rochester/Mankato), and Davenport. **Exception:** a
+cheap *adjacent* add off Cody's SD/NE base (Lincoln NE or Sioux City IA) is allowed if
+its waitlist self-nominates. Reassess true expansion for **2028**, and only when a border
+metro's Priority List crosses the promotion threshold on its own — same demand-driven
+rule as every other new city.
