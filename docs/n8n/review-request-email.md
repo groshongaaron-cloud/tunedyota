@@ -153,5 +153,130 @@ function buildReviewRequestEmail(booking, inst, opts = {}) {
   sending so nobody gets it twice (see the workflow draft).
 - Timing: **2 days after the event** reads as genuine (tune has been driven) without feeling
   automated. Adjustable in the schedule/filter.
-- If you later want a **second nudge** (e.g. +7 days to non-openers), we add a follow-up step
-  gated on the same flag — say the word and I'll draft that variant too.
+- A **+7-day second nudge** for non-openers is drafted below.
+
+---
+
+# +7-Day Second Nudge (non-openers)
+
+A single follow-up sent ~7 days after the first review request, **only to people who didn't
+open it**. Shorter, lighter, one ask. Same brand guardrails; sent once.
+
+## Who gets it — targeting logic
+
+The honest definition of "non-opener" needs **Resend open tracking**. Two ways to wire it,
+pick based on whether open-tracking is on:
+
+**Option 1 — true non-openers (recommended).** When Workflow 2 sends the first email, save
+the Resend message id to the booking (new field **`Review Email ID`**) and enable Resend
+open tracking. Either (a) subscribe an n8n **Webhook** to Resend's `email.opened` event and
+stamp **`Review Opened = true`**, or (b) in this workflow, GET the message status from Resend
+by id. Then the nudge targets:
+```
+Review Requested = TRUE  AND  Review Opened != TRUE  AND  Reviewed != TRUE
+AND  Review Nudged != TRUE  AND  (today − first-request date) >= 7 days
+```
+
+**Option 2 — simplest (no open tracking).** Nudge anyone who hasn't reviewed yet (practically
+the same goal, just not open-gated). Drop the `Review Opened` clause; keep `Reviewed != TRUE`
+(owner ticks `Reviewed` when a review lands) + `Review Nudged != TRUE` + the 7-day window.
+
+Either way, stamp **`Review Nudged = true`** after sending so it goes out **once**.
+*(New Airtable checkbox columns the owner adds: `Review Opened` and/or `Review Nudged`,
+and text field `Review Email ID` if using Option 1a/b.)*
+
+## Subject (A/B candidates)
+- **A.** `Still loving the {Vehicle}? (30 seconds)`
+- **B.** `One quick thing, {First}`
+- **C.** `No rush — just checking in on your {Vehicle}`
+
+## Preheader
+`If the tune's treating you right, a quick review goes a long way.`
+
+## Body copy (customer-ready)
+
+> Hi {First},
+>
+> Just circling back — if your **{Vehicle}** has been driving the way you hoped since
+> **{Installer}** tuned it, a quick **Google review** would mean a lot. It takes about 30
+> seconds, and it's the best way to help the next Toyota or Lexus owner find honest, in-person
+> tuning.
+>
+> **[ Leave a quick review → ]**  *(button → {ReviewURL})*
+>
+> No pressure at all — and if anything isn't quite right, just reply here or call
+> **{Installer}** at **{Phone}** and we'll make it right.
+>
+> Thanks again,
+> — Tuned Yota · Undeniable Performance
+
+## Plain-text version
+
+```
+Hi {First},
+
+Just circling back — if your {Vehicle} has been driving the way you hoped since {Installer}
+tuned it, a quick Google review would mean a lot. It takes about 30 seconds, and it's the
+best way to help the next Toyota or Lexus owner find honest, in-person tuning.
+
+Leave a quick review: {ReviewURL}
+
+No pressure at all — and if anything isn't quite right, just reply here or call {Installer}
+at {Phone} and we'll make it right.
+
+Thanks again,
+— Tuned Yota · Undeniable Performance
+```
+
+## Drop-in builder
+
+```js
+// buildReviewNudgeEmail(booking, inst, opts) -> { subject, html, text }
+// Shares the esc() helper + house style with buildReviewRequestEmail. Single CTA (review).
+function buildReviewNudgeEmail(booking, inst, opts = {}) {
+  const first = (booking.Name || "there").split(" ")[0];
+  const vehicle = booking.Vehicle || "Toyota";
+  const reviewUrl = opts.reviewUrl || "https://search.google.com/local/writereview"; // set from GBP
+
+  const subject = `Still loving the ${vehicle}? (30 seconds)`;
+
+  const text =
+    `Hi ${first},\n\n` +
+    `Just circling back — if your ${vehicle} has been driving the way you hoped since ` +
+    `${inst.name} tuned it, a quick Google review would mean a lot. It takes about 30 ` +
+    `seconds, and it's the best way to help the next Toyota or Lexus owner find honest, ` +
+    `in-person tuning.\n\n` +
+    `Leave a quick review: ${reviewUrl}\n\n` +
+    `No pressure at all — and if anything isn't quite right, just reply here or call ` +
+    `${inst.name} at ${inst.phone} and we'll make it right.\n\n` +
+    `Thanks again,\n— Tuned Yota · Undeniable Performance\n`;
+
+  const btn = (href, label, bg, color) =>
+    `<a href="${esc(href)}" style="display:inline-block;background:${bg};color:${color};` +
+    `font-weight:700;text-decoration:none;padding:13px 26px;border-radius:999px;` +
+    `font-size:15px;margin:6px 0">${esc(label)}</a>`;
+
+  const html =
+    `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px;line-height:1.5">` +
+    `<h2 style="color:#5B4B42">Still loving the ${esc(vehicle)}, ${esc(first)}?</h2>` +
+    `<p>Just circling back — if your <strong>${esc(vehicle)}</strong> has been driving the ` +
+    `way you hoped since <strong>${esc(inst.name)}</strong> tuned it, a quick Google review ` +
+    `would mean a lot. It takes about 30 seconds, and it's the best way to help the next ` +
+    `Toyota or Lexus owner find honest, in-person tuning.</p>` +
+    `<p>${btn(reviewUrl, "Leave a quick review →", "#B3D0D9", "#23303a")}</p>` +
+    `<p>No pressure at all — and if anything isn't quite right, just reply here or call ` +
+    `<strong>${esc(inst.name)}</strong> at <strong>${esc(inst.phone)}</strong> and we'll ` +
+    `make it right.</p>` +
+    `<p>Thanks again,</p>` +
+    `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p>` +
+    `</div>`;
+
+  return { subject, html, text };
+}
+```
+
+## Nudge notes
+- **One nudge only** — no third email. Two touches is the polite ceiling for a review ask.
+- Drops the referral CTA on purpose: a nudge converts best with a **single** ask.
+- If you skip open-tracking (Option 2), this still works great — it just nudges anyone who
+  hasn't reviewed rather than strictly non-openers.
