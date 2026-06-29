@@ -131,6 +131,38 @@ test("mods field persisted on booking record", async () => {
   assert.equal(h.created[0].fields.Modifications, "3in lift, 35s");
 });
 
+test("booked -> pings n8n with the booking payload when webhook url is set", async () => {
+  const h = harness({ events: EV });
+  const pings = [];
+  h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://ty.app.n8n.cloud/webhook/ty-booking";
+  h.deps.ping = async (a) => { pings.push(a); return { ok: true }; };
+  const r = await processBooking({ ...base, slot: "9:20" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal(pings.length, 1);
+  assert.equal(pings[0].url, "https://ty.app.n8n.cloud/webhook/ty-booking");
+  assert.equal(pings[0].payload.event, "booking");
+  assert.equal(pings[0].payload.city, "Sioux Falls");
+  assert.equal(pings[0].payload.slot, "9:20");
+  assert.equal(pings[0].payload.installer.key, "cody");
+  assert.equal(pings[0].payload.emailFailed, false);
+});
+test("a best-effort n8n ping failure does not affect the booking", async () => {
+  const h = harness({ events: EV });
+  h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://x";
+  h.deps.ping = async () => ({ ok: false, error: "n8n down" }); // pingN8n swallows internally
+  const r = await processBooking({ ...base, slot: "9:40" }, h.deps);
+  assert.equal(r.status, "booked");
+});
+test("priority (no event) does NOT ping n8n", async () => {
+  const h = harness({ events: "Market,Date,Active\nSioux Falls,nope,yes\n" });
+  const pings = [];
+  h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://x";
+  h.deps.ping = async (a) => { pings.push(a); return { ok: true }; };
+  const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
+  assert.equal(r.status, "priority");
+  assert.equal(pings.length, 0);
+});
+
 test("booking survives a missing Modifications column (retries without it)", async () => {
   const created = [];
   const fetchImpl = async (url, opts) => {

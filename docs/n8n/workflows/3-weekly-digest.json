@@ -1,0 +1,99 @@
+{
+  "name": "TY — WF3 Weekly Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "weeks", "weeksInterval": 1, "triggerAtDay": [1], "triggerAtHour": 7 }] }
+      },
+      "id": "wf3-sched",
+      "name": "Mon 07:00 CT",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
+        "table": { "__rl": true, "value": "Bookings", "mode": "name" },
+        "filterByFormula": "AND({Status}=\"Booked\", IS_AFTER(CREATED_TIME(), DATEADD(TODAY(), -7, 'days')))",
+        "options": {}
+      },
+      "id": "wf3-bookings",
+      "name": "Search bookings (7d)",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [460, 300],
+      "alwaysOutputData": true,
+      "credentials": { "airtableTokenApi": { "id": "REPLACE", "name": "Airtable PAT" } }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
+        "table": { "__rl": true, "value": "Priority List", "mode": "name" },
+        "filterByFormula": "IS_AFTER(CREATED_TIME(), DATEADD(TODAY(), -7, 'days'))",
+        "options": {}
+      },
+      "id": "wf3-priority",
+      "name": "Search priority (7d)",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [700, 300],
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": { "airtableTokenApi": { "id": "REPLACE", "name": "Airtable PAT" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate the week's bookings + new priority leads into an HTML digest.\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');\nconst bookings = $('Search bookings (7d)').all().map(i => i.json).filter(r => r && r.id);\nconst leads = $('Search priority (7d)').all().map(i => i.json).filter(r => r && r.id);\n\nfunction tally(rows, key) {\n  const m = {};\n  for (const r of rows) { const k = (r[key] || r.fields && r.fields[key] || 'Unknown'); m[k] = (m[k]||0)+1; }\n  return Object.entries(m).sort((a,b)=>b[1]-a[1]);\n}\nconst get = (r, k) => (r[k] != null ? r[k] : (r.fields ? r.fields[k] : undefined));\nconst norm = bookings.map(r => ({ City: get(r,'City')||'Unknown', Installer: get(r,'Installer')||'Unknown', utm: get(r,'UTM Source')||'' }));\n\nconst byCity = tally(norm, 'City');\nconst byInst = tally(norm, 'Installer');\nconst utmRows = norm.filter(r => r.utm);\nconst byUtm = tally(utmRows, 'utm');\nconst topUtm = byUtm.length ? `${byUtm[0][0]} (${byUtm[0][1]})` : 'direct / none tagged';\n\nconst rowsHtml = (pairs) => pairs.length\n  ? pairs.map(([k,v]) => `<tr><td style=\"padding:4px 12px 4px 0\">${esc(k)}</td><td style=\"padding:4px 0;text-align:right\"><strong>${v}</strong></td></tr>`).join('')\n  : `<tr><td style=\"padding:4px 0;color:#7c8472\" colspan=\"2\">none</td></tr>`;\n\nconst d = new Date();\nconst weekOf = d.toISOString().slice(0,10);\nconst subject = `Tuned Yota weekly digest — week of ${weekOf}`;\nconst html =\n  `<div style=\"font-family:Arial,sans-serif;color:#3A2E26;max-width:560px;line-height:1.5\">` +\n  `<h2 style=\"color:#5B4B42\">Weekly pulse — ${esc(weekOf)}</h2>` +\n  `<p><strong>${bookings.length}</strong> new booking(s) · <strong>${leads.length}</strong> new priority-list lead(s) this week.</p>` +\n  `<h3 style=\"color:#5B4B42;margin-bottom:4px\">Bookings by city</h3><table>${rowsHtml(byCity)}</table>` +\n  `<h3 style=\"color:#5B4B42;margin-bottom:4px\">Bookings by installer</h3><table>${rowsHtml(byInst)}</table>` +\n  `<p style=\"margin-top:14px\">Top source: <strong>${esc(topUtm)}</strong></p>` +\n  `<p style=\"color:#7c8472;font-size:13px\">Operational pulse — the formal monthly summary still ships separately.</p>` +\n  `</div>`;\nconst slackText = `:bar_chart: Weekly digest — ${bookings.length} booking(s), ${leads.length} new lead(s). Top source: ${topUtm}`;\nreturn [{ json: { subject, html, slackText } }];"
+      },
+      "id": "wf3-agg",
+      "name": "Aggregate digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { from: 'Tuned Yota <events@send.tunedyota.events>', to: ['info@tunedyota.com'], subject: $json.subject, html: $json.html } }}",
+        "options": {}
+      },
+      "id": "wf3-send",
+      "name": "Email digest to owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1180, 300],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE", "name": "Resend API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"text\": $('Aggregate digest').item.json.slackText } }}",
+        "options": {}
+      },
+      "id": "wf3-slack",
+      "name": "Slack one-liner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 300]
+    }
+  ],
+  "connections": {
+    "Mon 07:00 CT": { "main": [[{ "node": "Search bookings (7d)", "type": "main", "index": 0 }]] },
+    "Search bookings (7d)": { "main": [[{ "node": "Search priority (7d)", "type": "main", "index": 0 }]] },
+    "Search priority (7d)": { "main": [[{ "node": "Aggregate digest", "type": "main", "index": 0 }]] },
+    "Aggregate digest": { "main": [[{ "node": "Email digest to owner", "type": "main", "index": 0 }]] },
+    "Email digest to owner": { "main": [[{ "node": "Slack one-liner", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "timezone": "America/Chicago" }
+}

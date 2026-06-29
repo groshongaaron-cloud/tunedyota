@@ -7,6 +7,7 @@ const { cfg, listRecords, createRecord, createTolerant, updateRecord } = require
 const { isValidSlot, computeOpen } = require("./lib/slots.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
+const { pingN8n } = require("./lib/n8n.js");
 const { buildIcs } = require("./lib/ics.js");
 const tpl = require("./lib/templates.js");
 
@@ -33,7 +34,7 @@ async function reportEmailFailure({ fetchImpl, env, notify, update, c, table, id
 
 async function processBooking(body, deps) {
   const { fetchImpl = fetch, env = process.env, send = sendEmail, now, log = console,
-          notify = notifyOwner, update = updateRecord } = deps;
+          notify = notifyOwner, update = updateRecord, ping = pingN8n } = deps;
   const d = body || {};
   if (d.bot_field) return { status: "ignored" };
   const market = getMarket(d.city);
@@ -99,6 +100,20 @@ async function processBooking(body, deps) {
   }
   const emailFailed = d.email ? !custOk : false;
   if (!instOk || (d.email && !custOk)) await reportEmailFailure({ fetchImpl, env, notify, update, c, table: c.bookings, id: bid, d, city: market.city, reason: why, log });
+
+  // Additive, fire-and-forget: ping n8n so downstream automation (Slack #bookings,
+  // etc.) can react. No-op unless N8N_BOOKING_WEBHOOK_URL is set; never throws.
+  await ping({ fetchImpl, url: env.N8N_BOOKING_WEBHOOK_URL, log, payload: {
+    event: "booking", status: "booked",
+    name: d.name, email: d.email || "", phone: d.phone || "",
+    vehicle: d.vehicle || "", goals: d.goals || "", mods: d.mods || "",
+    city: market.city, state: market.state, slot: d.slot,
+    eventDateISO: event.dateISO, eventLabel: event.label,
+    installer: { key: inst.key, name: inst.name, email: inst.email, phone: inst.phone },
+    source: d.source || "find-your-exact-tune",
+    utm: { source: d.utm_source || "", medium: d.utm_medium || "", campaign: d.utm_campaign || "" },
+    emailFailed,
+  } });
 
   return { status: "booked", city: market.city, eventDateISO: event.dateISO, eventLabel: event.label, slot: d.slot, emailFailed };
 }

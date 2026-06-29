@@ -1,0 +1,86 @@
+{
+  "name": "TY — WF1 New Booking → Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ty-booking",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "wf1-webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "ty-booking"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (() => { const b = $json.body || {}; const contact = b.phone || b.email || 'no contact'; const inst = (b.installer && b.installer.name) || '?'; const utm = (b.utm && (b.utm.source || b.utm.campaign)) ? ((b.utm.source||'') + (b.utm.campaign ? ' / ' + b.utm.campaign : '')) : 'direct'; return { text: ':checkered_flag: New booking — ' + (b.name||'?') + ' · ' + (b.city||'?') + '\\n' + (b.vehicle||'vehicle') + ' · ' + (b.slot||'?') + ' on ' + (b.eventLabel||'?') + '\\nInstaller: ' + inst + ' · ' + contact + '\\nSource: ' + utm }; })() }}",
+        "options": {}
+      },
+      "id": "wf1-slack",
+      "name": "Slack #bookings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 220]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "cond-emailfailed",
+              "leftValue": "={{ $json.body.emailFailed }}",
+              "rightValue": "",
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "wf1-if",
+      "name": "IF email failed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [520, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"text\": \":warning: Confirmation email FAILED for \" + ($json.body.name||'?') + \" (\" + ($json.body.email||'no email') + \") — follow up manually.\" } }}",
+        "options": {}
+      },
+      "id": "wf1-slack-warn",
+      "name": "Slack email-failed note",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [780, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[
+        { "node": "Slack #bookings", "type": "main", "index": 0 },
+        { "node": "IF email failed", "type": "main", "index": 0 }
+      ]]
+    },
+    "IF email failed": {
+      "main": [
+        [{ "node": "Slack email-failed note", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

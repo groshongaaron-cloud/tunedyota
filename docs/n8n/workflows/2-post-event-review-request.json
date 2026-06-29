@@ -1,0 +1,113 @@
+{
+  "name": "TY — WF2 Post-Event Review Request",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "days", "triggerAtHour": 10 }] }
+      },
+      "id": "wf2-sched",
+      "name": "Daily 10:00 CT",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
+        "table": { "__rl": true, "value": "Bookings", "mode": "name" },
+        "filterByFormula": "AND({Status}=\"Completed\", {Email}!=\"\", {Review Requested}!=TRUE(), DATETIME_DIFF(TODAY(), {Event Date}, 'days')>=2, DATETIME_DIFF(TODAY(), {Event Date}, 'days')<=14)",
+        "options": {}
+      },
+      "id": "wf2-search",
+      "name": "Find completed bookings",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the brand-safe review-request email per matched booking.\n// Copy/voice mirrors docs/n8n/review-request-email.md (approved, brand-safe).\nconst INSTALLERS = {\n  aaron: { name: 'Aaron Groshong', phone: '(612) 406-7117' },\n  noah:  { name: 'Noah Kreis',     phone: '(920) 860-7050' },\n  cody:  { name: 'Cody Star',      phone: '(605) 214-1335' },\n};\nconst FALLBACK = INSTALLERS.aaron;\nconst REVIEW_URL = 'REPLACE_WITH_GOOGLE_REVIEW_LINK'; // <-- paste your GBP write-a-review link\nconst FIND_TUNE_URL = 'https://tunedyota.com/find-your-exact-tune?utm_source=email&utm_medium=review-request&utm_campaign=referral';\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');\n\nfunction build(f, inst) {\n  const first = (f.Name || 'there').split(' ')[0];\n  const vehicle = f.Vehicle || 'Toyota';\n  const city = f.City || 'your area';\n  const subject = `How's your ${vehicle} driving, ${first}?`;\n  const text =\n    `Hi ${first},\\n\\n` +\n    `It's been a little while since ${inst.name} dialed in your ${vehicle} at our ${city} ` +\n    `event — we hope it's been a different truck to drive ever since. Sharper throttle, ` +\n    `smoother shifts, and the right gear when you actually want it.\\n\\n` +\n    `If it's living up to that, would you take two minutes to share it? A quick Google ` +\n    `review is the single biggest way you can help other Toyota and Lexus owners find ` +\n    `honest, in-person tuning — and it genuinely means a lot to a small crew like ours.\\n\\n` +\n    `Leave a Google review: ${REVIEW_URL}\\n\\n` +\n    `Know someone whose Toyota or Lexus deserves the same? Send them our way — they can ` +\n    `find their exact tune and the next event near them in under two minutes:\\n${FIND_TUNE_URL}\\n\\n` +\n    `And if anything isn't driving the way you expected, just reply to this email or call ` +\n    `${inst.name} at ${inst.phone} — we'd rather hear from you and make it right.\\n\\n` +\n    `Thanks for trusting us with your build.\\n\\n— Tuned Yota · Undeniable Performance\\n`;\n  const btn = (href, label, bg, color) =>\n    `<a href=\"${esc(href)}\" style=\"display:inline-block;background:${bg};color:${color};font-weight:700;text-decoration:none;padding:13px 26px;border-radius:999px;font-size:15px;margin:6px 0\">${esc(label)}</a>`;\n  const html =\n    `<div style=\"font-family:Arial,sans-serif;color:#3A2E26;max-width:560px;line-height:1.5\">` +\n    `<h2 style=\"color:#5B4B42\">How's it driving, ${esc(first)}?</h2>` +\n    `<p>It's been a little while since <strong>${esc(inst.name)}</strong> dialed in your <strong>${esc(vehicle)}</strong> at our <strong>${esc(city)}</strong> event — we hope it's been a different truck to drive ever since. Sharper throttle, smoother shifts, and the right gear when you actually want it.</p>` +\n    `<p>If it's living up to that, would you take two minutes to share it? A quick Google review is the single biggest way you can help other Toyota and Lexus owners find honest, in-person tuning — and it genuinely means a lot to a small crew like ours.</p>` +\n    `<p>${btn(REVIEW_URL, 'Leave a Google review →', '#B3D0D9', '#23303a')}</p>` +\n    `<p>Know someone whose Toyota or Lexus deserves the same? Send them our way — they can find their exact tune and the next event near them in under two minutes.</p>` +\n    `<p>${btn(FIND_TUNE_URL, 'Find Your Exact Tune →', '#5B4B42', '#ffffff')}</p>` +\n    `<p>And if anything isn't driving the way you expected, just reply to this email or call <strong>${esc(inst.name)}</strong> at <strong>${esc(inst.phone)}</strong> — we'd rather hear from you and make it right.</p>` +\n    `<p>Thanks for trusting us with your build.</p>` +\n    `<p style=\"color:#7c8472;font-weight:700;letter-spacing:.04em\">— Tuned Yota · Undeniable Performance</p>` +\n    `</div>`;\n  return { subject, html, text };\n}\n\nconst out = [];\nfor (const item of $input.all()) {\n  const f = item.json.fields || item.json;\n  const recordId = item.json.id || (item.json.fields && item.json.id);\n  if (!f.Email) continue;\n  const inst = INSTALLERS[f.Installer] || FALLBACK;\n  const email = build(f, inst);\n  out.push({ json: { recordId, to: f.Email, subject: email.subject, html: email.html, text: email.text } });\n}\nreturn out;"
+      },
+      "id": "wf2-build",
+      "name": "Build review emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { from: 'Tuned Yota <events@send.tunedyota.events>', to: [$json.to], reply_to: 'info@tunedyota.com', subject: $json.subject, html: $json.html, text: $json.text } }}",
+        "options": {}
+      },
+      "id": "wf2-send",
+      "name": "Send via Resend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 300],
+      "credentials": { "httpHeaderAuth": { "id": "REPLACE", "name": "Resend API" } }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
+        "table": { "__rl": true, "value": "Bookings", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Build review emails').item.json.recordId }}",
+            "Review Requested": true
+          },
+          "matchingColumns": ["id"]
+        },
+        "options": {}
+      },
+      "id": "wf2-stamp",
+      "name": "Mark Review Requested",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [1180, 300],
+      "credentials": { "airtableTokenApi": { "id": "REPLACE", "name": "Airtable PAT" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { count: $input.all().length } }];"
+      },
+      "id": "wf2-count",
+      "name": "Count sent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"text\": \":envelope_with_arrow: Sent \" + $json.count + \" post-event review request(s).\" } }}",
+        "options": {}
+      },
+      "id": "wf2-slack",
+      "name": "Slack summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1660, 300]
+    }
+  ],
+  "connections": {
+    "Daily 10:00 CT": { "main": [[{ "node": "Find completed bookings", "type": "main", "index": 0 }]] },
+    "Find completed bookings": { "main": [[{ "node": "Build review emails", "type": "main", "index": 0 }]] },
+    "Build review emails": { "main": [[{ "node": "Send via Resend", "type": "main", "index": 0 }]] },
+    "Send via Resend": { "main": [[{ "node": "Mark Review Requested", "type": "main", "index": 0 }]] },
+    "Mark Review Requested": { "main": [[{ "node": "Count sent", "type": "main", "index": 0 }]] },
+    "Count sent": { "main": [[{ "node": "Slack summary", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "timezone": "America/Chicago" }
+}

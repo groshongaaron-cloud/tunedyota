@@ -1,9 +1,10 @@
 # Tuned Yota — Additive n8n Workflows (DRAFT)
 
-**Status:** design draft, 2026-06-29. Not yet built — the n8n instance isn't connected to
-this session and we don't have its URL/API key. Once you give me those, I'll turn each
-workflow below into a **validated, importable** n8n workflow (build → `validate_workflow`
-→ verify connections → test → activate). See [[n8n-integration-open-action]].
+**Status:** BUILT 2026-06-29. Importable n8n Cloud JSON for all 3 workflows + the shared
+error handler now lives in [`workflows/`](workflows/), and the §B `book.js` webhook ping
+shipped (env-gated, dark until `N8N_BOOKING_WEBHOOK_URL` is set). Import + activation steps:
+[SETUP.md](SETUP.md). The JSON was hand-authored (no live instance connected), so the owner
+runs validate → verify → test → activate on import. See [[n8n-integration-open-action]].
 
 ## Design principles (locked)
 
