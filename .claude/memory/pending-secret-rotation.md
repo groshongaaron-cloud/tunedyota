@@ -7,7 +7,18 @@ metadata:
   originSessionId: e5319100-6ade-4bc9-95a6-c9423d101c2c
 ---
 
-**OPEN — resume next session.** Rotate two live credentials that are sitting in plaintext in
+**CLOSED — COMPLETE 2026-06-29.** Both credentials fully rotated; both OLD secrets REVOKED
+and the plaintext copies in `.claude/settings.local.json` were scrubbed (replaced with
+`REVOKED_ROTATED_2026-06-29`, JSON re-validated).
+- **Airtable:** new PAT `patkSWrl…` set in Netlify, prod redeployed; new token whoami 200,
+  old token now 401.
+- **Slack:** owner's first replacement webhook returned `no_service` (Incoming Webhooks not
+  activated / app not installed); owner created a second one (bot id `B0BE3A1NQJY`) which
+  test-posts `ok`. Set in Netlify + prod redeployed → alert.js notifications post again.
+No secrets stored here. Nothing left to do on this task.
+
+---
+*(original task, for reference:)* Rotate two live credentials that were sitting in plaintext in
 the **gitignored** `.claude/settings.local.json` permission-rule history (not pushed to the
 repo, but locally exposed and likely still valid):
 

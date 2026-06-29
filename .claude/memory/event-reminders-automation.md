@@ -28,9 +28,14 @@ event-automation layer. Spec: `docs/superpowers/specs/2026-06-26-event-reminders
   field if Airtable 422s on a missing column, so bookings never break.
 
 Green Bay, WI event ADDED 2026-06-27 (master @ 7a5d5c0): Sept 12, 2026, Noah,
-live on the booking page. All event `address` fields are set to the placeholder
-**"To Be Released"** (real venues not yet provided) — customer 10/2-day emails will
-say "Address: To Be Released" until updated in `events-data.js`.
+live on the booking page (date confirmed correct 2026-06-29 — no change needed).
+
+**Venue addresses — 3 of 9 now set** (2026-06-29, master @ d72eed1): Twin Cities
+(620 Southcross Dr. W., Burnsville, MN), Cedar Rapids (Iowa Off-Road and Suspension,
+2109 N Towne Ln NE, Cedar Rapids, IA 52402), Des Moines (Innovative AutoHous, 20 NW
+54th Ave, Des Moines, IA 50313). Remaining 6 still **"To Be Released"**: Omaha, Fargo,
+Rapid City, Duluth, Madison, **Green Bay**. Address surfaces ONLY in the installer
+roster + customer 10/2-day address emails, not the public page/schema.
 
 Airtable `Modifications` column — ADDED by owner 2026-06-27 in both Bookings and
 Priority List (verified 200 via data API). Write path is live end-to-end.
@@ -39,8 +44,9 @@ columns must be done in the Airtable UI or with a separate schema-scoped token +
 `setup-airtable.mjs` (which now defines `Modifications`).
 
 **Owner actions still pending (graceful — nothing breaks without them):**
-1. Replace the "To Be Released" `address` values in `events-data.js` with real venue
-   addresses as they're confirmed (Green Bay + the 8 existing events).
+1. Provide the remaining 6 venue addresses (Omaha, Fargo, Rapid City, Duluth, Madison,
+   Green Bay) to replace "To Be Released" in `events-data.js`. 3 of 9 done 2026-06-29.
 2. `OTT Calibration` field — already added by owner. ✔
+3. Airtable `Modifications` column — already added by owner. ✔ (see above)
 
 See [[held-branches-ship-checklist]] and [[email-sending-infra]].

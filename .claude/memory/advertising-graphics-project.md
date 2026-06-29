@@ -17,8 +17,16 @@ existing UTM→Pixel→Funnel stack, and a 4-phase roadmap. It unifies (does not
 `docs/instagram-content-kit.md`, `docs/instagram-optimization.md`,
 `docs/lead-generation-playbook.md`, `docs/seo/gbp-setup.md`.
 
-**Next:** produce the actual ad-graphics templates (event flyer, dyno card, before/after,
-vehicle spotlight, supercharger feature, testimonial, etc.).
+**Template system BUILT (2026-06-29, commit 8c3db00):** all 10 families from the plan §3 now
+exist as HTML→Chrome-screenshot templates in `docs/marketing/ad-templates/` — dyno-card,
+event-flyer, vehicle-spotlight, testimonial (built earlier) + before-after, supercharger,
+emissions-intact, where-we-tune, find-your-tune, countdown (added this session), each in 3
+sizes (square 1080×1080 / story 1080×1920 / wide 1080×565) plus a youtube-thumbnail 1280×720.
+Render with `node docs/marketing/ad-templates/render.js` → PNGs land in the gitignored
+`assets-source/ad-exports/` (31 total). Also added `scripts/TUNEDYOTA_SHORTFORM_SCRIPT_PACK.md`
+(7 VO + text-overlay short-form scripts). The Canva brand kit remains the owner-editable
+companion to the HTML data-card generator. **Next:** owner inputs below; optional 1600×900
+wide-hero size if needed for email/web banners.
 
 Seed/idea assets now live in `assets-source/Advertisement Ideas/` (1080×1920 + 1080×565
 drafts for 3G Tacoma, 5G/6G 4Runner, Tundra, plus `5g4r Graphics` PNGs). The whole
