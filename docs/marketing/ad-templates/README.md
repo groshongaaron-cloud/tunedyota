@@ -12,7 +12,16 @@ No AI imagery — real charts/photos + the brand's topographic motif.
 | `event-flyer*` | Event promo — city, date, slots, live QR to the booking URL |
 | `vehicle-spotlight*` | Vehicle feature — real rig photo + "from $X" + proof |
 | `testimonial*` | Customer review card — quote + stars + name/vehicle/city (real reviews, with permission) |
+| `before-after*` | Drivability before→after — gear hunting / throttle lag / busy shifts → fixed (no numbers, claims only) |
+| `supercharger*` | Magnuson supercharger feature — real WHP number + "authorized dealer" + sold·installed·calibrated |
+| `emissions-intact*` | Trust card — emissions equipment in place · 5-gas verified · flashes back to stock |
+| `where-we-tune*` | 6-state footprint (MN·IA·WI·ND·SD·NE) + editable "next up" event cities |
+| `find-your-tune*` | Easy-CTA funnel — pick your rig → see your price → book, with live QR (no fabricated prices) |
+| `countdown*` | Event-urgency card — editable "X days out" + city + date + roster-filling line |
 | `youtube-thumbnail.html` | 1280×720 YouTube thumbnail |
+
+All 10 template families from `master-advertising-plan.md` §3 are now built (the data-driven HTML half;
+the Canva brand kit remains the owner-editable companion). Each family ships in three sizes below.
 
 ## Sizes (suffix → dimensions)
 - *(none)* / `-square` → **1080×1080** (IG/FB feed)
