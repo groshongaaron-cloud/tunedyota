@@ -97,6 +97,10 @@ fire-and-forget `ping` in `book.js`) and is **dark until you set one env var**:
    `https://<you>.app.n8n.cloud/webhook/ty-booking`).
 2. In **Netlify → Site settings → Environment variables**, add
    **`N8N_BOOKING_WEBHOOK_URL`** = that URL. Redeploy (or trigger a deploy).
+   ⚠️ **Use `/webhook/ty-booking`, NOT `/webhook-test/ty-booking`.** The test URL only
+   listens while the n8n editor is open clicking "Listen for test event" — it returns 404
+   for live traffic, so `pingN8n` silently no-ops and no execution is ever created. (This
+   exact mix-up broke WF1 once; the curl sample below uses the test URL on purpose.)
 3. Make a real test booking on the site → confirm the `#bookings` Slack post fires.
 
 Until that env var is set, `book.js` simply skips the ping — zero effect on booking.
