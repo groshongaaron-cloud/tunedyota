@@ -1,6 +1,6 @@
 ---
 name: pending-secret-rotation
-description: OPEN/paused 2026-06-28 — rotate the Airtable PAT + Slack webhook (both exposed in plaintext in gitignored .claude/settings.local.json); resume next session
+description: CLOSED — Airtable PAT + Slack webhook rotated 2026-06-29; ALSO logs the 2026-06-30 n8n API-key transcript exposure (revoked + reissued same day). Credential-incident log.
 metadata: 
   node_type: memory
   type: project
@@ -16,6 +16,14 @@ and the plaintext copies in `.claude/settings.local.json` were scrubbed (replace
   activated / app not installed); owner created a second one (bot id `B0BE3A1NQJY`) which
   test-posts `ok`. Set in Netlify + prod redeployed → alert.js notifications post again.
 No secrets stored here. Nothing left to do on this task.
+
+**2026-06-30 — 2nd exposure (n8n API key), CLOSED.** During n8n-mcp MCP setup, a `claude mcp add`
+ran from `C:\Windows\System32` and **mangled the command so the n8n API key (a JWT) landed in a
+package-name ARG instead of a hidden env value** — a later diagnostic that printed the config args
+echoed the full key into the session transcript. Owner **revoked** the leaked key and generated a
+new one same day. New key is stored ONLY as a Windows USER env var `N8N_API_KEY` (GUI), referenced
+by the MCP config as `${N8N_API_KEY}` — never inlined again. Lesson: never put secrets in MCP
+`args`; use `-e KEY=${ENV_REF}` + an OS/user env var. See [[n8n-integration-open-action]].
 
 ---
 *(original task, for reference:)* Rotate two live credentials that were sitting in plaintext in

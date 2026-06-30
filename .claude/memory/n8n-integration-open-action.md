@@ -74,3 +74,20 @@ but reported **no Slack `#bookings` post appeared**. Diagnosis in progress:
 **Next-session lead:** offer to connect the **n8n-mcp MCP server** so Claude can read executions
 & self-debug Q1/Q2 directly instead of via owner click-throughs (see [[prefer-automation-over-handoffs]]).
 Optional later build: WF4 +7-day review nudge (copy ready in review-request-email.md). GBP gates WF2.
+
+**2026-06-30 — n8n-mcp MCP server setup (IN PROGRESS, resume on reopen):** Registered the
+community **n8n-mcp** server at **USER scope** in `C:\Users\grosh\.claude.json` (top-level
+`mcpServers`): `command: cmd`, `args: ["/c","npx","-y","n8n-mcp"]`, env `MCP_MODE=stdio`,
+`N8N_API_URL=https://tunedyota.app.n8n.cloud`, `N8N_API_KEY=${N8N_API_KEY}` (literal ref —
+Claude Code expands at server launch). The key is stored as a **Windows USER environment
+variable** `N8N_API_KEY` (set via GUI, confirmed length 267 = JWT), NOT in config/transcript.
+RESUME: on reopen, `ToolSearch select:n8n_health_check,...` to confirm tools loaded → run
+`n8n_health_check` → then debug WF1 Q1/Q2 by reading executions (`n8n_executions`).
+Why earlier attempts failed (root cause): two prior `claude mcp add` runs executed from
+`C:\Windows\System32`, so n8n-mcp got registered under that dir's LOCAL scope (invisible to
+this project session); also one add mangled the command (key fused into the package-name arg).
+**Cleanup pending:** two inert/broken local registrations remain under project keys
+`C:/Windows/system32` + `C:/Windows/System32` in ~/.claude.json — remove once the user-scope
+server is confirmed working. **Gotcha:** the GUI env var only takes effect after a FULL quit+
+reopen of Claude Code (child MCP process inherits env at launch). See [[pending-secret-rotation]]
+for the 2nd key exposure that happened during this setup.
