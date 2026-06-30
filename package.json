@@ -6,5 +6,9 @@
   "scripts": {
     "test": "node --test",
     "build:seo": "node scripts/build-seo.mjs"
+  },
+  "dependencies": {
+    "google-auth-library": "^10.9.0",
+    "sharp": "^0.35.2"
   }
 }

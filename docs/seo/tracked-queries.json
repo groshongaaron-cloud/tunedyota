@@ -1,0 +1,18 @@
+[
+  { "query": "ott tune cost", "intent": "commercial", "targetPage": "/ott-tune-cost" },
+  { "query": "how much is an ott tune", "intent": "commercial", "targetPage": "/ott-tune-cost" },
+  { "query": "toyota tundra ott tune", "intent": "commercial", "targetPage": "/toyota-tundra-ott-tune" },
+  { "query": "toyota tacoma ott tune", "intent": "commercial", "targetPage": "/toyota-tacoma-ott-tune" },
+  { "query": "magnuson supercharger tundra cost", "intent": "commercial", "targetPage": "/magnuson-supercharger-guide" },
+  { "query": "magnuson supercharger tacoma", "intent": "commercial", "targetPage": "/magnuson-supercharger-guide" },
+  { "query": "is an ott tune worth it", "intent": "consideration", "targetPage": "/is-the-ott-tune-worth-it" },
+  { "query": "ott tune vs stock", "intent": "consideration", "targetPage": "/is-the-ott-tune-worth-it" },
+  { "query": "what is an ott tune", "intent": "consideration", "targetPage": "/ott-tune" },
+  { "query": "ott vs custom tune", "intent": "consideration", "targetPage": "/is-the-ott-tune-worth-it" },
+  { "query": "does a tune void warranty", "intent": "objection", "targetPage": "/tune-warranty-emissions-legality" },
+  { "query": "is tuning emissions legal", "intent": "objection", "targetPage": "/tune-warranty-emissions-legality" },
+  { "query": "will a tune throw a check engine light", "intent": "objection", "targetPage": "/tune-warranty-emissions-legality" },
+  { "query": "toyota tuning minnesota", "intent": "local", "targetPage": "/toyota-lexus-tuning-minnesota" },
+  { "query": "toyota tuning wisconsin", "intent": "local", "targetPage": "/toyota-lexus-tuning-wisconsin" },
+  { "query": "toyota tuning iowa", "intent": "local", "targetPage": "/toyota-lexus-tuning-iowa" }
+]
