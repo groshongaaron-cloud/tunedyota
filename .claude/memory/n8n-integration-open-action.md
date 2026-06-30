@@ -1,6 +1,6 @@
 ---
 name: n8n-integration-open-action
-description: "n8n integration — additive layer BUILT 2026-06-29 (importable JSON + env-gated book.js ping shipped); now blocked on OWNER import/activation in n8n Cloud"
+description: "n8n integration — additive layer LIVE. WF1 booking→Slack RESOLVED 2026-06-30: root cause was Netlify N8N_BOOKING_WEBHOOK_URL pointing at the /webhook-test/ URL (404) instead of /webhook/; fixed + redeployed. WF3 live, WF2 parked on GBP"
 metadata: 
   node_type: memory
   type: project
@@ -55,21 +55,61 @@ Instance subdomain = **tunedyota.app.n8n.cloud** (WF1 prod webhook = `https://tu
 - **WF3**: tested green (digest email + Slack). Owner to confirm Active toggle is ON.
 - **WF2**: still INACTIVE, parked on GBP (needs `Review Requested` Airtable column + GBP review link).
 
-**UNRESOLVED at end of session — resume here (full-chain env-var verification):** owner ran a
-real booking through the LIVE site `book.js` (test row "ZZ ENV TEST", Tacoma, Fargo 7/3 9:00)
-but reported **no Slack `#bookings` post appeared**. Diagnosis in progress:
-1. The green WF1 execution the owner inspected had `user-agent: curl/8.19.0` → it was Claude's
-   DIRECT webhook test, NOT a book.js ping. Webhook data confirmed nested under `body` (so
-   `$json.body.*` is correct). **Open Q1:** does an execution from book.js actually exist
-   (non-curl user-agent, vehicle "Tacoma")? If NOT → `N8N_BOOKING_WEBHOOK_URL` isn't reaching
-   the deployed Netlify fn (typo / scope / redeploy timing) → book.js never pinged.
-2. **Open Q2:** the `Slack #bookings` node OUTPUT (right panel) in a green prod execution —
-   is it `ok` (Slack accepted → message went to a channel the owner isn't watching, i.e. the
-   pasted webhook URL may bind to a different channel than the one they monitored) or an error?
-   NOTE the earlier webhook-TEST post DID appear, so channel/URL mismatch between then and now
-   is suspect.
-**Cleanup pending:** delete Airtable Bookings test row "ZZ ENV TEST - delete me" (Fargo 7/3,
-9:00) — it's holding that slot. (Owner already deleted the earlier "ZZ TEST" row.)
+**RESOLVED 2026-06-30 (~12:50am CDT) — root cause found & fixed by Claude via the n8n REST API.**
+Symptom: real site bookings produced no `#bookings` Slack post. Diagnosis:
+- WF1 had only **2 executions total** (one `curl/8.19.0`, one `manual`) → **zero book.js pings
+  ever arrived.** So Q1 = NO book.js execution existed.
+- The green prod execution's `Slack #bookings` node output was `{"data":"ok"}` → Q2 = Slack
+  ACCEPTED the message; node + incoming-webhook URL are fine. Slack node works.
+- **ROOT CAUSE:** Netlify env `N8N_BOOKING_WEBHOOK_URL` was set to
+  `https://tunedyota.app.n8n.cloud/webhook-test/ty-booking` — the n8n **test** URL, which only
+  listens while the editor is in "Listen for test event" mode and returns **404** for live
+  traffic. So `pingN8n` POSTed to a dead endpoint and silently no-op'd (fire-and-forget swallows
+  errors). Verified: POST to `/webhook-test/ty-booking` → 404; POST to `/webhook/ty-booking` → 200.
+  (Origin: the SETUP.md curl *sample* uses the test URL; owner copied that into Netlify.)
+- **FIX:** `netlify env:set N8N_BOOKING_WEBHOOK_URL https://tunedyota.app.n8n.cloud/webhook/ty-booking`
+  + `netlify deploy --build --prod` (deploy live). Added a ⚠️ guardrail note to `docs/n8n/SETUP.md`
+  (use `/webhook/` not `/webhook-test/`).
+- **END-TO-END VERIFIED (12:55am CDT):** fired a real booking through the LIVE site
+  `/.netlify/functions/book` (Fargo, "ZZ N8N TEST - delete me", Tacoma, slot 12:40) → returned
+  `{"status":"booked","emailFailed":false}` (2.06s warm) → WF1 **execution 34** appeared with
+  `user-agent: node` (= book.js node-fetch, the FIRST non-curl execution), correct payload, and
+  `Slack #bookings` node `{"data":"ok"}`. Chain confirmed working. NOTE: a COLD-START call timed
+  out (empty HTTP body) before reaching the ping (ping is the last step, after Airtable + 2 emails);
+  the warm retry succeeded.
+
+**2026-06-30 (~1:15am CDT) — ARCHITECTURE HARDENING (master @ 8d9b254, deployed):** the
+cold-start ping-drop is now structurally impossible. Split the booking pipeline:
+- `book.js` = SYNCHRONOUS critical path only (validate → slot check → create Airtable record →
+  return status to the UI). It no longer sends emails or pings; instead it POSTs a job
+  `{kind:"booking"|"priority", d, inst, market, event/reason, recordId, stamp}` to a new Netlify
+  **background function** via `lib/background.js` `triggerBackground()`.
+- `netlify/functions/book-background.js` = the `-background` suffix makes it a Netlify Background
+  Function (202 ACK immediately, runs ≤15 min). `processNotifications()` runs the MOVED installer/
+  customer emails (+ics) + `reportEmailFailure` + the n8n `pingN8n`. The ping now carries the
+  ACCURATE `emailFailed` (emails complete first, then ping). Verified end-to-end: WF1 **execution
+  35** `user-agent: node`, Slack `{"data":"ok"}`, emailFailed:false.
+- Plan check: team is **Netlify Pro** → `background_functions: included:true` (required for `-background`).
+- UI impact: `book.js` booked response no longer includes `emailFailed` (emails run after it); the
+  frontend defaults to "check your email", and book-background still Slack-alerts on real failures.
+- Tests split: `tests/book.test.js` (sync + trigger contract) + `tests/book-background.test.js`
+  (emails + ping) + `tests/background.test.js`. Full suite **156 pass**.
+- **HARDENING DONE (2026-06-30 ~1:25am CDT):** Netlify env `INTERNAL_TASK_SECRET` set (64-char hex,
+  value never printed) + redeployed. `book.js` attaches it as `x-ty-task`; `book-background` drops any
+  request whose header doesn't match (returns before `processNotifications`). Verified: authenticated
+  booking via book.js → WF1 **execution 36** (`user-agent: node`, Slack `ok`); a well-formed job POSTed
+  directly to book-background WITHOUT the secret created **no execution** (dropped). GOTCHA for future
+  testing: a Netlify Background Function ALWAYS returns HTTP **202** at the platform layer before the
+  handler runs, so the 401 is invisible over HTTP — verify the gate by EFFECT (did it process?), not
+  status code. To rotate the secret: `netlify env:set INTERNAL_TASK_SECRET <new>` + redeploy (book.js
+  and book-background read the same var, so one set + redeploy keeps them in sync).
+**Cleanup pending:** delete Airtable Bookings test rows holding real Fargo 7/3 slots:
+(a) "ZZ ENV TEST - delete me" (9:00) and (b) "ZZ N8N TEST - delete me" (12:40, created by the
+end-to-end verification above). ALSO possibly a stray Omaha **Priority List** record from a
+slot-probe (Omaha's event was 6/28, now past → no-event → priority path; the probe HTTP response
+was empty/timed-out so a record may or may not exist — verify). (Owner already deleted the earlier "ZZ TEST" row.)
+**Note:** Claude debugged this via direct `curl` to the n8n REST API (key from `$N8N_API_KEY`),
+NOT the n8n-mcp tools — those still don't register in-session (see below).
 
 **Next-session lead:** offer to connect the **n8n-mcp MCP server** so Claude can read executions
 & self-debug Q1/Q2 directly instead of via owner click-throughs (see [[prefer-automation-over-handoffs]]).
@@ -83,6 +123,14 @@ Claude Code expands at server launch). The key is stored as a **Windows USER env
 variable** `N8N_API_KEY` (set via GUI, confirmed length 267 = JWT), NOT in config/transcript.
 RESUME: on reopen, `ToolSearch select:n8n_health_check,...` to confirm tools loaded → run
 `n8n_health_check` → then debug WF1 Q1/Q2 by reading executions (`n8n_executions`).
+**2026-06-30 UPDATE:** `claude mcp list` shows `n8n-mcp: ✔ Connected` and `$N8N_API_KEY`
+authenticates (curl to `/api/v1/workflows` → 200), BUT the n8n-mcp **tools never register in
+this session's deferred registry** (ToolSearch for `n8n_*` / `mcp__n8n*` → nothing). Likely the
+slow `npx -y n8n-mcp` spawn doesn't finish before the session tool list is built. WORKAROUND
+THAT WORKS NOW: skip the MCP tools, hit the n8n REST API directly with curl + `$N8N_API_KEY`
+against `https://tunedyota.app.n8n.cloud/api/v1/` (workflows, executions?workflowId=…&limit=,
+executions/{id}?includeData=true). That's how WF1 was debugged. If MCP tools are wanted, a fresh
+restart *might* register them; not required for n8n work.
 Why earlier attempts failed (root cause): two prior `claude mcp add` runs executed from
 `C:\Windows\System32`, so n8n-mcp got registered under that dir's LOCAL scope (invisible to
 this project session); also one add mangled the command (key fused into the package-name arg).
