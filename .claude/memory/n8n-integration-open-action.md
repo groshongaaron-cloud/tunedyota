@@ -103,6 +103,14 @@ cold-start ping-drop is now structurally impossible. Split the booking pipeline:
   handler runs, so the 401 is invisible over HTTP — verify the gate by EFFECT (did it process?), not
   status code. To rotate the secret: `netlify env:set INTERNAL_TASK_SECRET <new>` + redeploy (book.js
   and book-background read the same var, so one set + redeploy keeps them in sync).
+
+**2026-06-30 (~1:40am CDT) — FULL LIVE UI VERIFICATION (browser, end-to-end):** drove the real
+booking form at tunedyota.com/find-your-exact-tune through all 6 steps (Toyota→Tacoma→2016-2023
+3.5L V6→More power & torque→Book at an Event→Fargo Jul 3→12:40 slot→form→Confirm Booking). UI showed
+"You're booked … Check your email" (new sync contract); WF1 **execution 37** `user-agent: node`,
+`source: find-your-exact-tune`, full form data, `emailFailed: False`, Slack `{"data":"ok"}`. Confirms
+the whole chain: real UI → book.js (sync) → book-background (async) → emails + n8n ping → Slack.
+Test row cleaned up; real customer bookings on that date left untouched.
 **Cleanup pending:** delete Airtable Bookings test rows holding real Fargo 7/3 slots:
 (a) "ZZ ENV TEST - delete me" (9:00) and (b) "ZZ N8N TEST - delete me" (12:40, created by the
 end-to-end verification above). ALSO possibly a stray Omaha **Priority List** record from a
