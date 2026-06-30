@@ -142,8 +142,12 @@ restart *might* register them; not required for n8n work.
 Why earlier attempts failed (root cause): two prior `claude mcp add` runs executed from
 `C:\Windows\System32`, so n8n-mcp got registered under that dir's LOCAL scope (invisible to
 this project session); also one add mangled the command (key fused into the package-name arg).
-**Cleanup pending:** two inert/broken local registrations remain under project keys
-`C:/Windows/system32` + `C:/Windows/System32` in ~/.claude.json — remove once the user-scope
-server is confirmed working. **Gotcha:** the GUI env var only takes effect after a FULL quit+
+**Cleanup DONE (2026-06-30 ~1:40am CDT):** removed the two inert/broken `n8n-mcp` registrations
+under project keys `C:/Windows/system32` + `C:/Windows/System32` in ~/.claude.json (both held OLD
+*revoked* JWTs in plaintext — one in `env.N8N_API_KEY`, one mangled into `args`; scrubbed, 0 leaked-key
+strings remain). User-scope keeper intact (`${N8N_API_KEY}` env ref) and `claude mcp list` ✔ Connected.
+The two empty System32 *project* keys (stat data only, no mcpServers) were left in place — harmless.
+NOTE: edited while Claude Code was running; if a System32 reg reappears after a restart, the live
+process rewrote the file from memory — redo with Claude Code closed. **Gotcha:** the GUI env var only takes effect after a FULL quit+
 reopen of Claude Code (child MCP process inherits env at launch). See [[pending-secret-rotation]]
 for the 2nd key exposure that happened during this setup.
