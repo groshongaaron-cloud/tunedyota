@@ -15,12 +15,13 @@ export function renderReport(snapshot, diff) {
   } else {
     lines.push(`AI presence ${pct(s.aiPresenceRate)} (${ptsDelta(diff.ai.aiPresenceDelta)}), Perplexity cites ${pct(s.perplexityCiteRate)} (${ptsDelta(diff.ai.perplexityCiteDelta)}).`);
     const top = (diff.movers || []).slice(0, 5)
+      // positionDelta = prev.position - curr.position, so a positive value (+) means rank IMPROVED
       .map((m) => `• ${m.query}: position ${m.positionDelta >= 0 ? "+" : ""}${m.positionDelta}`)
       .join("\n");
     if (top) lines.push(`*Top movers:*\n${top}`);
   }
 
-  if (s.ctrOpportunities.length) {
+  if ((s.ctrOpportunities || []).length) {
     lines.push(`*CTR opportunities (${s.ctrOpportunities.length}):* ${s.ctrOpportunities.join(", ")}`);
   }
 

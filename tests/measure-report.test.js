@@ -30,3 +30,11 @@ test("renderReport surfaces probe errors loudly", () => {
   assert.match(md, /GSC auth failed/);
   assert.match(md, /⚠|error/i);
 });
+
+test("renderReport omits the CTR section when there are no opportunities", () => {
+  const md = M.renderReport(
+    { date: "2026-06-30", summary: { aiPresenceRate: 0.5, perplexityCiteRate: 0.2, ctrOpportunities: [] }, meta: { errors: [] } },
+    { baseline: true, movers: [], ai: { aiPresenceDelta: 0, perplexityCiteDelta: 0 } }
+  );
+  assert.doesNotMatch(md, /CTR opportunities/);
+});
