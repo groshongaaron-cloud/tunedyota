@@ -3,38 +3,18 @@ const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const { getEventForCity } = require("./lib/events.js");
 const EVENTS = require("./lib/events-data.js");
-const { cfg, listRecords, createRecord, createTolerant, updateRecord } = require("./lib/airtable.js");
+const { cfg, listRecords, createRecord, createTolerant } = require("./lib/airtable.js");
 const { isValidSlot, computeOpen } = require("./lib/slots.js");
-const { sendEmail } = require("./lib/resend.js");
-const { notifyOwner } = require("./lib/alert.js");
-const { pingN8n } = require("./lib/n8n.js");
-const { buildIcs } = require("./lib/ics.js");
-const tpl = require("./lib/templates.js");
+const { triggerBackground } = require("./lib/background.js");
 
-// Sender must be on the Resend-verified domain (send.tunedyota.events).
-// The mailbox (events@) is arbitrary — Resend sends from it without an inbox.
-// Replies still route to the real info@ inbox via replyTo/OWNER below.
-const FROM = "Tuned Yota <events@send.tunedyota.events>";
-const OWNER = "info@tunedyota.com";
-
-// Surface an email-send failure without ever breaking the booking flow:
-// fire a Resend-independent Slack alert, and best-effort flag the record.
-async function reportEmailFailure({ fetchImpl, env, notify, update, c, table, id, d, city, reason, log }) {
-  const who = d.phone || d.email || "no contact";
-  try {
-    await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL,
-      text: `⚠️ Booking email FAILED — ${d.name} · ${city} · ${who} · reason: ${reason}`, log });
-  } catch (e) { if (log.error) log.error("notify", e.message); }
-  if (id) {
-    try {
-      await update({ fetchImpl, token: c.token, baseId: c.baseId, table, id, fields: { "Email Status": "FAILED" } });
-    } catch (e) { if (log.error) log.error("flag", e.message); }
-  }
-}
-
+// book.js is the SYNCHRONOUS critical path: validate -> check slots -> create the
+// Airtable record -> return a status the booking UI depends on (booked/conflict/
+// priority + openSlots). All the slow, best-effort follow-up (installer/customer
+// emails + the n8n ping) is handed to the `book-background` function so a cold-start
+// timeout can never drop it or stall this response. See lib/background.js.
 async function processBooking(body, deps) {
-  const { fetchImpl = fetch, env = process.env, send = sendEmail, now, log = console,
-          notify = notifyOwner, update = updateRecord, ping = pingN8n } = deps;
+  const { fetchImpl = fetch, env = process.env, now = icsStamp, log = console,
+          trigger = triggerBackground } = deps;
   const d = body || {};
   if (d.bot_field) return { status: "ignored" };
   const market = getMarket(d.city);
@@ -43,6 +23,13 @@ async function processBooking(body, deps) {
   const inst = keyToInstaller(market.inst);
   const c = cfg(env);
   const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
+
+  // Schedule the slow notifications without blocking this response. Best-effort:
+  // a failure to even enqueue must not break the booking the user just made.
+  async function fire(job) {
+    try { await trigger({ fetchImpl, env, name: "book-background", log, payload: job }); }
+    catch (e) { if (log.error) log.error("trigger book-background", e.message); }
+  }
 
   async function priority(reason) {
     const pfields = {
@@ -57,10 +44,7 @@ async function processBooking(body, deps) {
       const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications"]);
       pid = rec && rec.id;
     } catch (e) { if (log.error) log.error("priority create", e.message); return { status: "error", error: "store-unavailable" }; }
-    let ok = true, why = "";
-    try { const m = tpl.buildPriorityInstallerEmail(d, inst, market, reason); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { ok = false; why = e.message; if (log.error) log.error("prio inst email", e.message); }
-    if (d.email) { try { const m = tpl.buildPriorityCustomerEmail(d, inst, market, reason); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: d.email, replyTo: OWNER, subject: m.subject, html: m.html, text: m.text }); } catch (e) { ok = false; why = why || e.message; if (log.error) log.error("prio cust email", e.message); } }
-    if (!ok) await reportEmailFailure({ fetchImpl, env, notify, update, c, table: c.priority, id: pid, d, city: market.city, reason: why, log });
+    await fire({ kind: "priority", d, inst, market, reason, recordId: pid });
     return { status: "priority", reason };
   }
 
@@ -89,33 +73,12 @@ async function processBooking(body, deps) {
     bid = rec && rec.id;
   } catch (e) { if (log.error) log.error("create", e.message); return { status: "error", error: "store-unavailable" }; }
 
-  let instOk = true, custOk = true, why = "";
-  try { const m = tpl.buildBookingInstallerEmail(d, inst, market, event); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { instOk = false; why = e.message; if (log.error) log.error("inst email", e.message); }
-  if (d.email) {
-    try {
-      const ics = buildIcs({ uid: `${event.dateISO}-${d.slot}-${now()}@tunedyota.com`, dateISO: event.dateISO, slot: d.slot, summary: `Tuned Yota — ${market.city} OTT Tune`, location: `${market.city}, ${market.state}`, description: `Your ${d.vehicle || "vehicle"} tune with ${inst.name}. Questions: ${inst.phone}`, stamp: now() });
-      const m = tpl.buildBookingCustomerEmail(d, inst, market, event);
-      await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: d.email, replyTo: OWNER, subject: m.subject, html: m.html, text: m.text, attachments: [{ filename: "tuned-yota-booking.ics", content: Buffer.from(ics).toString("base64") }] });
-    } catch (e) { custOk = false; why = why || e.message; if (log.error) log.error("cust email", e.message); }
-  }
-  const emailFailed = d.email ? !custOk : false;
-  if (!instOk || (d.email && !custOk)) await reportEmailFailure({ fetchImpl, env, notify, update, c, table: c.bookings, id: bid, d, city: market.city, reason: why, log });
+  await fire({ kind: "booking", d, inst, market, event, recordId: bid, stamp: now() });
 
-  // Additive, fire-and-forget: ping n8n so downstream automation (Slack #bookings,
-  // etc.) can react. No-op unless N8N_BOOKING_WEBHOOK_URL is set; never throws.
-  await ping({ fetchImpl, url: env.N8N_BOOKING_WEBHOOK_URL, log, payload: {
-    event: "booking", status: "booked",
-    name: d.name, email: d.email || "", phone: d.phone || "",
-    vehicle: d.vehicle || "", goals: d.goals || "", mods: d.mods || "",
-    city: market.city, state: market.state, slot: d.slot,
-    eventDateISO: event.dateISO, eventLabel: event.label,
-    installer: { key: inst.key, name: inst.name, email: inst.email, phone: inst.phone },
-    source: d.source || "find-your-exact-tune",
-    utm: { source: d.utm_source || "", medium: d.utm_medium || "", campaign: d.utm_campaign || "" },
-    emailFailed,
-  } });
-
-  return { status: "booked", city: market.city, eventDateISO: event.dateISO, eventLabel: event.label, slot: d.slot, emailFailed };
+  // emailFailed is intentionally omitted: emails are sent in the background after
+  // this returns, so it's unknown here. The UI defaults to "check your email", and
+  // book-background independently Slack-alerts the owner if an email actually fails.
+  return { status: "booked", city: market.city, eventDateISO: event.dateISO, eventLabel: event.label, slot: d.slot };
 }
 
 function icsStamp() { return new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z"); }

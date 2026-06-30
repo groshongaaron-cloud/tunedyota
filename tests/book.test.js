@@ -2,9 +2,12 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { processBooking } = require("../netlify/functions/book.js");
 
+// book.js is now the synchronous path only: validate -> slot check -> create the
+// Airtable record -> hand a job to `trigger` (the book-background invocation) ->
+// return the user-facing status. Emails + the n8n ping live in book-background.js
+// (covered by tests/book-background.test.js).
 function harness({ events, taken = [] }) {
   const created = [];
-  const emails = [];
   const fetchImpl = async (url, opts) => {
     if (url.includes("docs.google.com")) return { ok: true, text: async () => events };
     if (url.includes("api.airtable.com")) {
@@ -13,115 +16,107 @@ function harness({ events, taken = [] }) {
     }
     throw new Error("unexpected " + url);
   };
-  const notifies = [];
-  const updates = [];
+  const jobs = [];
   const deps = {
     fetchImpl,
-    env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "re", SLACK_WEBHOOK_URL: "https://hooks.slack.test/x" },
-    send: async (a) => { emails.push(a); return { id: "e" }; },
-    notify: async (a) => { notifies.push(a); return { ok: true }; },
-    update: async (a) => { updates.push(a); return { id: a.id }; },
+    env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    trigger: async (a) => { jobs.push(a); return { ok: true }; },
     now: () => "20260101T000000Z",
     log: { warn() {}, error() {} },
   };
-  return { deps, created, emails, notifies, updates };
+  return { deps, created, jobs };
 }
 const base = { city: "Sioux Falls", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "Tacoma", goals: "Power" };
 const EV = "Market,Date,Active\nSioux Falls,2026-07-12,yes\n";
 
-test("honeypot ignored", async () => {
+test("honeypot ignored — no record, no job scheduled", async () => {
   const h = harness({ events: EV });
   const r = await processBooking({ ...base, slot: "9:00", bot_field: "x" }, h.deps);
   assert.equal(r.status, "ignored");
+  assert.equal(h.jobs.length, 0);
+  assert.equal(h.created.length, 0);
 });
-test("unknown city errors", async () => {
+test("unknown city errors — no job", async () => {
   const h = harness({ events: EV });
   assert.equal((await processBooking({ ...base, city: "Atlantis", slot: "9:00" }, h.deps)).status, "error");
+  assert.equal(h.jobs.length, 0);
 });
-test("missing contact errors", async () => {
+test("missing contact errors — no job", async () => {
   const h = harness({ events: EV });
   assert.equal((await processBooking({ city: "Sioux Falls", name: "Jane", slot: "9:00" }, h.deps)).status, "error");
+  assert.equal(h.jobs.length, 0);
 });
-test("no event -> priority (no-event)", async () => {
+test("no event -> priority (no-event), schedules a priority job", async () => {
   const h = harness({ events: "Market,Date,Active\nSioux Falls,nope,yes\n" });
   const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
   assert.equal(r.status, "priority");
   assert.equal(r.reason, "no-event");
   assert.ok(h.created[0].url.includes("Priority"));
+  assert.equal(h.jobs.length, 1);
+  assert.equal(h.jobs[0].name, "book-background");
+  assert.equal(h.jobs[0].payload.kind, "priority");
+  assert.equal(h.jobs[0].payload.reason, "no-event");
+  assert.equal(h.jobs[0].payload.recordId, "r1");
 });
-test("taken slot -> conflict", async () => {
+test("taken slot -> conflict, no job scheduled", async () => {
   const h = harness({ events: EV, taken: ["9:00"] });
   const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
   assert.equal(r.status, "conflict");
   assert.ok(r.openSlots.length === 11);
+  assert.equal(h.jobs.length, 0);
 });
-test("full -> priority (full)", async () => {
+test("full -> priority (full), schedules a priority job", async () => {
   const all = ["9:00","9:20","9:40","10:00","10:20","10:40","11:00","11:20","11:40","12:00","12:20","12:40"];
   const h = harness({ events: EV, taken: all });
   const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
   assert.equal(r.status, "priority");
   assert.equal(r.reason, "full");
   assert.equal(h.created[0].fields["Requested Slot"], "9:00");
+  assert.equal(h.jobs.length, 1);
+  assert.equal(h.jobs[0].payload.kind, "priority");
+  assert.equal(h.jobs[0].payload.reason, "full");
 });
-test("happy path booked -> creates booking + emails installer + customer", async () => {
+test("happy path booked -> creates booking record + schedules a booking job", async () => {
   const h = harness({ events: EV });
   const r = await processBooking({ ...base, slot: "9:20" }, h.deps);
   assert.equal(r.status, "booked");
   assert.equal(r.slot, "9:20");
   assert.equal(h.created[0].fields.Slot, "9:20");
   assert.equal(h.created[0].fields.Installer, "cody");
-  assert.ok(h.emails.some((e) => e.to === "cody@tunedyota.com"));  // installer
-  assert.ok(h.emails.some((e) => e.to === base.email));            // customer
-  assert.ok(h.emails.some((e) => e.attachments));                  // calendar invite
+  assert.equal(h.jobs.length, 1);
+  const job = h.jobs[0].payload;
+  assert.equal(job.kind, "booking");
+  assert.equal(job.recordId, "r1");
+  assert.equal(job.d.email, base.email);
+  assert.equal(job.inst.key, "cody");
+  assert.equal(job.inst.email, "cody@tunedyota.com");
+  assert.equal(job.market.city, "Sioux Falls");
+  assert.equal(job.event.dateISO, "2026-07-12");
+  assert.equal(job.stamp, "20260101T000000Z");
 });
-test("no email given -> books without sending a customer email", async () => {
+test("booked response omits emailFailed (resolved later in background)", async () => {
+  const h = harness({ events: EV });
+  const r = await processBooking({ ...base, slot: "9:20" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal("emailFailed" in r, false);
+});
+test("no email given -> still books; job carries empty email", async () => {
   const h = harness({ events: EV });
   const r = await processBooking({ ...base, email: "", slot: "9:20" }, h.deps);
   assert.equal(r.status, "booked");
-  assert.ok(!h.emails.some((e) => e.to === base.email));           // no customer email
-  assert.ok(h.emails.some((e) => e.to === "cody@tunedyota.com"));  // installer still notified
+  assert.equal(h.jobs[0].payload.d.email, "");
 });
-test("source flag tags the booking record + installer email", async () => {
+test("source flag tags the booking record + rides along in the job", async () => {
   const h = harness({ events: EV });
   const r = await processBooking({ ...base, slot: "9:20", source: "OTT Update" }, h.deps);
   assert.equal(r.status, "booked");
   assert.equal(h.created[0].fields.Source, "OTT Update");
-  const inst = h.emails.find((e) => e.to === "cody@tunedyota.com");
-  assert.ok(inst && /Free OTT Update/.test(inst.text), "installer email should flag the re-flash");
+  assert.equal(h.jobs[0].payload.d.source, "OTT Update");
 });
 test("booking source defaults when flag absent", async () => {
   const h = harness({ events: EV });
   await processBooking({ ...base, slot: "9:40" }, h.deps);
   assert.equal(h.created[0].fields.Source, "find-your-exact-tune");
-});
-test("failed customer email -> alert + Airtable flag + emailFailed", async () => {
-  const h = harness({ events: EV });
-  h.deps.send = async (a) => {                 // installer ok, customer throws
-    if (a.to === base.email) throw new Error("Resend 403: domain not verified");
-    return { id: "e" };
-  };
-  const r = await processBooking({ ...base, slot: "9:20" }, h.deps);
-  assert.equal(r.status, "booked");
-  assert.equal(r.emailFailed, true);
-  assert.equal(h.notifies.length, 1);
-  assert.match(h.notifies[0].text, /Booking email FAILED/);
-  assert.equal(h.updates.length, 1);
-  assert.equal(h.updates[0].fields["Email Status"], "FAILED");
-});
-test("all emails succeed -> no alert, no flag, emailFailed falsy", async () => {
-  const h = harness({ events: EV });
-  const r = await processBooking({ ...base, slot: "9:40" }, h.deps);
-  assert.equal(r.status, "booked");
-  assert.ok(!r.emailFailed);
-  assert.equal(h.notifies.length, 0);
-  assert.equal(h.updates.length, 0);
-});
-test("priority email failure -> alert (no throw into flow)", async () => {
-  const h = harness({ events: "Market,Date,Active\nSioux Falls,nope,yes\n" }); // no event -> priority
-  h.deps.send = async () => { throw new Error("Resend 403"); };
-  const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
-  assert.equal(r.status, "priority");
-  assert.equal(h.notifies.length, 1);
 });
 test("mods field persisted on booking record", async () => {
   const EV_OMAHA = "Market,Date,Active\nOmaha,2026-08-15,yes\n";
@@ -130,37 +125,11 @@ test("mods field persisted on booking record", async () => {
   assert.equal(r.status, "booked");
   assert.equal(h.created[0].fields.Modifications, "3in lift, 35s");
 });
-
-test("booked -> pings n8n with the booking payload when webhook url is set", async () => {
+test("a failure to enqueue the background job does not break the booking", async () => {
   const h = harness({ events: EV });
-  const pings = [];
-  h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://ty.app.n8n.cloud/webhook/ty-booking";
-  h.deps.ping = async (a) => { pings.push(a); return { ok: true }; };
+  h.deps.trigger = async () => { throw new Error("enqueue down"); };
   const r = await processBooking({ ...base, slot: "9:20" }, h.deps);
   assert.equal(r.status, "booked");
-  assert.equal(pings.length, 1);
-  assert.equal(pings[0].url, "https://ty.app.n8n.cloud/webhook/ty-booking");
-  assert.equal(pings[0].payload.event, "booking");
-  assert.equal(pings[0].payload.city, "Sioux Falls");
-  assert.equal(pings[0].payload.slot, "9:20");
-  assert.equal(pings[0].payload.installer.key, "cody");
-  assert.equal(pings[0].payload.emailFailed, false);
-});
-test("a best-effort n8n ping failure does not affect the booking", async () => {
-  const h = harness({ events: EV });
-  h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://x";
-  h.deps.ping = async () => ({ ok: false, error: "n8n down" }); // pingN8n swallows internally
-  const r = await processBooking({ ...base, slot: "9:40" }, h.deps);
-  assert.equal(r.status, "booked");
-});
-test("priority (no event) does NOT ping n8n", async () => {
-  const h = harness({ events: "Market,Date,Active\nSioux Falls,nope,yes\n" });
-  const pings = [];
-  h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://x";
-  h.deps.ping = async (a) => { pings.push(a); return { ok: true }; };
-  const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
-  assert.equal(r.status, "priority");
-  assert.equal(pings.length, 0);
 });
 
 test("booking survives a missing Modifications column (retries without it)", async () => {
@@ -178,7 +147,7 @@ test("booking survives a missing Modifications column (retries without it)", asy
     }
     throw new Error("unexpected " + url);
   };
-  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "re", SLACK_WEBHOOK_URL: "https://hooks.slack.test/x" }, send: async () => ({ id: "e" }), notify: async () => ({ ok: true }), update: async () => ({}), now: () => "20260101T000000Z", log: { warn() {}, error() {} } };
+  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, trigger: async () => ({ ok: true }), now: () => "20260101T000000Z", log: { warn() {}, error() {} } };
   const r = await processBooking({ ...base, slot: "9:00", mods: "lift" }, deps);
   assert.equal(r.status, "booked");
   assert.equal(created.length, 1);
