@@ -146,7 +146,8 @@ this project session); also one add mangled the command (key fused into the pack
 under project keys `C:/Windows/system32` + `C:/Windows/System32` in ~/.claude.json (both held OLD
 *revoked* JWTs in plaintext — one in `env.N8N_API_KEY`, one mangled into `args`; scrubbed, 0 leaked-key
 strings remain). User-scope keeper intact (`${N8N_API_KEY}` env ref) and `claude mcp list` ✔ Connected.
-The two empty System32 *project* keys (stat data only, no mcpServers) were left in place — harmless.
+The two empty System32 *project* keys were then also deleted entirely (~1:45am CDT); `projects` now
+holds only `C:/Users/grosh/Documents` + `C:/Users/grosh/Documents/tunedyota`.
 NOTE: edited while Claude Code was running; if a System32 reg reappears after a restart, the live
 process rewrote the file from memory — redo with Claude Code closed. **Gotcha:** the GUI env var only takes effect after a FULL quit+
 reopen of Claude Code (child MCP process inherits env at launch). See [[pending-secret-rotation]]
