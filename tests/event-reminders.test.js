@@ -44,3 +44,21 @@ test("post-event sweep creates a priority record", async () => {
   assert.equal(d._creates[0].fields.Reason, "Rebook — not completed");
   assert.equal(d._creates[0].fields.City, "Green Bay");
 });
+
+test("sends a post-event rebook report to the owner when a sweep occurs", async () => {
+  // Event was yesterday (du === -1) → waitlist-sweep → post-event rebook report.
+  // 2026-07-04T12:00:00Z = 07:00 CDT (UTC-5), so hour===7 passes the gate.
+  const eventDate = "2026-07-03";
+  const today = "2026-07-04";
+  const bookings = [{ id: "b1", fields: { City: "Green Bay", "Event Date": eventDate, Slot: "9:00", Name: "Walk In", Email: "w@x.com", Status: "Booked" } }];
+  const events = { "green bay": { city: "Green Bay", state: "WI", dateISO: eventDate, label: "Jul 3, 2026", active: true, address: "123 Dyno Rd" } };
+  const d = deps({
+    now: new Date(`${today}T12:00:00Z`),
+    loadEvents: async () => events,
+    listAll: async ({ table }) => (table === "Bookings" ? bookings : []),
+  });
+  await runReminders(d);
+  const report = d._sends.find((m) => /Post-event rebook/.test(m.subject || ""));
+  assert.ok(report, "expected a post-event rebook report email");
+  assert.equal(report.to, "info@tunedyota.com");
+});

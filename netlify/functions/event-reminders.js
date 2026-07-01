@@ -12,6 +12,7 @@ const { notifyOwner } = require("./lib/alert.js");
 const { centralParts } = require("./lib/central-time.js");
 const { planDispatch, SWEEP_REASON } = require("./lib/event-plan.js");
 const { renderRosterEmail } = require("./lib/roster-render.js");
+const { renderRebookReport } = require("./lib/rebook-render.js");
 const tpl = require("./lib/templates.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
@@ -83,6 +84,24 @@ async function runReminders(deps) {
     try { await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL, text: `⚠️ event-reminders had ${failures.length} failure(s): ${failures.join(" · ")}`, log }); }
     catch (e) { if (log.error) log.error("reminder notify", e.message); }
   }
+
+  const swept = actions.filter((a) => a.type === "waitlist-sweep");
+  if (swept.length) {
+    const rows = swept.map((a) => {
+      const mk = getMarket(a.event.city);
+      return {
+        Name: a.booking.Name, Phone: a.booking.Phone, Email: a.booking.Email, Vehicle: a.booking.Vehicle,
+        City: a.event.city, Reason: SWEEP_REASON, "Event Date": a.event.dateISO,
+        Installer: mk ? keyToInstaller(mk.inst).key : "aaron",
+      };
+    });
+    try {
+      const m = renderRebookReport(rows, { title: `Post-event rebook — ${nowCentral.dateISO}` });
+      await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: OWNER, replyTo: OWNER,
+        subject: m.subject, html: m.html, text: m.text });
+    } catch (e) { if (log.error) log.error("rebook report", e.message); }
+  }
+
   return { ok: true, actions: actions.length, failures: failures.length };
 }
 
