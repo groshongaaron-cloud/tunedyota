@@ -20,6 +20,7 @@ const H = { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json"
 const txt = (name) => ({ name, type: "singleLineText" });
 const sel = (name, choices) => ({ name, type: "singleSelect", options: { choices: choices.map((c) => ({ name: c })) } });
 const chk = (name) => ({ name, type: "checkbox", options: { icon: "check", color: "greenBright" } });
+const num = (name) => ({ name, type: "number", options: { precision: 0 } });
 
 const SLOTS = ["9:00","9:20","9:40","10:00","10:20","10:40","11:00","11:20","11:40","12:00","12:20","12:40"];
 const INSTALLERS = ["aaron", "noah", "cody"];
@@ -36,6 +37,12 @@ const SCHEMA = {
     txt("Name"), txt("City"), txt("Phone"), txt("Email"), txt("Vehicle"), txt("Goals"), txt("Modifications"), txt("Source"),
     sel("Installer", INSTALLERS), sel("Reason", ["No event scheduled", "Event full"]),
     txt("Event Date"), sel("Requested Slot", SLOTS), chk("Notified"),
+  ],
+  // First-party funnel-step beacons written by netlify/functions/track.js.
+  // Session is the primary field; Step is the numeric funnel index (0-6).
+  "Funnel Events": [
+    txt("Session"), num("Step"), txt("Step Name"),
+    txt("UTM Source"), txt("UTM Medium"), txt("UTM Campaign"),
   ],
 };
 
