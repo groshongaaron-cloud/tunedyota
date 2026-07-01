@@ -28,6 +28,30 @@ test("assembleSnapshot computes rates and flags below-curve high-impression page
   assert.deepEqual(snap.meta.errors, []);
 });
 
+test("assembleSnapshot surfaces below-curve high-impression page-1 topPages as pageOpportunities", () => {
+  const snap = M.assembleSnapshot({
+    date: "2026-06-30",
+    gsc: { range: { start: "a", end: "b" }, tracked: [], topPages: [
+      { page: "/supercharger", clicks: 1, impressions: 147, ctr: 0.0068, position: 8 },   // expected 0.03, below 0.7*curve -> opportunity
+      { page: "/ott-tune", clicks: 9, impressions: 449, ctr: 0.020, position: 9.5 },       // below-curve, higher impressions -> sorts first
+      { page: "/thin", clicks: 0, impressions: 40, ctr: 0, position: 3 },                  // too few impressions
+      { page: "/healthy", clicks: 30, impressions: 200, ctr: 0.09, position: 8 },          // at/above curve
+      { page: "/deep", clicks: 0, impressions: 300, ctr: 0, position: 30 },                // not page 1
+    ] },
+  });
+  const ops = snap.summary.pageOpportunities;
+  assert.equal(ops.length, 2);
+  assert.equal(ops[0].page, "/ott-tune");          // sorted by impressions desc
+  assert.equal(ops[1].page, "/supercharger");
+  assert.equal(ops[0].impressions, 449);
+  assert.equal(ops[1].expectedCtr, 0.03);
+});
+
+test("assembleSnapshot pageOpportunities is empty when there are no topPages", () => {
+  const snap = M.assembleSnapshot({ date: "2026-06-30", gsc: { tracked: [] } });
+  assert.deepEqual(snap.summary.pageOpportunities, []);
+});
+
 test("diffSnapshots returns baseline when there is no prior", () => {
   const d = M.diffSnapshots(null, { gsc: { tracked: [] }, summary: { aiPresenceRate: 0.5, perplexityCiteRate: 0.2 } });
   assert.equal(d.baseline, true);

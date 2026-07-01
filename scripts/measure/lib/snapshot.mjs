@@ -14,9 +14,23 @@ function rate(arr, pred) {
 }
 
 export function assembleSnapshot({ date, gsc, webSearch = [], perplexity = [], errors = [] }) {
+  const belowCurve = (r) => r.impressions >= 100 && r.position > 0 && r.position <= 10 && r.ctr < 0.7 * expectedCtr(r.position);
   const ctrOpportunities = (gsc?.tracked || [])
-    .filter((r) => r.impressions >= 100 && r.position > 0 && r.position <= 10 && r.ctr < 0.7 * expectedCtr(r.position))
+    .filter(belowCurve)
     .map((r) => r.query);
+  // Page-level CTR opportunities from topPages — the tracked-query set rarely
+  // clears the 100-impression bar on a young site, so scan the aggregate pages
+  // too and surface which URLs are earning fewer clicks than their rank implies.
+  const pageOpportunities = (gsc?.topPages || [])
+    .filter(belowCurve)
+    .map((r) => ({
+      page: r.page,
+      impressions: r.impressions,
+      position: Number(r.position.toFixed(1)),
+      ctr: Number(r.ctr.toFixed(4)),
+      expectedCtr: expectedCtr(r.position),
+    }))
+    .sort((a, b) => b.impressions - a.impressions);
   return {
     date,
     gsc: gsc || null,
@@ -25,6 +39,7 @@ export function assembleSnapshot({ date, gsc, webSearch = [], perplexity = [], e
       aiPresenceRate: rate(webSearch, (r) => r.present),
       perplexityCiteRate: rate(perplexity, (r) => r.citedUs),
       ctrOpportunities,
+      pageOpportunities,
     },
     meta: { errors },
   };

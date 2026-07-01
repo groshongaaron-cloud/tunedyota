@@ -35,6 +35,14 @@ export function renderReport(snapshot, diff) {
     lines.push(`*CTR opportunities (${s.ctrOpportunities.length}):* ${s.ctrOpportunities.join(", ")}`);
   }
 
+  if ((s.pageOpportunities || []).length) {
+    const rows = s.pageOpportunities
+      .slice(0, 8)
+      .map((p) => `• ${p.page} — pos ${p.position}, CTR ${pct(p.ctr)} vs ~${pct(p.expectedCtr)} expected (${p.impressions} impr)`)
+      .join("\n");
+    lines.push(`*Page CTR opportunities (${s.pageOpportunities.length}):*\n${rows}`);
+  }
+
   const errors = snapshot.meta?.errors || [];
   if (errors.length) lines.push(`⚠ *Probe errors:* ${errors.join("; ")}`);
 
