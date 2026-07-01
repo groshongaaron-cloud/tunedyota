@@ -259,9 +259,23 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 .tf-foot{text-align:center;font-size:13px;opacity:.75;margin-top:24px}
 .tf-link{color:var(--brown);font-weight:700;text-decoration:none}
 .tf-link:hover{text-decoration:underline}
+.fyt-more{max-width:760px;margin:30px auto 0;padding:0 18px}
+.fyt-more h2{font-family:'Spectral',serif;font-weight:600;font-size:26px;color:var(--ink);text-align:center;margin-bottom:16px}
+.fyt-links{margin-top:18px;text-align:center;font-size:13.5px;line-height:1.9}
+.fyt-links a{color:var(--brown);font-weight:700;text-decoration:none}.fyt-links a:hover{text-decoration:underline}
+.lp-fq{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:10px}
+.lp-fq.open{box-shadow:0 0 0 3px var(--ring),var(--shadow-sm);border-color:var(--brown)}
+.lp-fqq{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:'Spectral';font-weight:600;font-size:16px;color:var(--ink);padding:16px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.lp-fqq span{font-family:'Lato';font-weight:400;font-size:23px;color:var(--sage-d);transition:.25s;flex:0 0 auto}
+.lp-fq.open .lp-fqq span{transform:rotate(45deg)}
+.lp-fqa{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.lp-fqa p{font-size:14px;line-height:1.6;padding:0 18px 16px}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Service","serviceType":"Toyota & Lexus OTT Tune Calibration","provider":{"@id":"https://tunedyota.com/#business"},"areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"}],"description":"OTT Tune calibration for supported Toyota and Lexus platforms, with base, custom, and supercharger or turbo calibrations where supported.","offers":{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":"400","highPrice":"950"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How does booking work?","acceptedAnswer":{"@type":"Answer","text":"Pick your model, year, and goals above, choose an event city and time slot, and send your request. Your regional installer confirms the details and your exact calibration."}},{"@type":"Question","name":"How much does it cost?","acceptedAnswer":{"@type":"Answer","text":"OTT calibrations start from $400 to $550 by platform, with custom and supercharger paths priced higher. Your exact price shows as you complete the steps above."}},{"@type":"Question","name":"What if there is no event near me yet?","acceptedAnswer":{"@type":"Answer","text":"Send your request anyway and we will add you to the Priority Wait List for your area; you are the first we contact when a nearby date opens."}},{"@type":"Question","name":"Is the tune emissions-legal?","acceptedAnswer":{"@type":"Answer","text":"Yes. Factory emissions stay fully intact, every calibration is verified with a 5-gas analyzer, and it is EPA-compliant in every state. We never disable check-engine lights."}},{"@type":"Question","name":"Which vehicles can I book?","acceptedAnswer":{"@type":"Answer","text":"Toyota Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, and FJ Cruiser, plus Camry, Highlander, and RAV4, and the Lexus GX, LX570, RX350, and LS460."}}]}
 </script>
 
 <!-- Meta Pixel Code -->
@@ -984,6 +998,17 @@ $$("[data-goto]").forEach(b=>{ if(!b.closest("#crumb")) b.onclick=()=>go(+b.data
 go(0);
 loadEvents();   // overlay live event dates from the Google Sheet (no-op until configured)
 </script>
+<section class="fyt-more">
+  <h2>Questions before you book?</h2>
+  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">How does booking work?<span>+</span></button><div class="lp-fqa"><p>Pick your model, year, and goals above, choose an event city and time slot, and send your request. Your regional installer confirms the details and your exact calibration.</p></div></div>
+  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">How much does it cost?<span>+</span></button><div class="lp-fqa"><p>OTT calibrations start from $400 to $550 by platform, with custom and supercharger paths priced higher. Your exact price shows as you complete the steps above.</p></div></div>
+  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">What if there is no event near me yet?<span>+</span></button><div class="lp-fqa"><p>Send your request anyway and we will add you to the Priority Wait List for your area; you are the first we contact when a nearby date opens.</p></div></div>
+  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Is the tune emissions-legal?<span>+</span></button><div class="lp-fqa"><p>Yes. Factory emissions stay fully intact, every calibration is verified with a 5-gas analyzer, and it is EPA-compliant in every state. We never disable check-engine lights.</p></div></div>
+  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Which vehicles can I book?<span>+</span></button><div class="lp-fqa"><p>Toyota Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, and FJ Cruiser, plus Camry, Highlander, and RAV4, and the Lexus GX, LX570, RX350, and LS460.</p></div></div>
+  <div class="fyt-links">
+    <strong>Learn more:</strong> <a href="ott-tune.html">What is the OTT Tune?</a> · <a href="ott-tune-cost.html">OTT Tune cost</a> · <a href="is-the-ott-tune-worth-it.html">Is it worth it?</a> · <a href="tune-warranty-emissions-legality.html">Warranty &amp; emissions</a> · <a href="supercharger.html">Superchargers</a>
+  </div>
+</section>
 <footer class="sfoot">
   <div class="fmark">Tuned Yota</div>
   <div class="ftag">Undeniable Performance</div>
@@ -1026,6 +1051,14 @@ loadEvents();   // overlay live event dates from the Google Sheet (no-op until c
     if(t && t.matches && t.matches(SEL)){ e.preventDefault(); t.click(); }
   });
 })();
+</script>
+<script>
+document.querySelectorAll('.fyt-more .lp-fqq').forEach(q=>q.addEventListener('click',()=>{
+  const it=q.closest('.lp-fq'),a=it.querySelector('.lp-fqa'),open=it.classList.contains('open');
+  document.querySelectorAll('.fyt-more .lp-fq.open').forEach(o=>{o.classList.remove('open');o.querySelector('.lp-fqa').style.maxHeight=null;});
+  if(!open){it.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+}));
+document.querySelectorAll('.fyt-more .lp-fq').forEach(function(it,i){var q=it.querySelector('.lp-fqq'),a=it.querySelector('.lp-fqa');if(!q||!a)return;a.id='fytfaq-'+i;q.setAttribute('aria-controls','fytfaq-'+i);q.addEventListener('click',function(){q.setAttribute('aria-expanded',it.classList.contains('open')?'true':'false');});});
 </script>
 <script src="/share.js" defer></script>
 </body>
