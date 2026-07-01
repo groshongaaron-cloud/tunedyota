@@ -30,7 +30,10 @@
 {"@context":"https://schema.org","@type":"Service","@id":"https://tunedyota.com/ott-tune#service","serviceType":"OTT Tune (Overland Tailor Tune) installation and calibration","name":"OTT Tune installed by Tuned Yota","provider":{"@id":"https://tunedyota.com/#business"},"areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"}],"description":"OTT (Overland Tailor Tuning) custom ECU and transmission calibration for Toyota and Lexus, installed and dialed in by Tuned Yota, an authorized OTT retailer and installer for the Upper Midwest.","brand":{"@type":"Organization","name":"Overland Tailor Tuning","url":"https://overlandtailor.com/"}}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tunedyota.com/"},{"@type":"ListItem","position":2,"name":"OTT Tune","item":"https://tunedyota.com/ott-tune"},{"@type":"ListItem","position":3,"name":"OTT Tune","item":"https://tunedyota.com/ott-tune"}]}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tunedyota.com/"},{"@type":"ListItem","position":2,"name":"What Is the OTT Tune?","item":"https://tunedyota.com/ott-tune"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does OTT stand for?","acceptedAnswer":{"@type":"Answer","text":"OTT stands for Overland Tailor Tune, the calibration line from Overland Tailor Tuning. It is a custom ECU and transmission tune developed for specific Toyota and Lexus platforms, not a one-size-fits-all flash."}},{"@type":"Question","name":"Is the OTT tune a custom tune?","acceptedAnswer":{"@type":"Answer","text":"Yes. Every OTT calibration is matched to your exact platform, engine, and model year, then installed and dialed in person to your tire size, gearing, and modifications, never uploaded blind or remotely."}},{"@type":"Question","name":"Will the OTT tune add horsepower?","acceptedAnswer":{"@type":"Answer","text":"On supported platforms the tune frees up usable, real-world power and torque through smarter throttle, VVT-i, and octane-learning strategies. The bigger day-to-day win most owners feel is drivability: sharper response and decisive shifting."}},{"@type":"Question","name":"Will the OTT tune fix gear hunting and rough shifting?","acceptedAnswer":{"@type":"Answer","text":"Yes, and it is one of the most common reasons owners tune. Larger tires, added weight, towing, and hilly driving all confuse the factory shift logic; the calibration corrects shift points and tow-haul behavior so the transmission stops hunting."}},{"@type":"Question","name":"Is the OTT tune emissions legal?","acceptedAnswer":{"@type":"Answer","text":"Your factory emissions systems stay fully intact. Every calibration is verified with a 5-gas analyzer during drive-cycle testing and is EPA-compliant in every state. We never disable check-engine lights and do not tune off-road-only vehicles."}},{"@type":"Question","name":"How much does the OTT tune cost?","acceptedAnswer":{"@type":"Answer","text":"OTT calibrations start from $400 to $550 depending on your platform, with custom and supercharger paths priced higher. Use Find Your Exact Tune for your exact price, or see the full OTT tune pricing breakdown."}},{"@type":"Question","name":"Which Toyota and Lexus vehicles can get the OTT tune?","acceptedAnswer":{"@type":"Answer","text":"Supported platforms include the Toyota Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, and FJ Cruiser, plus the Camry, Highlander, and RAV4, and the Lexus GX, LX570, RX350, and LS460. Use Find Your Exact Tune to confirm your exact year and engine."}},{"@type":"Question","name":"How is the OTT tune installed?","acceptedAnswer":{"@type":"Answer","text":"Tuned Yota installs and calibrates in person at events across Minnesota, Iowa, Wisconsin, North Dakota, South Dakota, and Nebraska. Your regional installer confirms your platform and setup, flashes the calibration, and verifies it on the vehicle before you drive away."}}]}
 </script>
 <style>
 :root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--brown2:#5D4B40;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--card:#FAF9F7;--white:#fff;--line:rgba(91,75,66,.16);--ring:rgba(179,208,217,.55);--shadow:0 14px 50px -12px rgba(58,46,38,.22);--shadow-sm:0 6px 22px -10px rgba(58,46,38,.20);--r:16px}
@@ -66,6 +69,20 @@ h2{font-family:'Spectral',serif;font-weight:600;font-size:25px;color:var(--ink);
 .ott-final .row{display:grid;gap:10px;max-width:440px;margin:0 auto}@media(min-width:480px){.ott-final .row{grid-template-columns:1fr 1fr}}
 .ott-links{margin-top:26px;font-size:14px;line-height:2}.ott-links a{color:var(--brown);font-weight:700;text-decoration:none;margin-right:16px}.ott-links a:hover{text-decoration:underline}
 .ott-disc{font-size:11.5px;opacity:.55;text-align:center;margin-top:22px;line-height:1.55}
+.ott-prose{font-size:15px;line-height:1.62;opacity:.9;max-width:660px;margin-top:6px}.ott-prose b{color:var(--ink);opacity:1}
+.ott-prose a{color:var(--brown);font-weight:700;text-decoration:none}.ott-prose a:hover{text-decoration:underline}
+.ott-veh{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ott-veh a{font-size:13.5px;font-weight:700;color:var(--brown);background:var(--white);border:1.5px solid var(--line);border-radius:99px;padding:8px 14px;text-decoration:none;box-shadow:var(--shadow-sm);transition:.15s}
+.ott-veh a:hover{background:var(--ink);color:#F3EFEA;border-color:var(--ink)}
+.ott-faq{margin-top:8px}
+.lp-fq{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:10px}
+.lp-fq.open{box-shadow:0 0 0 3px var(--ring),var(--shadow-sm);border-color:var(--brown)}
+.lp-fqq{width:100%;text-align:left;background:none;border:none;cursor:pointer;font-family:'Spectral';font-weight:600;font-size:16px;color:var(--ink);padding:16px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.lp-fqq span{font-family:'Lato';font-weight:400;font-size:23px;color:var(--sage-d);transition:.25s;flex:0 0 auto}
+.lp-fq.open .lp-fqq span{transform:rotate(45deg)}
+.lp-fqa{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.lp-fqa p{font-size:14px;line-height:1.6;padding:0 18px 16px}
+.lp-fqa p a{color:var(--brown);font-weight:700;text-decoration:none}.lp-fqa p a:hover{text-decoration:underline}
 </style>
 
 <!-- Meta Pixel Code -->
@@ -109,6 +126,9 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
     <div class="ott-feat"><b>Hardware-aware</b><span>AGM battery support and calibration matched to your setup.</span></div>
   </div>
 
+  <h2>OTT vs. a stock or generic tune</h2>
+  <p class="ott-prose">The <b>factory calibration</b> is a compromise, tuned for emissions cycles, global fuel, and the mildest possible owner, not for your tires, your load, or how you actually drive. A <b>generic "canned" flash</b> swings the other way and ignores your exact platform and modifications. <b>OTT sits where you want to be:</b> a platform-specific Overland Tailor calibration, dialed in person to your year, engine, tire size, and setup, with your factory emissions systems left fully intact. <a href="is-the-ott-tune-worth-it.html">See how OTT compares to stock →</a></p>
+
   <div class="ott-why">
     <h2>Why get your OTT tune through Tuned Yota</h2>
     <ul>
@@ -118,6 +138,13 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
       <li>Factory emissions systems stay fully intact, verified with a 5-gas analyzer, EPA-compliant in every state. We never disable check-engine lights.</li>
     </ul>
   </div>
+
+  <h2>Which Toyota &amp; Lexus vehicles can get the OTT tune?</h2>
+  <p class="ott-prose">OTT supports a wide range of Toyota and Lexus platforms. Pick yours to see model-specific results, supported engines, and pricing:</p>
+  <div class="ott-veh">
+    <a href="toyota-tundra-ott-tune.html">Tundra</a><a href="toyota-tacoma-ott-tune.html">Tacoma</a><a href="toyota-4runner-ott-tune.html">4Runner</a><a href="toyota-sequoia-ott-tune.html">Sequoia</a><a href="toyota-land-cruiser-ott-tune.html">Land Cruiser</a><a href="toyota-fj-cruiser-ott-tune.html">FJ Cruiser</a><a href="toyota-camry-ott-tune.html">Camry</a><a href="toyota-highlander-ott-tune.html">Highlander</a><a href="toyota-rav4-ott-tune.html">RAV4</a><a href="lexus-gx-ott-tune.html">Lexus GX</a><a href="lexus-lx570-ott-tune.html">Lexus LX570</a><a href="lexus-rx350-ott-tune.html">Lexus RX350</a><a href="lexus-ls460-ott-tune.html">Lexus LS460</a>
+  </div>
+  <p class="ott-prose" style="margin-top:12px"><b>Not sure, or want pricing?</b> <a href="ott-tune-cost.html">See OTT tune cost by platform</a>, or <a href="find-your-exact-tune.html">Find Your Exact Tune</a> for your exact price in under a minute.</p>
 
   <h2>Real reviews of the OTT tune</h2>
   <p class="ott-lead">Owners and reviewers across the Toyota and Lexus community putting the OTT calibration to the test:</p>
@@ -131,6 +158,18 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
   </div>
   <p class="ott-credit">Videos by independent creators, featured on <a href="https://overlandtailor.com/video-reviews" target="_blank" rel="noopener">Overland Tailor Tuning's review page</a>. Learn more about OTT at <a href="https://overlandtailor.com/" target="_blank" rel="noopener">overlandtailor.com</a>.</p>
 
+  <h2>OTT tune FAQ</h2>
+  <div class="ott-faq">
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">What does OTT stand for?<span>+</span></button><div class="lp-fqa"><p>OTT stands for Overland Tailor Tune, the calibration line from Overland Tailor Tuning. It is a custom ECU and transmission tune developed for specific Toyota and Lexus platforms, not a one-size-fits-all flash.</p></div></div>
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Is the OTT tune a custom tune?<span>+</span></button><div class="lp-fqa"><p>Yes. Every OTT calibration is matched to your exact platform, engine, and model year, then installed and dialed in person to your tire size, gearing, and modifications, never uploaded blind or remotely.</p></div></div>
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Will the OTT tune add horsepower?<span>+</span></button><div class="lp-fqa"><p>On supported platforms the tune frees up usable, real-world power and torque through smarter throttle, VVT-i, and octane-learning strategies. The bigger day-to-day win most owners feel is drivability: sharper response and decisive shifting.</p></div></div>
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Will the OTT tune fix gear hunting and rough shifting?<span>+</span></button><div class="lp-fqa"><p>Yes, and it is one of the most common reasons owners tune. Larger tires, added weight, towing, and hilly driving all confuse the factory shift logic; the calibration corrects shift points and tow-haul behavior so the transmission stops hunting.</p></div></div>
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Is the OTT tune emissions legal?<span>+</span></button><div class="lp-fqa"><p>Your factory emissions systems stay fully intact. Every calibration is verified with a 5-gas analyzer during drive-cycle testing and is EPA-compliant in every state. We never disable check-engine lights and do not tune off-road-only vehicles.</p></div></div>
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">How much does the OTT tune cost?<span>+</span></button><div class="lp-fqa"><p>OTT calibrations start from $400 to $550 depending on your platform, with custom and supercharger paths priced higher. Use <a href="find-your-exact-tune.html">Find Your Exact Tune</a> for your exact price, or see the full <a href="ott-tune-cost.html">OTT tune pricing breakdown</a>.</p></div></div>
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">Which Toyota and Lexus vehicles can get the OTT tune?<span>+</span></button><div class="lp-fqa"><p>Supported platforms include the Toyota Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, and FJ Cruiser, plus the Camry, Highlander, and RAV4, and the Lexus GX, LX570, RX350, and LS460. Use <a href="find-your-exact-tune.html">Find Your Exact Tune</a> to confirm your exact year and engine.</p></div></div>
+    <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">How is the OTT tune installed?<span>+</span></button><div class="lp-fqa"><p>Tuned Yota installs and calibrates in person at events across Minnesota, Iowa, Wisconsin, North Dakota, South Dakota, and Nebraska. Your regional installer confirms your platform and setup, flashes the calibration, and verifies it on the vehicle before you drive away.</p></div></div>
+  </div>
+
   <div class="ott-final">
     <h2>Ready to feel the difference?</h2>
     <p>Get your exact OTT calibration and price, then book with your regional installer.</p>
@@ -141,8 +180,10 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
   </div>
 
   <div class="ott-links">
+    <strong>Learn more:</strong><br>
+    <a href="ott-tune-cost.html">OTT Tune Cost</a><a href="is-the-ott-tune-worth-it.html">Is It Worth It?</a><a href="tune-warranty-emissions-legality.html">Warranty &amp; Emissions</a><a href="supercharger.html">Superchargers</a><br>
     <strong>Explore:</strong><br>
-    <a href="index.html">Home</a><a href="find-your-exact-tune.html">Services</a><a href="team.html">Team</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a>
+    <a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a><a href="team.html">Team</a>
   </div>
 
   <p class="ott-disc">OTT and Overland Tailor Tune are products of Overland Tailor Tuning; Tuned Yota is an authorized installing retailer. Supported features vary by platform and model year and are confirmed at booking. All vehicles must retain fully intact, federally compliant emissions systems.</p>
@@ -156,5 +197,13 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
   <div class="fcopy">© Tuned Yota · Toyota &amp; Lexus Performance Tuning · Authorized OTT Installer</div>
 </footer>
+<script>
+document.querySelectorAll('.lp-fqq').forEach(q=>q.addEventListener('click',()=>{
+  const it=q.closest('.lp-fq'),a=it.querySelector('.lp-fqa'),open=it.classList.contains('open');
+  document.querySelectorAll('.lp-fq.open').forEach(o=>{o.classList.remove('open');o.querySelector('.lp-fqa').style.maxHeight=null;});
+  if(!open){it.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+}));
+document.querySelectorAll('.lp-fq').forEach(function(it,i){var q=it.querySelector('.lp-fqq'),a=it.querySelector('.lp-fqa');if(!q||!a)return;a.id='ottfqa-'+i;q.setAttribute('aria-controls','ottfqa-'+i);q.addEventListener('click',function(){q.setAttribute('aria-expanded',it.classList.contains('open')?'true':'false');});});
+</script>
 </body>
 </html>
