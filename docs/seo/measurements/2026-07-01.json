@@ -127,11 +127,245 @@
   },
   "ai": {
     "webSearch": [],
-    "perplexity": []
+    "perplexity": [
+      {
+        "query": "ott tune cost",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "facebook.com",
+          "tacoma3g.com",
+          "reddit.com",
+          "adventuremotorsusa.com",
+          "trailtacoma.com",
+          "youtube.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "how much is an ott tune",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "facebook.com",
+          "reddit.com",
+          "tacoma3g.com",
+          "adventuremotorsusa.com",
+          "trailtacoma.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "toyota tundra ott tune",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "bigdawgstoyotatuningshop.com",
+          "youtube.com",
+          "tundras.com",
+          "reddit.com",
+          "facebook.com",
+          "pnwtuningllc.com",
+          "yotaperformancetuning.com",
+          "instagram.com"
+        ]
+      },
+      {
+        "query": "toyota tacoma ott tune",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "yotatune.com",
+          "trailtacoma.com",
+          "reddit.com",
+          "bigdawgstoyotatuningshop.com",
+          "tacoma4g.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "magnuson supercharger tundra cost",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "magnusonsuperchargers.com",
+          "tundralifestyle.com",
+          "youtube.com",
+          "tundras.com",
+          "reddit.com",
+          "facebook.com"
+        ]
+      },
+      {
+        "query": "magnuson supercharger tacoma",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "superchargersonline.com",
+          "magnusonsuperchargers.com",
+          "facebook.com",
+          "tacomaworld.com",
+          "urdusa.com",
+          "youtube.com",
+          "reddit.com"
+        ]
+      },
+      {
+        "query": "is an ott tune worth it",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "reddit.com",
+          "adv4x4.us",
+          "tacoma4g.com",
+          "trailtacoma.com",
+          "tacoma3g.com",
+          "facebook.com",
+          "youtube.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "ott tune vs stock",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "tacoma3g.com",
+          "youtube.com",
+          "reddit.com",
+          "facebook.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "what is an ott tune",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/ott-tune"
+        ],
+        "competitors": [
+          "reddit.com",
+          "trailtacoma.com",
+          "youtube.com",
+          "adv4x4.us",
+          "adventuremotorsusa.com",
+          "facebook.com"
+        ]
+      },
+      {
+        "query": "ott vs custom tune",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/ott-tune"
+        ],
+        "competitors": [
+          "tacoma3g.com",
+          "reddit.com",
+          "facebook.com",
+          "youtube.com",
+          "pedalcommander.com.au",
+          "tacomaworld.com",
+          "tacoma4g.com"
+        ]
+      },
+      {
+        "query": "does a tune void warranty",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "mustang6g.com",
+          "reddit.com",
+          "5startuning.com",
+          "facebook.com",
+          "youtube.com",
+          "endurancewarranty.com",
+          "f80.bimmerpost.com",
+          "f150forum.com"
+        ]
+      },
+      {
+        "query": "is tuning emissions legal",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "mychiptuningfiles.com",
+          "morepowertuning.com",
+          "hpacademy.com",
+          "forums.justcommodores.com.au",
+          "duramaxtuner.com",
+          "3kcalibrations.com",
+          "forums.tdiclub.com",
+          "reddit.com"
+        ]
+      },
+      {
+        "query": "will a tune throw a check engine light",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "f150forum.com",
+          "reddit.com",
+          "youtube.com",
+          "corvetteforum.com",
+          "facebook.com",
+          "salineauto.com",
+          "support.bamaperformance.com"
+        ]
+      },
+      {
+        "query": "toyota tuning minnesota",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com"
+        ],
+        "competitors": [
+          "minnesotaperformancemn.hibuwebsites.com",
+          "mnperformance.com",
+          "dynoseek.com",
+          "facebook.com",
+          "masteryotallc.com",
+          "yelp.com",
+          "impulse-performance.com",
+          "reddit.com"
+        ]
+      },
+      {
+        "query": "toyota tuning wisconsin",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com"
+        ],
+        "competitors": [
+          "dynoseek.com",
+          "facebook.com",
+          "reddit.com",
+          "quantum-performance.com",
+          "masteryotallc.com",
+          "bigdawgstoyotatuningshop.com",
+          "yelp.com"
+        ]
+      },
+      {
+        "query": "toyota tuning iowa",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/toyota-lexus-tuning-iowa",
+          "https://tunedyota.com"
+        ],
+        "competitors": [
+          "yotatune.com",
+          "masteryotallc.com",
+          "facebook.com",
+          "instagram.com",
+          "yelp.com",
+          "appalachiantoyotatuning.com"
+        ]
+      }
+    ]
   },
   "summary": {
     "aiPresenceRate": 0,
-    "perplexityCiteRate": 0,
+    "perplexityCiteRate": 0.31,
     "ctrOpportunities": []
   },
   "meta": {
