@@ -1,0 +1,64 @@
+# Tuned Yota — Wix → new-site migration redirects (301).
+# Old www URLs already 301 to non-www (Netlify domain redirect); these map
+# the old Wix slugs to the matching new pages so Google transfers ranking
+# signals instead of landing on 404s. Model-specific rules first, then
+# static pages, then catch-alls (first match wins).
+
+# ── Vehicle booking/service pages → model landing pages ──
+/service-page/tundra-*                        /toyota-tundra-ott-tune                       301
+/booking-calendar/tundra-*                    /toyota-tundra-ott-tune                       301
+/service-page/sc-tundra-*                     /toyota-tundra-ott-tune                       301
+/booking-calendar/sc-tundra-*                 /toyota-tundra-ott-tune                       301
+/service-page/tacoma-*                        /toyota-tacoma-ott-tune                       301
+/booking-calendar/tacoma-*                    /toyota-tacoma-ott-tune                       301
+/service-page/sc-tacoma-*                     /toyota-tacoma-ott-tune                       301
+/booking-calendar/sc-tacoma-*                 /toyota-tacoma-ott-tune                       301
+/service-page/4runner-*                       /toyota-4runner-ott-tune                      301
+/booking-calendar/4runner-*                   /toyota-4runner-ott-tune                      301
+/service-page/sc-4runner-*                    /toyota-4runner-ott-tune                      301
+/booking-calendar/sc-4runner-*                /toyota-4runner-ott-tune                      301
+/service-page/sequoia-*                       /toyota-sequoia-ott-tune                      301
+/booking-calendar/sequoia-*                   /toyota-sequoia-ott-tune                      301
+/service-page/seqouia-*                       /toyota-sequoia-ott-tune                      301
+/booking-calendar/seqouia-*                   /toyota-sequoia-ott-tune                      301
+/service-page/sc-toyota-sequoia-*             /toyota-sequoia-ott-tune                      301
+/booking-calendar/sc-toyota-sequoia-*         /toyota-sequoia-ott-tune                      301
+/service-page/land-cruiser-*                  /toyota-land-cruiser-ott-tune                 301
+/booking-calendar/land-cruiser-*              /toyota-land-cruiser-ott-tune                 301
+/service-page/sc-land-cruiser-*               /toyota-land-cruiser-ott-tune                 301
+/booking-calendar/sc-land-cruiser-*           /toyota-land-cruiser-ott-tune                 301
+/service-page/fj-cruiser-*                    /toyota-fj-cruiser-ott-tune                   301
+/booking-calendar/fj-cruiser-*                /toyota-fj-cruiser-ott-tune                   301
+/service-page/sc-fj-cruiser-*                 /toyota-fj-cruiser-ott-tune                   301
+/booking-calendar/sc-fj-cruiser-*             /toyota-fj-cruiser-ott-tune                   301
+/service-page/camry-*                         /toyota-camry-ott-tune                        301
+/booking-calendar/camry-*                     /toyota-camry-ott-tune                        301
+/service-page/highlander-*                    /toyota-highlander-ott-tune                   301
+/booking-calendar/highlander-*                /toyota-highlander-ott-tune                   301
+/service-page/rav4-*                          /toyota-rav4-ott-tune                         301
+/booking-calendar/rav4-*                      /toyota-rav4-ott-tune                         301
+/service-page/lexus-gx460-*                   /lexus-gx-ott-tune                            301
+/booking-calendar/lexus-gx460-*               /lexus-gx-ott-tune                            301
+/service-page/lexus-gx470-*                   /lexus-gx-ott-tune                            301
+/booking-calendar/lexus-gx470-*               /lexus-gx-ott-tune                            301
+/service-page/lexus-gx550-*                   /lexus-gx-ott-tune                            301
+/booking-calendar/lexus-gx550-*               /lexus-gx-ott-tune                            301
+/service-page/lexus-lx570-*                   /lexus-lx570-ott-tune                         301
+/booking-calendar/lexus-lx570-*               /lexus-lx570-ott-tune                         301
+/service-page/lexus-ls460-*                   /lexus-ls460-ott-tune                         301
+/booking-calendar/lexus-ls460-*               /lexus-ls460-ott-tune                         301
+
+# ── Static Wix pages → best new equivalent ──
+/book-online                                  /find-your-exact-tune                         301
+/services                                     /find-your-exact-tune                         301
+/about                                        /team                                         301
+/about-5                                      /team                                         301
+/contact                                      /                                             301
+/gift-card                                    /                                             301
+/payment-request-page                         /                                             301
+
+# ── Catch-alls for any old booking/service slug not matched above ──
+/service-page/*                               /find-your-exact-tune                         301
+/booking-calendar/*                           /find-your-exact-tune                         301
+/service-page                                 /find-your-exact-tune                         301
+/booking-calendar                             /find-your-exact-tune                         301
