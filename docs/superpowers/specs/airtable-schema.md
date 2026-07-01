@@ -40,6 +40,7 @@ A slot counts as taken when a row exists for `City + Event Date + Slot` with
 | Vehicle    | Single line text | |
 | Goals      | Single line text | |
 | Modifications | Single line text | customer mods; also set by the post-event rebook sweep |
+| Source     | Single line text | intake channel, e.g. `intake:instagram` (from the staff intake form) |
 | Installer  | Single select    | `aaron` / `noah` / `cody` |
 | Reason     | Single select    | `No event scheduled` / `Event full` / `Rebook — not completed` |
 | Event Date | Single line text | set when Reason = Event full |
