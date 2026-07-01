@@ -32,7 +32,9 @@ async function processCloseout(body, deps) {
     return { status: "noshow" };
   }
 
-  // complete
+  // complete — idempotent: once the certificate is issued the calibration is
+  // locked, so a re-submit (e.g. a double-tap) must not send a second cert.
+  if (f["Certificate Sent"]) return { status: "completed", certSent: true, alreadySent: true };
   const calibration = String(d.calibration || "").trim();
   if (!CAL_OPTIONS.includes(calibration)) return { status: "error", error: "bad-calibration" };
   const issueDate = now.toISOString().slice(0, 10);

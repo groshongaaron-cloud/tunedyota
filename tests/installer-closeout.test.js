@@ -54,3 +54,14 @@ test("a cert-send failure still leaves the booking Completed, certSent false", a
   assert.equal(updates[0].Status, "Completed");             // completion persisted
   assert.ok(!updates.some((u) => u["Certificate Sent"]));   // never marked sent
 });
+
+test("re-completing an already-certified booking is idempotent (no duplicate cert)", async () => {
+  let sends = 0;
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light" },
+    { env, key: "cody", get: async () => recFor("cody", { "Certificate Sent": true, Status: "Completed" }),
+      update: async () => ({}), send: async () => { sends++; return {}; } });
+  assert.equal(out.status, "completed");
+  assert.equal(out.certSent, true);
+  assert.equal(out.alreadySent, true);
+  assert.equal(sends, 0); // did NOT re-send the certificate
+});
