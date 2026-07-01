@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Tuned Yota — Installer Console</title>
+<style>
+  :root{--ink:#3A2E26;--accent:#5B4B42;--line:#d8d2ca;--muted:#7c8472;}
+  *{box-sizing:border-box;} body{font-family:-apple-system,Arial,sans-serif;color:var(--ink);margin:0;background:#faf8f5;}
+  main{max-width:640px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:19px;color:var(--accent);margin:6px 0 10px;}
+  h2{font-size:16px;color:var(--accent);margin:20px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px;}
+  input{width:100%;padding:12px;font-size:16px;border:1px solid var(--line);border-radius:8px;}
+  .btn{padding:12px;font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:8px;}
+  .link{display:inline-block;margin:2px 0 8px;color:#2f5d8a;font-size:14px;}
+  .card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;background:#fff;}
+  .top{display:flex;justify-content:space-between;gap:8px;font-size:14px;}
+  .who{font-weight:700;} .meta{color:var(--muted);font-size:13px;margin:2px 0 6px;}
+  select{padding:9px;font-size:15px;border:1px solid var(--line);border-radius:8px;width:100%;margin:6px 0;}
+  .row-actions{display:flex;gap:8px;} .row-actions .btn{flex:1;}
+  .ns{background:#8a6a3a;} .done{color:#2f5d2a;font-weight:700;} .noshow{color:#8a2a2a;font-weight:700;}
+  .hidden{display:none;} .msg{margin-top:8px;font-size:13px;} .err{color:#8a2a2a;}
+</style>
+</head>
+<body>
+<main>
+  <h1>Tuned Yota — Installer Console</h1>
+  <div id="gate">
+    <input id="tok" type="password" autocomplete="off" placeholder="Your installer passcode">
+    <div style="height:8px"></div>
+    <button class="btn" id="unlock" style="width:100%">Unlock</button>
+  </div>
+  <div id="app" class="hidden">
+    <a class="link" href="/intake.html">+ Add a walk-in (intake form)</a>
+    <div id="events"></div>
+    <div id="msg" class="msg"></div>
+  </div>
+</main>
+<script>
+  var CAL = ["Light","Mild","Medium","Spicy","SS","Light and Mild","Mild and Medium","Medium and Spicy","Spicy and SS"];
+  function tok(){ return localStorage.getItem('ty_installer_token') || ''; }
+  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
+
+  document.getElementById('unlock').onclick=function(){
+    var v=document.getElementById('tok').value.trim(); if(!v) return;
+    localStorage.setItem('ty_installer_token', v); showApp();
+  };
+  if(tok()) showApp();
+
+  function showApp(){ document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
+  function fail(m){ var el=document.getElementById('msg'); el.className='msg err'; el.textContent=m; }
+
+  async function load(){
+    document.getElementById('events').innerHTML='Loading…';
+    var res = await fetch('/.netlify/functions/installer-roster', { headers:{ 'x-installer-token':tok() } });
+    if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    if(!res.ok){ document.getElementById('events').textContent='Could not load roster.'; return; }
+    var data = await res.json();
+    render(data);
+  }
+
+  function render(data){
+    var host=document.getElementById('events'); host.innerHTML='';
+    if(!data.events.length){ host.textContent='No upcoming events assigned to you.'; return; }
+    data.events.forEach(function(ev){
+      var h=document.createElement('h2'); h.textContent=ev.city+' · '+ev.dateISO; host.appendChild(h);
+      ev.bookings.forEach(function(b){ host.appendChild(rowCard(b)); });
+    });
+  }
+
+  function rowCard(b){
+    var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
+    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+'</span><span>'+esc(b.vehicle)+'</span></div>'+
+      '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+'</div>';
+    if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+'</div>'; return c; }
+    if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show</div>'; return c; }
+    var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
+    c.innerHTML=head+'<select id="cal_'+b.id+'">'+opts+'</select>'+
+      '<div class="row-actions"><button class="btn" id="ok_'+b.id+'">Mark complete</button>'+
+      '<button class="btn ns" id="ns_'+b.id+'">No-show</button></div>';
+    c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
+    c.querySelector('#ns_'+b.id).onclick=function(){ closeout(b.id,{action:'noshow'}); };
+    return c;
+  }
+
+  async function complete(id){
+    var cal=document.getElementById('cal_'+id).value;
+    if(!cal){ fail('Pick a calibration first.'); return; }
+    closeout(id,{action:'complete',calibration:cal});
+  }
+  async function closeout(id,extra){
+    var body=Object.assign({recordId:id},extra);
+    var res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(body)});
+    if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    var out=await res.json().catch(function(){return{};});
+    var card=document.getElementById('c_'+id);
+    if(out.status==='completed'){ card.querySelector('select').classList.add('hidden'); card.querySelector('.row-actions').classList.add('hidden');
+      var d=document.createElement('div'); d.className='done'; d.textContent='✓ Completed · '+(out.certSent?'certificate sent':'certificate will send shortly'); card.appendChild(d); }
+    else if(out.status==='noshow'){ card.querySelector('.row-actions').classList.add('hidden'); if(card.querySelector('select')) card.querySelector('select').classList.add('hidden');
+      var n=document.createElement('div'); n.className='noshow'; n.textContent='No-show'; card.appendChild(n); }
+    else { fail('Could not save: '+(out.error||'error '+res.status)); }
+  }
+</script>
+</body>
+</html>

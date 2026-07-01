@@ -55,6 +55,12 @@ async function createTolerant(createFn, args, optionalKeys = []) {
     return await createFn({ ...args, fields });
   }
 }
+async function getRecord({ fetchImpl = fetch, token, baseId, table, id }) {
+  const url = `${API}/${baseId}/${encodeURIComponent(table)}/${id}`;
+  const res = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new Error(`airtable get ${res.status}`);
+  return res.json();
+}
 async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSize = 100 }) {
   const out = [];
   let offset;
@@ -70,4 +76,4 @@ async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSiz
   } while (offset);
   return out;
 }
-module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, listAllRecords };
+module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, listAllRecords, getRecord };

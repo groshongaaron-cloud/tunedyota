@@ -50,3 +50,18 @@ test("listAllRecords follows offset across pages", async () => {
   assert.equal(recs[1].fields.Name, "B");
   assert.equal(call, 2);
 });
+
+test("getRecord GETs one record by id and returns its json", async () => {
+  const { getRecord } = require("../netlify/functions/lib/airtable.js");
+  let seenUrl;
+  const fetchImpl = async (url) => { seenUrl = url; return { ok: true, json: async () => ({ id: "rec1", fields: { Name: "Jane" } }) }; };
+  const out = await getRecord({ fetchImpl, token: "t", baseId: "appX", table: "Bookings", id: "rec1" });
+  assert.equal(out.id, "rec1");
+  assert.match(seenUrl, /appX\/Bookings\/rec1$/);
+});
+
+test("getRecord throws on non-ok", async () => {
+  const { getRecord } = require("../netlify/functions/lib/airtable.js");
+  const fetchImpl = async () => ({ ok: false, status: 404 });
+  await assert.rejects(getRecord({ fetchImpl, token: "t", baseId: "b", table: "Bookings", id: "x" }), /airtable get 404/);
+});
