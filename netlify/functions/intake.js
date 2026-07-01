@@ -31,24 +31,29 @@ async function processIntake(body, deps) {
   const channel = String(d.channel || "other").toLowerCase();
   const source = `intake:${channel}`;
   const market = getMarket(d.city);
-  if (!market) return { status: "error", error: "unknown-city" };
   if (!d.name || (!d.phone && !d.email)) return { status: "error", error: "missing-contact" };
-  const inst = keyToInstaller(market.inst);
   const c = cfg(env);
 
   if (d.mode === "lead") {
+    // Leads tolerate an unknown/blank area: store them in a general "Unassigned"
+    // bucket (City "Unassigned", blank Installer) so nothing is lost before the
+    // region/installer is known. The owner triages + assigns these later.
+    const instKey = market ? keyToInstaller(market.inst).key : "";
     const fields = {
-      City: market.city, Name: d.name, Phone: d.phone || "", Email: d.email || "",
+      City: market ? market.city : "Unassigned", Name: d.name, Phone: d.phone || "", Email: d.email || "",
       Vehicle: d.vehicle || "", Goals: d.goals || "", Modifications: d.mods || "",
-      Installer: inst.key, Reason: "No event scheduled", Source: source,
+      Reason: "No event scheduled", Source: source,
     };
+    if (instKey) fields.Installer = instKey; // omit when unassigned (leave the select blank)
     try {
       const rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields }, ["Modifications", "Source"]);
-      return { status: "lead", recordId: rec && rec.id, installer: inst.key };
+      return { status: "lead", recordId: rec && rec.id, installer: instKey || "unassigned", unassigned: !market };
     } catch (e) { if (log.error) log.error("intake lead", e.message); return { status: "error", error: "store-unavailable" }; }
   }
 
-  // book mode
+  // book mode — requires a real market + a scheduled event
+  if (!market) return { status: "error", error: "unknown-city" };
+  const inst = keyToInstaller(market.inst);
   const event = await loadEvent(market.city);
   if (!event) return { status: "error", error: "no-event" };
   let taken = [];

@@ -23,3 +23,11 @@ test("empty input says none outstanding", () => {
   assert.match(m.subject, /\(0\)/);
   assert.match(m.text, /None outstanding/i);
 });
+
+test("a blank installer groups under Unassigned, not the fallback installer", () => {
+  const rows = [{ Name: "A", City: "Omaha", Installer: "", Reason: "No event scheduled" }];
+  const m = renderRebookReport(rows, { title: "Weekly rebook backlog" });
+  assert.match(m.text, /Omaha \(1\)/);       // by location
+  assert.match(m.text, /Unassigned \(1\)/);  // by installer: blank → "Unassigned", not "Aaron Groshong"
+  assert.doesNotMatch(m.text, /Aaron Groshong/);
+});

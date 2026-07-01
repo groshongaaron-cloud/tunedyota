@@ -21,7 +21,7 @@ function renderRebookReport(records, opts = {}) {
     };
   }
   const byCity = groupBy(rows, (r) => r.City);
-  const byInst = groupBy(rows, (r) => keyToInstaller(r.Installer).name);
+  const byInst = groupBy(rows, (r) => (r.Installer ? keyToInstaller(r.Installer).name : "Unassigned"));
   const textSection = (label, map) => `${label}\n` +
     [...map.entries()].map(([k, list]) => `  ${k} (${list.length}):\n` + list.map((r) => `    - ${line(r)}`).join("\n")).join("\n") + "\n";
   const text = `${title} — ${rows.length} outstanding\n\nALL:\n` + rows.map((r) => `- ${line(r)}`).join("\n") +

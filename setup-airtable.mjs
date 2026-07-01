@@ -33,7 +33,7 @@ const SCHEMA = {
     txt("Source"), txt("UTM Source"), txt("UTM Medium"), txt("UTM Campaign"),
   ],
   "Priority List": [
-    txt("Name"), txt("City"), txt("Phone"), txt("Email"), txt("Vehicle"), txt("Goals"), txt("Modifications"),
+    txt("Name"), txt("City"), txt("Phone"), txt("Email"), txt("Vehicle"), txt("Goals"), txt("Modifications"), txt("Source"),
     sel("Installer", INSTALLERS), sel("Reason", ["No event scheduled", "Event full"]),
     txt("Event Date"), sel("Requested Slot", SLOTS), chk("Notified"),
   ],

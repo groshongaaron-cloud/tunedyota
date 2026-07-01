@@ -57,8 +57,22 @@ test("book mode books an open slot", async () => {
   assert.equal(created.fields.Installer, "cody");
 });
 
-test("unknown city errors", async () => {
-  const out = await processIntake({ mode: "lead", city: "Nowhere", name: "X", phone: "1" }, { env, create: async () => ({}) });
+test("unknown city errors in BOOK mode (leads are tolerated — see next test)", async () => {
+  const out = await processIntake({ mode: "book", city: "Nowhere", name: "X", phone: "1", slot: "9:00" }, { env, create: async () => ({}) });
   assert.equal(out.status, "error");
   assert.equal(out.error, "unknown-city");
+});
+
+test("lead mode with an unknown/blank area goes to the Unassigned bucket (no installer)", async () => {
+  let created = null;
+  const create = async (a) => { created = a; return { id: "recU" }; };
+  const out = await processIntake(
+    { mode: "lead", city: "Unassigned", name: "Jane", phone: "111", channel: "text" },
+    { env, create, fetchImpl: async () => ({ ok: true, json: async () => ({ records: [] }) }) }
+  );
+  assert.equal(out.status, "lead");
+  assert.equal(out.unassigned, true);
+  assert.equal(created.fields.City, "Unassigned");
+  assert.equal(created.fields.Source, "intake:text");
+  assert.ok(!("Installer" in created.fields), "Installer omitted when unassigned");
 });
