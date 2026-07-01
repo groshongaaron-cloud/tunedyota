@@ -37,3 +37,17 @@ test("post-event sweep at -1 for all non-completed, dedup against existing", () 
   const swept = a.filter((x) => x.type === "waitlist-sweep").map((x) => x.booking.Email).sort();
   assert.deepEqual(swept, ["c@x.com", "n@x.com"]); // a@ already queued, done@ completed
 });
+test("a T-0 (event morning) event produces a customer-notify per booked emailed row", () => {
+  const { planDispatch } = require("../netlify/functions/lib/event-plan.js");
+  const nowCentral = { hour: 7, dateISO: "2026-09-12" };
+  const events = [{ active: true, city: "Green Bay", dateISO: "2026-09-12" }];
+  const bookings = [
+    { City: "Green Bay", "Event Date": "2026-09-12", Email: "a@x.com", Status: "Booked" },
+    { City: "Green Bay", "Event Date": "2026-09-12", Email: "", Status: "Booked" },
+    { City: "Green Bay", "Event Date": "2026-09-12", Email: "c@x.com", Status: "Cancelled" },
+  ];
+  const actions = planDispatch({ events, bookings, priority: [], nowCentral });
+  const custs = actions.filter((a) => a.type === "customer-notify" && a.daysUntil === 0);
+  assert.equal(custs.length, 1);
+  assert.equal(custs[0].booking.Email, "a@x.com");
+});

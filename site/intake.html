@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Tuned Yota — Staff Intake</title>
+<style>
+  :root { --ink:#3A2E26; --accent:#5B4B42; --line:#d8d2ca; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, Arial, sans-serif; color: var(--ink); margin: 0; background:#faf8f5; }
+  main { max-width: 520px; margin: 0 auto; padding: 18px 16px 60px; }
+  h1 { font-size: 20px; color: var(--accent); margin: 8px 0 16px; }
+  label { display:block; font-weight:700; font-size:13px; margin:12px 0 4px; color:#7c8472; }
+  input, select, textarea { width:100%; padding:12px; font-size:16px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  textarea { min-height:64px; }
+  .row { display:flex; gap:10px; } .row > * { flex:1; }
+  .modes { display:flex; gap:8px; margin:8px 0 4px; }
+  .modes button { flex:1; padding:12px; border:1px solid var(--line); background:#fff; border-radius:8px; font-weight:700; }
+  .modes button[aria-pressed="true"] { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .submit { margin-top:18px; width:100%; padding:14px; font-size:16px; font-weight:700; color:#fff; background:var(--accent); border:0; border-radius:10px; }
+  .msg { margin-top:14px; padding:12px; border-radius:8px; font-size:14px; }
+  .ok { background:#e7f2e2; color:#2f5d2a; } .err { background:#f6e2e2; color:#8a2a2a; }
+  .hidden { display:none; }
+  .slots button { margin:4px 4px 0 0; padding:8px 10px; border:1px solid var(--line); background:#fff; border-radius:6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tuned Yota — Staff Intake</h1>
+
+  <div id="gate">
+    <label for="pass">Passcode</label>
+    <input id="pass" type="password" autocomplete="off" placeholder="Enter staff passcode">
+    <button class="submit" id="unlock">Unlock</button>
+  </div>
+
+  <form id="form" class="hidden">
+    <div class="modes">
+      <button type="button" id="mBook" aria-pressed="true">Book into event</button>
+      <button type="button" id="mLead" aria-pressed="false">Add as lead</button>
+    </div>
+
+    <label for="channel">Source channel</label>
+    <select id="channel">
+      <option>Walk-in</option><option>Text</option><option>Phone</option><option>Email</option>
+      <option>Facebook</option><option>Instagram</option><option>Other</option>
+    </select>
+
+    <label for="city">City</label>
+    <select id="city"></select>
+
+    <div id="bookFields">
+      <label for="slot">Slot</label>
+      <select id="slot">
+        <option value="">— pick a time —</option>
+        <option>9:00</option><option>9:20</option><option>9:40</option><option>10:00</option>
+        <option>10:20</option><option>10:40</option><option>11:00</option><option>11:20</option>
+        <option>11:40</option><option>12:00</option><option>12:20</option><option>12:40</option>
+      </select>
+    </div>
+
+    <div class="row"><div><label for="name">Name</label><input id="name"></div></div>
+    <div class="row">
+      <div><label for="phone">Phone</label><input id="phone" inputmode="tel"></div>
+      <div><label for="email">Email</label><input id="email" inputmode="email"></div>
+    </div>
+    <label for="vehicle">Vehicle</label><input id="vehicle" placeholder="e.g. 2022 Tundra">
+    <label for="mods">Modifications</label><input id="mods" placeholder="lift, tires, exhaust…">
+    <label for="goals">Goals / notes</label><textarea id="goals"></textarea>
+
+    <button class="submit" id="go" type="submit">Save intake</button>
+    <div id="msg"></div>
+  </form>
+</main>
+<script>
+  // Cities mirror the tune-finder markets. Keep in sync with markets.js if cities change.
+  var CITIES = ["Duluth","Twin Cities","Mankato","Rochester","Eau Claire","Green Bay","Madison","Milwaukee","Des Moines","Cedar Rapids","Davenport","Sioux City","Fargo","Rapid City","Sioux Falls","Omaha","Lincoln"];
+  var citySel = document.getElementById('city');
+  CITIES.forEach(function(c){ var o=document.createElement('option'); o.textContent=c; citySel.appendChild(o); });
+
+  var mode = 'book';
+  function setMode(m){ mode=m;
+    document.getElementById('mBook').setAttribute('aria-pressed', m==='book');
+    document.getElementById('mLead').setAttribute('aria-pressed', m==='lead');
+    document.getElementById('bookFields').classList.toggle('hidden', m!=='book');
+  }
+  document.getElementById('mBook').onclick=function(){setMode('book');};
+  document.getElementById('mLead').onclick=function(){setMode('lead');};
+
+  function secret(){ return localStorage.getItem('ty_intake_secret') || ''; }
+  document.getElementById('unlock').onclick=function(){
+    var v=document.getElementById('pass').value.trim();
+    if(!v) return;
+    localStorage.setItem('ty_intake_secret', v);
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('form').classList.remove('hidden');
+  };
+  if(secret()){ document.getElementById('gate').classList.add('hidden'); document.getElementById('form').classList.remove('hidden'); }
+
+  function val(id){ return (document.getElementById(id).value||'').trim(); }
+  function show(cls, text){ var m=document.getElementById('msg'); m.className='msg '+cls; m.textContent=text; }
+
+  document.getElementById('form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(!val('name') || (!val('phone') && !val('email'))){ show('err','Name and a phone or email are required.'); return; }
+    var payload={ mode:mode, channel:val('channel').toLowerCase(), city:val('city'),
+      name:val('name'), phone:val('phone'), email:val('email'), vehicle:val('vehicle'),
+      mods:val('mods'), goals:val('goals'), slot: mode==='book'? val('slot') : '' };
+    show('', 'Saving…');
+    try {
+      var res = await fetch('/.netlify/functions/intake', { method:'POST',
+        headers:{'Content-Type':'application/json','x-intake-secret':secret()}, body: JSON.stringify(payload) });
+      if(res.status===401){ show('err','Passcode rejected. Re-enter it.'); localStorage.removeItem('ty_intake_secret'); location.reload(); return; }
+      var out = await res.json();
+      if(out.status==='booked'){ show('ok','Booked '+out.slot+' at '+out.city+' → '+out.installer+'.'); resetSoft(); }
+      else if(out.status==='lead'){ show('ok','Lead saved for '+val('city')+' → '+out.installer+'.'); resetSoft(); }
+      else if(out.status==='conflict'){ show('err','That slot is taken. Open: '+(out.openSlots||[]).join(', ')); }
+      else { show('err','Could not save: '+(out.error||'unknown')); }
+    } catch(err){ show('err','Network error — try again.'); }
+  });
+  function resetSoft(){ ['name','phone','email','vehicle','mods','goals'].forEach(function(id){ document.getElementById(id).value=''; }); document.getElementById('slot').value=''; }
+</script>
+</body>
+</html>

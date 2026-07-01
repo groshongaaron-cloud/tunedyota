@@ -95,3 +95,14 @@ test("event reminder uses the customer's booked slot time, not a hardcoded 9 AM"
   assert.ok(m.html.includes("10:20 AM"));
   assert.ok(!m.html.includes("9:00 AM"));
 });
+test("day-of (daysUntil 0) customer email says today and names the slot", () => {
+  const tpl = require("../netlify/functions/lib/templates.js");
+  const booking = { Name: "Jane Doe", Slot: "9:40" };
+  const event = { city: "Green Bay", state: "WI", label: "Sep 12, 2026", dateISO: "2026-09-12", address: "123 Main St" };
+  const inst = { name: "Noah Kreis", phone: "(920) 860-7050" };
+  const m = tpl.buildEventReminderCustomerEmail(booking, event, inst, 0);
+  assert.match(m.subject, /today/i);
+  assert.match(m.text, /today/i);
+  assert.match(m.text, /9:40/);
+  assert.match(m.text, /123 Main St/);
+});
