@@ -63,6 +63,9 @@ ul.lp-bul li::before{content:"";position:absolute;left:0;top:5px;width:11px;heig
 .lp-links{margin-top:30px;font-size:14px;line-height:2}.lp-links a{color:var(--brown);font-weight:700;text-decoration:none;margin-right:16px}.lp-links a:hover{text-decoration:underline}
 .lp-final{text-align:center;margin-top:30px}
 .lp-disc{font-size:11.5px;opacity:.55;text-align:center;margin-top:22px;line-height:1.55}
+.lp-veh{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.lp-veh a{font-size:13.5px;font-weight:700;color:var(--brown);background:var(--white);border:1.5px solid var(--line);border-radius:99px;padding:8px 14px;text-decoration:none;box-shadow:var(--shadow-sm);transition:.15s}
+.lp-veh a:hover{background:var(--ink);color:#F3EFEA;border-color:var(--ink)}
 </style>`;
 
 // Shared nav/footer/skip-link chrome + design tokens live in site/site.css (the
@@ -107,6 +110,12 @@ const FOOTER = `<footer class="sfoot"><div class="fmark">Tuned Yota</div><div cl
 // a11y: keep each FAQ button's aria-expanded in sync with its open state (June 2026 a11y pass).
 const FQA11Y = `<script>document.querySelectorAll('.lp-fq').forEach(function(it,i){var q=it.querySelector('.lp-fqq'),a=it.querySelector('.lp-fqa');if(!q||!a)return;a.id='lpfqa-'+i;q.setAttribute('aria-controls','lpfqa-'+i);q.addEventListener('click',function(){q.setAttribute('aria-expanded',it.classList.contains('open')?'true':'false');});});</script>`;
 
+// Supported-vehicles internal-link hub — identical on every state page, links
+// each local page into the 13 model pages (relevance + link equity).
+const VEHHUB = `  <h2>Popular Toyota &amp; Lexus tunes</h2>
+  <p style="font-size:14.5px;line-height:1.6">Pick your platform to see model-specific results, supported engines, and pricing:</p>
+  <div class="lp-veh"><a href="toyota-tundra-ott-tune.html">Tundra</a><a href="toyota-tacoma-ott-tune.html">Tacoma</a><a href="toyota-4runner-ott-tune.html">4Runner</a><a href="toyota-sequoia-ott-tune.html">Sequoia</a><a href="toyota-land-cruiser-ott-tune.html">Land Cruiser</a><a href="toyota-fj-cruiser-ott-tune.html">FJ Cruiser</a><a href="toyota-camry-ott-tune.html">Camry</a><a href="toyota-highlander-ott-tune.html">Highlander</a><a href="toyota-rav4-ott-tune.html">RAV4</a><a href="lexus-gx-ott-tune.html">Lexus GX</a><a href="lexus-lx570-ott-tune.html">Lexus LX570</a><a href="lexus-rx350-ott-tune.html">Lexus RX350</a><a href="lexus-ls460-ott-tune.html">Lexus LS460</a></div>`;
+
 function citySentence(cities) {
   if (cities.length === 1) return cities[0];
   return cities.slice(0, -1).join(", ") + ", and " + cities[cities.length - 1];
@@ -125,8 +134,12 @@ function page({ name, slug, cities, instKeys }) {
   const faqs = [
     [`Where can I get my Toyota or Lexus tuned in ${name}?`, `Tuned Yota runs in-person tuning events across ${name}, including ${cityTxt}. Pick your city and the next date in Find Your Exact Tune.`],
     [`Which ${name} cities do you serve?`, `${cityTxt}.`],
-    [`How much does an OTT Tune cost in ${name}?`, `From $400 depending on platform; see the cost page or Find Your Exact Tune for your exact price.`],
-    [`Is the tune emissions-legal?`, `Yes. Factory emissions systems stay fully intact and every calibration is verified with a 5-gas analyzer, EPA-compliant in every state.`],
+    [`Do you have a shop in ${name}, or is it mobile?`, `We tune in person at scheduled events across ${name}, not a fixed storefront. You book the city and date that works for you, and your regional installer calibrates your vehicle on site.`],
+    [`Which Toyota and Lexus vehicles do you tune in ${name}?`, `Supported platforms include the Toyota Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, and FJ Cruiser, plus the Camry, Highlander, and RAV4, and the Lexus GX, LX570, RX350, and LS460. Confirm your exact year and engine in Find Your Exact Tune.`],
+    [`How much does an OTT Tune cost in ${name}?`, `OTT calibrations start from $400 depending on your platform, with custom and supercharger paths priced higher. See the OTT tune cost page or Find Your Exact Tune for your exact price.`],
+    [`How long does the tuning take?`, `Most OTT calibrations are completed during your appointment at the event. Custom and supercharger builds are dialed in over multiple log reviews for the best result on your specific setup.`],
+    [`Do you install superchargers in ${name}?`, `Yes. Tuned Yota is an authorized Magnuson Supercharger dealer, installer, and calibrator, and also supports Harrop and ProCharger systems; kits can drop-ship anywhere in the lower 48.`],
+    [`Is the tune emissions-legal?`, `Yes. Factory emissions systems stay fully intact and every calibration is verified with a 5-gas analyzer, EPA-compliant in every state. We never disable check-engine lights and do not tune off-road-only vehicles.`],
   ];
 
   const areaServed = [`{"@type":"State","name":"${name}"}`, ...cities.map((c) => `{"@type":"City","name":"${c}"}`)].join(",");
@@ -180,8 +193,19 @@ ${NAV}
     <li>Custom calibration and factory-turbo performance tuning where supported</li>
   </ul>
 
+${VEHHUB}
+
   <h2>Your ${name} installer</h2>
   <p style="font-size:14.5px;line-height:1.6">${instLine}</p>
+
+  <h2>Why ${name} owners choose Tuned Yota</h2>
+  <ul class="lp-bul">
+    <li>In-person calibration at events near you — never a blind, mailed-in flash.</li>
+    <li>Every tune built by a licensed VFTuner PRO Tuner who knows your platform.</li>
+    <li>Factory emissions stay fully intact, 5-gas verified and EPA-compliant in every state.</li>
+    <li>Authorized OTT installer and authorized Magnuson Supercharger dealer.</li>
+    <li>A dedicated regional installer for ${name}: ${instLabel}.</li>
+  </ul>
 
   <div class="lp-book">
     <h2>Get your ${name} price</h2>
@@ -194,7 +218,7 @@ ${faqVisible}
 
   <div class="lp-links">
     <strong>Explore:</strong><br>
-    <a href="ott-tune.html">What is the OTT Tune?</a><a href="ott-tune-cost.html">OTT Tune cost</a><a href="is-the-ott-tune-worth-it.html">Is it worth it?</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a>
+    <a href="ott-tune.html">What is the OTT Tune?</a><a href="ott-tune-cost.html">OTT Tune cost</a><a href="is-the-ott-tune-worth-it.html">Is it worth it?</a><a href="tune-warranty-emissions-legality.html">Warranty &amp; emissions</a><a href="supercharger.html">Superchargers</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a>
   </div>
   <div class="lp-final"><a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a></div>
   <p class="lp-disc">In-person tuning at scheduled events; dates and availability vary — confirm in Find Your Exact Tune. Supported years, engines, and features vary by platform. All vehicles must retain fully intact, federally compliant emissions systems.</p>
