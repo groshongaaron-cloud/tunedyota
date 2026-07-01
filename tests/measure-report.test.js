@@ -7,6 +7,7 @@ test.before(async () => { M = await import("../scripts/measure/lib/report.mjs");
 const SNAP = {
   date: "2026-06-30",
   summary: { aiPresenceRate: 0.55, perplexityCiteRate: 0.3, ctrOpportunities: ["ott tune cost", "is an ott tune worth it"] },
+  ai: { webSearch: [{ query: "a", present: true }], perplexity: [{ query: "a", citedUs: true }] },
   meta: { errors: [] },
 };
 
@@ -16,6 +17,18 @@ test("renderReport on a baseline run says baseline and shows rates", () => {
   assert.match(md, /55%/);
   assert.match(md, /30%/);
   assert.match(md, /ott tune cost/);
+});
+
+test("renderReport omits the WebSearch stat when that probe did not run (local GSC+Perplexity)", () => {
+  const local = {
+    date: "2026-07-01",
+    summary: { aiPresenceRate: 0, perplexityCiteRate: 0.3, ctrOpportunities: [] },
+    ai: { webSearch: [], perplexity: [{ query: "a", citedUs: true }] },
+    meta: { errors: [] },
+  };
+  const md = M.renderReport(local, { baseline: true, movers: [], ai: {} });
+  assert.doesNotMatch(md, /AI presence/);   // WebSearch probe skipped → not shown
+  assert.match(md, /Perplexity cites 30%/); // Perplexity still reported
 });
 
 test("renderReport on a trend run shows deltas and top movers", () => {

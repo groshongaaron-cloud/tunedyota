@@ -7,13 +7,23 @@ const ptsDelta = (n) => {
 
 export function renderReport(snapshot, diff) {
   const s = snapshot.summary;
+  // Only report a probe's stat if that probe actually ran — a local run that skips
+  // the WebSearch probe should not show a misleading "AI presence 0%".
+  const hasWeb = ((snapshot.ai?.webSearch) || []).length > 0;
+  const hasPplx = ((snapshot.ai?.perplexity) || []).length > 0;
   const lines = [];
   lines.push(`*Search + AI visibility — ${snapshot.date}*`);
 
   if (diff.baseline) {
-    lines.push(`Baseline established. AI presence ${pct(s.aiPresenceRate)}, Perplexity cites ${pct(s.perplexityCiteRate)}.`);
+    const parts = [];
+    if (hasWeb) parts.push(`AI presence ${pct(s.aiPresenceRate)}`);
+    if (hasPplx) parts.push(`Perplexity cites ${pct(s.perplexityCiteRate)}`);
+    lines.push(`Baseline established.${parts.length ? ` ${parts.join(", ")}.` : ""}`);
   } else {
-    lines.push(`AI presence ${pct(s.aiPresenceRate)} (${ptsDelta(diff.ai.aiPresenceDelta)}), Perplexity cites ${pct(s.perplexityCiteRate)} (${ptsDelta(diff.ai.perplexityCiteDelta)}).`);
+    const parts = [];
+    if (hasWeb) parts.push(`AI presence ${pct(s.aiPresenceRate)} (${ptsDelta(diff.ai?.aiPresenceDelta)})`);
+    if (hasPplx) parts.push(`Perplexity cites ${pct(s.perplexityCiteRate)} (${ptsDelta(diff.ai?.perplexityCiteDelta)})`);
+    if (parts.length) lines.push(`${parts.join(", ")}.`);
     const top = (diff.movers || []).slice(0, 5)
       // positionDelta = prev.position - curr.position, so a positive value (+) means rank IMPROVED
       .map((m) => `• ${m.query}: position ${m.positionDelta >= 0 ? "+" : ""}${m.positionDelta}`)
