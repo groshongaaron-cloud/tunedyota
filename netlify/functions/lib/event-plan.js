@@ -5,7 +5,7 @@ const { daysBetweenISO } = require("./central-time.js");
 
 const SWEEP_REASON = "Rebook — not completed";
 const INSTALLER_OFFSETS = [30, 15, 10, 2, 0];
-const CUSTOMER_OFFSETS = [10, 2];
+const CUSTOMER_OFFSETS = [10, 2, 0];
 const norm = (s) => String(s == null ? "" : s).trim().toLowerCase();
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10); // tolerate a DateTime "Event Date"
 
