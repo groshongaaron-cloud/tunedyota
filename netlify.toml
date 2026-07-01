@@ -21,3 +21,9 @@
 # Daily Certificate of Authenticity dispatch (netlify/functions/certificate-dispatch.js).
 [functions."certificate-dispatch"]
   schedule = "0 14 * * *"
+
+# "Get OTT Now!" share link -> the decision funnel, tagged to the share campaign.
+[[redirects]]
+  from = "/get-ott-now"
+  to = "/find-your-exact-tune?utm_source=share&utm_medium=social&utm_campaign=get-ott-now"
+  status = 302
