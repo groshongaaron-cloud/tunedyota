@@ -132,12 +132,14 @@ function buildPriorityInstallerEmail(d, inst, market, reason) {
 }
 function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
   const first = (booking.Name || "there").split(" ")[0];
+  const phrase = daysUntil === 0 ? "today" : daysUntil === 2 ? "in 2 days" : "coming up";
+  const subjWhen = daysUntil === 0 ? "is today" : daysUntil === 2 ? "in 2 days" : "coming up";
   const when = `${event.label || event.dateISO} at ${booking.Slot ? formatSlot(booking.Slot) : "9:00 AM"}`;
   const where = `${event.city}, ${event.state || ""}`.trim().replace(/,\s*$/, "");
-  const subject = `Tuned Yota — ${event.city} event ${daysUntil === 2 ? "in 2 days" : "coming up"}`;
+  const subject = `Tuned Yota — your ${event.city} tune ${subjWhen}`;
   const addr = event.address ? `\nAddress: ${event.address}` : "";
   const text =
-    `Hi ${first},\n\nYour Tuned Yota tuning event is ${daysUntil === 2 ? "in 2 days" : "coming up"}.\n\n` +
+    `Hi ${first},\n\nYour Tuned Yota tuning event is ${phrase}.\n\n` +
     `When: ${when}\nWhere: ${where}${addr}\n\n` +
     `Please save the address above so you know exactly where to go. ` +
     `Questions? Call or text ${inst.name} at ${inst.phone}.\n\n— Tuned Yota · Undeniable Performance\n`;
@@ -147,7 +149,7 @@ function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
   const html =
     `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px">` +
     `<h2 style="color:#5B4B42">See you soon, ${esc(first)}.</h2>` +
-    `<p>Your tuning event is <strong>${daysUntil === 2 ? "in 2 days" : "coming up"}</strong>. Here are the details:</p>` +
+    `<p>Your tuning event is <strong>${phrase}</strong>. Here are the details:</p>` +
     `<table style="border-collapse:collapse;font-size:14px">` +
     `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">When</td><td style="padding:4px 0;color:#3A2E26">${esc(when)}</td></tr>` +
     `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Where</td><td style="padding:4px 0;color:#3A2E26">${esc(where)}</td></tr>` +
