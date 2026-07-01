@@ -24,7 +24,10 @@ async function processCloseout(body, deps) {
   try { rec = await get({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId }); }
   catch (e) { if (log.error) log.error("closeout get", e.message); return { status: "error", error: "store-unavailable" }; }
   const f = (rec && rec.fields) || {};
-  if (f.Installer !== key) return { status: "error", error: "not-yours" };
+  // Airtable returns Installer as a single-select string OR a multi-select array
+  // (the live base uses multi-select → ["aaron"]). Normalize before the ownership check.
+  const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+  if (owner !== key) return { status: "error", error: "not-yours" };
 
   if (d.action === "noshow") {
     try { await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: { Status: "No-show" } }); }
@@ -45,7 +48,7 @@ async function processCloseout(body, deps) {
 
   let certSent = false;
   try {
-    const inst = keyToInstaller(f.Installer);
+    const inst = keyToInstaller(owner);
     const certNo = certSerial(d.recordId, issueDate, issueDate);
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, calibration, installer: inst.name,

@@ -55,6 +55,18 @@ test("a cert-send failure still leaves the booking Completed, certSent false", a
   assert.ok(!updates.some((u) => u["Certificate Sent"]));   // never marked sent
 });
 
+test("accepts a multi-select Installer array (Airtable multi-select returns [\"cody\"])", async () => {
+  const updates = []; let sent = null;
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light" },
+    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+      get: async () => ({ id: "rec1", fields: { Installer: ["cody"], Name: "Jane", Vehicle: "Tundra" } }),
+      update: async (a) => { updates.push(a.fields); return {}; },
+      send: async (m) => { sent = m; return { ok: true }; } });
+  assert.equal(out.status, "completed");           // NOT "not-yours"
+  assert.equal(updates[0].Status, "Completed");
+  assert.equal(sent.to, "cody@tunedyota.com");     // installer resolved from the array
+});
+
 test("re-completing an already-certified booking is idempotent (no duplicate cert)", async () => {
   let sends = 0;
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light" },
