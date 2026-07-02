@@ -1,13 +1,12 @@
-// Monthly OTT completed-calibrations report — DRAFT stage (rule #1: owner approves
-// before anything goes to OTT). Scheduled on the 1st; reports the month that just
-// closed. It emails the OWNER a draft + CSV with a private "approve & send" link;
-// it never emails OTT. The link triggers ott-report-send.js. Pricing (rule #4) and
-// the annual rollup (rule #3) are added once the pricing sheet is loaded.
+// Monthly OTT commission submission — DRAFT stage (rule #1: owner approves before
+// anything goes to OTT). Scheduled on the 1st for the month just closed. Emails the
+// OWNER a filled .xlsx (OTT's 14-column format) + a private approve link; never
+// emails OTT. The link triggers ott-report-send.js.
 const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { flattenRecords } = require("./lib/report-sources.js");
-const { priorMonth, buildOttRows, renderOttCsv, renderOwnerDraftHtml } = require("./lib/ott-report.js");
+const { priorMonth, buildSubmissionRows, renderOttXlsx, renderOwnerDraftHtml, totalCommission, unresolved } = require("./lib/ott-report.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -25,34 +24,33 @@ async function runOttReport(deps) {
   const month = priorMonth(now);
 
   const bRecs = await listAll({ token: c.token, baseId: c.baseId, table: c.bookings });
-  const rows = buildOttRows(flattenRecords(bRecs), month);
+  const subRows = buildSubmissionRows(flattenRecords(bRecs), month, { retailer: env.OTT_RETAILER, sendDate: "" });
 
-  if (!rows.length) {
-    try { await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL, text: `Tuned Yota — OTT report (${month.label}): 0 completed calibrations — nothing to approve.`, log }); }
+  if (!subRows.length) {
+    try { await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL, text: `Tuned Yota — OTT commission draft (${month.label}): 0 completed calibrations — nothing to approve.`, log }); }
     catch (e) { if (log.error) log.error("ott slack", e.message); }
     return { ok: true, count: 0, drafted: false };
   }
 
-  const csv = renderOttCsv(rows);
-  const missingVin = rows.filter((r) => !r.vin).length;
+  const xlsx = renderOttXlsx(subRows);
+  const u = unresolved(subRows).length, total = totalCommission(subRows);
 
-  // Draft goes to the OWNER only — never to OTT at this stage.
   let draftFailed = false;
   try {
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: OWNER, replyTo: OWNER,
-      subject: `DRAFT — OTT Calibrations (${month.label}) — review & approve`,
-      html: renderOwnerDraftHtml(rows, month, approveUrl(env, month.key)),
-      text: `${rows.length} completed OTT calibration(s) for ${month.label} are ready to report. Review the attached CSV, then use the approve link in the HTML email to send to OTT. Nothing has been sent yet.`,
-      attachments: [{ filename: `ott-calibrations-${month.key}.csv`, content: Buffer.from(csv).toString("base64") }] });
+      subject: `DRAFT — OTT Commissions (${month.label}) — review & approve`,
+      html: renderOwnerDraftHtml(subRows, month, approveUrl(env, month.key)),
+      text: `${subRows.length} completed calibration(s) for ${month.label}, commission total $${total}${u ? `, ${u} needing confirmation` : ""}. Review the attached .xlsx, then use the approve link to send to OTT. Nothing has been sent yet.`,
+      attachments: [{ filename: `ott-commissions-${month.key}.xlsx`, content: Buffer.from(xlsx).toString("base64") }] });
   } catch (e) { draftFailed = true; if (log.error) log.error("ott draft email", e.message); }
 
-  let slack = `*Tuned Yota — OTT report DRAFTED* (${month.label}): ${rows.length} completed calibration${rows.length === 1 ? "" : "s"} awaiting your approval`;
-  if (missingVin) slack += ` · ${missingVin} missing VIN`;
+  let slack = `*Tuned Yota — OTT commission DRAFTED* (${month.label}): ${subRows.length} calibration${subRows.length === 1 ? "" : "s"} · $${total} · awaiting your approval`;
+  if (u) slack += ` · ${u} need commission confirmed`;
   if (draftFailed) slack += ` — DRAFT EMAIL FAILED, check logs`;
   try { await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL, text: slack, log }); }
   catch (e) { if (log.error) log.error("ott slack", e.message); }
 
-  return { ok: true, count: rows.length, drafted: !draftFailed, missingVin };
+  return { ok: true, count: subRows.length, drafted: !draftFailed, unresolved: u, total };
 }
 
 async function handler() { const r = await runOttReport({}); return { statusCode: 200, body: JSON.stringify(r) }; }

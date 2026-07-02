@@ -1,82 +1,21 @@
-// Pure builder for the monthly OTT completed-calibrations report. No I/O.
-// Source: Airtable Bookings rows that were Completed with an OTT Calibration
-// recorded (see installer close-out). Feeds functions/ott-report.js.
-const { keyToInstaller } = require("./routing.js");
-const { certSerial } = require("./certificate.js");
+// Pure builders for the monthly OTT commission submission (Track A). Turns
+// completed-calibration bookings into OTT's mandatory 14-column submission,
+// renders it as a filled .xlsx, and renders the owner-draft + OTT cover emails.
+// No I/O. Commission is resolved by lib/ott-commission.js; the owner confirms
+// every amount on the draft (rule #1), so an unresolved amount is left blank +
+// flagged rather than guessed. Format: docs/ott/README.md.
+const { deriveVehicle, lookupCommission } = require("./ott-commission.js");
+const { buildXlsx } = require("./xlsx-writer.js");
 
 const MONTHS = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
 
-// The month to report = the month BEFORE `now`. The function runs on the 1st and
-// covers the month that just closed.
+// The month to report = the month before `now` (the draft fires on the 1st).
 function priorMonth(now = new Date()) {
-  const y = now.getUTCFullYear(), m = now.getUTCMonth(); // m is 0-based
-  const py = m === 0 ? y - 1 : y;
-  const pm = m === 0 ? 11 : m - 1;                        // 0-based prior month
+  const y = now.getUTCFullYear(), m = now.getUTCMonth();
+  const py = m === 0 ? y - 1 : y, pm = m === 0 ? 11 : m - 1;
   return { key: `${py}-${String(pm + 1).padStart(2, "0")}`, label: `${MONTHS[pm]} ${py}`, year: py, month: pm + 1 };
 }
-
-const normInstaller = (v) => (Array.isArray(v) ? v[0] : v); // Airtable may return a multi-select array
-const monthOf = (iso) => String(iso == null ? "" : iso).slice(0, 7); // "YYYY-MM"
-
-// Completed OTT calibrations whose Calibration Date falls in the target month.
-// `bookings` are flattened records (fields spread + id).
-function buildOttRows(bookings, month) {
-  const rows = [];
-  for (const b of bookings || []) {
-    if (String(b.Status || "").trim().toLowerCase() !== "completed") continue;
-    const calibration = String(b["OTT Calibration"] || "").trim();
-    if (!calibration) continue;                            // certs are held until calibration is set
-    const calDate = b["Calibration Date"] || "";
-    if (monthOf(calDate) !== month.key) continue;
-    const inst = keyToInstaller(normInstaller(b.Installer));
-    rows.push({
-      serial: certSerial(b.id, calDate, calDate),
-      calibrationDate: calDate,
-      name: b.Name || "",
-      vehicle: b.Vehicle || "",
-      vin: String(b.VIN || "").toUpperCase(),
-      calibration,
-      installer: inst.name,
-      region: inst.region,
-      city: b.City || "",
-    });
-  }
-  rows.sort((a, b) => String(a.calibrationDate).localeCompare(String(b.calibrationDate)) || a.serial.localeCompare(b.serial));
-  return rows;
-}
-
-function csvCell(v) { const s = String(v == null ? "" : v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }
-function renderOttCsv(rows) {
-  const head = ["Certificate Serial", "Calibration Date", "Customer", "Vehicle", "VIN", "OTT Calibration", "Installer", "Region"];
-  const lines = [head.join(",")];
-  for (const r of rows) {
-    lines.push([r.serial, r.calibrationDate, r.name, r.vehicle, r.vin, r.calibration, r.installer, r.region].map(csvCell).join(","));
-  }
-  return lines.join("\n") + "\n";
-}
-
-function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-function ottTable(rows) {
-  let html = `<table style="border-collapse:collapse;font-size:13px"><tr>${["Serial", "Date", "Customer", "Vehicle", "VIN", "Calibration", "Installer"].map((h) => `<th style="text-align:left;border-bottom:2px solid #3A2E26;padding:4px 12px 4px 0">${esc(h)}</th>`).join("")}</tr>`;
-  for (const r of rows) {
-    html += `<tr>${[r.serial, r.calibrationDate, r.name, r.vehicle, r.vin || "—", r.calibration, r.installer].map((c) => `<td style="padding:3px 12px 3px 0;border-bottom:1px solid #eee">${esc(c)}</td>`).join("")}</tr>`;
-  }
-  return html + `</table>`;
-}
-function renderOttEmailHtml(rows, month) {
-  const missingVin = rows.filter((r) => !r.vin).length;
-  let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:720px">`;
-  html += `<h1 style="color:#3A2E26">Tuned Yota — Completed OTT Calibrations</h1>`;
-  html += `<p style="color:#7c8472">${esc(month.label)} · ${rows.length} completed calibration${rows.length === 1 ? "" : "s"}</p>`;
-  html += `<p>Tuned Yota, an authorized Overland Tailor Tune installer, reports the following calibrations completed in ${esc(month.label)}. Full detail is attached as a CSV.</p>`;
-  html += ottTable(rows);
-  if (missingVin) html += `<p style="color:#8a2a2a">Note: ${missingVin} record(s) are missing a VIN.</p>`;
-  html += `</div>`;
-  return html;
-}
-
-// Rebuild a month descriptor from a "YYYY-MM" key (used by the approve endpoint).
 function monthFromKey(key) {
   const m = /^(\d{4})-(\d{2})$/.exec(String(key == null ? "" : key));
   if (!m) return null;
@@ -85,8 +24,6 @@ function monthFromKey(key) {
   return { key: `${m[1]}-${m[2]}`, label: `${MONTHS[mo - 1]} ${y}`, year: y, month: mo };
 }
 
-// OTT report recipients. Overridable via OTT_REPORT_TO (comma-separated); defaults
-// to the two OTT contacts. The owner (info@) is always CC'd, set by the caller.
 const DEFAULT_OTT_RECIPIENTS = ["info@overlandtailor.com", "hgobbels@me.com"];
 function recipients(env = {}) {
   return env.OTT_REPORT_TO
@@ -94,20 +31,98 @@ function recipients(env = {}) {
     : DEFAULT_OTT_RECIPIENTS.slice();
 }
 
-// Owner-facing DRAFT (rule #1: the owner reviews and approves before anything is
-// sent to OTT). Contains the calibration table + a private approve-and-send link.
-function renderOwnerDraftHtml(rows, month, approveUrl) {
-  const missingVin = rows.filter((r) => !r.vin).length;
-  let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:720px">`;
-  html += `<h1 style="color:#3A2E26">OTT Calibration Report — DRAFT for your approval</h1>`;
-  html += `<p style="color:#7c8472">${esc(month.label)} · ${rows.length} completed calibration${rows.length === 1 ? "" : "s"}${missingVin ? ` · ${missingVin} missing VIN` : ""}</p>`;
-  html += `<p><strong>Nothing has been sent to OTT yet.</strong> Review the ${rows.length} calibration(s) below and the attached CSV, then approve.</p>`;
+const monthOf = (iso) => String(iso == null ? "" : iso).slice(0, 7);
+
+// OTT's mandatory submission columns, in exact order (Master OTT Tracker).
+const SUBMISSION_HEADERS = [
+  "Date of Submission", "Date Calibration Applied", "OTT Retailer", "Customer First Last Name",
+  "VIN", "Vehicle Year", "Vehicle Type", "Engine Size", "ECU ID", "Gear Size", "Mileage",
+  "Tuning Platform", "Calibration Type", "Commission",
+];
+
+// One submission row per completed calibration in the target month. Vehicle
+// Type/Year/Engine are derived from the booking's vehicle text; the rest come
+// from the installer's close-out; Commission is auto-resolved (null if unsure).
+function buildSubmissionRows(bookings, month, opts = {}) {
+  const retailer = opts.retailer || "Tuned Yota";
+  const sendDate = opts.sendDate || "";
+  const out = [];
+  for (const b of bookings || []) {
+    if (String(b.Status || "").trim().toLowerCase() !== "completed") continue;
+    const tier = String(b["OTT Calibration"] || "").trim();
+    if (!tier) continue;
+    const calDate = b["Calibration Date"] || "";
+    if (monthOf(calDate) !== month.key) continue;
+    const dv = deriveVehicle(b.Vehicle);
+    const tuningPlatform = String(b["Tuning Platform"] || "").trim().toUpperCase();
+    const calibrationType = String(b["Calibration Type"] || "").trim();
+    const look = lookupCommission({ vehicleType: dv.vehicleType, year: dv.year, engine: dv.engine, tuningPlatform, calibrationType });
+    out.push({
+      dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailer,
+      customer: b.Name || "", vin: String(b.VIN || "").toUpperCase(),
+      vehicleYear: dv.year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
+      ecuId: String(b["ECU ID"] || "").toUpperCase(), gearSize: b["Gear Size"] || "",
+      mileage: (b.Mileage === 0 || b.Mileage) ? Number(b.Mileage) : "",
+      tuningPlatform, calibrationType, commission: look.commission,
+      _confidence: look.confidence, _candidates: look.candidates, _tier: tier,
+    });
+  }
+  out.sort((a, b) => String(a.dateCalibrationApplied).localeCompare(String(b.dateCalibrationApplied)) || String(a.customer).localeCompare(String(b.customer)));
+  return out;
+}
+
+function rowToArray(r) {
+  return [r.dateOfSubmission, r.dateCalibrationApplied, r.ottRetailer, r.customer, r.vin,
+    r.vehicleYear, r.vehicleType, r.engineSize, r.ecuId, r.gearSize, r.mileage,
+    r.tuningPlatform, r.calibrationType, (r.commission == null ? "" : r.commission)];
+}
+// Filled .xlsx in OTT's exact 14-column order. Returns a Buffer.
+function renderOttXlsx(subRows) {
+  return buildXlsx("OTT Commissions", [SUBMISSION_HEADERS, ...subRows.map(rowToArray)]);
+}
+
+function totalCommission(subRows) { return subRows.reduce((s, r) => s + (typeof r.commission === "number" ? r.commission : 0), 0); }
+function unresolved(subRows) { return subRows.filter((r) => r.commission == null); }
+
+function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function subTable(subRows) {
+  const head = ["Date", "Customer", "VIN", "Vehicle", "Platform", "Cal Type", "Commission"];
+  let h = `<table style="border-collapse:collapse;font-size:13px"><tr>${head.map((x) => `<th style="text-align:left;border-bottom:2px solid #3A2E26;padding:4px 12px 4px 0">${esc(x)}</th>`).join("")}</tr>`;
+  for (const r of subRows) {
+    const veh = [r.vehicleYear, r.vehicleType, r.engineSize].filter(Boolean).join(" ") || "—";
+    const com = r.commission == null ? `<span style="color:#8a2a2a">— confirm</span>` : `$${r.commission}`;
+    h += `<tr>${[r.dateCalibrationApplied, r.customer, r.vin || "—", veh, r.tuningPlatform || "—", r.calibrationType || "—", com].map((c) => `<td style="padding:3px 12px 3px 0;border-bottom:1px solid #eee">${esc(c)}</td>`).join("")}</tr>`;
+  }
+  return h + "</table>";
+}
+
+function renderOwnerDraftHtml(subRows, month, approveUrl) {
+  const u = unresolved(subRows), total = totalCommission(subRows);
+  let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:820px">`;
+  html += `<h1 style="color:#3A2E26">OTT Commission Submission — DRAFT for your approval</h1>`;
+  html += `<p style="color:#7c8472">${esc(month.label)} · ${subRows.length} calibration${subRows.length === 1 ? "" : "s"} · commission total <strong>$${total}</strong></p>`;
+  html += `<p><strong>Nothing has been sent to OTT yet.</strong> Review the attached workbook (OTT's exact 14-column format), then approve.</p>`;
+  if (u.length) html += `<p style="color:#8a2a2a"><strong>${u.length} row(s) need a commission confirmed</strong> — the amount was ambiguous or the platform was bench (BB). Fill those cells in the attached .xlsx before submitting, or fix the close-out data.</p>`;
   html += `<p style="margin:18px 0"><a href="${esc(approveUrl)}" style="background:#5B4B42;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">Approve &amp; send to OTT</a></p>`;
-  html += `<p style="color:#7c8472;font-size:13px">This approval link is private to you — do not forward it.</p>`;
-  html += ottTable(rows);
-  if (missingVin) html += `<p style="color:#8a2a2a">Note: ${missingVin} record(s) are missing a VIN — fix before approving if OTT requires them.</p>`;
+  html += `<p style="color:#7c8472;font-size:13px">This approval link is private to you — do not forward it. Vehicle Type/Year/Engine are auto-derived; verify them in the sheet.</p>`;
+  html += subTable(subRows);
   html += `</div>`;
   return html;
 }
 
-module.exports = { priorMonth, monthFromKey, buildOttRows, renderOttCsv, renderOttEmailHtml, renderOwnerDraftHtml, recipients };
+function renderOttEmailHtml(subRows, month) {
+  const total = totalCommission(subRows);
+  let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:820px">`;
+  html += `<h1 style="color:#3A2E26">Tuned Yota — OTT Commission Submission</h1>`;
+  html += `<p style="color:#7c8472">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong>$${total}</strong></p>`;
+  html += `<p>Tuned Yota, an authorized Overland Tailor Tune installer, submits the following completed calibrations for ${esc(month.label)}. The full submission is attached as a workbook in OTT's standard 14-column format.</p>`;
+  html += subTable(subRows);
+  html += `</div>`;
+  return html;
+}
+
+module.exports = {
+  priorMonth, monthFromKey, recipients, SUBMISSION_HEADERS,
+  buildSubmissionRows, renderOttXlsx, renderOwnerDraftHtml, renderOttEmailHtml,
+  totalCommission, unresolved,
+};
