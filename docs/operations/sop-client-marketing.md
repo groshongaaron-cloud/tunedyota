@@ -70,4 +70,3 @@ The +1-week captured content recycles into the next city's T−6 announce.
 - [ ] Spend and bookings are attributable in Funnel Events for the monthly report (SOP 9 / measurement).
 
 **Related:** [SOP 2 Lead Tracking](sop-lead-tracking.md) · [SOP 3 Booking](sop-event-booking.md) · [SOP 7 Event Scheduling](sop-event-scheduling.md)
-</content>

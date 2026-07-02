@@ -65,4 +65,3 @@ Calibration"; emissions-intact positioning) — grep before shipping copy.
 | Slot availability API | `/.netlify/functions/availability?city=` | Public |
 | Airtable | Bookings · Priority List · Funnel Events | Owner |
 | Alerts | Slack (via `/notify` relay) | Owner |
-</content>

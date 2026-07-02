@@ -65,4 +65,3 @@ Every Monday, when the rebook report arrives:
 - [ ] High-demand cities flagged for a new event date.
 
 **Related:** [SOP 2 Lead Tracking](sop-lead-tracking.md) · [SOP 3 Booking](sop-event-booking.md) · [SOP 7 Event Scheduling](sop-event-scheduling.md)
-</content>

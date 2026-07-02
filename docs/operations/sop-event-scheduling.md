@@ -71,4 +71,3 @@ Because event data feeds SEO schema, follow the [`ship`](../../.claude/skills/sh
 - [ ] Venue "To Be Released" resolved before T−2 weeks.
 
 **Related:** [SOP 3 Booking](sop-event-booking.md) · [SOP 5 Priority Waitlist](sop-priority-waitlist.md) · [SOP 1 Marketing](sop-client-marketing.md)
-</content>

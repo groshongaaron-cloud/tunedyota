@@ -78,4 +78,3 @@ failed — investigate).
 - [ ] Reminders will fire on schedule.
 
 **Related:** [SOP 2 Lead Tracking](sop-lead-tracking.md) · [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 5 Priority Waitlist](sop-priority-waitlist.md) · [SOP 7 Event Scheduling](sop-event-scheduling.md)
-</content>

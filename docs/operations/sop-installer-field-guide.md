@@ -71,4 +71,3 @@ Someone shows up without a booking?
 - [ ] Walk-ins recorded via intake.
 
 **Related:** [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 3 Booking](sop-event-booking.md)
-</content>

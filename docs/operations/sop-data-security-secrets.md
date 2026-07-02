@@ -77,4 +77,3 @@ echoing it into logs or chat.
 - [ ] Any leak followed the rotation playbook and is verified closed.
 
 **Related:** [SOP 8 Monitoring & Incident Response](sop-monitoring-incident-response.md)
-</content>

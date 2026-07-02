@@ -63,4 +63,3 @@ Don't outsource this to the cloud routines — verify at ship time (see [`ship`]
 - [ ] Latest production deploy is `ready` and live-verified.
 
 **Related:** [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 10 Data Security](sop-data-security-secrets.md) · [`docs/architecture/`](../architecture/)
-</content>

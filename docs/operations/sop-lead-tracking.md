@@ -86,4 +86,3 @@ beacons, independent of the booking write (analytics never block a booking).
 - [ ] Weekly rebook report is actioned, not just received.
 
 **Related:** [SOP 1 Marketing](sop-client-marketing.md) · [SOP 3 Booking](sop-event-booking.md) · [SOP 5 Priority Waitlist](sop-priority-waitlist.md)
-</content>

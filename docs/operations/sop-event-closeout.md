@@ -81,4 +81,3 @@ Idempotent: a certificate is never sent twice.
 - [ ] Certificate PDF sent to the customer.
 
 **Related:** [SOP 6 Installer Field Guide](sop-installer-field-guide.md) · [SOP 5 Priority Waitlist](sop-priority-waitlist.md) · [SOP 9 Monthly OTT Report](sop-monthly-ott-report.md)
-</content>
