@@ -64,28 +64,44 @@ function sheetXml(aoa) {
     `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${rows}</sheetData></worksheet>`;
 }
 
-function buildXlsx(sheetName, aoa) {
+// Excel sheet names: <=31 chars, no : \ / ? * [ ], unique within the workbook.
+function sheetName(name, used) {
+  let n = String(name == null ? "Sheet" : name).replace(/[:\\/?*[\]]/g, "-").slice(0, 31) || "Sheet";
+  const base = n; let i = 1;
+  while (used.has(n.toLowerCase())) { n = (base.slice(0, 28) + "_" + (++i)); }
+  used.add(n.toLowerCase());
+  return n;
+}
+
+// Multi-sheet workbook from [{ name, aoa }]. Returns a Buffer.
+function buildWorkbook(sheets) {
   const P = "http://schemas.openxmlformats.org/";
+  const used = new Set();
+  const norm = (sheets || []).map((s) => ({ name: sheetName(s.name, used), aoa: s.aoa || [] }));
+  const overrides = norm.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("");
   const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
     `<Types xmlns="${P}package/2006/content-types">` +
     `<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>` +
     `<Default Extension="xml" ContentType="application/xml"/>` +
-    `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>` +
-    `<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`;
+    `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${overrides}</Types>`;
   const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
     `<Relationships xmlns="${P}package/2006/relationships"><Relationship Id="rId1" Type="${P}officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+  const sheetTags = norm.map((s, i) => `<sheet name="${esc(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("");
   const wb = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
-    `<workbook xmlns="${P}spreadsheetml/2006/main" xmlns:r="${P}officeDocument/2006/relationships">` +
-    `<sheets><sheet name="${esc(sheetName).slice(0, 31)}" sheetId="1" r:id="rId1"/></sheets></workbook>`;
+    `<workbook xmlns="${P}spreadsheetml/2006/main" xmlns:r="${P}officeDocument/2006/relationships"><sheets>${sheetTags}</sheets></workbook>`;
+  const relTags = norm.map((_, i) => `<Relationship Id="rId${i + 1}" Type="${P}officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("");
   const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
-    `<Relationships xmlns="${P}package/2006/relationships"><Relationship Id="rId1" Type="${P}officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`;
+    `<Relationships xmlns="${P}package/2006/relationships">${relTags}</Relationships>`;
   return zip([
     { name: "[Content_Types].xml", data: Buffer.from(ct, "utf8") },
     { name: "_rels/.rels", data: Buffer.from(rels, "utf8") },
     { name: "xl/workbook.xml", data: Buffer.from(wb, "utf8") },
     { name: "xl/_rels/workbook.xml.rels", data: Buffer.from(wbRels, "utf8") },
-    { name: "xl/worksheets/sheet1.xml", data: Buffer.from(sheetXml(aoa), "utf8") },
+    ...norm.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: Buffer.from(sheetXml(s.aoa), "utf8") })),
   ]);
 }
 
-module.exports = { buildXlsx };
+// Single-sheet convenience (unchanged API).
+function buildXlsx(name, aoa) { return buildWorkbook([{ name, aoa }]); }
+
+module.exports = { buildXlsx, buildWorkbook };

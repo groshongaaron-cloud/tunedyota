@@ -24,6 +24,12 @@
 [functions."ott-report"]
   schedule = "0 13 1 * *"
 
+# Annual private OTT rollup (Tuned Yota internal) on Jan 1 for the prior year
+# (netlify/functions/ott-annual.js). Emails info@ only — never OTT. Also on-demand
+# via a token-gated HTTP call (?year=YYYY&token=OTT_APPROVE_SECRET).
+[functions."ott-annual"]
+  schedule = "0 14 1 1 *"
+
 # Daily Certificate of Authenticity dispatch (netlify/functions/certificate-dispatch.js).
 [functions."certificate-dispatch"]
   schedule = "0 14 * * *"
