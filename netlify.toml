@@ -18,6 +18,12 @@
 [functions."rebook-report"]
   schedule = "0 13 * * 1"
 
+# Monthly OTT completed-calibrations DRAFT on the 1st (netlify/functions/ott-report.js).
+# Covers the month that just closed; emails a DRAFT + approve-link to the owner only.
+# The owner's approval triggers ott-report-send.js, which emails OTT.
+[functions."ott-report"]
+  schedule = "0 13 1 * *"
+
 # Daily Certificate of Authenticity dispatch (netlify/functions/certificate-dispatch.js).
 [functions."certificate-dispatch"]
   schedule = "0 14 * * *"

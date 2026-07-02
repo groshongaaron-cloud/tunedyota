@@ -1,14 +1,14 @@
 # SOP 9 — Monthly OTT Calibration Report
 
-**Owner:** Owner/Operator · **Cadence:** Monthly · **Status:** Data pipeline live; auto-report build pending
-**Goal:** Report every completed OTT calibration to OTT once a month, accurately and without manual
-data assembly.
+**Owner:** Owner/Operator · **Cadence:** Monthly · **Status:** Monthly draft→approve flow LIVE; pricing + annual rollup pending the pricing sheet
+**Goal:** Report every completed OTT calibration to OTT once a month — **only after the Owner
+reviews and approves** — and roll the same data into a private annual record for Tuned Yota.
 
 ---
 
 ## 1. What gets reported
 
-Every **completed calibration** performed at a Tuned Yota event. The source is the Airtable
+Every **completed calibration** performed at a Tuned Yota event. Source is the Airtable
 **Bookings** table, filtered to:
 
 ```
@@ -17,7 +17,7 @@ AND OTT Calibration is set
 AND Calibration Date within the report month
 ```
 
-Each completed booking now carries everything OTT needs, captured at close-out (SOP 4):
+Each completed booking carries everything needed, captured at close-out (SOP 4):
 
 | Field | Source column |
 |-------|---------------|
@@ -31,48 +31,56 @@ Each completed booking now carries everything OTT needs, captured at close-out (
 
 ---
 
-## 2. Current state of the pipeline
+## 2. The monthly flow — draft → approve → send
 
-- ✅ **VIN capture** is live (installer console → Bookings → certificate), shipped 2026-07-02.
-- ✅ **Airtable `VIN` column** exists on Bookings.
-- ⏳ **The automated monthly report** is not yet built. Two inputs are needed before building:
-  1. **OTT contact email** the report should be sent to.
-  2. **Confirmed columns/format** OTT wants (see the field list above as the proposed default).
+The report is **never auto-sent to OTT**. The Owner approves first.
 
----
+| Stage | Function | Trigger | Recipients |
+|-------|----------|---------|-----------|
+| **1. Draft** | `ott-report.js` (scheduled) | 1st of month, for the month just closed | **Owner only** (`info@tunedyota.com`) — draft email + CSV + a private "Approve & send" link; Slack "awaiting approval" |
+| **2. Review** | — | Owner opens the draft, checks the CSV | — |
+| **3. Approve & send** | `ott-report-send.js` (HTTP, token-gated) | Owner clicks the approve link | **OTT:** `info@overlandtailor.com` + `hgobbels@me.com`, CC `info@tunedyota.com`; Slack "SENT (approved by owner)" |
 
-## 3. Planned automation (fits existing infrastructure)
-
-The report will be a **scheduled Netlify function**, a sibling of `submissions-report.js`
-(which already runs monthly on the 1st and emails `info@` + posts Slack). The new function will:
-
-1. Run on the **1st of each month** for the prior month.
-2. Query Bookings with the filter above (`listAllRecords` handles paging).
-3. Build a **CSV** (one row per completed calibration) + a short summary.
-4. **Email it to the OTT contact** via Resend (from `send.tunedyota.events`), CC `info@`.
-5. Post a Slack confirmation via the `/notify` relay.
-6. Reuse existing libs: `airtable.js`, `resend.js`, `routing.js` (installer name/region), `certificate.js` (`certSerial`).
-
-Delivery method chosen by the Owner: **email to an OTT contact.**
+- The approve link carries a secret token (`OTT_APPROVE_SECRET`); a bad/missing token fails closed.
+- Zero-calibration months draft nothing — just a Slack note.
+- A send failure is surfaced (never reported as success), and nothing reaches OTT.
+- Recipients are overridable via `OTT_REPORT_TO` (comma-separated) without a code change.
 
 ---
 
-## 4. Interim manual procedure (until the function ships)
+## 3. Annual rollup (private to Tuned Yota) — PENDING pricing sheet
 
-1. In Airtable Bookings, filter: `Status = Completed` and `Calibration Date` in the target month.
-2. Export those rows (Name, Vehicle, VIN, OTT Calibration, Calibration Date, Installer).
-3. Email the export to the OTT contact; keep a copy for records.
+Each month's completed calibrations roll into a **per-calendar-year** historical record, **owned
+by Tuned Yota and private to `info@tunedyota.com`** — never sent to OTT. It tracks the year's
+calibrations **and the cost Tuned Yota pays OTT per calibration** (totals by tier / installer /
+month). This is built once the pricing sheet is loaded (below).
 
 ---
 
-## 5. Definition of done
+## 4. Pricing — PENDING
+
+Tuned Yota pays OTT a price per calibration tier (Light / Mild / Medium / Spicy / SS + combos).
+Those prices come from the Owner's pricing spreadsheet. Once loaded, a **price column + totals**
+are added to the reports and the annual cost rollup is completed. Until then the reports list
+calibrations without pricing.
+
+---
+
+## 5. Go-live checklist
+
+- [x] Monthly draft→approve→send flow built + tested (235 tests green).
+- [x] `OTT_APPROVE_SECRET` set in Netlify.
+- [x] Recipients set to `info@overlandtailor.com` + `hgobbels@me.com` (CC `info@`).
+- [ ] Pricing sheet loaded → price column + totals added.
+- [ ] Annual private rollup built.
+
+---
+
+## 6. Definition of done (each month)
 
 - [ ] Installers captured VIN + calibration for every completed vehicle (SOP 4).
-- [ ] Report covers exactly the month's completed calibrations.
-- [ ] Sent to the OTT contact with a retained copy.
-- [ ] (When automated) function runs on the 1st and posts a Slack confirmation.
+- [ ] Draft reviewed by the Owner.
+- [ ] Approved → sent to OTT; Slack confirms the send.
+- [ ] Data also reflected in the private annual rollup.
 
-**To build the automation, provide:** the OTT contact email + confirmation of the required columns.
-
-**Related:** [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 2 Lead Tracking](sop-lead-tracking.md) · `netlify/functions/submissions-report.js` (pattern)
-</content>
+**Related:** [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 2 Lead Tracking](sop-lead-tracking.md) · `netlify/functions/ott-report.js` · `ott-report-send.js`
