@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Tuned Yota — Calibration Reference</title>
+<style>
+  :root{--ink:#3A2E26;--accent:#5B4B42;--line:#d8d2ca;--muted:#7c8472;--ember:#C04A1B;}
+  *{box-sizing:border-box;} body{font-family:-apple-system,Arial,sans-serif;color:var(--ink);margin:0;background:#faf8f5;}
+  main{max-width:720px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:19px;color:var(--accent);margin:6px 0 4px;} .sub{color:var(--muted);font-size:13px;margin:0 0 12px;}
+  h2{font-size:15px;color:var(--accent);margin:18px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px;}
+  input,select{width:100%;padding:11px;font-size:16px;border:1px solid var(--line);border-radius:8px;background:#fff;}
+  label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em;display:block;margin:8px 0 2px;}
+  .btn{padding:12px;font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:8px;width:100%;}
+  .link{display:inline-block;margin:2px 0 8px;color:#2f5d8a;font-size:14px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .card{border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;background:#fff;}
+  .cal{font-family:ui-monospace,Consolas,monospace;font-size:22px;font-weight:800;color:var(--ember);letter-spacing:.02em;}
+  .cfg{color:var(--muted);font-size:13px;margin:3px 0 6px;}
+  .kv{font-size:13px;margin:2px 0;} .kv b{color:var(--muted);font-weight:700;}
+  .cuw{display:inline-block;margin-top:6px;background:#8a2a2a;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;}
+  .hidden{display:none;} .msg{margin-top:8px;font-size:13px;} .err{color:#8a2a2a;}
+  .cov{font-size:13px;color:var(--muted);} .cov b{color:var(--ink);}
+  .pend{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .chip{background:#efe9e2;border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:12px;}
+  details{margin-top:14px;} summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:14px;}
+</style>
+</head>
+<body>
+<main>
+  <h1>Tuned Yota — Calibration Reference</h1>
+  <p class="sub">Resolve a vehicle to its OTT calibration ID, TSB, and CUW flag.</p>
+  <div id="gate">
+    <input id="tok" type="password" autocomplete="off" placeholder="Your installer passcode">
+    <div style="height:8px"></div>
+    <button class="btn" id="unlock">Unlock</button>
+  </div>
+  <div id="app" class="hidden">
+    <a class="link" href="/installer.html">← Back to installer console</a>
+    <div class="grid">
+      <div><label>Model</label><select id="f_model"></select></div>
+      <div><label>Year</label><select id="f_year"></select></div>
+      <div><label>Drivetrain</label><select id="f_dt"></select></div>
+      <div><label>Fuel Tank</label><select id="f_ft"></select></div>
+      <div><label>Tow</label><select id="f_tow"></select></div>
+      <div><label>Flex Fuel</label><select id="f_flex"></select></div>
+    </div>
+    <div id="results"></div>
+    <details id="covwrap">
+      <summary>Coverage — what's known vs. pending</summary>
+      <div id="coverage" style="margin-top:8px"></div>
+    </details>
+    <div id="msg" class="msg"></div>
+  </div>
+</main>
+<script>
+  var ROWS=[], COV=null;
+  function tok(){ return localStorage.getItem('ty_installer_token') || ''; }
+  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
+  function el(id){ return document.getElementById(id); }
+  function fail(m){ var e=el('msg'); e.className='msg err'; e.textContent=m; }
+
+  el('unlock').onclick=function(){ var v=el('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
+  if(tok()) showApp();
+  function showApp(){ el('gate').classList.add('hidden'); el('app').classList.remove('hidden'); load(); }
+
+  async function load(){
+    var res = await fetch('/.netlify/functions/calibration-reference', { headers:{ 'x-installer-token':tok() } });
+    if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    if(!res.ok){ fail('Could not load the reference.'); return; }
+    var data = await res.json(); ROWS=data.rows||[]; COV=data.coverage||null;
+    fillOptions('f_model', uniq(ROWS.map(function(r){return r.model;})), false, 'Model');
+    ['f_year','f_dt','f_ft','f_tow','f_flex'].forEach(function(id){ el(id).onchange=render; });
+    el('f_model').onchange=function(){ syncDependent(); render(); };
+    syncDependent(); render(); renderCoverage();
+  }
+
+  function uniq(a){ var s=[]; a.forEach(function(v){ if(v!=null&&v!==''&&s.indexOf(v)<0) s.push(v); }); return s; }
+  function fillOptions(id, vals, anyOpt, label){
+    var cur=el(id).value;
+    var html = anyOpt ? '<option value="">Any</option>' : '<option value="" disabled selected>'+label+'…</option>';
+    html += vals.map(function(v){ return '<option'+(String(v)===cur?' selected':'')+'>'+esc(v)+'</option>'; }).join('');
+    el(id).innerHTML=html;
+  }
+  function subset(){ // rows for the chosen model (+year) to populate dependent filters
+    var m=el('f_model').value, y=el('f_year').value;
+    return ROWS.filter(function(r){ return (!m||String(r.model)===m) && (!y||String(r.year)===y); });
+  }
+  function syncDependent(){
+    var m=el('f_model').value;
+    var forModel=ROWS.filter(function(r){ return !m||String(r.model)===m; });
+    fillOptions('f_year', uniq(forModel.map(function(r){return r.year;})).sort(function(a,b){return String(a).localeCompare(String(b),undefined,{numeric:true});}), false, 'Year');
+    var s=subset();
+    fillOptions('f_dt', uniq(s.map(function(r){return r.drivetrain;})), true);
+    fillOptions('f_ft', uniq(s.map(function(r){return r.fuelTank;})), true);
+    fillOptions('f_tow', uniq(s.map(function(r){return r.tow;})), true);
+    fillOptions('f_flex', uniq(s.map(function(r){return r.flex;})), true);
+  }
+  function match(r){
+    var m=el('f_model').value, y=el('f_year').value, dt=el('f_dt').value, ft=el('f_ft').value, tow=el('f_tow').value, fx=el('f_flex').value;
+    if(m && String(r.model)!==m) return false;
+    if(y && String(r.year)!==y) return false;
+    if(dt && String(r.drivetrain)!==dt) return false;
+    if(ft && String(r.fuelTank)!==ft) return false;
+    if(tow && String(r.tow)!==tow) return false;
+    if(fx && String(r.flex)!==fx) return false;
+    return true;
+  }
+  function render(){
+    var host=el('results'); el('msg').textContent='';
+    if(!el('f_model').value || !el('f_year').value){ host.innerHTML='<p class="sub">Pick a model and year to see calibrations.</p>'; return; }
+    var rows=ROWS.filter(match);
+    if(!rows.length){ host.innerHTML='<p class="sub">No matching calibration — adjust the filters.</p>'; return; }
+    host.innerHTML=rows.map(function(r){
+      var cfg=[r.year, r.model, r.drivetrain, (r.fuelTank?r.fuelTank+' gal':''), (r.tow?'Tow '+r.tow:''), (r.flex?'Flex '+r.flex:'')].filter(Boolean).map(esc).join(' · ');
+      return '<div class="card"><div class="cal">'+esc(r.newCal||'—')+'</div>'+
+        '<div class="cfg">'+cfg+'</div>'+
+        (r.oldCal?'<div class="kv"><b>Old Cal:</b> '+esc(r.oldCal)+'</div>':'')+
+        (r.tsb?'<div class="kv"><b>TSB:</b> '+esc(r.tsb)+'</div>':'')+
+        (String(r.cuw).toLowerCase()==='yes'?'<div class="cuw">CUW required</div>':'')+
+        '</div>';
+    }).join('');
+  }
+  function renderCoverage(){
+    if(!COV){ return; }
+    var covered=(COV.covered||[]).map(function(c){ return c.engine+'L '+c.model; });
+    var pend=(COV.pending||[]).map(function(p){ return '<span class="chip">'+esc(p.platform)+' · '+esc(p.engine)+'L</span>'; }).join('');
+    el('coverage').innerHTML='<div class="cov"><b>Known:</b> '+esc(covered.join(' · ')||'—')+' (+ LX570 folded into Land Cruiser)</div>'+
+      '<div class="cov" style="margin-top:8px"><b>Data pending</b> (owner to provide next session):</div><div class="pend">'+(pend||'<span class="chip">none</span>')+'</div>';
+  }
+</script>
+</body>
+</html>
