@@ -64,6 +64,38 @@ test("complete still persists when the base has no VIN column (tolerant)", async
   assert.ok(certHtml.includes("5TFDW5F17MX000000"));   // cert still carries the VIN
 });
 
+test("complete stores the OTT commission fields (normalized) but keeps them off the certificate", async () => {
+  const updates = []; let sent = null;
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy", vin: "5TFDW5F17MX000000",
+      tuningPlatform: "vft", calibrationType: "Basic", ecuId: "04c21", gearSize: "4.30", mileage: "85,000 mi" },
+    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+      get: async () => recFor("cody"),
+      update: async (a) => { updates.push(a.fields); return {}; },
+      send: async (m) => { sent = m; return { ok: true }; } });
+  assert.equal(out.status, "completed");
+  assert.equal(updates[0]["Tuning Platform"], "VFT");          // upper-cased
+  assert.equal(updates[0]["Calibration Type"], "Basic");
+  assert.equal(updates[0]["ECU ID"], "04C21");
+  assert.equal(updates[0]["Gear Size"], "4.30");
+  assert.equal(updates[0]["Mileage"], 85000);                  // digits only, numeric
+  const cert = Buffer.from(sent.attachments[0].content, "base64").toString();
+  assert.ok(!/Tuning Platform|Calibration Type|ECU ID|Gear Size|Mileage/i.test(cert)); // not on the customer cert
+  assert.ok(!cert.includes("04C21"));
+});
+
+test("complete still persists when the base lacks the OTT columns (tolerant)", async () => {
+  const updates = [];
+  const update = async (a) => {
+    updates.push(a.fields);
+    if ("Tuning Platform" in a.fields) throw new Error('airtable update 422: Unknown field name: "Tuning Platform"');
+    return {};
+  };
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light", vin: "5TFDW5F17MX000000", tuningPlatform: "PCM", calibrationType: "Custom", ecuId: "CM5201", gearSize: "3.91", mileage: "42000" },
+    { env, key: "cody", get: async () => recFor("cody"), update, send: async () => ({}), log: { error() {} } });
+  assert.equal(out.status, "completed");
+  assert.equal(updates[0].Status, "Completed");                // completion persisted on retry
+});
+
 test("noshow just sets Status", async () => {
   const updates = [];
   const out = await processCloseout({ recordId: "rec1", action: "noshow" },

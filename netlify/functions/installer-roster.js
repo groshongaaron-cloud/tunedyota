@@ -23,7 +23,8 @@ async function buildRoster(deps) {
       id: f.id, slot: f.Slot || "", slotLabel: f.Slot ? formatSlot(f.Slot) : "",
       name: f.Name || "", vehicle: f.Vehicle || "", phone: f.Phone || "", email: f.Email || "",
       mods: f.Modifications || "", status: f.Status || "Booked", calibration: f["OTT Calibration"] || "",
-      vin: f.VIN || "",
+      vin: f.VIN || "", tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
+      ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
     });
   }
   const out = [...events.values()].sort((a, b) => a.dateISO.localeCompare(b.dateISO));

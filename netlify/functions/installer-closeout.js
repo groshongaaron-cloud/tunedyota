@@ -43,13 +43,28 @@ async function processCloseout(body, deps) {
   // VIN: normalize to the standard 17-char uppercase form (strip spaces/dashes).
   // Optional at this layer so a close-out is never blocked; the console enforces it.
   const vin = String(d.vin || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  // OTT commission-submission fields — additive, installer-entered, NEVER on the
+  // customer certificate. All optional at this layer so completion + cert never
+  // depend on them; the installer console requires them and the owner confirms the
+  // monthly draft. See lib/ott-commission.js + docs/ott/README.md.
+  const tuningPlatform = String(d.tuningPlatform || "").trim().toUpperCase();
+  const calibrationType = String(d.calibrationType || "").trim();
+  const ecuId = String(d.ecuId || "").trim().toUpperCase();
+  const gearSize = String(d.gearSize || "").trim();
+  const mileage = String(d.mileage == null ? "" : d.mileage).replace(/[^0-9]/g, "");
   const issueDate = now.toISOString().slice(0, 10);
   const completeFields = { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": issueDate };
   if (vin) completeFields.VIN = vin;
+  if (tuningPlatform) completeFields["Tuning Platform"] = tuningPlatform;
+  if (calibrationType) completeFields["Calibration Type"] = calibrationType;
+  if (ecuId) completeFields["ECU ID"] = ecuId;
+  if (gearSize) completeFields["Gear Size"] = gearSize;
+  if (mileage) completeFields["Mileage"] = Number(mileage);
   try {
-    // updateTolerant: if the base has no "VIN" column yet, drop only VIN and retry
-    // so the completion (Status/Calibration) still persists.
-    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields }, ["VIN"]);
+    // updateTolerant: if the base hasn't added a column yet, drop only the missing
+    // optional field(s) and retry, so the completion (Status/Calibration) still persists.
+    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields },
+      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage"]);
   } catch (e) { if (log.error) log.error("closeout complete", e.message); return { status: "error", error: "store-unavailable" }; }
 
   let certSent = false;

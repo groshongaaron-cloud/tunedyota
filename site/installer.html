@@ -21,6 +21,7 @@
   .row-actions{display:flex;gap:8px;} .row-actions .btn{flex:1;}
   .ns{background:#8a6a3a;} .done{color:#2f5d2a;font-weight:700;} .noshow{color:#8a2a2a;font-weight:700;}
   .hidden{display:none;} .msg{margin-top:8px;font-size:13px;} .err{color:#8a2a2a;}
+  .otthdr{font-size:11px;color:var(--muted);margin:10px 0 0;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
 </style>
 </head>
 <body>
@@ -39,6 +40,10 @@
 </main>
 <script>
   var CAL = ["Light","Mild","Medium","Spicy","SS","Light and Mild","Mild and Medium","Medium and Spicy","Spicy and SS"];
+  var TP = ["VFT","HPT","PCM","BB"];
+  var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
+  function sel(id,list,ph){ return '<select id="'+id+'"><option value="" disabled selected>'+ph+'…</option>'+list.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>'; }
+  function val(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
   function tok(){ return localStorage.getItem('ty_installer_token') || ''; }
   function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
 
@@ -73,12 +78,18 @@
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+'</div>';
-    if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+'</div>'; return c; }
+    if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'; return c; }
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
       '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
       '<select id="cal_'+b.id+'">'+opts+'</select>'+
+      '<div class="otthdr">OTT commission report</div>'+
+      sel('tp_'+b.id, TP, 'Tuning Platform')+
+      sel('ct_'+b.id, CT, 'Calibration Type')+
+      '<input id="ecu_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="ECU ID" style="text-transform:uppercase;margin:5px 0">'+
+      '<input id="gear_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="Gear ratio (e.g. 4.30)" style="margin:5px 0">'+
+      '<input id="mi_'+b.id+'" inputmode="numeric" autocomplete="off" placeholder="Mileage" style="margin:5px 0">'+
       '<div class="row-actions"><button class="btn" id="ok_'+b.id+'">Mark complete</button>'+
       '<button class="btn ns" id="ns_'+b.id+'">No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
@@ -87,11 +98,15 @@
   }
 
   async function complete(id){
-    var vin=(document.getElementById('vin_'+id).value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    var vin=val('vin_'+id).toUpperCase().replace(/[^A-Z0-9]/g,'');
     if(vin.length!==17){ fail('Enter the full 17-character VIN.'); return; }
-    var cal=document.getElementById('cal_'+id).value;
-    if(!cal){ fail('Pick a calibration first.'); return; }
-    closeout(id,{action:'complete',calibration:cal,vin:vin});
+    var cal=val('cal_'+id); if(!cal){ fail('Pick an OTT Calibration.'); return; }
+    var tp=val('tp_'+id); if(!tp){ fail('Pick the Tuning Platform.'); return; }
+    var ct=val('ct_'+id); if(!ct){ fail('Pick the Calibration Type.'); return; }
+    var ecu=val('ecu_'+id).toUpperCase(); if(!ecu){ fail('Enter the ECU ID.'); return; }
+    var gear=val('gear_'+id); if(!gear){ fail('Enter the gear ratio.'); return; }
+    var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!mi){ fail('Enter the mileage.'); return; }
+    closeout(id,{action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi});
   }
   async function closeout(id,extra){
     var body=Object.assign({recordId:id},extra);
