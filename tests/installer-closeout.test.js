@@ -35,6 +35,35 @@ test("complete sets fields, sends the cert, marks Certificate Sent", async () =>
   assert.ok(sent.attachments && sent.attachments[0].filename === "certificate.html");
 });
 
+test("complete stores a normalized VIN and stamps it on the certificate", async () => {
+  const updates = []; let sent = null;
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy", vin: " 5tfdw5f17-mx000000 " },
+    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+      get: async () => recFor("cody"),
+      update: async (a) => { updates.push(a.fields); return {}; },
+      send: async (m) => { sent = m; return { ok: true }; } });
+  assert.equal(out.status, "completed");
+  assert.equal(updates[0].VIN, "5TFDW5F17MX000000");   // upper-cased, spaces + dashes stripped
+  const certHtml = Buffer.from(sent.attachments[0].content, "base64").toString();
+  assert.ok(certHtml.includes("5TFDW5F17MX000000"));   // VIN present on the certificate
+});
+
+test("complete still persists when the base has no VIN column (tolerant)", async () => {
+  const updates = []; let sent = null;
+  const update = async (a) => {
+    updates.push(a.fields);
+    if ("VIN" in a.fields) throw new Error('airtable update 422: Unknown field name: "VIN"');
+    return {};
+  };
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light", vin: "5TFDW5F17MX000000" },
+    { env, key: "cody", get: async () => recFor("cody"), update, send: async (m) => { sent = m; return {}; }, log: { error() {} } });
+  assert.equal(out.status, "completed");
+  assert.equal(out.certSent, true);
+  assert.equal(updates[0].Status, "Completed");        // completion persisted on retry
+  const certHtml = Buffer.from(sent.attachments[0].content, "base64").toString();
+  assert.ok(certHtml.includes("5TFDW5F17MX000000"));   // cert still carries the VIN
+});
+
 test("noshow just sets Status", async () => {
   const updates = [];
   const out = await processCloseout({ recordId: "rec1", action: "noshow" },

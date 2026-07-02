@@ -73,10 +73,12 @@
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+'</div>';
-    if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+'</div>'; return c; }
+    if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+'</div>'; return c; }
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
-    c.innerHTML=head+'<select id="cal_'+b.id+'">'+opts+'</select>'+
+    c.innerHTML=head+
+      '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
+      '<select id="cal_'+b.id+'">'+opts+'</select>'+
       '<div class="row-actions"><button class="btn" id="ok_'+b.id+'">Mark complete</button>'+
       '<button class="btn ns" id="ns_'+b.id+'">No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
@@ -85,9 +87,11 @@
   }
 
   async function complete(id){
+    var vin=(document.getElementById('vin_'+id).value||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(vin.length!==17){ fail('Enter the full 17-character VIN.'); return; }
     var cal=document.getElementById('cal_'+id).value;
     if(!cal){ fail('Pick a calibration first.'); return; }
-    closeout(id,{action:'complete',calibration:cal});
+    closeout(id,{action:'complete',calibration:cal,vin:vin});
   }
   async function closeout(id,extra){
     var body=Object.assign({recordId:id},extra);

@@ -51,6 +51,27 @@ test("listAllRecords follows offset across pages", async () => {
   assert.equal(call, 2);
 });
 
+test("updateTolerant retries without an optional field on unknown-field error", async () => {
+  const { updateTolerant } = require("../netlify/functions/lib/airtable.js");
+  const calls = [];
+  const updateFn = async (a) => {
+    calls.push(a.fields);
+    if ("VIN" in a.fields) throw new Error('airtable update 422: Unknown field name: "VIN"');
+    return { id: "r1" };
+  };
+  const r = await updateTolerant(updateFn, { id: "r1", fields: { Status: "Completed", VIN: "5TFDW5F17MX000000" } }, ["VIN"]);
+  assert.equal(r.id, "r1");
+  assert.equal(calls.length, 2);                 // first with VIN (422), retry without
+  assert.equal(calls[1].Status, "Completed");    // required field survived
+  assert.ok(!("VIN" in calls[1]));               // only VIN was dropped
+});
+
+test("updateTolerant rethrows a non-unknown-field error", async () => {
+  const { updateTolerant } = require("../netlify/functions/lib/airtable.js");
+  const updateFn = async () => { throw new Error("airtable update 500: server error"); };
+  await assert.rejects(() => updateTolerant(updateFn, { id: "r1", fields: { VIN: "x" } }, ["VIN"]), /500/);
+});
+
 test("getRecord GETs one record by id and returns its json", async () => {
   const { getRecord } = require("../netlify/functions/lib/airtable.js");
   let seenUrl;

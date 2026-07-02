@@ -2,7 +2,7 @@
 // Per-installer close-out: mark a booking Completed (+ OTT Calibration) or No-show.
 // On completion, emails the Certificate of Calibration immediately (daily
 // certificate-dispatch backstops any send failure). Ownership is re-checked server-side.
-const { cfg, getRecord, updateRecord } = require("./lib/airtable.js");
+const { cfg, getRecord, updateRecord, updateTolerant } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate.js");
@@ -40,10 +40,16 @@ async function processCloseout(body, deps) {
   if (f["Certificate Sent"]) return { status: "completed", certSent: true, alreadySent: true };
   const calibration = String(d.calibration || "").trim();
   if (!CAL_OPTIONS.includes(calibration)) return { status: "error", error: "bad-calibration" };
+  // VIN: normalize to the standard 17-char uppercase form (strip spaces/dashes).
+  // Optional at this layer so a close-out is never blocked; the console enforces it.
+  const vin = String(d.vin || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   const issueDate = now.toISOString().slice(0, 10);
+  const completeFields = { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": issueDate };
+  if (vin) completeFields.VIN = vin;
   try {
-    await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId,
-      fields: { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": issueDate } });
+    // updateTolerant: if the base has no "VIN" column yet, drop only VIN and retry
+    // so the completion (Status/Calibration) still persists.
+    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields }, ["VIN"]);
   } catch (e) { if (log.error) log.error("closeout complete", e.message); return { status: "error", error: "store-unavailable" }; }
 
   let certSent = false;
@@ -51,7 +57,7 @@ async function processCloseout(body, deps) {
     const inst = keyToInstaller(owner);
     const certNo = certSerial(d.recordId, issueDate, issueDate);
     const { subject, html } = buildCertificate({
-      name: f.Name, vehicle: f.Vehicle, calibration, installer: inst.name,
+      name: f.Name, vehicle: f.Vehicle, vin, calibration, installer: inst.name,
       installerRegion: inst.region, calibrationDate: issueDate, certNo, issueDate });
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email,
       cc: inst.email === OWNER ? undefined : OWNER, replyTo: OWNER, subject,

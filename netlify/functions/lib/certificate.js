@@ -28,7 +28,7 @@ function certSerial(recordId, dateISO, issueISO) {
 // renders as static, non-editable text (no dropdown). The choosable picker lives
 // only in the design master, docs/brand/tuned-yota-master-certificate.html.
 
-function buildCertificate({ name, vehicle, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
+function buildCertificate({ name, vehicle, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
   const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicle ? ` · ${vehicle}` : ""}`;
   const installerLine = `${esc(installer || "")}${installerRegion ? ` &middot; ${esc(installerRegion)}` : ""}`;
   const html = `<!DOCTYPE html>
@@ -284,6 +284,10 @@ function buildCertificate({ name, vehicle, calibration, installer, installerRegi
         <div class="row">
           <div class="label">Vehicle</div>
           <div class="value">${esc(vehicle || "")}</div>
+        </div>
+        <div class="row">
+          <div class="label">VIN</div>
+          <div class="value">${esc(vin) || "&mdash;"}</div>
         </div>
         <div class="row">
           <div class="label">OTT Calibration</div>

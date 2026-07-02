@@ -23,6 +23,7 @@ async function buildRoster(deps) {
       id: f.id, slot: f.Slot || "", slotLabel: f.Slot ? formatSlot(f.Slot) : "",
       name: f.Name || "", vehicle: f.Vehicle || "", phone: f.Phone || "", email: f.Email || "",
       mods: f.Modifications || "", status: f.Status || "Booked", calibration: f["OTT Calibration"] || "",
+      vin: f.VIN || "",
     });
   }
   const out = [...events.values()].sort((a, b) => a.dateISO.localeCompare(b.dateISO));

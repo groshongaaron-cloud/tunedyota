@@ -30,6 +30,15 @@ test("any calibration value renders as locked static text (no dropdown)", () => 
   assert.ok(!/<select/.test(html));
 });
 
+test("renders the VIN when provided, em-dash when blank", () => {
+  const withVin = buildCertificate({ name: "A", vehicle: "V", vin: "5TFDW5F17MX000000" }).html;
+  assert.match(withVin, /VIN/);
+  assert.ok(withVin.includes("5TFDW5F17MX000000"));
+  const noVin = buildCertificate({ name: "A", vehicle: "V" }).html;
+  assert.match(noVin, /VIN/);               // label still present
+  assert.ok(noVin.includes("&mdash;"));      // value falls back to an em-dash
+});
+
 test("blank calibration renders an em-dash, not a picker", () => {
   const { html } = buildCertificate({ name: "A", vehicle: "V" });
   assert.ok(!/<select/.test(html));

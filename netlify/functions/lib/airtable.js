@@ -55,6 +55,22 @@ async function createTolerant(createFn, args, optionalKeys = []) {
     return await createFn({ ...args, fields });
   }
 }
+// Update a record, tolerating a base that hasn't added an optional column yet
+// (e.g. "VIN" before the owner creates it). Mirrors createTolerant: on an
+// unknown-field error naming one of `optionalKeys`, drop only that field and
+// retry once — so a completion write is never lost to a missing optional column.
+async function updateTolerant(updateFn, args, optionalKeys = []) {
+  try {
+    return await updateFn(args);
+  } catch (e) {
+    if (!/unknown[_ ]field/i.test(e.message)) throw e;
+    const offending = optionalKeys.filter((k) => args.fields && k in args.fields && new RegExp(`\\b${k}\\b`, "i").test(e.message));
+    if (!offending.length) throw e;
+    const fields = { ...args.fields };
+    for (const k of offending) delete fields[k];
+    return await updateFn({ ...args, fields });
+  }
+}
 async function getRecord({ fetchImpl = fetch, token, baseId, table, id }) {
   const url = `${API}/${baseId}/${encodeURIComponent(table)}/${id}`;
   const res = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` } });
@@ -76,4 +92,4 @@ async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSiz
   } while (offset);
   return out;
 }
-module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, listAllRecords, getRecord };
+module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, updateTolerant, listAllRecords, getRecord };
