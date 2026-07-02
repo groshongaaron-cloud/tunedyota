@@ -2,6 +2,7 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { buildAnnual, renderAnnualXlsx } = require("../netlify/functions/lib/ott-annual.js");
 const { runAnnual } = require("../netlify/functions/ott-annual.js");
+const { runOnDemand } = require("../netlify/functions/ott-annual-run.js");
 
 const booking = (extra = {}) => ({
   Name: "Jane", Vehicle: "2015 Toyota Tundra 5.7L V8", VIN: "5TFDW5F17MX000000", Status: "Completed",
@@ -43,7 +44,7 @@ test("renderAnnualXlsx produces a real 2-sheet workbook (Summary + Detail)", () 
 function deps(overrides = {}) {
   const notifies = [], sends = [];
   return {
-    env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", SLACK_WEBHOOK_URL: "https://hooks.slack.test/x", RESEND_API_KEY: "re" },
+    env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", SLACK_WEBHOOK_URL: "https://hooks.slack.test/x", RESEND_API_KEY: "re", OTT_APPROVE_SECRET: "s3cret" },
     listAll: async () => [{ id: "r1", fields: booking({ "Calibration Date": "2026-06-15" }) }, { id: "r2", fields: booking({ Name: "Sam", "Calibration Date": "2026-08-02" }) }],
     notify: async (a) => { notifies.push(a); return { ok: true }; },
     send: async (a) => { sends.push(a); return { id: "e" }; },
@@ -72,4 +73,16 @@ test("runAnnual reports zero cleanly for a year with no calibrations", async () 
   assert.equal(out.count, 0);
   assert.equal(out.total, 0);
   assert.equal(d._sends[0].to, "info@tunedyota.com");
+});
+
+test("on-demand run is token-gated, then emails info@ for the requested year", async () => {
+  const bad = await runOnDemand({ year: "2026", token: "nope" }, deps());
+  assert.equal(bad.code, 401);
+  assert.equal(deps()._sends.length, 0);
+  const d = deps();
+  const out = await runOnDemand({ year: "2026", token: "s3cret" }, d);
+  assert.equal(out.status, "ok");
+  assert.equal(out.count, 2);
+  assert.equal(d._sends[0].to, "info@tunedyota.com");
+  assert.equal(d._sends[0].attachments[0].filename, "ott-annual-2026.xlsx");
 });

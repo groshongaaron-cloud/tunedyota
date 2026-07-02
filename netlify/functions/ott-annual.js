@@ -36,24 +36,9 @@ async function runAnnual(year, deps) {
   return { ok: true, year, count: a.count, total: a.totalCommission, unresolved: a.unresolvedCount, emailFailed };
 }
 
-function page(title, body) {
-  return `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>` +
-    `<div style="font-family:-apple-system,Arial,sans-serif;max-width:520px;margin:60px auto;padding:0 20px;color:#3A2E26"><h1 style="color:#5B4B42">${title}</h1>${body}</div>`;
-}
-
-async function handler(event) {
-  const env = process.env;
-  const q = (event && event.queryStringParameters) || null;
-  // On-demand HTTP call (token-gated) — any year, defaults to the current YTD.
-  if (q && (q.token !== undefined || q.year !== undefined)) {
-    if (!env.OTT_APPROVE_SECRET || String(q.token || "") !== env.OTT_APPROVE_SECRET) {
-      return { statusCode: 401, headers: { "Content-Type": "text/html; charset=utf-8" }, body: page("Not authorized", "<p>Invalid or missing token.</p>") };
-    }
-    const year = /^\d{4}$/.test(String(q.year || "")) ? +q.year : new Date().getUTCFullYear();
-    const r = await runAnnual(year, {});
-    return { statusCode: 200, headers: { "Content-Type": "text/html; charset=utf-8" }, body: page("Annual rollup sent ✓", `<p>${r.count} calibration(s) for <strong>${year}</strong> ($${r.total}) — emailed privately to ${OWNER}.${r.unresolved ? ` ${r.unresolved} need a confirmed commission.` : ""}</p>`) };
-  }
-  // Scheduled (Jan 1): the prior calendar year.
+// Scheduled (Jan 1) only — Netlify scheduled functions aren't HTTP-invokable.
+// On-demand runs for any year live in ott-annual-run.js (a token-gated HTTP fn).
+async function handler() {
   const year = new Date().getUTCFullYear() - 1;
   const r = await runAnnual(year, {});
   return { statusCode: 200, body: JSON.stringify(r) };
