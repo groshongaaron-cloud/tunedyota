@@ -45,6 +45,26 @@ test("post-event sweep creates a priority record", async () => {
   assert.equal(d._creates[0].fields.City, "Green Bay");
 });
 
+test("baked events (no embedded city) route correctly — no unknown-city failure", async () => {
+  // Reproduces the real prod path: baked events-data.js keys by city but the
+  // event object has no `city` field. fetchEvents must backfill it, else every
+  // event fails getMarket → unknown-city:undefined and matches zero bookings.
+  const { fetchEvents } = require("../netlify/functions/lib/events.js");
+  const baked = { fargo: { dateISO: "2026-07-03", label: "July 3, 2026", active: true, address: "123 Test Rd" } };
+  const bookings = [{ id: "b1", fields: { City: "Fargo", "Event Date": "2026-07-03", Name: "A", Email: "a@x.com", Status: "Booked" } }];
+  const failures = [];
+  const d = deps({
+    now: new Date("2026-07-03T12:00:00Z"), // 07:00 CDT, du === 0
+    loadEvents: (a) => fetchEvents({ ...a, baked, sheetId: "" }),
+    listAll: async ({ table }) => (table === "Bookings" ? bookings : []),
+    notify: async (a) => { failures.push(a.text); return { ok: true }; },
+  });
+  await runReminders(d);
+  assert.equal(failures.length, 0, `expected no failures, got: ${failures.join("; ")}`);
+  assert.ok(d._sends.some((s) => /Roster/.test(s.subject || "")), "installer roster sent");
+  assert.ok(d._sends.some((s) => s.to === "a@x.com"), "customer notified");
+});
+
 test("sends a post-event rebook report to the owner when a sweep occurs", async () => {
   // Event was yesterday (du === -1) → waitlist-sweep → post-event rebook report.
   // 2026-07-04T12:00:00Z = 07:00 CDT (UTC-5), so hour===7 passes the gate.

@@ -60,7 +60,15 @@ async function fetchEvents({ fetchImpl, sheetId, baked = {}, log = console }) {
       else if (log.warn) log.warn("events fetch status", res.status);
     } catch (e) { if (log.warn) log.warn("events fetch failed", e.message); }
   }
-  return { ...baked, ...fromSheet }; // a configured sheet overrides baked
+  const merged = { ...baked, ...fromSheet }; // a configured sheet overrides baked
+  // Baked entries (events-data.js) are keyed by city but don't embed a `city`
+  // field; sheet entries do. Downstream — getMarket routing and roster/booking
+  // filtering in event-plan.js — keys off ev.city. Backfill it from the map key
+  // so baked events don't route to unknown-city:undefined and match 0 bookings.
+  for (const key of Object.keys(merged)) {
+    if (merged[key] && !merged[key].city) merged[key] = { ...merged[key], city: key };
+  }
+  return merged;
 }
 async function getEventForCity(city, deps) {
   const map = await fetchEvents(deps);

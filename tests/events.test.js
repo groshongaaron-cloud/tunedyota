@@ -1,6 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { parseCsv, toISO, parseEvents, getEventForCity } = require("../netlify/functions/lib/events.js");
+const { parseCsv, toISO, parseEvents, getEventForCity, fetchEvents } = require("../netlify/functions/lib/events.js");
+const BAKED = require("../netlify/functions/lib/events-data.js");
 
 test("baked fallback used when no sheet; sheet overrides baked", async () => {
   const baked = { fargo: { city: "Fargo", dateISO: "2026-07-03", label: "July 3, 2026", active: true } };
@@ -47,4 +48,15 @@ test("parseEvents reads an Address column", () => {
 test("parseEvents address defaults to empty when column absent", () => {
   const csv = "Market,Date,Active\nOmaha,2026-06-28,yes\n";
   assert.equal(parseEvents(csv)["omaha"].address, "");
+});
+test("fetchEvents backfills city from the map key for baked entries", async () => {
+  // Baked entries are keyed by city but don't embed a `city` field. Downstream
+  // routing (getMarket) + roster filtering key off ev.city — must be populated.
+  const baked = { fargo: { dateISO: "2026-07-03", label: "July 3, 2026", active: true } };
+  const map = await fetchEvents({ fetchImpl: async () => ({ ok: false }), sheetId: "", baked });
+  assert.equal(map.fargo.city, "fargo");
+});
+test("fetchEvents gives every real baked event a routable city", async () => {
+  const map = await fetchEvents({ fetchImpl: async () => ({ ok: false }), sheetId: "", baked: BAKED });
+  for (const [key, ev] of Object.entries(map)) assert.ok(ev.city, `missing city for ${key}`);
 });
