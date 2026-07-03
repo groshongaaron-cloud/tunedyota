@@ -59,7 +59,10 @@ async function runReminders(deps) {
     const inst = keyToInstaller(market.inst);
     try {
       if (act.type === "installer-roster") {
-        const m = renderRosterEmail(act.event, act.bookings, act.waitlist);
+        // Render with the market's proper-case city + state (baked events carry
+        // only the lowercase key and no state).
+        const evRender = { ...act.event, city: market.city, state: act.event.state || market.state };
+        const m = renderRosterEmail(evRender, act.bookings, act.waitlist);
         await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, replyTo: OWNER,
           subject: `${m.subject} (${act.daysUntil === 0 ? "morning-of" : act.daysUntil + "-day"})`, html: m.html, text: m.text });
       } else if (act.type === "customer-notify") {
