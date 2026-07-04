@@ -49,3 +49,29 @@ test("booking success copy softens when email delivery fails", () => {
   assert.ok(HTML.includes("out.emailFailed"), "missing emailFailed branch");
   assert.ok(/confirm the details by phone\/text/i.test(HTML), "missing softened fallback copy");
 });
+
+test("model-year capture: field sits between Your vehicle and Modifications", () => {
+  const iVeh = HTML.indexOf('id="fVeh"');
+  const iYear = HTML.indexOf('id="fYearGroup"');
+  const iMods = HTML.indexOf('id="fMods"');
+  assert.ok(iVeh > 0 && iYear > 0 && iMods > 0, "one of fVeh/fYearGroup/fMods missing");
+  assert.ok(iVeh < iYear && iYear < iMods, "Model year field not positioned between Your vehicle and Modifications");
+});
+
+test("model-year capture: constrained select, placeholder, hidden-by-default, required", () => {
+  assert.ok(/<select id="fYear"[^>]*\brequired\b/.test(HTML), "fYear should be a required <select>");
+  assert.ok(HTML.includes("Select your exact year"), "missing placeholder option");
+  assert.ok(/id="fYearGroup"[^>]*display:none/.test(HTML), "Model year group should be hidden by default");
+});
+
+test("model-year capture: parse + populate helpers and payload wiring present", () => {
+  assert.ok(/function parseYearRange/.test(HTML), "missing parseYearRange()");
+  assert.ok(/function populateModelYear/.test(HTML), "missing populateModelYear()");
+  assert.ok(/populateModelYear\(\)/.test(HTML), "populateModelYear() not called (prepBooking)");
+  for (const tok of ["present", "current", "newer", "now"]) {
+    assert.ok(HTML.includes(tok), `parseYearRange missing open-ended token: ${tok}`);
+  }
+  assert.ok(/vehicle:\$\("#fVeh"\)\.value, ?modelYear/.test(HTML), "modelYear missing from /book payload");
+  assert.ok(/vehicle, ?modelYear,/.test(HTML), "modelYear missing from Netlify lead fields");
+  assert.ok(/select your exact model year/i.test(HTML), "missing model-year validation message");
+});

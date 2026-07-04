@@ -300,7 +300,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
 <form name="tune-lead" data-netlify="true" netlify-honeypot="bot-field" hidden aria-hidden="true">
   <input type="text" name="name"><input type="tel" name="phone"><input type="email" name="email">
   <input type="text" name="market"><input type="text" name="installer_key"><input type="text" name="installer_name">
-  <input type="text" name="vehicle"><input type="text" name="goals">
+  <input type="text" name="vehicle"><input type="text" name="modelYear"><input type="text" name="goals">
   <input type="text" name="quote_base"><input type="text" name="quote_custom"><input type="text" name="quote_sc">
   <textarea name="message"></textarea><input type="text" name="source">
   <input type="text" name="referrer"><input type="text" name="utm_source">
@@ -421,6 +421,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
       </div>
       <div class="tf-field"><label for="fEmail">Email</label><input id="fEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
       <div class="tf-field"><label for="fVeh">Your vehicle</label><input id="fVeh" type="text" readonly></div>
+      <div class="tf-field" id="fYearGroup" style="display:none"><label for="fYear">Model year</label><select id="fYear" name="modelYear" required><option value="" disabled selected>Select your exact year</option></select></div>
       <div class="tf-field"><label for="fMods">Modifications</label><input id="fMods" type="text" placeholder="Lift, tires, exhaust, intake, supercharger…"></div>
       <div class="tf-field"><label for="fMsg">Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
       <button class="btn primary" id="fSubmit" style="width:100%">Send My Request →</button>
@@ -812,8 +813,32 @@ function selectMarket(i){
 function prepBooking(){
   initMap(); renderBar(); renderList();
   $("#fVeh").value=vehStr()+(S.goals.size?`  \u00b7  ${[...S.goals].map(id=>GOALS.find(g=>g.id===id).l).join(", ")}`:"");
+  populateModelYear();
   $("#proofBook").innerHTML=proofCard(pickReview(S.make,[proofResultName]));
   setTimeout(()=>{ if(MAP) MAP.invalidateSize(); },300);
+}
+/* Model-year capture: when the selected config spans a range (e.g. "2016-2023"
+   or open-ended "2024+"), show a required newest-first dropdown so the exact
+   year is captured for calibration-ID selection. Single-year, "All years", or
+   unparseable ranges hide the field (nothing ambiguous to pick). Parses the
+   clean S.cfg.y range, not the #fVeh display string (which also carries goals). */
+function parseYearRange(str){
+  if(!str) return null;
+  const CUR=new Date().getFullYear();
+  let m=String(str).match(/((?:19|20)\d{2})\s*(?:-|\u2013|\u2014|to)\s*((?:19|20)\d{2})/i);
+  if(m) return {lo:Math.min(+m[1],+m[2]), hi:Math.max(+m[1],+m[2])};
+  m=String(str).match(/((?:19|20)\d{2})\s*(?:\+|present|current|newer|now)/i);
+  if(m) return {lo:+m[1], hi:CUR};
+  return null;
+}
+function populateModelYear(){
+  const group=$("#fYearGroup"), sel=$("#fYear");
+  if(!group||!sel) return;
+  sel.innerHTML='<option value="" disabled selected>Select your exact year</option>';
+  const r=parseYearRange(S.cfg&&S.cfg.y);
+  if(!r||r.hi<=r.lo){ group.style.display="none"; sel.required=false; sel.value=""; return; }
+  for(let y=r.hi;y>=r.lo;y--){ const o=document.createElement("option"); o.value=String(y); o.textContent=String(y); sel.appendChild(o); }
+  group.style.display=""; sel.required=true;
 }
 /* ---- live booking: slots + priority list ---- */
 const BOOK={avail:null,slot:null,reason:null};
@@ -923,13 +948,16 @@ $("#fSubmit").onclick=async()=>{
   if(!S.marketCity){ return submitNetlifyLead(); }   // no market selected → legacy lead path
   const a=BOOK.avail, needSlot=!!(a && a.hasEvent && !a.full && !a.error);
   if(needSlot && !BOOK.slot){ $("#fErr").textContent="Please pick a time above."; $("#fErr").style.display="block"; const sl=document.querySelector("#tfSlots button,#tfSlots [tabindex]"); if(sl) sl.focus(); else $("#fErr").scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  const yearEl=$("#fYear"), yearShown=$("#fYearGroup") && $("#fYearGroup").style.display!=="none";
+  if(yearShown && !yearEl.value){ $("#fErr").textContent="Please select your exact model year."; $("#fErr").style.display="block"; yearEl.focus(); return; }
+  const modelYear=yearShown?yearEl.value:"";
   const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
   const msg=$("#fMsg").value.trim();
   const mods=$("#fMods").value.trim();
   const btn=$("#fSubmit"), prev=btn.textContent; btn.textContent="Submitting…"; btn.disabled=true;
   const payload={
     city:S.marketCity, slot:BOOK.slot||undefined,
-    name, phone, email, vehicle:$("#fVeh").value, mods,
+    name, phone, email, vehicle:$("#fVeh").value, modelYear, mods,
     goals: goalsStr + (msg?` · Note: ${msg}`:""),
     installer_key:S.installerKey||"", bot_field:"",
     source: S.intent==="update" ? "OTT Update" : "find-your-exact-tune",
@@ -957,12 +985,13 @@ function submitNetlifyLead(){
   const market=$("#fLoc").value||S.market||"Not selected";
   const message=$("#fMsg").value.trim();
   const vehicle=$("#fVeh").value;
-  const payload={ name, phone, email, location:market, installer:S.installer||"", vehicle, message, source:"Tune Finder" };
+  const modelYear=($("#fYearGroup")&&$("#fYearGroup").style.display!=="none")?$("#fYear").value:"";
+  const payload={ name, phone, email, location:market, installer:S.installer||"", vehicle, modelYear, message, source:"Tune Finder" };
   const fields={
     "form-name":LEAD_FORM_NAME, "bot-field":"",
     name, phone, email, market,
     installer_key:S.installerKey||"", installer_name:S.installer||"",
-    vehicle, goals:goalsStr,
+    vehicle, modelYear, goals:goalsStr,
     quote_base:cfg.base!=null?String(cfg.base):"",
     quote_custom:cfg.custom!=null?String(cfg.custom):"",
     quote_sc:cfg.sc!=null?String(cfg.sc):"",
@@ -978,7 +1007,7 @@ function submitNetlifyLead(){
 function openMail(p){
   const subj=encodeURIComponent(`Tune Finder request, ${p.vehicle}`);
   const body=encodeURIComponent(
-    `Name: ${p.name}\nPhone: ${p.phone}\nEmail: ${p.email}\nMarket: ${p.location}\nInstaller: ${p.installer}\nVehicle: ${p.vehicle}\n\nMessage:\n${p.message}`
+    `Name: ${p.name}\nPhone: ${p.phone}\nEmail: ${p.email}\nMarket: ${p.location}\nInstaller: ${p.installer}\nVehicle: ${p.vehicle}${p.modelYear?`\nModel year: ${p.modelYear}`:""}\n\nMessage:\n${p.message}`
   );
   window.location.href=`mailto:${LEAD_EMAIL}?subject=${subj}&body=${body}`;
 }

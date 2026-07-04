@@ -78,6 +78,12 @@ test("booking job pings n8n with the booking payload", async () => {
   assert.equal(h.pings[0].payload.slot, "9:20");
   assert.equal(h.pings[0].payload.installer.key, "cody");
 });
+test("booking job carries the exact model year into the n8n payload", async () => {
+  const h = harness();
+  h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://ty.app.n8n.cloud/webhook/ty-booking";
+  await processNotifications(bookingJob({ d: { modelYear: "2019" } }), h.deps);
+  assert.equal(h.pings[0].payload.modelYear, "2019");
+});
 test("a best-effort n8n ping failure does not break the flow", async () => {
   const h = harness();
   h.deps.env.N8N_BOOKING_WEBHOOK_URL = "https://x";

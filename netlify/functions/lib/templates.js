@@ -89,7 +89,7 @@ function buildBookingCustomerEmail(d, inst, market, event) {
     `<p>Your <strong>${esc(d.vehicle || "vehicle")}</strong> tune is confirmed.</p>` +
     `<table style="border-collapse:collapse;font-size:14px">` +
     row("City", `${market.city}, ${market.state}`).html + row("Date", event.label || event.dateISO).html +
-    row("Time", d.slot).html + row("Installer", `${inst.name} (${inst.phone})`).html +
+    row("Time", d.slot).html + row("Model year", d.modelYear).html + row("Installer", `${inst.name} (${inst.phone})`).html +
     `</table>` +
     `<p style="margin-top:14px">A calendar invite is attached. Need to change it? Call or text <strong>${esc(inst.phone)}</strong>.</p>` +
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
@@ -100,7 +100,7 @@ function buildBookingInstallerEmail(d, inst, market, event) {
     ...(d.source === "OTT Update" ? [row("Request type", "Free OTT Update (existing customer re-flash)")] : []),
     row("Name", d.name), row("Phone", d.phone), row("Email", d.email),
     row("City", `${market.city}, ${market.state}`), row("Date", event.label || event.dateISO),
-    row("Time", d.slot), row("Vehicle", d.vehicle), row("Goals", d.goals), row("Attribution", attribution(d)),
+    row("Time", d.slot), row("Vehicle", d.vehicle), row("Model year", d.modelYear), row("Goals", d.goals), row("Attribution", attribution(d)),
   ];
   const subject = `New booking — ${market.city} ${event.label || event.dateISO} @ ${d.slot}`;
   const text = `New booking routed to ${inst.name}.\n\n` + rows.map((r) => r.text).join("") + `\nReply to reach the customer.\n`;
@@ -123,7 +123,7 @@ function buildPriorityCustomerEmail(d, inst, market, reason) {
   return { subject, html, text };
 }
 function buildPriorityInstallerEmail(d, inst, market, reason) {
-  const rows = [...(d.source === "OTT Update" ? [row("Request type", "Free OTT Update (existing customer re-flash)")] : []), row("Name", d.name), row("Phone", d.phone), row("Email", d.email), row("City", market.city), row("Requested time", reason === "full" ? (d.slot || "") : ""), row("Vehicle", d.vehicle), row("Goals", d.goals), row("Reason", reason === "full" ? "Event full" : "No event scheduled"), row("Attribution", attribution(d))];
+  const rows = [...(d.source === "OTT Update" ? [row("Request type", "Free OTT Update (existing customer re-flash)")] : []), row("Name", d.name), row("Phone", d.phone), row("Email", d.email), row("City", market.city), row("Requested time", reason === "full" ? (d.slot || "") : ""), row("Vehicle", d.vehicle), row("Model year", d.modelYear), row("Goals", d.goals), row("Reason", reason === "full" ? "Event full" : "No event scheduled"), row("Attribution", attribution(d))];
   const subject = `New Priority Wait List signup, ${market.city}`;
   const text = `New Priority Wait List signup routed to ${inst.name}.\n\n` + rows.map((r) => r.text).join("");
   const html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px"><h2 style="color:#5B4B42;margin:0 0 4px">Priority Wait List signup</h2>` +

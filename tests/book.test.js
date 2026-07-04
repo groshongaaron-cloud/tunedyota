@@ -153,3 +153,31 @@ test("booking survives a missing Modifications column (retries without it)", asy
   assert.equal(created.length, 1);
   assert.ok(!("Modifications" in created[0]));
 });
+test("booking record captures Model Year + rides along in the job", async () => {
+  const h = harness({ events: EV });
+  const r = await processBooking({ ...base, slot: "9:20", modelYear: "2019" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal(h.created[0].fields["Model Year"], "2019");
+  assert.equal(h.jobs[0].payload.d.modelYear, "2019");
+});
+test("booking survives a missing Model Year column (retries without it)", async () => {
+  const created = [];
+  const fetchImpl = async (url, opts) => {
+    if (url.includes("docs.google.com")) return { ok: true, text: async () => EV };
+    if (url.includes("api.airtable.com")) {
+      if (opts && opts.method === "POST") {
+        const b = JSON.parse(opts.body);
+        if ("Model Year" in b.fields) return { ok: false, status: 422, text: async () => '{"error":{"type":"UNKNOWN_FIELD_NAME","message":"Unknown field name: Model Year"}}' };
+        created.push(b.fields);
+        return { ok: true, json: async () => ({ id: "r1" }) };
+      }
+      return { ok: true, json: async () => ({ records: [] }) };
+    }
+    throw new Error("unexpected " + url);
+  };
+  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, trigger: async () => ({ ok: true }), now: () => "20260101T000000Z", log: { warn() {}, error() {} } };
+  const r = await processBooking({ ...base, slot: "9:00", modelYear: "2019" }, deps);
+  assert.equal(r.status, "booked");
+  assert.equal(created.length, 1);
+  assert.ok(!("Model Year" in created[0]));
+});

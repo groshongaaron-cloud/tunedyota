@@ -73,7 +73,7 @@ async function processNotifications(job, deps) {
   await ping({ fetchImpl, url: env.N8N_BOOKING_WEBHOOK_URL, log, payload: {
     event: "booking", status: "booked",
     name: d.name, email: d.email || "", phone: d.phone || "",
-    vehicle: d.vehicle || "", goals: d.goals || "", mods: d.mods || "",
+    vehicle: d.vehicle || "", modelYear: d.modelYear || "", goals: d.goals || "", mods: d.mods || "",
     city: market.city, state: market.state, slot: d.slot,
     eventDateISO: event.dateISO, eventLabel: event.label,
     installer: { key: inst.key, name: inst.name, email: inst.email, phone: inst.phone },

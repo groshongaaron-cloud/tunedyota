@@ -60,6 +60,15 @@ test("booking installer email lists details", () => {
   assert.ok(m.text.includes("Jane Doe"));
   assert.ok(m.text.includes("9:20"));
 });
+test("booking emails surface the exact model year when set, omit it when not", () => {
+  const withYear = tB.buildBookingInstallerEmail({ ...dB, slot: "9:20", modelYear: "2019" }, instB, marketB, eventB);
+  assert.ok(withYear.text.includes("Model year: 2019"), "installer text missing model year");
+  assert.ok(withYear.html.includes("2019"), "installer html missing model year");
+  const cust = tB.buildBookingCustomerEmail({ ...dB, slot: "9:20", modelYear: "2019" }, instB, marketB, eventB);
+  assert.ok(cust.html.includes("2019"), "customer html missing model year");
+  const noYear = tB.buildBookingInstallerEmail({ ...dB, slot: "9:20" }, instB, marketB, eventB);
+  assert.ok(!/Model year:/.test(noYear.text), "should omit model-year row when absent");
+});
 test("installer emails surface Free OTT Update request type when source set", () => {
   const b = tB.buildBookingInstallerEmail({ ...dB, slot: "9:20", source: "OTT Update" }, instB, marketB, eventB);
   assert.ok(b.text.includes("Free OTT Update"), "booking text row missing");

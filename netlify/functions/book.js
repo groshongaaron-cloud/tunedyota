@@ -34,14 +34,14 @@ async function processBooking(body, deps) {
   async function priority(reason) {
     const pfields = {
       City: market.city, Name: d.name, Phone: d.phone || "", Email: d.email || "",
-      Vehicle: d.vehicle || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
+      Vehicle: d.vehicle || "", "Model Year": d.modelYear || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
       Reason: reason === "full" ? "Event full" : "No event scheduled",
       "Event Date": event ? event.dateISO : "",
     };
     if (reason === "full" && isValidSlot(d.slot)) pfields["Requested Slot"] = d.slot; // only set when a preference was picked
     let pid;
     try {
-      const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications"]);
+      const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications", "Model Year"]);
       pid = rec && rec.id;
     } catch (e) { if (log.error) log.error("priority create", e.message); return { status: "error", error: "store-unavailable" }; }
     await fire({ kind: "priority", d, inst, market, reason, recordId: pid });
@@ -66,10 +66,10 @@ async function processBooking(body, deps) {
     const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, fields: {
       City: market.city, "Event Date": event.dateISO, Slot: d.slot,
       Name: d.name, Phone: d.phone || "", Email: d.email || "",
-      Vehicle: d.vehicle || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
+      Vehicle: d.vehicle || "", "Model Year": d.modelYear || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
       Status: "Booked", Source: d.source || "find-your-exact-tune",
       "UTM Source": d.utm_source || "", "UTM Medium": d.utm_medium || "", "UTM Campaign": d.utm_campaign || "",
-    } }, ["Modifications"]);
+    } }, ["Modifications", "Model Year"]);
     bid = rec && rec.id;
   } catch (e) { if (log.error) log.error("create", e.message); return { status: "error", error: "store-unavailable" }; }
 
