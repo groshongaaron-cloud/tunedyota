@@ -31,7 +31,7 @@ async function dispatchCertificates(deps) {
     const inst = keyToInstaller(f.Installer);
     const certNo = certSerial(row.id, f["Calibration Date"], issueDate);
     const { subject, html } = buildCertificate({
-      name: f.Name, vehicle: f.Vehicle, vin: f.VIN, calibration,
+      name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin: f.VIN, calibration,
       installer: inst.name, installerRegion: inst.region,
       calibrationDate: f["Calibration Date"], certNo, issueDate,
     });

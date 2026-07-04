@@ -28,8 +28,12 @@ function certSerial(recordId, dateISO, issueISO) {
 // renders as static, non-editable text (no dropdown). The choosable picker lives
 // only in the design master, docs/brand/tuned-yota-master-certificate.html.
 
-function buildCertificate({ name, vehicle, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
-  const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicle ? ` · ${vehicle}` : ""}`;
+function buildCertificate({ name, vehicle, modelYear, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
+  // Append the exact model year to the vehicle string when captured at booking
+  // (the vehicle string itself carries only the platform year range, e.g.
+  // "2016-2023 Toyota Tacoma 3.5L V6"). Empty for single-year vehicles.
+  const vehicleDisplay = vehicle ? `${vehicle}${modelYear ? ` (${modelYear})` : ""}` : "";
+  const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicleDisplay ? ` · ${vehicleDisplay}` : ""}`;
   const installerLine = `${esc(installer || "")}${installerRegion ? ` &middot; ${esc(installerRegion)}` : ""}`;
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -283,7 +287,7 @@ function buildCertificate({ name, vehicle, vin, calibration, installer, installe
         </div>
         <div class="row">
           <div class="label">Vehicle</div>
-          <div class="value">${esc(vehicle || "")}</div>
+          <div class="value">${esc(vehicleDisplay)}</div>
         </div>
         <div class="row">
           <div class="label">VIN</div>

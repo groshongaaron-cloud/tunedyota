@@ -39,6 +39,15 @@ test("renders the VIN when provided, em-dash when blank", () => {
   assert.ok(noVin.includes("&mdash;"));      // value falls back to an em-dash
 });
 
+test("appends the exact model year to the vehicle line when provided, omits it when blank", () => {
+  const withYear = buildCertificate({ name: "A", vehicle: "2016-2023 Toyota Tacoma 3.5L V6", modelYear: "2019" });
+  assert.ok(withYear.html.includes("2016-2023 Toyota Tacoma 3.5L V6 (2019)"), "vehicle line should carry the exact year");
+  assert.ok(withYear.subject.includes("(2019)"), "subject should carry the exact year");
+  const noYear = buildCertificate({ name: "A", vehicle: "2016-2023 Toyota Tacoma 3.5L V6" });
+  assert.ok(noYear.html.includes("2016-2023 Toyota Tacoma 3.5L V6"), "vehicle still renders without a year");
+  assert.ok(!/\(\s*\)/.test(noYear.html), "no dangling empty parens when model year is blank");
+});
+
 test("blank calibration renders an em-dash, not a picker", () => {
   const { html } = buildCertificate({ name: "A", vehicle: "V" });
   assert.ok(!/<select/.test(html));
