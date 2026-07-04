@@ -409,6 +409,28 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
     <div class="tf-mktlist" id="mktList"></div>
     <p class="tf-mapcap">Select a market, then send your request. Tuned Yota confirms platform, model year, engine, tire size, modifications, event availability, and final calibration support.</p>
 
+    <div id="leadForm">
+      <div class="tf-field">
+        <label for="fLoc">Selected market</label>
+        <input id="fLoc" type="text" readonly placeholder="Select a market on the map above">
+      </div>
+      <div id="tfSlots" style="display:none"></div>
+      <div class="tf-row2">
+        <div class="tf-field"><label for="fName">Name</label><input id="fName" type="text" autocomplete="name" placeholder="Your name"></div>
+        <div class="tf-field"><label for="fPhone">Phone</label><input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(___) ___-____"></div>
+      </div>
+      <div class="tf-field"><label for="fEmail">Email</label><input id="fEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
+      <div class="tf-field"><label for="fVeh">Your vehicle</label><input id="fVeh" type="text" readonly></div>
+      <div class="tf-field"><label for="fMods">Modifications</label><input id="fMods" type="text" placeholder="Lift, tires, exhaust, intake, supercharger…"></div>
+      <div class="tf-field"><label for="fMsg">Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
+      <button class="btn primary" id="fSubmit" style="width:100%">Send My Request →</button>
+      <p id="fErr" role="alert" style="color:#9b4a3a;font-size:13px;text-align:center;margin-top:10px;display:none">Please add your name and a phone or email so we can reach you.</p>
+    </div>
+
+    <div id="proofBook"></div>
+
+    <div class="tf-or">or reach your installer directly</div>
+
     <div class="tf-inst" id="instCard">
       <img id="instPhoto" alt="" src="">
       <div class="ibody">
@@ -427,28 +449,6 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
     <div class="tf-call">
       <a class="btn primary" href="tel:+16124067117">📞 Call (612) 406-7117</a>
       <a class="btn outline" href="sms:+16124067117">💬 Text us</a>
-    </div>
-
-    <div class="tf-or">or send a request</div>
-
-    <div id="proofBook"></div>
-
-    <div id="leadForm">
-      <div class="tf-field">
-        <label for="fLoc">Selected market</label>
-        <input id="fLoc" type="text" readonly placeholder="Select a market on the map above">
-      </div>
-      <div id="tfSlots" style="display:none"></div>
-      <div class="tf-row2">
-        <div class="tf-field"><label for="fName">Name</label><input id="fName" type="text" autocomplete="name" placeholder="Your name"></div>
-        <div class="tf-field"><label for="fPhone">Phone</label><input id="fPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(___) ___-____"></div>
-      </div>
-      <div class="tf-field"><label for="fEmail">Email</label><input id="fEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
-      <div class="tf-field"><label for="fVeh">Your vehicle</label><input id="fVeh" type="text" readonly></div>
-      <div class="tf-field"><label for="fMods">Modifications</label><input id="fMods" type="text" placeholder="Lift, tires, exhaust, intake, supercharger…"></div>
-      <div class="tf-field"><label for="fMsg">Anything else?</label><textarea id="fMsg" placeholder="Mods, supercharger interest, questions…"></textarea></div>
-      <button class="btn primary" id="fSubmit" style="width:100%">Send My Request →</button>
-      <p id="fErr" role="alert" style="color:#9b4a3a;font-size:13px;text-align:center;margin-top:10px;display:none">Please add your name and a phone or email so we can reach you.</p>
     </div>
 
     <div class="tf-success" id="leadSuccess">
