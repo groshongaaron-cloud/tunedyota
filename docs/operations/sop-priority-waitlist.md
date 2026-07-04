@@ -6,11 +6,13 @@
 The **Priority List** (Airtable) is the waitlist. People land on it three ways, tracked in the
 `Reason` column:
 
-| `Reason` | How they got there |
-|----------|--------------------|
-| `no-event` | Wanted a tune in a city with no scheduled event yet |
-| `full` | Wanted a specific event whose 12 slots were all taken |
-| `Rebook — not completed` | No-show or unfinished at an event (added by the overnight sweep) |
+| `Reason` (exact value stored + shown in the emails) | What it means |
+|------------------------------------------------------|---------------|
+| `Rebook — not completed` | Booked but not marked complete at the event — no-show or unfinished. Re-book them. (Added by the overnight +1-day sweep.) |
+| `Event full` | Wanted a slot but the event's 12 were all taken — joined the waitlist. |
+| `No event scheduled` | Interested in a city with no event on the calendar yet. |
+
+This same **Reason key** legend now prints at the bottom of the rebook emails (Post-Event Summary + Weekly backlog) so installers/owner can decode it inline.
 
 ---
 
@@ -20,7 +22,7 @@ The **Priority List** (Airtable) is the waitlist. People land on it three ways, 
 |-----------|------|--------------|
 | **Waitlist sweep** (`event-reminders.js`) | +1 day after each event, 07:00 CT | Adds no-shows / not-completed bookings to the Priority List as rebooks (de-duped by email + date) |
 | **Weekly rebook report** (`rebook-report.js`) | **Mondays ~8:00 AM Central** | Emails `info@` the full **outstanding** backlog (where `Notified` ≠ true), grouped by location + installer |
-| **Post-event rebook summary** (`event-reminders.js`) | After an event | Emails `info@` that event's rebook list |
+| **Post-Event Summary** (`event-reminders.js`) | +1 day after an event | Emails `info@` that event's rebook list, titled `Post-Event Summary — <City> (<date>)` |
 
 The `Notified` column is the control: an outstanding lead is one that hasn't been worked yet.
 

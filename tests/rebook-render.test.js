@@ -28,6 +28,17 @@ test("appends the exact model year after the vehicle, omits it when blank", () =
   assert.doesNotMatch(m.text, /2\.4L-T I4 \(\)/);                    // no dangling parens when blank
 });
 
+test("includes a Reason key legend decoding all three Reason values", () => {
+  const m = renderRebookReport([{ Name: "A", City: "Omaha", Reason: "Rebook — not completed", Installer: "cody" }],
+    { title: "Post-Event Summary — Omaha (2026-07-03)" });
+  assert.match(m.text, /REASON KEY:/);
+  assert.match(m.html, /Reason key/);
+  for (const r of ["Rebook — not completed", "Event full", "No event scheduled"]) {
+    assert.ok(m.text.includes(r), `text legend missing: ${r}`);
+    assert.ok(m.html.includes(r), `html legend missing: ${r}`);
+  }
+});
+
 test("empty input says none outstanding", () => {
   const m = renderRebookReport([], { title: "Weekly rebook backlog" });
   assert.match(m.subject, /\(0\)/);
