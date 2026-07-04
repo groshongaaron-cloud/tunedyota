@@ -10,7 +10,7 @@ function renderRosterEmail(event, bookings, waitlist) {
 
   const head = ["Time", "Name", "Vehicle", "Phone", "Email", "Mods"];
   const bodyRows = sorted.map((b) => [
-    b.Slot ? formatSlot(b.Slot) : "", b.Name || "", b.Vehicle || "", b.Phone || "", b.Email || "", b.Modifications || "",
+    b.Slot ? formatSlot(b.Slot) : "", b.Name || "", `${b.Vehicle || ""}${b["Model Year"] ? ` (${b["Model Year"]})` : ""}`, b.Phone || "", b.Email || "", b.Modifications || "",
   ]);
 
   const th = head.map((h) => `<th style="text-align:left;padding:4px 12px 4px 0;color:#7c8472;border-bottom:1px solid #ccc">${h}</th>`).join("");

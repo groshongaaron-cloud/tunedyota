@@ -2,7 +2,8 @@
 const { keyToInstaller } = require("./routing.js");
 function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 function line(r) {
-  return `${r.Name || ""} — ${r.Phone || r.Email || ""} · ${r.Vehicle || "—"} · ${r.City || "—"} · ${r.Reason || ""}${r["Event Date"] ? ` · ${r["Event Date"]}` : ""}`;
+  const veh = `${r.Vehicle || "—"}${r["Model Year"] ? ` (${r["Model Year"]})` : ""}`;
+  return `${r.Name || ""} — ${r.Phone || r.Email || ""} · ${veh} · ${r.City || "—"} · ${r.Reason || ""}${r["Event Date"] ? ` · ${r["Event Date"]}` : ""}`;
 }
 function groupBy(records, keyFn) {
   const m = new Map();

@@ -35,6 +35,17 @@ test("complete sets fields, sends the cert, marks Certificate Sent", async () =>
   assert.ok(sent.attachments && sent.attachments[0].filename === "certificate.html");
 });
 
+test("stamps the exact model year on the certificate (appended to the vehicle)", async () => {
+  let sent = null;
+  await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
+    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+      get: async () => recFor("cody", { Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2019" }),
+      update: async () => ({}),
+      send: async (m) => { sent = m; return { ok: true }; } });
+  const certHtml = Buffer.from(sent.attachments[0].content, "base64").toString();
+  assert.ok(certHtml.includes("2016-2023 Toyota Tacoma 3.5L V6 (2019)"), "cert shows the exact model year");
+});
+
 test("complete stores a normalized VIN and stamps it on the certificate", async () => {
   const updates = []; let sent = null;
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy", vin: " 5tfdw5f17-mx000000 " },

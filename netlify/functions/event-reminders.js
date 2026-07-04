@@ -73,9 +73,9 @@ async function runReminders(deps) {
         const b = act.booking;
         await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields: {
           City: act.event.city, Name: b.Name || "", Phone: b.Phone || "", Email: b.Email || "",
-          Vehicle: b.Vehicle || "", Modifications: b.Modifications || "", Installer: inst.key,
+          Vehicle: b.Vehicle || "", "Model Year": b["Model Year"] || "", Modifications: b.Modifications || "", Installer: inst.key,
           Reason: SWEEP_REASON, "Event Date": b["Event Date"] || act.event.dateISO,
-        } }, ["Modifications"]);
+        } }, ["Modifications", "Model Year"]);
       }
     } catch (e) {
       failures.push(`${act.type}:${act.event.city}:${e.message}`);
@@ -94,12 +94,15 @@ async function runReminders(deps) {
       const mk = getMarket(a.event.city);
       return {
         Name: a.booking.Name, Phone: a.booking.Phone, Email: a.booking.Email, Vehicle: a.booking.Vehicle,
+        "Model Year": a.booking["Model Year"],
         City: a.event.city, Reason: SWEEP_REASON, "Event Date": a.event.dateISO,
         Installer: mk ? keyToInstaller(mk.inst).key : "aaron",
       };
     });
     try {
-      const m = renderRebookReport(rows, { title: `Post-event rebook — ${nowCentral.dateISO}` });
+      // Name the event(s) swept (proper-case city + date) rather than just today's date.
+      const evName = [...new Set(swept.map((a) => { const mk = getMarket(a.event.city); return `${mk ? mk.city : a.event.city} (${a.event.dateISO})`; }))].join(", ");
+      const m = renderRebookReport(rows, { title: `Post-Event Summary — ${evName}` });
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: OWNER, replyTo: OWNER,
         subject: m.subject, html: m.html, text: m.text });
     } catch (e) { if (log.error) log.error("rebook report", e.message); }

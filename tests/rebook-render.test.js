@@ -18,6 +18,16 @@ test("renders all, grouped by city and by installer, with counts", () => {
   assert.match(m.text, /Aaron Groshong \(1\)/);
 });
 
+test("appends the exact model year after the vehicle, omits it when blank", () => {
+  const rows = [
+    { Name: "A One", Phone: "111", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2019", City: "Omaha", Reason: "Rebook — not completed", Installer: "cody" },
+    { Name: "B Two", Phone: "222", Vehicle: "2024+ Toyota Tacoma 2.4L-T I4", City: "Omaha", Reason: "Event full", Installer: "cody" },
+  ];
+  const m = renderRebookReport(rows, { title: "Post-Event Summary — Omaha (2026-07-03)" });
+  assert.match(m.text, /2016-2023 Toyota Tacoma 3\.5L V6 \(2019\)/); // year appended
+  assert.doesNotMatch(m.text, /2\.4L-T I4 \(\)/);                    // no dangling parens when blank
+});
+
 test("empty input says none outstanding", () => {
   const m = renderRebookReport([], { title: "Weekly rebook backlog" });
   assert.match(m.subject, /\(0\)/);

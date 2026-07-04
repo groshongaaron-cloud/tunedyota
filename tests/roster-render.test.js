@@ -19,6 +19,16 @@ test("roster sorts by slot, basics-only columns, no goal blurbs", () => {
   assert.ok(html.includes("W Lister") && /waitlist/i.test(html));
   assert.ok(text.includes("A One"));
 });
+test("roster appends the exact model year to the vehicle cell when present", () => {
+  const b = [
+    { Slot: "9:00", Name: "A One", Vehicle: "2010-2019 Toyota 4Runner 4.0L V6", "Model Year": "2015", Phone: "p1", Email: "a@x.com" },
+    { Slot: "9:20", Name: "B Two", Vehicle: "2024+ Toyota Tacoma 2.4L-T I4", Phone: "p2", Email: "b@x.com" },
+  ];
+  const { html, text } = renderRosterEmail(event, b, []);
+  assert.ok(html.includes("2010-2019 Toyota 4Runner 4.0L V6 (2015)"), "year appended in vehicle cell");
+  assert.ok(text.includes("(2015)"));
+  assert.ok(!/2\.4L-T I4 \(\)/.test(html), "no dangling parens when blank");
+});
 test("roster handles empty bookings + empty waitlist", () => {
   const { html } = renderRosterEmail(event, [], []);
   assert.ok(/no bookings/i.test(html));

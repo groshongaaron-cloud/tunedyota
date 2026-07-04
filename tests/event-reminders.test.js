@@ -37,12 +37,13 @@ test("off-hour does nothing", async () => {
   assert.equal(d._sends.length, 0);
 });
 test("post-event sweep creates a priority record", async () => {
-  const bookings = [{ id: "b1", fields: { City: "Green Bay", "Event Date": "2026-09-12", Slot: "9:00", Name: "A", Email: "a@x.com", Status: "Booked" } }];
+  const bookings = [{ id: "b1", fields: { City: "Green Bay", "Event Date": "2026-09-12", Slot: "9:00", Name: "A", Email: "a@x.com", "Model Year": "2019", Status: "Booked" } }];
   const d = deps({ now: new Date("2026-09-13T12:00:00Z"), listAll: async ({ table }) => (table === "Bookings" ? bookings : []) });
   await runReminders(d);
   assert.equal(d._creates.length, 1);
   assert.equal(d._creates[0].fields.Reason, "Rebook — not completed");
   assert.equal(d._creates[0].fields.City, "Green Bay");
+  assert.equal(d._creates[0].fields["Model Year"], "2019"); // model year persists onto the swept priority record
 });
 
 test("baked events (no embedded city) route correctly — no unknown-city failure", async () => {
@@ -70,7 +71,7 @@ test("sends a post-event rebook report to the owner when a sweep occurs", async 
   // 2026-07-04T12:00:00Z = 07:00 CDT (UTC-5), so hour===7 passes the gate.
   const eventDate = "2026-07-03";
   const today = "2026-07-04";
-  const bookings = [{ id: "b1", fields: { City: "Green Bay", "Event Date": eventDate, Slot: "9:00", Name: "Walk In", Email: "w@x.com", Status: "Booked" } }];
+  const bookings = [{ id: "b1", fields: { City: "Green Bay", "Event Date": eventDate, Slot: "9:00", Name: "Walk In", Email: "w@x.com", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2019", Status: "Booked" } }];
   const events = { "green bay": { city: "Green Bay", state: "WI", dateISO: eventDate, label: "Jul 3, 2026", active: true, address: "123 Dyno Rd" } };
   const d = deps({
     now: new Date(`${today}T12:00:00Z`),
@@ -78,7 +79,9 @@ test("sends a post-event rebook report to the owner when a sweep occurs", async 
     listAll: async ({ table }) => (table === "Bookings" ? bookings : []),
   });
   await runReminders(d);
-  const report = d._sends.find((m) => /Post-event rebook/.test(m.subject || ""));
-  assert.ok(report, "expected a post-event rebook report email");
+  const report = d._sends.find((m) => /Post-Event Summary/.test(m.subject || ""));
+  assert.ok(report, "expected a Post-Event Summary report email");
+  assert.match(report.subject, /Green Bay \(2026-07-03\)/);  // names the event + date
+  assert.match(report.text, /\(2019\)/);                     // exact model year appears in the report
   assert.equal(report.to, "info@tunedyota.com");
 });

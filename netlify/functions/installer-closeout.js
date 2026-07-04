@@ -72,7 +72,7 @@ async function processCloseout(body, deps) {
     const inst = keyToInstaller(owner);
     const certNo = certSerial(d.recordId, issueDate, issueDate);
     const { subject, html } = buildCertificate({
-      name: f.Name, vehicle: f.Vehicle, vin, calibration, installer: inst.name,
+      name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin, calibration, installer: inst.name,
       installerRegion: inst.region, calibrationDate: issueDate, certNo, issueDate });
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email,
       cc: inst.email === OWNER ? undefined : OWNER, replyTo: OWNER, subject,
