@@ -152,3 +152,27 @@ NOTE: edited while Claude Code was running; if a System32 reg reappears after a 
 process rewrote the file from memory — redo with Claude Code closed. **Gotcha:** the GUI env var only takes effect after a FULL quit+
 reopen of Claude Code (child MCP process inherits env at launch). See [[pending-secret-rotation]]
 for the 2nd key exposure that happened during this setup.
+
+**2026-07-04 — n8n-mcp TOOLS WORKED IN-SESSION (correction to the note above).** This session the
+`mcp__n8n-mcp__*` tools DID register/load via `ToolSearch select:...` and ran fine (health_check ok,
+list/get/update_partial/validate/executions all worked against `tunedyota.app.n8n.cloud`). So the
+"tools never register" workaround is no longer always true — TRY the MCP tools first now; fall back to
+curl + `$N8N_API_KEY` only if they don't load.
+
+**2026-07-04 — WF1 Slack message now shows the exact MODEL YEAR** (part of the [[booking-model-year-capture]]
+feature). WF1 = **"TY — WF1 New Booking → Slack"** (id `ALeBJP3JlqNxC16T`). Applied via
+`n8n_update_partial_workflow` `patchNodeField` on the `Slack #bookings` node's `parameters.jsonBody`:
+appended `+ (b.modelYear ? ' (' + b.modelYear + ')' : '')` right after the vehicle, so the alert reads
+e.g. `2016-2023 Toyota Tacoma 3.5L V6 (2019) · 9:20 …` and shows nothing extra when modelYear is empty.
+Owner-approved before applying. Verified: test webhook POST → **execution 41 success**, Slack node
+`{"data":"ok"}`. **The Airtable Model Year write is in book.js (owner added the column) — WF1 has NO
+Airtable node**, so there was nothing to "map to Airtable" in n8n; the only n8n change was the Slack text.
+Full pipeline now complete: form → book.js (Airtable Model Year, tolerant) → book-background n8n ping
+(`modelYear`) → WF1 Slack shows it.
+
+**KNOWN FALSE POSITIVE:** `n8n_validate_workflow` on WF1 reports an error that the node **"IF email failed"**
+should move from the Webhook's `main[0]` to an error output (`main[1]` + `onError:continueErrorOutput`).
+DO NOT do this — that node is an intentional PARALLEL branch (fires on every booking, checks the
+`emailFailed` flag in the payload, posts a note only if an email bounced). It is NOT a webhook error
+handler; the validator just trips on the word "failed" in the node name. Rewiring would break the
+email-failed notification. Leave WF1's connections as-is.
