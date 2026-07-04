@@ -1,0 +1,23 @@
+---
+name: booking-model-year-capture
+description: "Exact model-year dropdown on the booking form (LIVE 2026-07-04); code sends modelYear everywhere, but 2 external steps (Airtable column, n8n node) still pending → value not yet stored"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 5dc65e6b-44f7-4e23-afad-16cc858aa763
+---
+
+**Model-year capture SHIPPED & LIVE 2026-07-04 (master @ 29a5625, verified on prod).** The booking form (`/find-your-exact-tune`, step 5) now has a **Model year** `<select>` between "Your vehicle" and "Modifications". When the selected config spans a range it shows a **required, newest-first** dropdown; single-year / **"All years"** / unparseable ranges **hide** it (not required).
+
+Implementation notes (the non-obvious bits):
+- Parses the clean **`S.cfg.y`** range (e.g. "2016-2023", open-ended "2024+"→current year), NOT the `#fVeh` display string (which also appends goals text). Helpers: `parseYearRange()` + `populateModelYear()` (called in `prepBooking()`). Field ids: `#fYearGroup` (wrapper, `display:none` default) / `#fYear` (select). Validation in `#fSubmit.onclick` blocks submit when visible+unpicked.
+- Value (`modelYear`) is wired through the WHOLE in-repo path: `/book` JSON payload + Netlify lead-fallback fields + hidden `tune-lead` form + mailto fallback; `book.js` writes **`Model Year`** to Bookings + Priority Airtable tables; `book-background.js` adds it to the n8n ping payload; `templates.js` shows it in booking installer + customer emails (row() self-omits when empty). 263 tests green (7 new across book/book-background/booking-ui/templates tests).
+- **SAFE via `createTolerant`**: `"Model Year"` is in the drop-on-unknown-field lists in book.js, so writing it can NEVER break a booking before the Airtable column exists (same pattern VIN used).
+
+**⚠️ TWO EXTERNAL-UI STEPS STILL PENDING (owner Aaron — can't be done from the repo). Until done, the value is captured + emailed but NOT stored:**
+1. **Airtable** (base `appMYG0QlSZTCYxUU`) — add a `Model Year` field (Single line text) to BOTH the **Bookings** and **Priority** tables. (Tolerant write silently drops it until then.)
+2. **n8n Cloud** — in the `ty-booking` workflow, map incoming `modelYear` → the new Airtable column (and into the Slack #bookings message if wanted).
+
+**Known limitation:** `"All years"` configs (older Tundra/Sequoia V8s: 4.0L/4.7L/4.6L) have no bounded range → field stays hidden → no exact year captured for them. Would need explicit year bounds added to the VEHICLES data to cover.
+
+Verified on prod with the **stub-fetch technique** (override `window.fetch` to capture the `/book` POST body + return a fake `booked` response) so NO real booking/email/Slack was created — see [[funnel-step5-layout-and-verification]] for how to drive the funnel. Deploy = push master (see [[funnel-roadmap-and-lead-setup]]).
