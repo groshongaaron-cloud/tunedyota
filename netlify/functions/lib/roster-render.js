@@ -1,5 +1,6 @@
 // netlify/functions/lib/roster-render.js
 const { formatSlot } = require("./slots.js");
+const { reasonKeyText, reasonKeyHtml } = require("./reasons.js");
 function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 function bySlot(a, b) { return String(a.Slot || "").localeCompare(String(b.Slot || ""), undefined, { numeric: true }); }
 
@@ -21,17 +22,22 @@ function renderRosterEmail(event, bookings, waitlist) {
   const wl = (waitlist || []).map((w) => `<li>${esc(w.Name || "")} — ${esc(w.Phone || w.Email || "")}${w.Reason ? ` (${esc(w.Reason)})` : ""}</li>`).join("");
   const wlHtml = `<h3 style="color:#5B4B42;margin:18px 0 4px">Priority waitlist</h3>` + (wl ? `<ul>${wl}</ul>` : `<p style="color:#7c8472">None.</p>`);
 
+  // Only show the Reason key when there's a waitlist — that's the only place a
+  // Reason appears on the roster.
+  const hasWaitlist = !!(waitlist && waitlist.length);
+
   const html =
     `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:680px">` +
     `<h2 style="color:#5B4B42;margin:0 0 2px">${esc(evLabel)}</h2>` +
     `<p style="color:#7c8472;margin:0 0 12px">9:00 AM start${event.address ? ` · ${esc(event.address)}` : ""} · ${sorted.length} booked</p>` +
     `<table style="border-collapse:collapse;font-size:14px"><tr>${th}</tr>${trs}</table>` +
-    wlHtml + `</div>`;
+    wlHtml + (hasWaitlist ? reasonKeyHtml() : "") + `</div>`;
 
   const text =
     `${evLabel}\n9:00 AM start${event.address ? ` · ${event.address}` : ""}\n\n` +
     (bodyRows.length ? bodyRows.map((r) => r.join("  |  ")).join("\n") : "No bookings yet.") +
-    `\n\nPriority waitlist:\n` + ((waitlist || []).map((w) => `- ${w.Name || ""} ${w.Phone || w.Email || ""}${w.Reason ? ` (${w.Reason})` : ""}`).join("\n") || "None.");
+    `\n\nPriority waitlist:\n` + ((waitlist || []).map((w) => `- ${w.Name || ""} ${w.Phone || w.Email || ""}${w.Reason ? ` (${w.Reason})` : ""}`).join("\n") || "None.") +
+    (hasWaitlist ? `\n\n` + reasonKeyText() : "");
 
   return { subject, html, text };
 }

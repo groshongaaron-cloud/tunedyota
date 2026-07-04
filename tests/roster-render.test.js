@@ -33,3 +33,13 @@ test("roster handles empty bookings + empty waitlist", () => {
   const { html } = renderRosterEmail(event, [], []);
   assert.ok(/no bookings/i.test(html));
 });
+
+test("roster shows the Reason key legend only when there is a waitlist", () => {
+  const withWl = renderRosterEmail(event, bookings, [{ Name: "W Lister", Phone: "p3", Reason: "Event full" }]);
+  assert.match(withWl.html, /Reason key/);
+  assert.match(withWl.text, /REASON KEY:/);
+  assert.ok(withWl.text.includes("No event scheduled"), "legend decodes all reasons");
+  const noWl = renderRosterEmail(event, bookings, []);
+  assert.doesNotMatch(noWl.html, /Reason key/);   // no legend when nothing to decode
+  assert.doesNotMatch(noWl.text, /REASON KEY:/);
+});
