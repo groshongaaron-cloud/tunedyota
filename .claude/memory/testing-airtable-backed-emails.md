@@ -1,6 +1,6 @@
 ---
 name: testing-airtable-backed-emails
-description: "How to test a roster/report email end-to-end when it renders live Airtable data — inject a transient test row, send, then delete. Used 2026-07-04 to confirm Model Year shows in the roster."
+description: "How to preview/test a roster/report email: (A) full-pipeline — inject a transient Airtable row, send via the real endpoint, delete; (B) direct render-and-send via Resend for styling previews (no test row). Used 2026-07-04 for the Model Year roster + Post-Event Summary preview."
 metadata: 
   node_type: memory
   type: reference
@@ -31,3 +31,24 @@ curl -s -H "x-ty-task: $SECRET" "https://tunedyota.com/.netlify/functions/event-
 **5. DELETE the test row** (`curl -X DELETE .../Bookings/<recId>`) and verify it's gone. It's your own seconds-old artifact; deleting restores state so it doesn't pollute rosters/reports/counts. Same principle as the n8n test-execution delete.
 
 Secret hygiene: `netlify env:get VAR` prints the value, so always `VAR=$(netlify env:get VAR 2>/dev/null)` into a shell var and use it only inside a header/`-H` — never `echo` it (keeps it out of the transcript). Related browser-side technique: stub `window.fetch` to test the booking form without a real booking — see [[funnel-step5-layout-and-verification]]. Field being tested here: [[booking-model-year-capture]].
+
+---
+
+## Two ways to preview/test these emails — pick by goal
+
+**A. Full-pipeline test (the recipe above)** — inject a transient Airtable row → send via the real endpoint (`event-roster-run`) → delete the row. Use when you need to prove the LIVE path works end-to-end (Airtable query + filter + real trigger). Downsides: writes/deletes real data, only the endpoints that exist (roster; there is NO on-demand endpoint for the Post-Event Summary / rebook report — those only fire from the −1d sweep / weekly cron).
+
+**B. Direct render-and-send preview (cleaner when you just want to SEE the styling)** — render the email in a node script and POST it straight to Resend. NO Airtable write, NO test row, NO cleanup. This is how the styled **Post-Event Summary** preview was sent 2026-07-04 (works for ANY of the renderers — rebook/roster/templates — even ones with no live endpoint):
+```
+export RESEND_API_KEY="$(netlify env:get RESEND_API_KEY 2>/dev/null)"   # capture, never echo
+node -e '
+const { renderRebookReport } = require("./netlify/functions/lib/rebook-render.js");
+const { sendEmail } = require("./netlify/functions/lib/resend.js");
+const m = renderRebookReport([ /* sample rows, incl. "Model Year" */ ], { title: "Post-Event Summary — Duluth (2026-07-25)" });
+sendEmail({ apiKey: process.env.RESEND_API_KEY,
+  from: "Tuned Yota <events@send.tunedyota.events>",   // MUST be the Resend-verified domain
+  to: "info@tunedyota.com", replyTo: "info@tunedyota.com",
+  subject: "[PREVIEW] Post-Event Summary — sample layout",
+  html: m.html, text: m.text }).then(r=>console.log("SENT", r.id));'
+```
+Rules that make B safe/clean: `from` must be `events@send.tunedyota.events` (only verified sender — an `@tunedyota.com` from will 403); use obvious **sample** names + a `[PREVIEW]` subject + an in-body PREVIEW banner so it can't be mistaken for a real report; `sendEmail` (`lib/resend.js`) throws on any non-2xx, so a returned `id` = real delivery, not swallowed. Recipient is the owner's own inbox (info@) — no external send.
