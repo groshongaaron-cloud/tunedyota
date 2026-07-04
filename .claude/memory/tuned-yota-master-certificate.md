@@ -43,3 +43,13 @@ left unmarked so a later daily run auto-sends it once the calibration is set; th
 owner gets one Slack nudge per run listing held names. So a blank-calibration cert
 never reaches a customer. The `docs/brand/` HTML remains the
 canonical design source to evolve. Related: [[event-reminders-automation]].
+
+**Fields added back since the "dropped" note above (that line is now stale):**
+- **VIN** — re-added to the cert readout 2026-07-02 (captured at installer close-out).
+- **Model year** — added 2026-07-04 (master @ ff05111). NOT a separate field: the exact
+  year is **appended to the Vehicle line** as `vehicle (YYYY)` (e.g. "2016-2023 Toyota
+  Tacoma 3.5L V6 (2019)"), in both the Vehicle readout value and the email subject; the
+  parens are omitted when the year is blank (single-year vehicles). Owner chose append-to-
+  vehicle over a separate labeled field. Rendered by `buildCertificate({..., modelYear})`;
+  `certificate-dispatch.js` passes `f["Model Year"]` from the booking record; canonical
+  `docs/brand` sample updated to match. Part of the [[booking-model-year-capture]] pipeline.
