@@ -3,16 +3,25 @@
 _Master plan drafted 2026-06-27. A working roadmap, not a commitment — dates firm up
 as venues, installer availability, and demand signals confirm. Owner edits freely._
 
+_Firm dates assigned 2026-07-06 (Phase 1 + the full 2027 calendar below). New operating
+rules folded in: **skip major-holiday weekends** (Memorial Day, July 4, Labor Day);
+**installers in separate territories may share a date/weekend** (owner floats or the
+installer runs their own event console). Duluth held at its booked Sat Jul 25, 2026._
+
 ## The lens I'm planning through
 
 Tuned Yota runs **mobile, event-based OTT tuning** for Toyota/Lexus trucks (plus
 Magnuson supercharger work) across the Upper Midwest. The constraints that shape any
 good calendar here:
 
-1. **Three installers, three territories.** Aaron (MN, IA, ND-Fargo, + Eau Claire &
-   Madison WI), Noah (rest of WI — Green Bay, Milwaukee), Cody (SD + Omaha NE). The
-   calendar is really *three parallel calendars* that should rarely collide on the same
-   weekend, so no installer is double-booked and owner support can float.
+1. **Three installers, three territories, three home bases.** Aaron (home: **Twin
+   Cities**; covers MN, IA, ND-Fargo, + Eau Claire & Madison WI), Noah (home:
+   **Sheboygan**; rest of WI — Green Bay, Milwaukee), Cody (home: **Sioux Falls**; SD +
+   Omaha NE). Events are almost always **round-trips from home base**, so optimize
+   spacing as *spokes from home*, not city-to-city routes. The calendar is *three
+   parallel calendars*; **installers in separate territories may run the same
+   date/weekend** (owner floats or the installer runs their own event console) — just
+   never double-book one installer.
 2. **Brutal winters.** Outdoor/mobile tuning in MN/WI/the Dakotas is impractical
    **mid-November through March**. The realistic event season is **April–October**,
    with a hard summer peak (truck/off-road season) June–August.
@@ -60,8 +69,9 @@ rebooks from the summer events).
 |-------------|--------|-----------|-----------|
 | **Sat Aug 15, 2026** | **Sioux Falls, SD** | Cody | Cody's home base, untouched in the summer slate; pairs logistically with the earlier Rapid City/Omaha runs. |
 | **Sat Aug 22, 2026** | **Milwaukee, WI** | Noah | Largest WI metro; warms up Noah's region ahead of the Green Bay capstone. |
-| **Sat Aug 29, 2026** | **Twin Cities, MN (round 2)** | Aaron | TC is the biggest single market and the season opener — a Labor-Day-weekend repeat catches everyone who missed June. |
+| **Sat Aug 29, 2026** | **Twin Cities, MN (round 2)** | Aaron | TC is the biggest single market and the season opener; a late-August repeat catches everyone who missed June. Holiday-safe — a week ahead of Labor Day (Sep 5–7). |
 | Sep 12, 2026 | _Green Bay, WI_ | Noah | _(existing)_ |
+| **Sat Sep 19, 2026** _(optional)_ | **Omaha, NE (fall return)** | Cody | Uses Cody's headroom; ~180 mi from Sioux Falls. Promote if the summer Omaha waitlist re-fills. |
 | **Sat Sep 26, 2026** | **Rochester, MN** _or_ **Mankato, MN** | Aaron | Southern MN, never served directly; choose by whichever waitlist is deeper. |
 | **Sat Oct 10, 2026** | **Des Moines, IA (fall finale)** | Aaron | Iowa demand ran hot in June; a fall return + "last tune before winter" urgency closes the season. |
 
@@ -87,48 +97,42 @@ Design principles for 2027:
   regulars; evaluate Bismarck, La Crosse, Kansas City-adjacent as stretch markets).
 - **One flagship anniversary event** to build brand gravity.
 
-### Spring kickoff (April–May) — anchor metros first
-| Target | Market | Installer |
-|--------|--------|-----------|
-| Late Apr 2027 | Twin Cities, MN (season opener) | Aaron |
-| Late Apr 2027 | Milwaukee, WI | Noah |
-| Early May 2027 | Des Moines, IA | Aaron |
-| Mid May 2027 | Omaha, NE | Cody |
-| Late May 2027 | Madison, WI | Aaron |
+### Firm 2027 calendar (Apr → Oct)
 
-### Early summer (June) — regional swings
-| Target | Market | Installer |
-|--------|--------|-----------|
-| Early Jun | **Iowa swing**: Cedar Rapids → Davenport (back-to-back) | Aaron |
-| Mid Jun | Green Bay, WI | Noah |
-| Mid Jun | Sioux Falls, SD | Cody |
-| Late Jun | Fargo, ND | Aaron |
+_Saturdays throughout (Sundays only for the second leg of a swing). **Skips the three
+major-holiday weekends** — Memorial Day (Sat May 29), July 4 (Sat Jul 3), Labor Day
+(Sat Sep 4). Distances are round-trips from each installer's home base (Aaron = Twin
+Cities, Cody = Sioux Falls, Noah = Sheboygan)._
 
-### Mid summer (July) — peak season, spread wide
-| Target | Market | Installer |
-|--------|--------|-----------|
-| Early Jul | Duluth, MN | Aaron |
-| Mid Jul | Rapid City, SD | Cody |
-| Mid Jul | Eau Claire, WI | Aaron |
-| Late Jul | Rochester / Mankato, MN | Aaron |
+| Date | Market | Installer |
+|------|--------|-----------|
+| Sat Apr 24 | Twin Cities, MN (season opener) | Aaron |
+| Sat May 1 | Milwaukee, WI (opener) | Noah |
+| Sat May 8 | Des Moines, IA | Aaron |
+| Sat May 15 **+ Sun 16** | Omaha **+ Lincoln, NE** (swing) | Cody |
+| Sat May 22 | Madison, WI | Aaron |
+| Sat Jun 5 **+ Sun 6** | **Iowa swing**: Cedar Rapids **+ Davenport** | Aaron |
+| Sat Jun 12 | Green Bay, WI | Noah |
+| Sat Jun 19 **+ Sun 20** | Sioux Falls **+ Sioux City, IA** (swing) | Cody |
+| Sat Jun 26 | Fargo, ND | Aaron |
+| Sat Jul 10 | Duluth, MN | Aaron |
+| Sat Jul 17 | Rapid City, SD | Cody |
+| Sat Jul 24 **+ Sun 25** | **S-MN swing**: Rochester **+ Mankato** | Aaron |
+| Sat Aug 14 | Milwaukee, WI (round 2) | Noah |
+| Sat Sep 11 | **Green Bay, WI — 1-Year Anniversary / flagship** | Noah |
+| Sat Sep 25 | Sioux Falls or Omaha (fall return) | Cody |
+| Sat Oct 16 | Twin Cities, MN — "last tune before winter" finale | Aaron |
 
-### Late summer (August) — second pass on hot metros
-| Target | Market | Installer |
-|--------|--------|-----------|
-| Early Aug | Twin Cities, MN (round 2) | Aaron |
-| Mid Aug | Milwaukee, WI (round 2) | Noah |
-| Late Aug | **Des Moines, IA (round 2)** | Aaron |
+**Load:** Aaron 8 weekends (2 are swings), Cody 4 (2 swings), Noah 4 — all at/under the
+~8-weekend cap from Q1. **~16 event-weekends / ~22 city-tunes** across the season.
+Green Bay's anniversary (Sat Sep 11, 2027) lands ~one year after the original Sep 12, 2026.
 
-### Fall finale (September–October)
-| Target | Market | Installer |
-|--------|--------|-----------|
-| Mid Sep | **Green Bay, WI — 1-Year Anniversary / flagship** | Noah |
-| Late Sep | Sioux Falls or Omaha (fall return) | Cody |
-| Mid Oct | Twin Cities, MN — "last tune before winter" finale | Aaron |
-
-That's roughly **22–24 events across 2027** (~7–8 per installer over a 7-month season —
-about one event every 3–4 weeks each), which is a sustainable cadence with room for the
-rig, travel, and rebooks.
+**Demand-gated optional adds** — now that separate-territory installers can share a
+weekend, these can run *parallel* to the core without stretching anyone; promote each only
+when its Priority List clears the ~8-name threshold:
+- **Eau Claire, WI** — fold as a Sun leg after Duluth (Jul 10) or Rochester/Mankato.
+- **Twin Cities round 2** (early Aug) — biggest market; catches late-summer demand.
+- **Des Moines round 2** (late Aug) — Iowa ran hot; "last tune before winter" urgency.
 
 ---
 
@@ -143,8 +147,15 @@ event when **any** of these trip:
 - An installer flags a local **partner shop or truck/off-road event** to co-locate with
   (free venue + built-in foot traffic).
 
-Stretch candidates to watch via the above: **Davenport IA, Bismarck ND, La Crosse WI,
-Wausau WI, Lincoln NE.**
+Stretch candidates to watch via the above: **Davenport IA, La Crosse WI, Wausau WI,
+Lincoln NE.**
+
+**Live waitlist-only markets pending a NEW installer (added 2026-07-06):** **Bismarck, ND ·
+Grand Forks, ND · Brainerd, MN.** These are on the map + lead routing now (interim-routed to
+Aaron so leads don't drop) but **carry no event date** until a new installer is onboarded to
+cover them. When that installer lands, the natural first swings are a **ND run — Fargo →
+Grand Forks → Bismarck** and **Brainerd folded into the central-MN cluster**, each promoted
+to a real date only once its Priority List clears the ~8-name threshold.
 
 ## Calendar hygiene (operational)
 - **Saturdays** for nearly everything (max truck-owner availability); reserve Fridays for

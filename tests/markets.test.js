@@ -2,7 +2,12 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { MARKETS, getMarket } = require("../netlify/functions/lib/markets.js");
 
-test("has 17 markets", () => { assert.equal(MARKETS.length, 17); });
+test("has 20 markets", () => { assert.equal(MARKETS.length, 20); });
+test("Brainerd, Bismarck, Grand Forks are waitlist-only, interim-routed to aaron (new installer TBD)", () => {
+  assert.equal(getMarket("Brainerd").inst, "aaron");
+  assert.equal(getMarket("Bismarck").inst, "aaron");
+  assert.equal(getMarket("Grand Forks").inst, "aaron");
+});
 test("Lincoln and Sioux City route to cody (waitlist-only adjacent markets)", () => {
   assert.equal(getMarket("Lincoln").inst, "cody");
   assert.equal(getMarket("Sioux City").inst, "cody");
