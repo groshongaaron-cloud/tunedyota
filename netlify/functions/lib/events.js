@@ -1,5 +1,7 @@
 // netlify/functions/lib/events.js
-// Reads the published event Google Sheet (gviz CSV) and maps city -> event.
+// Reads the published event Google Sheet (gviz CSV) and maps city -> [events].
+// A city now holds an ARRAY of event objects (multi-date support). Single-object
+// baked entries are normalized to a one-element array via asArray().
 function parseCsv(text) {
   const rows = []; let row = [], field = "", q = false;
   for (let i = 0; i < text.length; i++) {
@@ -25,6 +27,8 @@ function toISO(label) {
   const pad = (n) => String(n).padStart(2, "0");
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
+
+// --- parseEvents: build city -> array (append duplicates) ---
 function parseEvents(csv) {
   const rows = parseCsv(csv || "");
   if (!rows.length) return {};
@@ -39,7 +43,7 @@ function parseEvents(csv) {
     const row = rows[r]; if (!row || ci.market < 0) continue;
     const city = (row[ci.market] || "").trim(); if (!city) continue;
     const activeRaw = (ci.active >= 0 ? row[ci.active] || "" : "").trim().toLowerCase();
-    out[city.toLowerCase()] = {
+    const rec = {
       city, label: (ci.date >= 0 ? row[ci.date] || "" : "").trim(),
       dateISO: toISO(ci.date >= 0 ? row[ci.date] : ""),
       active: !["no", "false", "0"].includes(activeRaw),
@@ -47,9 +51,24 @@ function parseEvents(csv) {
       details: ci.details >= 0 ? (row[ci.details] || "").trim() : "",
       address: ci.address >= 0 ? (row[ci.address] || "").trim() : "",
     };
+    (out[city.toLowerCase()] || (out[city.toLowerCase()] = [])).push(rec);
   }
   return out;
 }
+
+// --- normalization + flattening helpers ---
+function asArray(v) { return Array.isArray(v) ? v : (v ? [v] : []); }
+function flattenEvents(map) {
+  const out = [];
+  for (const key of Object.keys(map || {})) for (const e of asArray(map[key])) out.push(e);
+  return out;
+}
+function todayISO(now) {
+  const d = now || new Date(); const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+// --- fetch: city -> array, sheet wins per city, backfill city on each element ---
 async function fetchEvents({ fetchImpl, sheetId, baked = {}, log = console }) {
   let fromSheet = {};
   if (sheetId) {
@@ -60,20 +79,45 @@ async function fetchEvents({ fetchImpl, sheetId, baked = {}, log = console }) {
       else if (log.warn) log.warn("events fetch status", res.status);
     } catch (e) { if (log.warn) log.warn("events fetch failed", e.message); }
   }
-  const merged = { ...baked, ...fromSheet }; // a configured sheet overrides baked
-  // Baked entries (events-data.js) are keyed by city but don't embed a `city`
-  // field; sheet entries do. Downstream — getMarket routing and roster/booking
-  // filtering in event-plan.js — keys off ev.city. Backfill it from the map key
-  // so baked events don't route to unknown-city:undefined and match 0 bookings.
+  const merged = {};
+  for (const key of Object.keys(baked)) merged[key] = asArray(baked[key]);
+  for (const key of Object.keys(fromSheet)) merged[key] = fromSheet[key]; // a configured sheet overrides baked
+  // Baked entries are keyed by city but don't embed a `city` field. Downstream
+  // routing (getMarket) + roster/booking filtering key off ev.city — backfill it
+  // from the map key so baked events don't route to unknown-city:undefined.
   for (const key of Object.keys(merged)) {
-    if (merged[key] && !merged[key].city) merged[key] = { ...merged[key], city: key };
+    merged[key] = merged[key].map((e) => (e && !e.city ? { ...e, city: key } : e));
   }
   return merged;
 }
+
+// --- funnel/booking helpers: future-filtered, soonest-first ---
+async function getEventsForCity(city, deps, now) {
+  const map = await fetchEvents(deps);
+  const key = String(city == null ? "" : city).trim().toLowerCase();
+  const today = todayISO(now);
+  return asArray(map[key])
+    .filter((e) => e && e.active && e.dateISO && e.dateISO >= today)
+    .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+}
+async function getCurrentEventForCity(city, deps, now) {
+  return (await getEventsForCity(city, deps, now))[0] || null;
+}
+
+// --- ops helper: every active dated event, no future filter ---
+async function getAllActiveEvents(deps) {
+  const map = await fetchEvents(deps);
+  return flattenEvents(map).filter((e) => e && e.active && e.dateISO);
+}
+
+// --- back-compat: soonest active dated event regardless of past/future ---
 async function getEventForCity(city, deps) {
   const map = await fetchEvents(deps);
-  const e = map[String(city == null ? "" : city).trim().toLowerCase()];
-  if (!e || !e.active || !e.dateISO) return null;
-  return e;
+  const key = String(city == null ? "" : city).trim().toLowerCase();
+  const list = asArray(map[key])
+    .filter((e) => e && e.active && e.dateISO)
+    .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  return list[0] || null;
 }
-module.exports = { parseCsv, toISO, parseEvents, fetchEvents, getEventForCity };
+
+module.exports = { parseCsv, toISO, parseEvents, fetchEvents, getEventForCity, getEventsForCity, getCurrentEventForCity, getAllActiveEvents, flattenEvents, asArray };
