@@ -22,6 +22,7 @@ function harness({ events, taken = [] }) {
     env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
     trigger: async (a) => { jobs.push(a); return { ok: true }; },
     now: () => "20260101T000000Z",
+    nowDate: new Date("2026-07-01T00:00:00Z"),
     log: { warn() {}, error() {} },
   };
   return { deps, created, jobs };
@@ -147,7 +148,7 @@ test("booking survives a missing Modifications column (retries without it)", asy
     }
     throw new Error("unexpected " + url);
   };
-  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, trigger: async () => ({ ok: true }), now: () => "20260101T000000Z", log: { warn() {}, error() {} } };
+  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, trigger: async () => ({ ok: true }), now: () => "20260101T000000Z", nowDate: new Date("2026-07-01T00:00:00Z"), log: { warn() {}, error() {} } };
   const r = await processBooking({ ...base, slot: "9:00", mods: "lift" }, deps);
   assert.equal(r.status, "booked");
   assert.equal(created.length, 1);
@@ -175,9 +176,34 @@ test("booking survives a missing Model Year column (retries without it)", async 
     }
     throw new Error("unexpected " + url);
   };
-  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, trigger: async () => ({ ok: true }), now: () => "20260101T000000Z", log: { warn() {}, error() {} } };
+  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, trigger: async () => ({ ok: true }), now: () => "20260101T000000Z", nowDate: new Date("2026-07-01T00:00:00Z"), log: { warn() {}, error() {} } };
   const r = await processBooking({ ...base, slot: "9:00", modelYear: "2019" }, deps);
   assert.equal(r.status, "booked");
   assert.equal(created.length, 1);
   assert.ok(!("Model Year" in created[0]));
+});
+
+const EV_TWO = "Market,Date,Active\nTwin Cities,2026-08-29,yes\nTwin Cities,2026-10-16,yes\n";
+const tcBase = { city: "Twin Cities", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "Tacoma", goals: "Power" };
+
+test("no dateISO books the soonest date", async () => {
+  const h = harness({ events: EV_TWO });
+  const r = await processBooking({ ...tcBase, slot: "9:20" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal(r.eventDateISO, "2026-08-29");
+  assert.equal(h.created[0].fields["Event Date"], "2026-08-29");
+});
+test("explicit dateISO books that specific later date", async () => {
+  const h = harness({ events: EV_TWO });
+  const r = await processBooking({ ...tcBase, slot: "9:20", dateISO: "2026-10-16" }, h.deps);
+  assert.equal(r.status, "booked");
+  assert.equal(r.eventDateISO, "2026-10-16");
+  assert.equal(h.created[0].fields["Event Date"], "2026-10-16");
+  assert.equal(h.jobs[0].payload.event.dateISO, "2026-10-16");
+});
+test("an unknown dateISO for the city falls back to the priority waitlist", async () => {
+  const h = harness({ events: EV_TWO });
+  const r = await processBooking({ ...tcBase, slot: "9:20", dateISO: "2099-01-01" }, h.deps);
+  assert.equal(r.status, "priority");
+  assert.equal(r.reason, "no-event");
 });

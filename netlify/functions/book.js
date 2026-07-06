@@ -1,7 +1,7 @@
 // netlify/functions/book.js
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
-const { getEventForCity } = require("./lib/events.js");
+const { getEventsForCity } = require("./lib/events.js");
 const EVENTS = require("./lib/events-data.js");
 const { cfg, listRecords, createRecord, createTolerant } = require("./lib/airtable.js");
 const { isValidSlot, computeOpen } = require("./lib/slots.js");
@@ -14,7 +14,7 @@ const { triggerBackground } = require("./lib/background.js");
 // timeout can never drop it or stall this response. See lib/background.js.
 async function processBooking(body, deps) {
   const { fetchImpl = fetch, env = process.env, now = icsStamp, log = console,
-          trigger = triggerBackground } = deps;
+          trigger = triggerBackground, nowDate } = deps;
   const d = body || {};
   if (d.bot_field) return { status: "ignored" };
   const market = getMarket(d.city);
@@ -22,7 +22,8 @@ async function processBooking(body, deps) {
   if (!d.name || (!d.phone && !d.email)) return { status: "error", error: "missing-contact" };
   const inst = keyToInstaller(market.inst);
   const c = cfg(env);
-  const event = await getEventForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
+  const list = await getEventsForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }, nowDate);
+  const event = d.dateISO ? list.find((e) => e.dateISO === d.dateISO) : list[0];
 
   // Schedule the slow notifications without blocking this response. Best-effort:
   // a failure to even enqueue must not break the booking the user just made.
