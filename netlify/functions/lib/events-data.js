@@ -12,5 +12,6 @@ module.exports = {
   "fargo":        { dateISO: "2026-07-03", label: "July 3, 2026",  active: true, event: "Fargo, North Dakota Summer 2026 OTT Event", details: "", address: "1666 1st Avenue N., Fargo, ND 58102" },
   "madison":      { dateISO: "2026-08-01", label: "August 1, 2026", active: true, event: "Madison, Wisconsin Summer 2026 OTT Event", details: "", address: "430 Commerce Drive, Madison, WI 53719" },
   "duluth":       { dateISO: "2026-07-25", label: "July 25, 2026", active: true, event: "Duluth, Minnesota Summer 2026 OTT Event", details: "", address: "4165 Loberg Avenue, Hermantown, MN 55811" },
+  "sioux falls":  { dateISO: "2026-08-15", label: "August 15, 2026", active: true, event: "Sioux Falls, South Dakota Summer 2026 OTT Event", details: "", address: "To Be Released" },
   "green bay":    { dateISO: "2026-09-12", label: "September 12, 2026", active: true, event: "Green Bay, Wisconsin Fall 2026 OTT Event", details: "", address: "To Be Released" },
 };
