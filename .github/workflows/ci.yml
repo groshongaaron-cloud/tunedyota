@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      mcp_url:
+        description: "WebMCP endpoint URL for the smoke test"
+        default: "https://tunedyota.com/mcp"
+        required: false
+  schedule:
+    # WebMCP live smoke against production every 6 hours (prod health monitor).
+    - cron: "17 */6 * * *"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    name: Unit tests (offline)
+    # The scheduled run is a prod monitor only — no code to unit-test there.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Run offline test suite
+        run: npm test
+
+  smoke:
+    name: WebMCP live smoke (real MCP SDK client)
+    # Skip on pull requests: it hits production, which does not reflect the PR's code.
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      MCP_URL: ${{ github.event.inputs.mcp_url || 'https://tunedyota.com/mcp' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Wait for the endpoint to respond (lets a fresh deploy settle)
+        run: |
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$MCP_URL" || echo 000)
+            echo "attempt $i: GET $MCP_URL -> HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 15
+          done
+          echo "::error::$MCP_URL did not return HTTP 200 after retries"
+          exit 1
+      - name: Run smoke test through the official MCP SDK client
+        run: npm run test:smoke
+        env:
+          MCP_SMOKE_URL: ${{ env.MCP_URL }}
