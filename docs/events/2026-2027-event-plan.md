@@ -8,6 +8,15 @@ rules folded in: **skip major-holiday weekends** (Memorial Day, July 4, Labor Da
 **installers in separate territories may share a date/weekend** (owner floats or the
 installer runs their own event console). Duluth held at its booked Sat Jul 25, 2026._
 
+> **✅ SCHEDULED LIVE 2026-07-06.** Every event in Phase 1 and the 2027 calendar below is
+> now a real, bookable date in the production booking system (`events-data.js` +
+> the `/find-your-exact-tune` map), not just a proposal — **30 active events**, and **10
+> cities carry multiple dates** so the funnel's "See next date →" stepwise chain is active
+> (see [[multi-date-booking-and-schedule]]). Resolved picks: **Rochester** (not Mankato)
+> for Sep 26 2026; **Sioux Falls** for the 2027 fall return; **Lincoln + Sioux City**
+> promoted from waitlist-only to scheduled 2027 swings. Most new venues are still **"To Be
+> Released"** pending owner addresses. Change any date via the `schedule-event` skill.
+
 ## The lens I'm planning through
 
 Tuned Yota runs **mobile, event-based OTT tuning** for Toyota/Lexus trucks (plus
@@ -59,7 +68,7 @@ early October are prime tuning weather being left on the table.
 
 ---
 
-## Phase 1 — Finish 2026 strong (Aug → Oct)
+## Phase 1 — Finish 2026 strong (Aug → Oct) — ✅ LIVE
 
 Goal: keep momentum through the back half of the season and convert the summer waitlist
 before winter. **Co-anchor on demand we already captured** (Priority List / not-completed
@@ -71,8 +80,8 @@ rebooks from the summer events).
 | **Sat Aug 22, 2026** | **Milwaukee, WI** | Noah | Largest WI metro; warms up Noah's region ahead of the Green Bay capstone. |
 | **Sat Aug 29, 2026** | **Twin Cities, MN (round 2)** | Aaron | TC is the biggest single market and the season opener; a late-August repeat catches everyone who missed June. Holiday-safe — a week ahead of Labor Day (Sep 5–7). |
 | Sep 12, 2026 | _Green Bay, WI_ | Noah | _(existing)_ |
-| **Sat Sep 19, 2026** _(optional)_ | **Omaha, NE (fall return)** | Cody | Uses Cody's headroom; ~180 mi from Sioux Falls. Promote if the summer Omaha waitlist re-fills. |
-| **Sat Sep 26, 2026** | **Rochester, MN** _or_ **Mankato, MN** | Aaron | Southern MN, never served directly; choose by whichever waitlist is deeper. |
+| **Sat Sep 19, 2026** | **Omaha, NE (fall return)** | Cody | Uses Cody's headroom; ~180 mi from Sioux Falls. **Live.** |
+| **Sat Sep 26, 2026** | **Rochester, MN** | Aaron | Southern MN, never served directly. **Live — Rochester chosen** over Mankato (Mankato scheduled for 2027 instead). |
 | **Sat Oct 10, 2026** | **Des Moines, IA (fall finale)** | Aaron | Iowa demand ran hot in June; a fall return + "last tune before winter" urgency closes the season. |
 
 **Nov 2026 – Mar 2027 — off-season, but not idle.** No outdoor events. Use the window to:
@@ -97,7 +106,7 @@ Design principles for 2027:
   regulars; evaluate Bismarck, La Crosse, Kansas City-adjacent as stretch markets).
 - **One flagship anniversary event** to build brand gravity.
 
-### Firm 2027 calendar (Apr → Oct)
+### Firm 2027 calendar (Apr → Oct) — ✅ LIVE
 
 _Saturdays throughout (Sundays only for the second leg of a swing). **Skips the three
 major-holiday weekends** — Memorial Day (Sat May 29), July 4 (Sat Jul 3), Labor Day
@@ -120,7 +129,7 @@ Cities, Cody = Sioux Falls, Noah = Sheboygan)._
 | Sat Jul 24 **+ Sun 25** | **S-MN swing**: Rochester **+ Mankato** | Aaron |
 | Sat Aug 14 | Milwaukee, WI (round 2) | Noah |
 | Sat Sep 11 | **Green Bay, WI — 1-Year Anniversary / flagship** | Noah |
-| Sat Sep 25 | Sioux Falls or Omaha (fall return) | Cody |
+| Sat Sep 25 | Sioux Falls (fall return) | Cody |
 | Sat Oct 16 | Twin Cities, MN — "last tune before winter" finale | Aaron |
 
 **Load:** Aaron 8 weekends (2 are swings), Cody 4 (2 swings), Noah 4 — all at/under the
@@ -224,6 +233,12 @@ expansion — is spec'd as an executable plan below.**
 
 ## Cody's tri-state expansion — executable plan (2027 pilot)
 
+> **Update 2026-07-06:** Owner fast-tracked this — **Lincoln (Sat May 16, 2027)** and
+> **Sioux City (Sat Jun 20, 2027)** are now **scheduled as live back-to-back swings**
+> (Omaha+Lincoln, Sioux Falls+Sioux City) rather than held as waitlist-only through the
+> demand gate. The Phase A/B instrumentation below is superseded for these two metros; the
+> Phase D success measure (slot-fill ≥ 60%) still applies retroactively for the 2028 read.
+
 **Why Cody, why now.** Cody has the lightest event load of the three installers and the
 most headroom to add days, and two metros sit *cheaply adjacent* to stops he already
 makes — so this is expansion with almost no new windshield time:
@@ -264,8 +279,10 @@ it clears the bar.** Numbers below are starting targets — adjust to reality.
    fills graduates to a **2027/2028 regular**; one that doesn't reverts to waitlist-only.
 10. Either way, the result is logged so the 2028 calendar inherits a real read, not a guess.
 
-**Owner:** Cody (territory lead) + owner support for scheduling/SEO. **First milestone:**
-Lincoln + Sioux City live as waitlist-only markets before the 2026 season closes.
+**Owner:** Cody (territory lead) + owner support for scheduling/SEO. ~~**First milestone:**
+Lincoln + Sioux City live as waitlist-only markets before the 2026 season closes.~~
+**Done 2026-07-06 — both scheduled as live 2027 events** (see the update note at the top of
+this section).
 
 ---
 
