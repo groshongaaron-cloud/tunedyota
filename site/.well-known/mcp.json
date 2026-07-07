@@ -11,5 +11,5 @@
     { "name": "get_tune_pricing", "description": "OTT Tune pricing guidance plus the link to an exact, vehicle-specific price." }
   ],
   "contact": { "email": "info@tunedyota.com", "url": "https://tunedyota.com" },
-  "notes": "WebMCP is an emerging convention with no finalized standard yet; this manifest and endpoint are a forward-compatible preview and are disabled until the WEBMCP_ENABLED flag is set. Tools are read-only (no booking/writes)."
+  "notes": "WebMCP is an emerging convention with no finalized standard yet; this manifest and endpoint are a forward-compatible preview (enabled 2026-07-07). Tools are read-only (no booking/writes)."
 }
