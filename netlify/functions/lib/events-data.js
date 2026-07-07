@@ -23,7 +23,7 @@ module.exports = {
   ],
   "twin cities": [
     { dateISO: "2026-06-20", label: "June 20, 2026", active: false, event: "Zeus Off-Road Event", details: "", address: "620 Southcross Dr. W., Burnsville, MN" },
-    { dateISO: "2026-08-29", label: "August 29, 2026", active: true, event: "Twin Cities, Minnesota Summer 2026 OTT Event", details: "", address: "To Be Released" },
+    { dateISO: "2026-08-29", label: "August 29, 2026", active: true, event: "Twin Cities, Minnesota Summer 2026 OTT Event", details: "", address: "620 Southcross Dr. W., Burnsville, MN" },
     { dateISO: "2027-04-24", label: "April 24, 2027", active: true, event: "Twin Cities, Minnesota Spring 2027 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-10-16", label: "October 16, 2027", active: true, event: "Twin Cities, Minnesota Fall 2027 OTT Event", details: "", address: "To Be Released" },
   ],
