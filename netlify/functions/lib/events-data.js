@@ -54,7 +54,7 @@ module.exports = {
     { dateISO: "2027-09-25", label: "September 25, 2027", active: true, event: "Sioux Falls, South Dakota Fall 2027 OTT Event", details: "", address: "To Be Released" },
   ],
   "milwaukee": [
-    { dateISO: "2026-08-22", label: "August 22, 2026", active: true, event: "Milwaukee, Wisconsin Summer 2026 OTT Event", details: "", address: "To Be Released" },
+    { dateISO: "2026-08-22", label: "August 22, 2026", active: true, event: "Milwaukee, Wisconsin Summer 2026 OTT Event", details: "", address: "1350 N Port Washington Rd, Grafton, WI 53024" },
     { dateISO: "2027-05-01", label: "May 1, 2027", active: true, event: "Milwaukee, Wisconsin Spring 2027 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-08-14", label: "August 14, 2027", active: true, event: "Milwaukee, Wisconsin Summer 2027 OTT Event", details: "", address: "To Be Released" },
   ],

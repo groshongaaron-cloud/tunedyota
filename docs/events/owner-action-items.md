@@ -15,12 +15,11 @@ Prefer not to type it in chat? Copy the address to your clipboard and say "clipb
 
 ---
 
-## ⬜ Venue addresses still needed (27)
+## ⬜ Venue addresses still needed (26)
 
-### 2026 (7)
+### 2026 (6)
 - [ ] **Rapid City, SD** — July 16, 2026 — _Cody_
 - [ ] **Sioux Falls, SD** — August 15, 2026 — _Cody_ (intentionally left TBR for now)
-- [ ] **Milwaukee, WI** — August 22, 2026 — _Noah_
 - [ ] **Green Bay, WI** — September 12, 2026 — _Noah_
 - [ ] **Omaha, NE** — September 19, 2026 — _Cody_
 - [ ] **Rochester, MN** — September 26, 2026 — _Aaron_
@@ -54,6 +53,7 @@ Prefer not to type it in chat? Copy the address to your clipboard and say "clipb
 - **Duluth** — July 25, 2026 → 4165 Loberg Avenue, Hermantown, MN 55811
 - **Madison** — August 1, 2026 → 430 Commerce Drive, Madison, WI 53719
 - **Twin Cities** — August 29, 2026 → 620 Southcross Dr. W., Burnsville, MN
+- **Milwaukee** — August 22, 2026 → 1350 N Port Washington Rd, Grafton, WI 53024
 
 ---
 
