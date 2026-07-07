@@ -6,7 +6,7 @@
 // renderRosterEmail so the output is identical to the scheduled roster.
 // Gated by INTERNAL_TASK_SECRET via the `x-ty-task` header (same as book-background).
 const EVENTS = require("./lib/events-data.js");
-const { fetchEvents } = require("./lib/events.js");
+const { fetchEvents, asArray } = require("./lib/events.js");
 const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { renderRosterEmail } = require("./lib/roster-render.js");
@@ -32,7 +32,9 @@ async function runRosterSend(params, deps = {}) {
   if (!city) return { status: "error", code: 400, error: "missing city" };
 
   const eventMap = await loadEvents({ fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
-  const ev = eventMap[city];
+  const evs = asArray(eventMap[city]).filter((e) => e && e.dateISO)
+    .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  const ev = params.date ? evs.find((e) => e.dateISO === params.date) : evs[0];
   if (!ev || !ev.dateISO) return { status: "error", code: 404, error: `no event for ${city}` };
 
   const c = cfg(env);
@@ -67,7 +69,7 @@ async function handler(event) {
   const h = (event && event.headers) || {};
   // Prefer the header (keeps the secret out of URL/query logs); fall back to ?token=.
   const token = h["x-ty-task"] || h["X-Ty-Task"] || h["X-TY-TASK"] || q.token || "";
-  const out = await runRosterSend({ city: q.city, token }, {});
+  const out = await runRosterSend({ city: q.city, date: q.date, token }, {});
   const html = out.status === "ok"
     ? page("Roster sent ✓", `<p><strong>${out.city}</strong> (${out.dateISO}) — ${out.booked} booked, ${out.waitlist} waitlisted — emailed to ${OWNER}.</p>`)
     : page("Not sent", `<p>${out.error === "unauthorized" ? "This link is invalid or the token is missing." : out.error}</p>`);

@@ -66,6 +66,15 @@ test("baked events (no embedded city) route correctly — no unknown-city failur
   assert.ok(d._sends.some((s) => s.to === "a@x.com"), "customer notified");
 });
 
+test("a city with two dates flattens to two events", () => {
+  const { flattenEvents } = require("../netlify/functions/lib/events.js");
+  const eventMap = { "twin cities": [
+    { city: "twin cities", dateISO: "2026-08-29", label: "Aug 29", active: true },
+    { city: "twin cities", dateISO: "2026-10-16", label: "Oct 16", active: true },
+  ] };
+  assert.equal(flattenEvents(eventMap).length, 2);
+});
+
 test("sends a post-event rebook report to the owner when a sweep occurs", async () => {
   // Event was yesterday (du === -1) → waitlist-sweep → post-event rebook report.
   // 2026-07-04T12:00:00Z = 07:00 CDT (UTC-5), so hour===7 passes the gate.

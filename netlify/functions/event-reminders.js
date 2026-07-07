@@ -3,7 +3,7 @@
 // 9 AM event start). Sends installer rosters (30/15/10/2/0d), customer address
 // notifications (10/2d), and runs the post-event waitlist sweep (-1d).
 const EVENTS = require("./lib/events-data.js");
-const { fetchEvents } = require("./lib/events.js");
+const { fetchEvents, flattenEvents } = require("./lib/events.js");
 const { cfg, listAllRecords, createRecord, createTolerant } = require("./lib/airtable.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
@@ -36,7 +36,7 @@ async function runReminders(deps) {
 
   const c = cfg(env);
   const eventMap = await loadEvents({ fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
-  const events = Object.values(eventMap);
+  const events = flattenEvents(eventMap);
   const [bRecs, pRecs] = await Promise.all([
     listAll({ token: c.token, baseId: c.baseId, table: c.bookings }),
     listAll({ token: c.token, baseId: c.baseId, table: c.priority }),
