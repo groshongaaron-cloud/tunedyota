@@ -5,10 +5,14 @@
   "description": "Tuned Yota marketing site + Netlify lead-routing functions",
   "scripts": {
     "test": "node --test",
+    "test:smoke": "node --test tests/mcp-smoke.mjs",
     "build:seo": "node scripts/build-seo.mjs"
   },
   "dependencies": {
     "google-auth-library": "^10.9.0",
     "sharp": "^0.35.2"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
   }
 }
