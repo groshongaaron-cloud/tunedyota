@@ -1,6 +1,8 @@
 // netlify/functions/lib/vehicle-pricing.js
-// Server-side per-vehicle OTT pricing, sourced from lib/vehicles.json (a byte-exact
-// copy of the funnel's inline VEHICLES config — kept honest by tests/vehicles-parity.test.js).
+// Server-side per-vehicle OTT pricing, sourced from lib/vehicles.json — which is
+// GENERATED from the funnel's inline VEHICLES config by scripts/build-seo.mjs
+// (syncVehicles) and guarded by tests/vehicles-parity.test.js. Edit prices in the
+// funnel ("Edit prices here"), then `npm run build:seo`.
 // Powers the WebMCP `get_vehicle_pricing` tool. Read-only; no quotes are committed here.
 const VEHICLES = require("./vehicles.json");
 

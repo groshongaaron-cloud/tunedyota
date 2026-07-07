@@ -82,6 +82,22 @@ function processEvents() {
   fs.writeFileSync(p, html);
 }
 
+// Sync the server-side vehicle/pricing source (netlify/functions/lib/vehicles.json)
+// from the funnel's inline VEHICLES literal — the single human-edited price source
+// ("Edit prices here" in find-your-exact-tune.html). The WebMCP get_vehicle_pricing
+// tool reads the JSON; tests/vehicles-parity.test.js fails loudly if this wasn't re-run
+// after a price edit (same role seo.test.js plays for the schema/sitemap output).
+function syncVehicles() {
+  const p = path.join(SITE_DIR, "find-your-exact-tune.html");
+  const html = fs.readFileSync(p, "utf8");
+  const m = html.match(/const VEHICLES = (\{[^\n]*\});/);
+  if (!m) throw new Error("VEHICLES literal not found in find-your-exact-tune.html");
+  const vehicles = JSON.parse(m[1]); // throws on malformed JSON → fails the build
+  fs.writeFileSync(path.join(ROOT, "netlify", "functions", "lib", "vehicles.json"),
+    JSON.stringify(vehicles, null, 2) + "\n");
+  console.log("vehicles: synced lib/vehicles.json from funnel VEHICLES");
+}
+
 // Repoint the broken Services breadcrumb to the real OTT Tune hub. Whitespace-
 // insensitive so it catches both spaced (vehicle pages) and compact (ott-tune)
 // JSON formatting. team.html already ships its own Person schema, so no Person
@@ -109,6 +125,7 @@ async function main() {
   for (const f of SD.HEAD_PAGES) processHead(f);
   fixBreadcrumbs();
   processEvents();
+  syncVehicles();
   writeSitemap();
   console.log("seo build complete");
 }

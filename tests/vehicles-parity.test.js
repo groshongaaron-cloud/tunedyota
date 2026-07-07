@@ -15,5 +15,5 @@ test("lib/vehicles.json is byte-equal to the funnel's inline VEHICLES config", (
   assert.ok(m, "could not locate `const VEHICLES = {...};` on a single line in the funnel");
   const funnel = JSON.parse(m[1]);
   assert.deepEqual(JSON_COPY, funnel,
-    "netlify/functions/lib/vehicles.json is out of sync with the funnel VEHICLES — re-run the extraction or update both.");
+    "lib/vehicles.json is out of sync with the funnel VEHICLES — run `npm run build:seo` (it regenerates the JSON from the funnel), then re-run tests.");
 });
