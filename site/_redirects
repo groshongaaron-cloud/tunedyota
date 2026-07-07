@@ -4,6 +4,9 @@
 # signals instead of landing on 404s. Model-specific rules first, then
 # static pages, then catch-alls (first match wins).
 
+# ── WebMCP preview endpoint (JSON-RPC MCP server; dormant until WEBMCP_ENABLED) ──
+/mcp                                          /.netlify/functions/mcp                       200
+
 # ── Vehicle booking/service pages → model landing pages ──
 /service-page/tundra-*                        /toyota-tundra-ott-tune                       301
 /booking-calendar/tundra-*                    /toyota-tundra-ott-tune                       301

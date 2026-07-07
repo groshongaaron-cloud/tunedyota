@@ -14,8 +14,15 @@ Tuned Yota is an authorized **OTT (Overland Tailor Tune) installer** and the Mid
 - [Find Your Exact Tune](https://tunedyota.com/find-your-exact-tune): interactive tool to pick your vehicle, see calibration options and starting price, and request a booking tied to your nearest event market.
 - [What is the OTT Tune?](https://tunedyota.com/ott-tune): explanation of OTT calibration, what it fixes (gear hunting, throttle lag, lazy shifting), and verified YouTube reviews.
 - [Superchargers](https://tunedyota.com/supercharger): Magnuson supercharger sales, install, and calibration; supported vehicles and pricing.
+- [OTT Tune cost](https://tunedyota.com/ott-tune-cost): what an OTT Tune costs and what drives the price by platform.
+- [Is the OTT Tune worth it?](https://tunedyota.com/is-the-ott-tune-worth-it): the value case with real Dynojet before/after results.
+- [Tune warranty & emissions legality](https://tunedyota.com/tune-warranty-emissions-legality): Magnuson-Moss warranty protection, EPA/emissions compliance, and why the tune is street-legal.
+- [Magnuson supercharger guide](https://tunedyota.com/magnuson-supercharger-guide): supported platforms, dyno-proven horsepower/torque gains, and pricing guidance.
 - [FAQ](https://tunedyota.com/faq): common questions on pricing, emissions compliance, what's included, and booking.
 - [Team](https://tunedyota.com/team): the regional OTT installers — Aaron Groshong, Noah Kreis, Cody Star.
+
+## Service areas (state pages)
+- [Minnesota](https://tunedyota.com/toyota-lexus-tuning-minnesota) · [Iowa](https://tunedyota.com/toyota-lexus-tuning-iowa) · [Wisconsin](https://tunedyota.com/toyota-lexus-tuning-wisconsin) · [North Dakota](https://tunedyota.com/toyota-lexus-tuning-north-dakota) · [South Dakota](https://tunedyota.com/toyota-lexus-tuning-south-dakota) · [Nebraska](https://tunedyota.com/toyota-lexus-tuning-nebraska)
 
 ## Vehicles tuned
 Toyota: Tacoma, 4Runner, Tundra, Sequoia, Land Cruiser, FJ Cruiser, RAV4, Highlander, Camry.

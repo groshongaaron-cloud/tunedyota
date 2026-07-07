@@ -1,0 +1,15 @@
+{
+  "name": "tunedyota-webmcp",
+  "version": "0.1.0",
+  "status": "preview",
+  "description": "WebMCP preview for Tuned Yota — read-only Model Context Protocol tools for upcoming Toyota/Lexus OTT tuning events, per-city availability, and pricing across the Upper Midwest (MN, IA, WI, ND, SD, NE).",
+  "protocol": "mcp",
+  "transport": { "type": "http", "jsonrpc": "2.0", "endpoint": "https://tunedyota.com/mcp" },
+  "tools": [
+    { "name": "find_tuning_events", "description": "List upcoming Tuned Yota tuning events; optional 2-letter state or city filter." },
+    { "name": "check_event_availability", "description": "Upcoming event dates and open booking-slot counts for a given city." },
+    { "name": "get_tune_pricing", "description": "OTT Tune pricing guidance plus the link to an exact, vehicle-specific price." }
+  ],
+  "contact": { "email": "info@tunedyota.com", "url": "https://tunedyota.com" },
+  "notes": "WebMCP is an emerging convention with no finalized standard yet; this manifest and endpoint are a forward-compatible preview and are disabled until the WEBMCP_ENABLED flag is set. Tools are read-only (no booking/writes)."
+}
