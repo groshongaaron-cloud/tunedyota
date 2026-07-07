@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test",
     "test:smoke": "node --test tests/mcp-smoke.mjs",
-    "build:seo": "node scripts/build-seo.mjs"
+    "build:seo": "node scripts/build-seo.mjs",
+    "ingest:dealers": "node scripts/ingest-dealers.js"
   },
   "dependencies": {
     "google-auth-library": "^10.9.0",
