@@ -75,3 +75,15 @@ test("model-year capture: parse + populate helpers and payload wiring present", 
   assert.ok(/vehicle, ?modelYear,/.test(HTML), "modelYear missing from Netlify lead fields");
   assert.ok(/select your exact model year/i.test(HTML), "missing model-year validation message");
 });
+
+test("multi-date stepwise: helper, next-date control, and copy present", () => {
+  assert.ok(/function showEventAt/.test(HTML), "missing showEventAt() helper");
+  assert.ok(/BOOK\.events/.test(HTML), "missing BOOK.events state");
+  assert.ok(/BOOK\.eventIdx/.test(HTML), "missing BOOK.eventIdx state");
+  assert.ok(HTML.includes("tf-nextdate"), "missing tf-nextdate control class");
+  assert.ok(/See next date/.test(HTML), "missing 'See next date' copy");
+  assert.ok(/Can'?t make/.test(HTML), "missing 'Can't make' fallback copy");
+});
+test("booking payload carries the shown event's dateISO", () => {
+  assert.ok(/dateISO:\s*\(?BOOK\.events/.test(HTML), "missing dateISO in /book payload");
+});

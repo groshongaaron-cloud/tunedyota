@@ -226,6 +226,9 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 .tf-scarcity{text-align:center;font-family:'Lato';font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--sage-d);margin:0 0 10px}
 .tf-scarcity.low{color:#9b4a3a}
 .tf-scarcity.low::before{content:"●";margin-right:7px;color:#c2603f;font-size:10px;vertical-align:middle}
+.tf-altrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;font-size:13px;color:var(--brown2)}
+.tf-nextdate,.tf-waitlist{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font-weight:700;font-size:13px;cursor:pointer;color:var(--brown)}
+.tf-nextdate:hover,.tf-waitlist:hover{background:var(--bg)}
 .tf-urgency{text-align:center;font-family:'Lato';font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--sage-d);margin:0 0 6px}
 .tf-urgency.hot{color:#9b4a3a}
 .tf-slot.sel{position:relative}
@@ -844,7 +847,7 @@ function populateModelYear(){
   group.style.display=""; sel.required=true;
 }
 /* ---- live booking: slots + priority list ---- */
-const BOOK={avail:null,slot:null,reason:null};
+const BOOK={avail:null,slot:null,reason:null,events:[],eventIdx:0};
 /* verified reviews — mirrors index.html AutomotiveBusiness schema; keep in sync */
 const REVIEWS=[
   {name:"S. Berry",make:"toyota",text:"Dropped in to a scheduled local tuning event for the latest OTT calibration on my Tacoma — trans up/down shifts and power delivery is the smoothest it's ever been."},
@@ -888,38 +891,58 @@ function urgencyLine(a){
   return u?`<div class="tf-urgency${u.tier==="now"||u.tier==="soon"?" hot":""}">${u.text}</div>`:"";
 }
 async function loadAvailability(city){
-  BOOK.avail=null;BOOK.slot=null;BOOK.reason=null;
+  BOOK.avail=null;BOOK.slot=null;BOOK.reason=null;BOOK.events=[];BOOK.eventIdx=0;
   const box=$("#tfSlots"); if(!box) return; box.style.display="block";
   box.innerHTML='<p class="tf-foot" style="margin:8px 0">Loading available times…</p>';
   try{
     const r=await fetch(`/.netlify/functions/availability?city=${encodeURIComponent(city)}`);
-    const a=await r.json(); BOOK.avail=a;
-    if(a.hasEvent && !a.full && !a.error) renderSlots(a);
-    else if(a.hasEvent && a.full && !a.error) renderWaitlistFull(a);
+    const a=await r.json(); BOOK.avail=a; BOOK.events=(a&&a.events)||[];
+    if(a.error && a.error!=="unknown-city"){ renderPriority("no-event"); }
+    else if(BOOK.events.length){ showEventAt(0); }
     else renderPriority("no-event");
   }catch(e){ renderPriority("no-event"); }
   updateBookCta();
 }
-function renderSlots(a){
-  const box=$("#tfSlots"); const day=a.eventLabel||a.eventDateISO;
-  const lab=s=>(a.slotLabels&&a.slotLabels[s])||s;
-  const open=(a.openSlots||[]).map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
-  const taken=(a.takenSlots||[]).map(s=>`<button type="button" class="tf-slot" disabled>${lab(s)}</button>`).join("");
-  const sc=scarcityLine((a.openSlots||[]).length, Object.keys(a.slotLabels||{}).length||12, a.city, day);
-  box.innerHTML=`${urgencyLine(a)}${sc}<div class="tf-slot-day">${a.city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
+function fallbackRow(e){
+  const hasNext=BOOK.eventIdx < BOOK.events.length-1;
+  const next=hasNext?`<button type="button" class="tf-nextdate" id="tfNext">See next date →</button>`:"";
+  return `<div class="tf-altrow"><span>Can't make ${e.eventLabel||e.dateISO}?</span>`+
+    `${next}<button type="button" class="tf-waitlist" id="tfWait">Join the Priority Wait List</button></div>`;
+}
+function wireFallback(city){
+  const nx=$("#tfNext"); if(nx) nx.onclick=()=>showEventAt(BOOK.eventIdx+1);
+  const w=$("#tfWait"); if(w) w.onclick=()=>{ BOOK.reason="waitlist"; BOOK.slot=null;
+    $("#tfSlots").innerHTML=`<div class="tf-prio"><strong>You're choosing the Priority Wait List for ${city}.</strong> Add your details below and we'll reach out the moment a slot opens.</div>`;
+    updateBookCta(); };
+}
+function showEventAt(i){
+  BOOK.eventIdx=i; BOOK.slot=null; BOOK.reason=null;
+  const e=BOOK.events[i], city=(BOOK.avail&&BOOK.avail.city)||S.marketCity;
+  if(e.full) renderWaitlistFull(city,e); else renderSlots(city,e);
+  const box=$("#tfSlots"); box.insertAdjacentHTML("beforeend", fallbackRow(e));
+  wireFallback(city);
+  updateBookCta();
+}
+function renderSlots(city,e){
+  const box=$("#tfSlots"); const day=e.eventLabel||e.dateISO;
+  const lab=s=>(e.slotLabels&&e.slotLabels[s])||s;
+  const open=(e.openSlots||[]).map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
+  const taken=(e.takenSlots||[]).map(s=>`<button type="button" class="tf-slot" disabled>${lab(s)}</button>`).join("");
+  const sc=scarcityLine((e.openSlots||[]).length, Object.keys(e.slotLabels||{}).length||12, city, day);
+  box.innerHTML=`${urgencyLine({city,eventDateISO:e.dateISO,eventLabel:e.eventLabel})}${sc}<div class="tf-slot-day">${city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
   box.querySelectorAll(".tf-slot:not([disabled])").forEach(b=>b.onclick=()=>{
     box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
     b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
   });
 }
-function renderWaitlistFull(a){
+function renderWaitlistFull(city,e){
   BOOK.slot=null; BOOK.reason="full"; const box=$("#tfSlots");
-  const day=a.eventLabel||a.eventDateISO;
-  const lab=s=>(a.slotLabels&&a.slotLabels[s])||s;
-  const times=Object.keys(a.slotLabels||{});
-  const list=times.length?times:(a.openSlots||[]).concat(a.takenSlots||[]);
+  const day=e.eventLabel||e.dateISO;
+  const lab=s=>(e.slotLabels&&e.slotLabels[s])||s;
+  const times=Object.keys(e.slotLabels||{});
+  const list=times.length?times:(e.openSlots||[]).concat(e.takenSlots||[]);
   const btns=list.map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
-  box.innerHTML=`<div class="tf-prio" style="margin-bottom:10px"><strong>${a.city} on ${day} is full.</strong> Pick your preferred time to join the Priority Wait List, and we'll reach out the moment a slot opens.</div><div class="tf-slot-day">Preferred time</div><div class="tf-slotgrid">${btns}</div>`;
+  box.innerHTML=`<div class="tf-prio" style="margin-bottom:10px"><strong>${city} on ${day} is full.</strong> Pick your preferred time to join the Priority Wait List, and we'll reach out the moment a slot opens.</div><div class="tf-slot-day">Preferred time</div><div class="tf-slotgrid">${btns}</div>`;
   box.querySelectorAll(".tf-slot").forEach(b=>b.onclick=()=>{
     box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
     b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
@@ -930,8 +953,8 @@ function renderPriority(reason){
   box.innerHTML=`<div class="tf-prio"><strong>No event is scheduled here yet.</strong> Join the Priority Wait List below, and we'll tell you the moment a slot opens.</div>`;
 }
 function updateBookCta(){
-  const btn=$("#fSubmit"), a=BOOK.avail;
-  const ready=!!(a && a.hasEvent && !a.full && !a.error);
+  const btn=$("#fSubmit"), e=BOOK.events[BOOK.eventIdx];
+  const ready=!!(e && !e.full && BOOK.reason!=="waitlist" && BOOK.reason!=="full");
   if(ready) btn.textContent=BOOK.slot?"Confirm Booking →":"Pick a time above";
   else btn.textContent="Join the Priority Wait List →";
   btn.classList.toggle("ready", ready && !!BOOK.slot);
@@ -949,7 +972,8 @@ $("#fSubmit").onclick=async()=>{
   if(!name||(!phone&&!email)){$("#fErr").textContent="Please add your name and a phone or email so we can reach you.";$("#fErr").style.display="block";(!name?$("#fName"):$("#fPhone")).focus();return;}
   $("#fErr").style.display="none";
   if(!S.marketCity){ return submitNetlifyLead(); }   // no market selected → legacy lead path
-  const a=BOOK.avail, needSlot=!!(a && a.hasEvent && !a.full && !a.error);
+  const a=BOOK.avail;
+  const e=BOOK.events[BOOK.eventIdx], needSlot=!!(e && !e.full && BOOK.reason!=="waitlist" && BOOK.reason!=="full");
   if(needSlot && !BOOK.slot){ $("#fErr").textContent="Please pick a time above."; $("#fErr").style.display="block"; const sl=document.querySelector("#tfSlots button,#tfSlots [tabindex]"); if(sl) sl.focus(); else $("#fErr").scrollIntoView({behavior:"smooth",block:"center"}); return; }
   const yearEl=$("#fYear"), yearShown=$("#fYearGroup") && $("#fYearGroup").style.display!=="none";
   if(yearShown && !yearEl.value){ $("#fErr").textContent="Please select your exact model year."; $("#fErr").style.display="block"; yearEl.focus(); return; }
@@ -959,7 +983,7 @@ $("#fSubmit").onclick=async()=>{
   const mods=$("#fMods").value.trim();
   const btn=$("#fSubmit"), prev=btn.textContent; btn.textContent="Submitting…"; btn.disabled=true;
   const payload={
-    city:S.marketCity, slot:BOOK.slot||undefined,
+    city:S.marketCity, dateISO:(BOOK.events[BOOK.eventIdx]||{}).dateISO||undefined, slot:BOOK.slot||undefined,
     name, phone, email, vehicle:$("#fVeh").value, modelYear, mods,
     goals: goalsStr + (msg?` · Note: ${msg}`:""),
     installer_key:S.installerKey||"", bot_field:"",
@@ -972,10 +996,11 @@ $("#fSubmit").onclick=async()=>{
     if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} track(6,"booked"); const tail=out.emailFailed?"We'll confirm the details by phone/text shortly.":"Check your email for a calendar invite."; bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. ${tail}`); }
     else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority Wait List'});}catch(e){} track(6,"priority"); bookSuccess("You're on the Priority Wait List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}${BOOK.slot?` for your preferred time, ${BOOK.slot}`:""}.`); }
     else if(out.status==="conflict"){
-      if(BOOK.avail){ const all=Object.keys(BOOK.avail.slotLabels||{}); BOOK.avail.openSlots=out.openSlots||[]; BOOK.avail.takenSlots=all.filter(s=>!BOOK.avail.openSlots.includes(s)); BOOK.slot=null;
-        if(BOOK.avail.openSlots.length){ renderSlots(BOOK.avail); } else { BOOK.avail.full=true; renderWaitlistFull(BOOK.avail); } }
+      const ce=BOOK.events[BOOK.eventIdx];
+      if(ce){ const all=Object.keys(ce.slotLabels||{}); ce.openSlots=out.openSlots||[]; ce.takenSlots=all.filter(s=>!ce.openSlots.includes(s)); ce.full=!ce.openSlots.length; BOOK.slot=null;
+        showEventAt(BOOK.eventIdx); }
       $("#fErr").textContent="That time was just taken. Please pick another."; $("#fErr").style.display="block";
-      btn.textContent=(BOOK.avail&&BOOK.avail.openSlots&&BOOK.avail.openSlots.length)?"Pick a time above":"Join the Priority Wait List →"; btn.disabled=false;
+      updateBookCta(); btn.disabled=false;
     }
     else { throw new Error(out.error||"book-failed"); }
   }catch(e){ btn.disabled=false; btn.textContent=prev; submitNetlifyLead(); }
