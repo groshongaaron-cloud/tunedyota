@@ -1,0 +1,40 @@
+/* Tuned Yota Dealer Partner Kit — shared US-Letter print styling.
+   Brand tokens mirror the site (sage green + charcoal). One artifact per page. */
+:root{
+  --sage:#4a5d4f; --sage-d:#2f3d33; --ink:#1c2320; --line:#d7ddd6;
+  --paper:#ffffff; --accent:#8a6d3b; --muted:#5c665e; --wash:#f4f6f3;
+}
+@page{ size:Letter; margin:0.6in; }
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; background:var(--paper); color:var(--ink);
+  font:15px/1.55 "Segoe UI",-apple-system,Helvetica,Arial,sans-serif; }
+.page{ padding:0.1in 0; max-width:7.3in; margin:0 auto; }
+.eyebrow{ text-transform:uppercase; letter-spacing:.14em; font-size:11px;
+  color:var(--sage); font-weight:700; }
+h1{ font-size:27px; line-height:1.15; margin:6px 0 10px; color:var(--sage-d); }
+h2{ font-size:17px; margin:20px 0 8px; color:var(--sage-d);
+  border-bottom:2px solid var(--line); padding-bottom:4px; }
+h3{ font-size:14px; margin:14px 0 4px; color:var(--ink); }
+p,li{ font-size:13.5px; }
+ul{ margin:6px 0 6px 18px; padding:0; } li{ margin:3px 0; }
+.lead{ font-size:15px; color:var(--muted); }
+table{ border-collapse:collapse; width:100%; margin:10px 0; font-size:12.5px; }
+th,td{ border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+th{ background:var(--wash); color:var(--sage-d); }
+.brandbar{ display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:3px solid var(--sage); padding-bottom:8px; margin-bottom:14px; }
+.brandbar .wordmark{ font-weight:800; letter-spacing:.02em; color:var(--sage-d); font-size:18px; }
+.brandbar .tag{ font-size:11px; color:var(--muted); }
+.callout{ background:var(--wash); border-left:4px solid var(--sage); padding:10px 14px; margin:12px 0; }
+.owner-input{ background:#fff3cd; border:1px dashed var(--accent); padding:0 6px;
+  border-radius:3px; font-weight:600; color:#6b4e18; }
+.foot{ margin-top:22px; border-top:1px solid var(--line); padding-top:8px;
+  font-size:10.5px; color:var(--muted); }
+/* Draft watermark for counsel-review artifacts */
+body.draft::before{ content:"DRAFT — COUNSEL REVIEW REQUIRED"; position:fixed;
+  top:46%; left:50%; transform:translate(-50%,-50%) rotate(-24deg);
+  font-size:46px; font-weight:800; color:rgba(180,60,60,.10);
+  letter-spacing:.06em; white-space:nowrap; pointer-events:none; z-index:0; }
+.draft-banner{ background:#f8d7da; border:1px solid #d9534f; color:#842029;
+  font-weight:700; font-size:12px; padding:7px 12px; border-radius:4px; margin-bottom:12px; }
+.page{ position:relative; z-index:1; }

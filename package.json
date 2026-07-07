@@ -8,7 +8,8 @@
     "test:smoke": "node --test tests/mcp-smoke.mjs",
     "build:seo": "node scripts/build-seo.mjs",
     "ingest:dealers": "node scripts/ingest-dealers.js",
-    "score:dealers": "node scripts/score-dealers.js"
+    "score:dealers": "node scripts/score-dealers.js",
+    "render:dealer-kit": "node docs/marketing/dealer-kit/render.js"
   },
   "dependencies": {
     "google-auth-library": "^10.9.0",
