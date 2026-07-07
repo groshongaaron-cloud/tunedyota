@@ -80,3 +80,22 @@ test("readXlsx parses the dealer master list into row objects", () => {
   assert.equal(rows[0]["Dealer Name"], "Lake Country Toyota");
   assert.equal(rows[0]["Abbrev"], "MN");
 });
+
+const { STATE_REP: SR } = require("../netlify/functions/lib/dealer-zones.js");
+
+test("registry integrity: every dealer is valid and consistently scored", () => {
+  const regPath = path.join(__dirname, "..", "netlify", "functions", "lib", "dealers.json");
+  if (!fs.existsSync(regPath)) return; // skip until ingest+score have run
+  const dealers = JSON.parse(fs.readFileSync(regPath, "utf8"));
+  assert.ok(dealers.length > 0, "registry is empty");
+  for (const d of dealers) {
+    assert.match(d.state, /^[A-Z]{2}$/, `bad state ${d.state} for ${d.name}`);
+    assert.ok(STAGES.includes(d.stage), `bad stage ${d.stage} for ${d.name}`);
+    assert.equal(d.owningRep, SR[d.state], `rep mismatch for ${d.name} (${d.state})`);
+    assert.ok(["A", "B", "C"].includes(d.tier), `bad tier ${d.tier} for ${d.name}`);
+    // score/tier must agree with the pure function (registry not hand-edited into inconsistency)
+    const fresh = scoreDealer(d);
+    assert.equal(d.score, fresh.score, `stale score for ${d.name}`);
+    assert.equal(d.tier, fresh.tier, `stale tier for ${d.name}`);
+  }
+});
