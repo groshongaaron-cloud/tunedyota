@@ -13,9 +13,10 @@ function marketIndex() {
 
 function eventsList() {
   const ix = marketIndex();
-  return Object.entries(EVENTS).map(([key, ev]) => {
+  const asArr = (v) => Array.isArray(v) ? v : (v ? [v] : []);
+  return Object.entries(EVENTS).flatMap(([key, val]) => {
     const m = ix[key] || {};
-    return { city: titleCase(key), state: m.state || "", dateISO: ev.dateISO, label: ev.label, installerKey: m.inst || "", active: ev.active !== false };
+    return asArr(val).map((ev) => ({ city: titleCase(key), state: m.state || "", dateISO: ev.dateISO, label: ev.label, installerKey: m.inst || "", active: ev.active !== false }));
   });
 }
 

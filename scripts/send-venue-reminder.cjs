@@ -39,7 +39,9 @@ function todayISO() {
 }
 
 function buildRows(today) {
+  const asArr = (v) => Array.isArray(v) ? v : (v ? [v] : []);
   return Object.entries(EVENTS)
+    .flatMap(([key, val]) => asArr(val).map((e) => [key, e]))
     .filter(([, e]) => e.active && String(e.address || "").trim() === PLACEHOLDER)
     .map(([city, e]) => {
       const market = getMarket(e.event && e.event.split(",")[0] ? city : city) || getMarket(city);

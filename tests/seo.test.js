@@ -82,3 +82,13 @@ test("generated image assets exist", () => {
     assert.ok(fs.existsSync(path.join(SITE_DIR, f)), `${f} exists`);
   }
 });
+
+test("buildEventsJsonLd emits one Event per active date, including a city's second date", async () => {
+  const { buildEventsJsonLd } = await import("../scripts/lib/seo-data.mjs");
+  const events = { "twin cities": [
+    { city: "twin cities", dateISO: "2026-08-29", label: "Aug 29", active: true, event: "TC Aug" },
+    { city: "twin cities", dateISO: "2026-10-16", label: "Oct 16", active: true, event: "TC Oct" },
+  ] };
+  const json = buildEventsJsonLd(events, ["MN"]);
+  assert.equal((json.match(/"@type":\s*"Event"/g) || []).length, 2);
+});

@@ -81,7 +81,9 @@ export const BUSINESS_STUB = JSON.stringify({
 });
 
 export function buildEventsJsonLd(events, states) {
+  const asArr = (v) => Array.isArray(v) ? v : (v ? [v] : []);
   const items = Object.entries(events)
+    .flatMap(([key, v]) => asArr(v).map((e) => [key, e]))
     .filter(([, e]) => e && e.active && e.dateISO)
     .sort((a, b) => a[1].dateISO.localeCompare(b[1].dateISO))
     .map(([city, e], i) => {
