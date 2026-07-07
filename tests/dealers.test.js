@@ -26,3 +26,40 @@ test("tagGroup name-matches multi-store groups, else null", () => {
   assert.equal(tagGroup("Luther Brookdale Toyota"), "Luther");
   assert.equal(tagGroup("Lake Country Toyota"), null);
 });
+
+const { scoreDealer, inferOwnership, STAGES } = require("../netlify/functions/lib/dealer-scoring.js");
+
+test("inferOwnership: group present → group, else independent", () => {
+  assert.equal(inferOwnership("Luther"), "group");
+  assert.equal(inferOwnership(null), "independent");
+});
+
+test("scoreDealer: fully-signalled A-tier", () => {
+  const r = scoreDealer({ truckVolume: "high", proximity: "close", enthusiastPosture: true, ownershipType: "independent" });
+  assert.equal(r.score, 7); // 3+2+1+1
+  assert.equal(r.tier, "A");
+  assert.equal(r.needsSignal, false);
+});
+
+test("scoreDealer: null signals score provisionally and flag needsSignal", () => {
+  const r = scoreDealer({ truckVolume: null, proximity: "mid", enthusiastPosture: null, ownershipType: "independent" });
+  assert.equal(r.score, 4); // 2(null→med)+1+0+1
+  assert.equal(r.tier, "B");
+  assert.equal(r.needsSignal, true);
+});
+
+test("scoreDealer: group store with null signals defaults to C", () => {
+  const r = scoreDealer({ truckVolume: null, proximity: "mid", enthusiastPosture: null, ownershipType: "group" });
+  assert.equal(r.score, 3); // 2+1+0+0
+  assert.equal(r.tier, "C");
+  assert.equal(r.needsSignal, true);
+});
+
+test("scoreDealer: tier thresholds (A>=6, B 4-5, C<=3)", () => {
+  assert.equal(scoreDealer({ truckVolume: "high", proximity: "close", enthusiastPosture: false, ownershipType: "group" }).tier, "B"); // 3+2+0+0=5
+  assert.equal(scoreDealer({ truckVolume: "med", proximity: "close", enthusiastPosture: true, ownershipType: "independent" }).tier, "A"); // 2+2+1+1=6
+});
+
+test("STAGES enum is the pipeline order", () => {
+  assert.deepEqual(STAGES, ["Prospect", "Contacted", "Kit Sent", "Pilot", "Active"]);
+});
