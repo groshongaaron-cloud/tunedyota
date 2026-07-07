@@ -63,3 +63,20 @@ test("scoreDealer: tier thresholds (A>=6, B 4-5, C<=3)", () => {
 test("STAGES enum is the pipeline order", () => {
   assert.deepEqual(STAGES, ["Prospect", "Contacted", "Kit Sent", "Pilot", "Active"]);
 });
+
+const path = require("node:path");
+const fs = require("node:fs");
+const { readXlsx } = require("../netlify/functions/lib/xlsx-reader.js");
+
+test("readXlsx parses the dealer master list into row objects", () => {
+  const file = path.join(__dirname, "..", "docs", "dealers", "dealer-master-list.xlsx");
+  if (!fs.existsSync(file)) return; // skip if the source file isn't present
+  const rows = readXlsx(file);
+  assert.equal(rows.length, 77);
+  const header = Object.keys(rows[0]);
+  for (const col of ["State", "Abbrev", "Dealer Name", "City", "ZIP"]) {
+    assert.ok(header.includes(col), `missing column ${col}`);
+  }
+  assert.equal(rows[0]["Dealer Name"], "Lake Country Toyota");
+  assert.equal(rows[0]["Abbrev"], "MN");
+});
