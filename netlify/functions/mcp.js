@@ -11,6 +11,7 @@ const { getMarket } = require("./lib/markets.js");
 const { getAllActiveEvents } = require("./lib/events.js");
 const EVENTS = require("./lib/events-data.js");
 const { getAvailability } = require("./availability.js");
+const { priceVehicle } = require("./lib/vehicle-pricing.js");
 
 const SERVER = { name: "tunedyota-webmcp", version: "0.1.0" };
 const PROTOCOL_VERSION = "2025-06-18";
@@ -43,6 +44,18 @@ const TOOLS = [
     name: "get_tune_pricing",
     description: "Get Tuned Yota OTT Tune pricing guidance and the link to see an exact, vehicle-specific price.",
     inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "get_vehicle_pricing",
+    description: "Get the exact OTT Tune starting price (plus custom and supercharger/turbo prices where offered) for a specific Toyota or Lexus. Give make + model, and optionally the model year to pin the exact engine/config. With no model it returns the supported-vehicle catalog.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        make: { type: "string", description: "\"Toyota\" or \"Lexus\"." },
+        model: { type: "string", description: "Model, e.g. \"Tacoma\", \"4Runner\", \"GX\"." },
+        year: { type: "integer", description: "Model year, e.g. 2021 — narrows to the exact engine/config." },
+      },
+    },
   },
 ];
 
@@ -85,6 +98,7 @@ async function callTool(name, args, deps) {
   if (name === "find_tuning_events") return await findEvents(args, deps);
   if (name === "check_event_availability") return await checkAvailability(args, deps);
   if (name === "get_tune_pricing") return getPricing();
+  if (name === "get_vehicle_pricing") return priceVehicle(args, (deps.now || new Date()).getFullYear());
   throw new Error(`Unknown tool: ${name}`);
 }
 

@@ -8,7 +8,8 @@
   "tools": [
     { "name": "find_tuning_events", "description": "List upcoming Tuned Yota tuning events; optional 2-letter state or city filter." },
     { "name": "check_event_availability", "description": "Upcoming event dates and open booking-slot counts for a given city." },
-    { "name": "get_tune_pricing", "description": "OTT Tune pricing guidance plus the link to an exact, vehicle-specific price." }
+    { "name": "get_tune_pricing", "description": "OTT Tune pricing guidance plus the link to an exact, vehicle-specific price." },
+    { "name": "get_vehicle_pricing", "description": "Exact OTT/custom/supercharger starting prices for a specific Toyota or Lexus (make + model + optional year); returns the supported catalog with no model." }
   ],
   "contact": { "email": "info@tunedyota.com", "url": "https://tunedyota.com" },
   "notes": "WebMCP is an emerging convention with no finalized standard yet; this manifest and endpoint are a forward-compatible preview (enabled 2026-07-07). Tools are read-only (no booking/writes)."

@@ -29,7 +29,14 @@ test("initialize returns protocol + serverInfo", async () => {
 test("tools/list returns the 3 read-only tools", async () => {
   const out = await handleRequest({ jsonrpc: "2.0", id: 2, method: "tools/list" }, deps());
   const names = out.json.result.tools.map((t) => t.name);
-  assert.deepEqual(names, ["find_tuning_events", "check_event_availability", "get_tune_pricing"]);
+  assert.deepEqual(names, ["find_tuning_events", "check_event_availability", "get_tune_pricing", "get_vehicle_pricing"]);
+});
+test("get_vehicle_pricing returns the exact config for a make/model/year", async () => {
+  const out = await handleRequest({ jsonrpc: "2.0", id: 8, method: "tools/call", params: { name: "get_vehicle_pricing", arguments: { make: "Toyota", model: "Tacoma", year: 2021 } } }, deps());
+  const data = JSON.parse(out.json.result.content[0].text);
+  assert.equal(data.supported, true);
+  assert.equal(data.options[0].engine, "3.5L V6");
+  assert.equal(data.options[0].ottTuneFrom, 500);
 });
 test("find_tuning_events filters by state and returns upcoming events soonest-first", async () => {
   const out = await handleRequest({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "find_tuning_events", arguments: { state: "MN" } } }, deps());
