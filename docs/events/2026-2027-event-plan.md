@@ -8,14 +8,26 @@ rules folded in: **skip major-holiday weekends** (Memorial Day, July 4, Labor Da
 **installers in separate territories may share a date/weekend** (owner floats or the
 installer runs their own event console). Duluth held at its booked Sat Jul 25, 2026._
 
-> **✅ SCHEDULED LIVE 2026-07-06.** Every event in Phase 1 and the 2027 calendar below is
-> now a real, bookable date in the production booking system (`events-data.js` +
-> the `/find-your-exact-tune` map), not just a proposal — **30 active events**, and **10
-> cities carry multiple dates** so the funnel's "See next date →" stepwise chain is active
-> (see [[multi-date-booking-and-schedule]]). Resolved picks: **Rochester** (not Mankato)
-> for Sep 26 2026; **Sioux Falls** for the 2027 fall return; **Lincoln + Sioux City**
-> promoted from waitlist-only to scheduled 2027 swings. Most new venues are still **"To Be
-> Released"** pending owner addresses. Change any date via the `schedule-event` skill.
+> **✅ SCHEDULED LIVE — revised 2026-07-07.** Every event below is a real, bookable date in
+> production (`events-data.js` + the `/find-your-exact-tune` map); many cities carry
+> multiple dates so the funnel's "See next date →" stepwise chain is active (see
+> [[multi-date-booking-and-schedule]]).
+>
+> **Owner-approved season revision (2026-07-07):**
+> - **Season now runs mid-March → the 2nd week of November** (was Apr → mid-Oct). The 2026
+>   tail extends with a **fall finale run (Oct 17 → Nov 14)**; 2027 **opens mid-March
+>   (Mar 13)** and closes **Nov 13**.
+> - **Shoulder-season dates (Mar–Apr, Oct–Nov) are reserved for the five priority markets**
+>   — **Twin Cities, Omaha, Iowa (Des Moines/Cedar Rapids/Davenport), Madison, Milwaukee** —
+>   which each run **~3× in 2027**. Smaller markets stay in the warm core (May–Sep).
+> - **Lincoln, NE reverted to waitlist-only**; **Sioux City** stays scheduled (Omaha swing).
+> - New cities **Bismarck, Grand Forks, Brainerd** remain **waitlist-only**.
+> - **Known tradeoff:** Aaron carries ~13 of the 2027 weekends (he owns 3 priority markets +
+>   the northern tier). To be rebalanced when the **new installer** is onboarded (hand them
+>   Fargo/Duluth + Bismarck/Grand Forks/Brainerd). Owner floats meanwhile.
+>
+> Most new venues are **"To Be Released"** — tracked in `docs/events/owner-action-items.md`.
+> Change any date via the `schedule-event` skill.
 
 ## The lens I'm planning through
 
@@ -82,9 +94,19 @@ rebooks from the summer events).
 | Sep 12, 2026 | _Green Bay, WI_ | Noah | _(existing)_ |
 | **Sat Sep 19, 2026** | **Omaha, NE (fall return)** | Cody | Uses Cody's headroom; ~180 mi from Sioux Falls. **Live.** |
 | **Sat Sep 26, 2026** | **Rochester, MN** | Aaron | Southern MN, never served directly. **Live — Rochester chosen** over Mankato (Mankato scheduled for 2027 instead). |
-| **Sat Oct 10, 2026** | **Des Moines, IA (fall finale)** | Aaron | Iowa demand ran hot in June; a fall return + "last tune before winter" urgency closes the season. |
+| **Sat Oct 10, 2026** | **Des Moines, IA** | Aaron | Iowa demand ran hot in June; a fall return keeps the state warm into the extension. |
 
-**Nov 2026 – Mar 2027 — off-season, but not idle.** No outdoor events. Use the window to:
+### Fall extension — Oct 17 → Nov 14 (priority markets, "last tune before winter") ✅ LIVE
+| Date | Market | Installer |
+|------|--------|-----------|
+| **Sat Oct 17, 2026** | Madison, WI | Aaron |
+| **Sat Oct 24, 2026** | Milwaukee, WI | Noah |
+| **Sat Oct 31, 2026** | Omaha, NE | Cody |
+| **Sat Nov 7, 2026** | Cedar Rapids, IA _(Iowa)_ | Aaron |
+| **Sat Nov 14, 2026** | **Twin Cities, MN — SEASON FINALE** | Aaron |
+
+**Mid-Nov 2026 – early-Mar 2027 — off-season, but not idle.** No outdoor events in the
+deep-cold window (the season now bookends it: last event Nov 14, next Mar 13). Use it to:
 - Run a **winter waitlist campaign** ("lock your spring slot now") off the Priority List.
 - Execute the **Google Business Profile** push (the keystone for geo search — see
   `docs/seo/gbp-setup.md`) and the pending SEO content pages while bookings are quiet.
@@ -95,53 +117,59 @@ rebooks from the summer events).
 
 ---
 
-## Phase 2 — A rhythmic 2027 season (Apr → Oct)
+## Phase 2 — A rhythmic 2027 season (mid-March → mid-November)
 
 Design principles for 2027:
-- **Open ~6 weeks earlier than 2026** (April, not late June) to capture pent-up
-  spring demand and spread installer load.
+- **Open mid-March** (Mar 13) and **close the 2nd week of November** (Nov 13) — a longer
+  season that spreads installer load and captures pent-up spring + last-chance fall demand.
+- **Prioritize the five largest markets** — Twin Cities, Omaha, Iowa, Madison, Milwaukee —
+  which each run **~3×** and own the cold-shoulder dates (Mar–Apr, Oct–Nov). Smaller
+  markets stay in the warm core (May–Sep).
 - **Repeat every 2026 market that filled**, on roughly the same calendar slot, so
   customers learn "my city's event is around [month]."
-- **Add new cities the waitlist earned** (Davenport, Sioux Falls, Milwaukee graduate to
-  regulars; evaluate Bismarck, La Crosse, Kansas City-adjacent as stretch markets).
-- **One flagship anniversary event** to build brand gravity.
+- **One flagship anniversary event** (Green Bay, Sep 11) to build brand gravity.
 
-### Firm 2027 calendar (Apr → Oct) — ✅ LIVE
+### Firm 2027 calendar (mid-Mar → Nov 13) — ✅ LIVE
 
 _Saturdays throughout (Sundays only for the second leg of a swing). **Skips the three
 major-holiday weekends** — Memorial Day (Sat May 29), July 4 (Sat Jul 3), Labor Day
-(Sat Sep 4). Distances are round-trips from each installer's home base (Aaron = Twin
-Cities, Cody = Sioux Falls, Noah = Sheboygan)._
+(Sat Sep 4). **★ = priority market** (Twin Cities, Omaha, Iowa, Madison, Milwaukee), each
+running ~3×; the cold-shoulder dates are reserved for them. Distances are round-trips from
+each installer's home base (Aaron = Twin Cities, Cody = Sioux Falls, Noah = Sheboygan)._
 
 | Date | Market | Installer |
 |------|--------|-----------|
-| Sat Apr 24 | Twin Cities, MN (season opener) | Aaron |
-| Sat May 1 | Milwaukee, WI (opener) | Noah |
-| Sat May 8 | Des Moines, IA | Aaron |
-| Sat May 15 **+ Sun 16** | Omaha **+ Lincoln, NE** (swing) | Cody |
-| Sat May 22 | Madison, WI | Aaron |
-| Sat Jun 5 **+ Sun 6** | **Iowa swing**: Cedar Rapids **+ Davenport** | Aaron |
-| Sat Jun 12 | Green Bay, WI | Noah |
-| Sat Jun 19 **+ Sun 20** | Sioux Falls **+ Sioux City, IA** (swing) | Cody |
-| Sat Jun 26 | Fargo, ND | Aaron |
-| Sat Jul 10 | Duluth, MN | Aaron |
+| **Sat Mar 13** | ★ Twin Cities, MN — season opener | Aaron |
+| Sat Mar 20 | ★ Milwaukee, WI | Noah |
+| Sat Mar 27 | ★ Omaha, NE | Cody |
+| Sat Apr 3 | ★ Madison, WI | Aaron |
+| Sat Apr 17 | ★ Des Moines, IA _(Iowa)_ | Aaron |
+| Sat May 1 | Green Bay, WI | Noah |
+| Sat May 15 | Sioux Falls, SD | Cody |
+| Sat May 22 | Fargo, ND | Aaron |
+| Sat Jun 5 **+ Sun 6** | ★ Cedar Rapids **+ Davenport** _(Iowa swing)_ | Aaron |
+| Sat Jun 12 | ★ Milwaukee, WI (R2) | Noah |
+| Sat Jun 19 | ★ Twin Cities, MN (R2) | Aaron |
+| Sat Jun 26 **+ Sun 27** | ★ Omaha **+ Sioux City, IA** (swing) | Cody |
+| Sat Jul 10 | ★ Madison, WI (R2) | Aaron |
 | Sat Jul 17 | Rapid City, SD | Cody |
-| Sat Jul 24 **+ Sun 25** | **S-MN swing**: Rochester **+ Mankato** | Aaron |
-| Sat Aug 14 | Milwaukee, WI (round 2) | Noah |
+| Sat Jul 24 | Duluth, MN | Aaron |
+| Sat Aug 7 **+ Sun 8** | Rochester **+ Mankato** _(S-MN swing)_ | Aaron |
+| Sat Aug 14 | Eau Claire, WI | Aaron |
 | Sat Sep 11 | **Green Bay, WI — 1-Year Anniversary / flagship** | Noah |
-| Sat Sep 25 | Sioux Falls (fall return) | Cody |
-| Sat Oct 16 | Twin Cities, MN — "last tune before winter" finale | Aaron |
+| Sat Sep 25 | Sioux Falls, SD (R2) | Cody |
+| Sat Oct 2 | ★ Des Moines, IA (R2) _(Iowa)_ | Aaron |
+| Sat Oct 9 | ★ Omaha, NE (R2) | Cody |
+| Sat Oct 16 | ★ Milwaukee, WI (R3) | Noah |
+| Sat Oct 23 | ★ Madison, WI (R3) | Aaron |
+| **Sat Nov 13** | ★ **Twin Cities, MN — season finale** | Aaron |
 
-**Load:** Aaron 8 weekends (2 are swings), Cody 4 (2 swings), Noah 4 — all at/under the
-~8-weekend cap from Q1. **~16 event-weekends / ~22 city-tunes** across the season.
-Green Bay's anniversary (Sat Sep 11, 2027) lands ~one year after the original Sep 12, 2026.
-
-**Demand-gated optional adds** — now that separate-territory installers can share a
-weekend, these can run *parallel* to the core without stretching anyone; promote each only
-when its Priority List clears the ~8-name threshold:
-- **Eau Claire, WI** — fold as a Sun leg after Duluth (Jul 10) or Rochester/Mankato.
-- **Twin Cities round 2** (early Aug) — biggest market; catches late-summer demand.
-- **Des Moines round 2** (late Aug) — Iowa ran hot; "last tune before winter" urgency.
+**Priority-market coverage:** Twin Cities / Milwaukee / Omaha / Madison each **3×**; Iowa
+**4 tunes** across 3 weekends. **~24 event-weekends / ~27 city-tunes.**
+**Load:** Aaron ~13 weekends (2 swings), Cody ~6 (2 swings), Noah ~5. **Aaron's load is the
+known constraint** — rebalance when the new installer is onboarded (hand off the northern
+tier: Fargo, Duluth + the waitlist cities Bismarck / Grand Forks / Brainerd). Owner floats
+his heaviest weekends meanwhile. **Lincoln, NE stays waitlist-only** for now.
 
 ---
 
@@ -233,11 +261,12 @@ expansion — is spec'd as an executable plan below.**
 
 ## Cody's tri-state expansion — executable plan (2027 pilot)
 
-> **Update 2026-07-06:** Owner fast-tracked this — **Lincoln (Sat May 16, 2027)** and
-> **Sioux City (Sat Jun 20, 2027)** are now **scheduled as live back-to-back swings**
-> (Omaha+Lincoln, Sioux Falls+Sioux City) rather than held as waitlist-only through the
-> demand gate. The Phase A/B instrumentation below is superseded for these two metros; the
-> Phase D success measure (slot-fill ≥ 60%) still applies retroactively for the 2028 read.
+> **Update 2026-07-07:** **Sioux City** is scheduled live as a **Sun Jun 27, 2027** leg of
+> Cody's **Omaha (Sat Jun 26) + Sioux City** swing. **Lincoln, NE has been reverted to
+> waitlist-only** (owner's call — revisit once its Priority List clears the bar or the new
+> installer adds Cody-region capacity). The Phase A/B instrumentation below still applies to
+> Lincoln; Sioux City graduated early, so its Phase D success measure (slot-fill ≥ 60%)
+> applies retroactively for the 2028 read.
 
 **Why Cody, why now.** Cody has the lightest event load of the three installers and the
 most headroom to add days, and two metros sit *cheaply adjacent* to stops he already
