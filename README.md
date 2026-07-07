@@ -1,5 +1,7 @@
 # Tuned Yota — Website
 
+[![CI](https://github.com/groshongaaron-cloud/tunedyota/actions/workflows/ci.yml/badge.svg)](https://github.com/groshongaaron-cloud/tunedyota/actions/workflows/ci.yml)
+
 Fresh, standalone marketing site for Tuned Yota (Toyota & Lexus performance tuning).
 Static HTML — no build step. The deployable site lives in [`site/`](site/);
 `site/index.html` is the home page.
