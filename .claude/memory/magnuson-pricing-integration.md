@@ -1,0 +1,31 @@
+---
+name: magnuson-pricing-integration
+description: "Magnuson supercharger pricing pages + quote builder LIVE; confidential price-file handling, Stripe-off order path, price-sync cadence"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: dec445be-0b21-4bdb-b027-b5d6457278bd
+---
+
+Magnuson Toyota/Lexus supercharger integration shipped LIVE 2026-07-07 (master @ 513df5f, from `handoff.md` + `tunedyota-magnuson-integration.zip`). 8 new pages: `/magnuson-supercharger-pricing` (hub: real Retail/MSP prices, interactive quote builder, reservation flow, ItemList schema) + 7 vehicle pages (Tundra, Tacoma, 4Runner, FJ Cruiser, Land Cruiser, LX570, Sequoia). Verified live end-to-end.
+
+**Single source of truth:** `site/magnuson-catalog.js` (Retail tier ONLY) powers the quote builder; `site/magnuson-schema.js` injects Product/Offer JSON-LD from it. When a new Magnuson price file (xlsx) arrives, update `magnuson-catalog.js` + the static tables on the pricing hub + vehicle pages (OPEN-ITEMS §2).
+
+**CONFIDENTIAL price file:** `data/magnuson-catalog.json` (repo-root, NOT `site/`) holds all six tiers incl. **dealer/jobber cost** = margin data. It is **gitignored** (never committed, never served — `publish="site"`, so anything under `site/` is public; verified `/data/magnuson-catalog.json` → 404). Never move it under `site/` and never commit it.
+
+**Stripe intentionally OFF** (`window.MAGNUSON_CHECKOUT = {}` in magnuson-catalog.js). The live order path is the frictionless **reservation flow** (pre-filled mailto). To enable payments later (OPEN-ITEMS §1): create Stripe account → make a Payment Link per kit → paste links keyed by SKU into `MAGNUSON_CHECKOUT`; the hub auto-switches "Reserve" → "Checkout" for those SKUs. `netlify/functions/create-checkout.js` is a disabled dynamic-checkout stub.
+
+**Integration deviations from the raw handoff** (forced by repo architecture — see [[seo-generator]]): pages registered in `HEAD_PAGES` (scripts/lib/seo-data.mjs) so `build:seo` owns OG + business stub + sitemap (did NOT hand-edit sitemap.xml or use sitemap-additions.xml); package `llms.txt` MERGED into existing `site/llms.txt` (not overwritten); manual `og:` tags stripped from pages (generator owns them); Meta Pixel `1307227328237229` copied onto all 8.
+
+Guardrails honored (see [[brand-rules-locked]]): prices/part#s/hp/CARB EO come from the July 1 2026 file — do not change without a new source doc. Fitment ambiguities the owner should confirm with Magnuson are in the zip's OPEN-ITEMS.md §3 (4Runner year ranges, Sequoia 01-26-57-123-BL, flex-fuel Tundra years).
+
+**Install photos:** the `.lp-media` blocks auto-hide the gradient placeholder when an `<img>` is the FIRST child (CSS `.lp-media img~.mark,~.cap{display:none}`); for full-display images (collages, charts) use the site's `<figure>`+`<img style="width:100%;height:auto">`+`<figcaption>` pattern instead of lp-media (cover-crop). Web-optimize + EXIF-strip everything via sharp before serving.
+- **Tacoma** DONE 2026-07-07 (master @ de85ddc) — 2 real Magnuson TVS1900 engine-bay shots (Tuned Yota's own, from `assets-source/Tacoma (3G)/SC/`) → `site/images/tacoma-3.5-magnuson-install*.jpg`. Tacoma was the ONLY platform with Tuned Yota's own SC install photos; everything else in those SC folders was dyno charts.
+- **Tundra 2022+ Performance Pack section** DONE 2026-07-07 (master @ f7c5a02) — used **Magnuson's OWN official product images** (owner supplied them in `assets-source/Magnuson/`, from magnusonsuperchargers.com's Performance Pack guide): clean TRD Pro install photo + labeled component collage + Magnuson's published dyno chart. Dyno chart attributed to **Magnuson Superchargers** (NOT OTT — it's not our dyno), figcaption has the required "results vary" disclaimer, ImageObject `creditText:"Magnuson Superchargers"`. Skipped the Magnuson-wrapped demo-truck "Hero" image. Owner OK'd using Magnuson's official imagery as their authorized dealer.
+- **STILL need photos:** Tundra 5.7L TVS2650 hero (page hero is still placeholder — a 3.4L image must NOT go there under the "TVS2650" caption), plus **4Runner, FJ, Land Cruiser, LX570, Sequoia** (zero photos). Don't reuse one platform's hardware shot on another (honesty guardrail per [[dyno-proof-on-seo-pages]]).
+
+**GSC sitemap:** RESUBMITTED 2026-07-07 after the new pages went live (live sitemap now 37 URLs incl. all 8 SC pages; HTTP 204, isPending). Done via the API, NOT the UI — `node scripts/measure/submit-sitemap.mjs` (commit 69c4951). The `gsc-reader` SA has full-user WRITE access, so sitemaps.submit works with the read-write `webmasters` scope — sitemap submission is automatable, correcting the old "GSC is owner-manual" note (only the GSC *SPA UI* can't be driven; the API can — see [[gsc-indexing-migration]]).
+
+**GSC indexing (2026-07-07):** after sitemap resubmit + Indexing API push (all 8 → 200, `node scripts/measure/request-indexing.mjs`; Indexing API now enabled + SA is a property owner — see [[gsc-indexing-migration]]), **baseline: 3/8 already indexed within hours** (pricing, Tundra, Tacoma = "Submitted and indexed"; 4Runner/FJ/LandCruiser/LX570/Sequoia "Discovered/unknown — pending crawl"). Authoritative status via URL Inspection API: `node scripts/measure/check-indexing.mjs` (reads the SA key; prints coverageState + Slacks a rollup if `notifyToken` in `~/.tunedyota/config`). **A local Windows Task "TunedYota Indexing Recheck" reruns it Sat 2026-07-11 09:00 and Slacks the result** (must run locally — the SA key isn't in the cloud). If they're all indexed by then, delete the task (`Unregister-ScheduledTask`).
+
+**Other owner post-deploy items:** optional Google Merchant Center / GBP product feed.
