@@ -18,6 +18,8 @@ Tuned Yota is an authorized **OTT (Overland Tailor Tune) installer** and the Mid
 - [Is the OTT Tune worth it?](https://tunedyota.com/is-the-ott-tune-worth-it): the value case with real Dynojet before/after results.
 - [Tune warranty & emissions legality](https://tunedyota.com/tune-warranty-emissions-legality): Magnuson-Moss warranty protection, EPA/emissions compliance, and why the tune is street-legal.
 - [Magnuson supercharger guide](https://tunedyota.com/magnuson-supercharger-guide): supported platforms, dyno-proven horsepower/torque gains, and pricing guidance.
+- [Magnuson supercharger pricing & instant quote](https://tunedyota.com/magnuson-supercharger-pricing): every current Magnuson kit price, an interactive quote builder, and online reservation.
+- [Toyota Tundra supercharger](https://tunedyota.com/toyota-tundra-supercharger) · [Tacoma](https://tunedyota.com/toyota-tacoma-supercharger) · [4Runner](https://tunedyota.com/toyota-4runner-supercharger) · [FJ Cruiser](https://tunedyota.com/toyota-fj-cruiser-supercharger) · [Land Cruiser](https://tunedyota.com/toyota-land-cruiser-supercharger) · [Lexus LX570](https://tunedyota.com/lexus-lx570-supercharger) · [Sequoia](https://tunedyota.com/toyota-sequoia-supercharger): per-vehicle Magnuson kit price, horsepower, and CARB legality.
 - [FAQ](https://tunedyota.com/faq): common questions on pricing, emissions compliance, what's included, and booking.
 - [Team](https://tunedyota.com/team): the regional OTT installers — Aaron Groshong, Noah Kreis, Cody Star.
 
@@ -30,6 +32,22 @@ Lexus: GX, LX570, RX350, LS460. Supported years and engines vary by platform.
 
 ## Forced induction
 Supercharger-supported platforms: Toyota Tacoma (3.5L/4.0L V6), 4Runner (4.0L V6), FJ Cruiser (4.0L V6), and the 5.7L V8 Tundra, Sequoia, and Land Cruiser. Tuned Yota also supports Harrop and ProCharger systems; factory-turbo platforms receive a dedicated turbo performance calibration.
+
+## Magnuson supercharger kits & pricing (current Magnuson retail, July 2026)
+- Toyota Tundra 5.7L V8 (2007–2021, incl. Flex Fuel): Magnuson TVS2650 Magnum — $8,295. 560 hp / 563 lb-ft at the crank, 7 psi, calibration + fuel system included, CARB EO D-488-69 (50-state legal).
+- Toyota Tundra TVS1900/TRD → TVS2650 upgrade system (2007–2021): $5,195 (reuses existing tune).
+- Toyota Land Cruiser / Lexus LX570 / Toyota Sequoia 5.7L (2008–2021): Magnuson TVS2650 — $8,395. 543 hp / 535 lb-ft at the crank, CARB EO D-488-69.
+- Toyota Tacoma 3.5L (2016–2023): Magnuson TVS1900 — $7,495 (colored lid +$300). 370+ hp / 330+ lb-ft, CARB EO D-488-59.
+- Toyota Tacoma 4.0L (2005–2015): Magnuson MP90 — $6,595. 305 hp / 335 lb-ft, CARB EO D-488-40.
+- Toyota 4Runner 4.0L (2010–2019): Magnuson TVS1320 — $7,695. 335+ hp / 345+ lb-ft, CARB EO D-488-45.
+- Toyota 4Runner 4.0L (2020–2024): Magnuson TVS1320 — $7,695. CARB EO D-488-64.
+- Toyota 4Runner 4.0L (2003–2009): Magnuson MP90 tuner kit — $6,495 (no factory tune; Tuned Yota supplies calibration; not CARB-exempt).
+- Toyota FJ Cruiser 4.0L (2010–2014): Magnuson TVS1320 — $7,695. CARB EO D-488-45.
+- Toyota FJ Cruiser 4.0L (2007–2009): Magnuson MP90 — $6,595. CARB EO D-488-40.
+- Toyota Land Cruiser 80-Series / Lexus LX450 4.5L I6 (1995–1997): Magnuson MP90 Classic — $7,995. +25% power, runs on stock ECU, CARB EO D-488-71.
+- Toyota Tacoma/4Runner/Tundra/T100 3.4L 5VZ-FE (1996–2004): Magnuson TVS1320 retrofit (successor to the TRD supercharger) — $4,495. 260+ hp, runs on stock ECU, CARB EO D-488-57 (excl. 2000–03 Tundra).
+- 2022+ Toyota Tundra / 2023+ Sequoia i-FORCE Performance Packs: $1,500 (tune, +85 hp/+85 lb-ft) to $3,846 (tune + charge air cooler + low-temp radiator + cold air kit + cat-back). 49-state (CA CARB pending).
+All Magnuson systems carry a 3-year/36,000-mile factory warranty. Installation and OTT calibration are quoted separately by Tuned Yota. Full prices and an instant quote builder: https://tunedyota.com/magnuson-supercharger-pricing
 
 ## Key facts
 - OTT Tune pricing: from $400–$550 depending on platform; custom calibration and forced-induction paths are priced higher. Exact price is shown instantly at https://tunedyota.com/find-your-exact-tune.

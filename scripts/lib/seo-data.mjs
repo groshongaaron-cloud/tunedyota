@@ -22,12 +22,16 @@ export const HEAD_PAGES = [
   "toyota-highlander-ott-tune.html","toyota-land-cruiser-ott-tune.html","toyota-rav4-ott-tune.html",
   "toyota-sequoia-ott-tune.html","toyota-tacoma-ott-tune.html","toyota-tundra-ott-tune.html",
   "lexus-gx-ott-tune.html","lexus-ls460-ott-tune.html","lexus-lx570-ott-tune.html","lexus-rx350-ott-tune.html",
+  "magnuson-supercharger-pricing.html",
+  "toyota-tundra-supercharger.html","toyota-tacoma-supercharger.html","toyota-4runner-supercharger.html",
+  "toyota-fj-cruiser-supercharger.html","toyota-land-cruiser-supercharger.html","lexus-lx570-supercharger.html","toyota-sequoia-supercharger.html",
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 
 // Sitemap priority by filename (preserves the existing sitemap's weighting).
 export const PRIORITY = {
   "index.html": "1.0", "find-your-exact-tune.html": "0.9", "supercharger.html": "0.9",
+  "magnuson-supercharger-pricing.html": "0.9",
   "faq.html": "0.7", "ott-tune.html": "0.7", "team.html": "0.7",
 };
 // loc path for a filename (index -> "/", others -> "/name" without .html).
