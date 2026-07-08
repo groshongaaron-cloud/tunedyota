@@ -30,5 +30,10 @@ build, fuel & mods"; `ImageObject` schema (`@graph` when >1 chart); **FAQ accord
 to avoid FAQPage-schema desync; charts credited "Overland Tailor Tuning". Honest framing also
 satisfies [[brand-rules-locked]].
 
-**Still pending (owner):** Magnuson kit/install + custom-calibration **pricing** is still
-"Call for pricing" on the cost page + Magnuson guide.
+**Still pending (owner) — SEO money-page number gaps (exact locations, audited 2026-07-07; owner chose to leave the whole set OPEN):**
+1. **Pricing — 5 "Call for pricing" cells** (the only literal placeholders):
+   - `site/magnuson-supercharger-guide.html` lines 113–115 = Tacoma 3.5L V6 / Tacoma-4Runner-FJ 4.0L V6 / Tundra-Sequoia-LC 5.7L V8 kit+install+cal "from" prices.
+   - `site/ott-tune-cost.html` lines 117–118 = Custom calibration + Supercharger+calibration prices.
+2. **Magnuson 4.0L gain row** (`magnuson-supercharger-guide.html` line 114) shows only `~334 whp (Magnuson)` — missing the stock baseline + `+gain` delta the 3.5L/5.7L rows have. Needs a verified stock 4.0L dyno number to read `~XXX→~334 (+XX)`; else leave as-is (honest, just non-parallel).
+3. **CARB nuance** (`site/tune-warranty-emissions-legality.html` line 107 + FAQ lines 32/130) is a deliberate "varies by state — contact us" hedge. NOT a number — a legal/positioning wording call only owner can make (tighten to a firmer emissions-intact/state-specific stance, or keep the hedge). See [[brand-rules-locked]].
+Fill path when data arrives: edit cells → `npm run build:seo` → tests → ship. See [[search-ai-visibility-program]].
