@@ -35,6 +35,7 @@
   <div id="app" class="hidden">
     <a class="link" href="/intake.html">+ Add a walk-in (intake form)</a>
     <a class="link" href="/calibration.html" style="margin-left:14px">Calibration reference (cal ID · TSB)</a>
+    <a class="link" href="#" id="logout" style="margin-left:14px;color:#8a2a2a">Log out</a>
     <div id="events"></div>
     <div id="msg" class="msg"></div>
   </div>
@@ -53,6 +54,12 @@
     localStorage.setItem('ty_installer_token', v); showApp();
   };
   if(tok()) showApp();
+
+  document.getElementById('logout').onclick=function(e){
+    e.preventDefault();
+    localStorage.removeItem('ty_installer_token');
+    location.reload();
+  };
 
   function showApp(){ document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
   function fail(m){ var el=document.getElementById('msg'); el.className='msg err'; el.textContent=m; }
