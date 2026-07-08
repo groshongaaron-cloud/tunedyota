@@ -26,6 +26,9 @@
 .snav-links a:hover{background:rgba(153,160,142,.18);color:#3A2E26}
 .snav-call{font-family:'Lato';font-weight:900;font-size:13px;background:#3A2E26;color:#F3EFEA;text-decoration:none;border-radius:99px;padding:9px 16px;margin-left:6px}
 .snav-call:hover{background:#5B4B42}
+.snav-share{background:transparent;border:1.6px solid var(--brown);color:var(--brown);border-radius:99px;padding:10px 18px;font-family:'Lato',sans-serif;font-weight:900;font-size:13.5px;letter-spacing:.03em;cursor:pointer;margin-left:8px;transition:.2s}
+.snav-share:hover{background:var(--brown);color:#fff}
+@media(max-width:560px){.snav-share{display:none}}
 
 /* ---------- footer ---------- */
 .sfoot{font-family:'Lato',sans-serif;background:#3A2E26;color:#D8CFC4;margin-top:46px;padding:34px 20px 28px;text-align:center}
