@@ -9,6 +9,8 @@
     "build:seo": "node scripts/build-seo.mjs",
     "ingest:dealers": "node scripts/ingest-dealers.js",
     "score:dealers": "node scripts/score-dealers.js",
+    "build:signals": "node scripts/build-signals-sheet.js",
+    "ingest:signals": "node scripts/ingest-signals.js",
     "render:dealer-kit": "node docs/marketing/dealer-kit/render.js"
   },
   "dependencies": {

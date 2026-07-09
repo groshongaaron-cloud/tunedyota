@@ -29,6 +29,13 @@ function sortDealers(a, b) {
   return (TIER_ORDER[a.tier] - TIER_ORDER[b.tier]) || (b.score - a.score) || a.name.localeCompare(b.name);
 }
 
+// Cluster grouped stores first (by group name), singletons last, so the owner can
+// bulk-fill a whole group in one pass on the worksheet.
+function byGroupThenName(a, b) {
+  const ga = a.group ? 0 : 1; const gb = b.group ? 0 : 1;
+  return ga - gb || (a.group || "").localeCompare(b.group || "") || a.name.localeCompare(b.name);
+}
+
 function pipelineMd(dealers) {
   const counts = { A: 0, B: 0, C: 0 };
   dealers.forEach((d) => counts[d.tier]++);
@@ -58,7 +65,7 @@ function worksheetMd(dealers) {
   md += `then paste values back into \`netlify/functions/lib/dealers.json\` (or hand this to Claude)\n`;
   md += `and run \`npm run score:dealers\`. Grouped by rep; tip: fill by group in one pass.\n\n`;
   for (const rep of ["aaron", "noah", "cody"]) {
-    const list = dealers.filter((d) => d.owningRep === rep).sort((a, b) => a.name.localeCompare(b.name));
+    const list = dealers.filter((d) => d.owningRep === rep).sort(byGroupThenName);
     md += `## ${REP_NAMES[rep]} (${list.length})\n\n`;
     md += `| Dealer | City | ST | Group | Truck Volume | Enthusiast? |\n|---|---|---|---|---|---|\n`;
     for (const d of list) {
@@ -72,14 +79,22 @@ function worksheetMd(dealers) {
   return md;
 }
 
-function main() {
+// Re-enrich + re-score every dealer, persist dealers.json, and regenerate the two
+// markdown views. Idempotent. Returns the scored dealers + tier counts so callers
+// (e.g. ingest-signals) can reuse the exact same pass instead of duplicating it.
+function rescoreAll() {
   const dealers = JSON.parse(fs.readFileSync(REG, "utf8")).map(enrich);
   fs.writeFileSync(REG, JSON.stringify(dealers, null, 2) + "\n");
   fs.writeFileSync(PIPE, pipelineMd(dealers));
   fs.writeFileSync(WORK, worksheetMd(dealers));
-  const c = { A: 0, B: 0, C: 0 };
-  dealers.forEach((d) => c[d.tier]++);
-  console.log(`Scored ${dealers.length} dealers (A ${c.A} · B ${c.B} · C ${c.C}) → pipeline + worksheet regenerated`);
+  const counts = { A: 0, B: 0, C: 0 };
+  dealers.forEach((d) => counts[d.tier]++);
+  return { dealers, counts };
 }
 
-main();
+module.exports = { rescoreAll };
+
+if (require.main === module) {
+  const { dealers, counts: c } = rescoreAll();
+  console.log(`Scored ${dealers.length} dealers (A ${c.A} · B ${c.B} · C ${c.C}) → pipeline + worksheet regenerated`);
+}
