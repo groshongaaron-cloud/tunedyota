@@ -11,14 +11,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Chester Berg Toyota",
@@ -32,14 +32,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Walser Bloomington Toyota",
@@ -53,14 +53,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Luther Brookdale Toyota",
@@ -74,14 +74,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Burnsville Toyota",
@@ -95,14 +95,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Carlson Toyota",
@@ -116,14 +116,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Kolar Toyota",
@@ -137,14 +137,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Quality Toyota",
@@ -158,14 +158,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Rudy Luther Toyota",
@@ -179,14 +179,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Inver Grove Toyota",
@@ -200,14 +200,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 5,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "LeadCar Toyota Mankato",
@@ -221,14 +221,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 3,
     "tier": "C",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Maplewood Toyota",
@@ -242,14 +242,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 5,
-    "tier": "B",
-    "needsSignal": true
+    "score": 7,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Rochester Toyota",
@@ -263,14 +263,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Iron Trail Toyota",
@@ -284,14 +284,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "St. Cloud Toyota",
@@ -305,14 +305,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Mills Toyota",
@@ -326,14 +326,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Dahl Toyota Winona",
@@ -347,14 +347,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
+    "score": 2,
     "tier": "C",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Wilson Toyota of Ames",
@@ -368,14 +368,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Motor Inn Toyota of Carroll",
@@ -389,14 +389,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Dan Deery Toyota",
@@ -410,14 +410,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
-    "tier": "C",
-    "needsSignal": true
+    "score": 4,
+    "tier": "B",
+    "needsSignal": false
   },
   {
     "name": "Billion Toyota of Clinton",
@@ -431,14 +431,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 3,
     "tier": "C",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Smart Toyota of Quad Cities",
@@ -452,14 +452,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Anderson-Weber Toyota",
@@ -473,14 +473,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Fort Dodge Ford, Lincoln, Toyota",
@@ -494,14 +494,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Toyota of Des Moines",
@@ -515,14 +515,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Cedar Rapids Toyota, Inc.",
@@ -536,14 +536,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "McGrath Toyota of Iowa City",
@@ -557,14 +557,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Hosmer Toyota",
@@ -578,14 +578,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Toyota of Muscatine",
@@ -599,14 +599,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Gregg Young Toyota Ottumwa",
@@ -620,14 +620,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
+    "score": 2,
     "tier": "C",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Rick Collins Toyota",
@@ -641,14 +641,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Okoboji Toyota",
@@ -662,14 +662,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Deery Brothers Toyota",
@@ -683,14 +683,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 3,
     "tier": "C",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Kolosso Toyota",
@@ -704,14 +704,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Marthaler Toyota of Ashland",
@@ -725,14 +725,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Toyota of Brookfield",
@@ -746,14 +746,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 5,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Markquart Toyota",
@@ -767,14 +767,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Umansky Toyota",
@@ -788,14 +788,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Le Mieux & Son Toyota",
@@ -809,14 +809,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 5,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Hesser Toyota",
@@ -830,14 +830,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Kenosha Toyota",
@@ -851,14 +851,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "LeadCar Toyota La Crosse",
@@ -872,14 +872,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 3,
     "tier": "C",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "East Madison Toyota",
@@ -893,14 +893,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Smart Motors Toyota",
@@ -914,14 +914,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Serra Toyota",
@@ -935,14 +935,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 5,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Heiser Toyota",
@@ -956,14 +956,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 5,
-    "tier": "B",
-    "needsSignal": true
+    "score": 7,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Ruda Toyota",
@@ -977,14 +977,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Zeigler Toyota of Racine",
@@ -998,14 +998,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Bergstrom Toyota of Oshkosh",
@@ -1019,14 +1019,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Mark Toyota of Plover",
@@ -1040,14 +1040,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Rhinelander Toyota",
@@ -1061,14 +1061,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Dahl Toyota Sheboygan",
@@ -1082,14 +1082,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Kari Toyota",
@@ -1103,14 +1103,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "LeadCar Toyota Wausau",
@@ -1124,14 +1124,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
-    "tier": "C",
-    "needsSignal": true
+    "score": 4,
+    "tier": "B",
+    "needsSignal": false
   },
   {
     "name": "Wilde Toyota",
@@ -1145,14 +1145,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Russ Darrow Toyota",
@@ -1166,14 +1166,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Cedric Theel Toyota",
@@ -1187,14 +1187,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Lake Toyota",
@@ -1208,14 +1208,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Dan Porter Honda-Toyota",
@@ -1229,14 +1229,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Corwin Toyota",
@@ -1250,14 +1250,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": true,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
-    "tier": "C",
-    "needsSignal": true
+    "score": 5,
+    "tier": "B",
+    "needsSignal": false
   },
   {
     "name": "Rydell Toyota of Grand Forks",
@@ -1271,14 +1271,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Lloyds Toyota",
@@ -1292,14 +1292,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Minot Toyota",
@@ -1313,14 +1313,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Harr Toyota",
@@ -1334,14 +1334,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Capital City Toyota",
@@ -1355,14 +1355,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Denny Menholt Toyota",
@@ -1376,14 +1376,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Billion Toyota",
@@ -1397,14 +1397,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
+    "score": 5,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Sharp Chevrolet-Toyota",
@@ -1418,14 +1418,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Corwin Toyota of Bellevue",
@@ -1439,14 +1439,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
-    "tier": "C",
-    "needsSignal": true
+    "score": 4,
+    "tier": "B",
+    "needsSignal": false
   },
   {
     "name": "Gregg Young Toyota of Columbus",
@@ -1460,14 +1460,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
+    "score": 2,
     "tier": "C",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Cornhusker Toyota",
@@ -1481,14 +1481,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Baxter Toyota of La Vista",
@@ -1502,14 +1502,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
-    "tier": "C",
-    "needsSignal": true
+    "score": 4,
+    "tier": "B",
+    "needsSignal": false
   },
   {
     "name": "Baxter Toyota of Lincoln",
@@ -1523,14 +1523,14 @@
     "ownershipType": "group",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 3,
-    "tier": "C",
-    "needsSignal": true
+    "score": 4,
+    "tier": "B",
+    "needsSignal": false
   },
   {
     "name": "Wagner Toyota",
@@ -1544,14 +1544,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "low",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 4,
-    "tier": "B",
-    "needsSignal": true
+    "score": 3,
+    "tier": "C",
+    "needsSignal": false
   },
   {
     "name": "Premier Toyota",
@@ -1565,14 +1565,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   },
   {
     "name": "Village Pointe Toyota",
@@ -1586,14 +1586,14 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "close",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "high",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
-    "score": 5,
-    "tier": "B",
-    "needsSignal": true
+    "score": 6,
+    "tier": "A",
+    "needsSignal": false
   },
   {
     "name": "Team Toyota",
@@ -1607,13 +1607,13 @@
     "ownershipType": "independent",
     "ownershipInferred": true,
     "proximity": "mid",
-    "truckVolume": null,
-    "enthusiastPosture": null,
+    "truckVolume": "med",
+    "enthusiastPosture": false,
     "stage": "Prospect",
     "lastTouch": null,
     "notes": "",
     "score": 4,
     "tier": "B",
-    "needsSignal": true
+    "needsSignal": false
   }
 ]

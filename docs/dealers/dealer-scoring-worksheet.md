@@ -8,91 +8,91 @@ and run `npm run score:dealers`. Grouped by rep; tip: fill by group in one pass.
 
 | Dealer | City | ST | Group | Truck Volume | Enthusiast? |
 |---|---|---|---|---|---|
-| Billion Toyota of Clinton | Clinton | IA | Billion |  |  |
-| Corwin Toyota | Fargo | ND | Corwin |  |  |
-| Dahl Toyota Winona | Winona | MN | Dahl |  |  |
-| Dan Deery Toyota | Cedar Falls | IA | Deery |  |  |
-| Deery Brothers Toyota | West Burlington | IA | Deery |  |  |
-| Gregg Young Toyota Ottumwa | Ottumwa | IA | Gregg Young |  |  |
-| LeadCar Toyota Mankato | Mankato | MN | LeadCar |  |  |
-| Luther Brookdale Toyota | Brooklyn Center | MN | Luther |  |  |
-| Rudy Luther Toyota | Golden Valley | MN | Luther |  |  |
-| Walser Bloomington Toyota | Bloomington | MN | Walser |  |  |
-| Anderson-Weber Toyota | Dubuque | IA | — |  |  |
-| Burnsville Toyota | Burnsville | MN | — |  |  |
-| Carlson Toyota | Coon Rapids | MN | — |  |  |
-| Cedar Rapids Toyota, Inc. | Hiawatha | IA | — |  |  |
-| Cedric Theel Toyota | Bismarck | ND | — |  |  |
-| Chester Berg Toyota | Bemidji | MN | — |  |  |
-| Dan Porter Honda-Toyota | Dickinson | ND | — |  |  |
-| Fort Dodge Ford, Lincoln, Toyota | Fort Dodge | IA | — |  |  |
-| Hosmer Toyota | Mason City | IA | — |  |  |
-| Inver Grove Toyota | Inver Grove Heights | MN | — |  |  |
-| Iron Trail Toyota | Virginia | MN | — |  |  |
-| Kolar Toyota | Duluth | MN | — |  |  |
-| Lake Country Toyota | Baxter | MN | — |  |  |
-| Lake Toyota | Devils Lake | ND | — |  |  |
-| Lloyds Toyota | Jamestown | ND | — |  |  |
-| Maplewood Toyota | Maplewood | MN | — |  |  |
-| McGrath Toyota of Iowa City | Iowa City | IA | — |  |  |
-| Mills Toyota | Willmar | MN | — |  |  |
-| Minot Toyota | Minot | ND | — |  |  |
-| Motor Inn Toyota of Carroll | Carroll | IA | — |  |  |
-| Okoboji Toyota | Spirit Lake | IA | — |  |  |
-| Quality Toyota | Fergus Falls | MN | — |  |  |
-| Rick Collins Toyota | Sioux City | IA | — |  |  |
-| Rochester Toyota | Rochester | MN | — |  |  |
-| Rydell Toyota of Grand Forks | Grand Forks | ND | — |  |  |
-| Smart Toyota of Quad Cities | Davenport | IA | — |  |  |
-| St. Cloud Toyota | Waite Park | MN | — |  |  |
-| Toyota of Des Moines | Grimes | IA | — |  |  |
-| Toyota of Muscatine | Muscatine | IA | — |  |  |
-| Wilson Toyota of Ames | Ames | IA | — |  |  |
+| Billion Toyota of Clinton | Clinton | IA | Billion | med | no |
+| Corwin Toyota | Fargo | ND | Corwin | high | yes |
+| Dahl Toyota Winona | Winona | MN | Dahl | low | no |
+| Dan Deery Toyota | Cedar Falls | IA | Deery | high | no |
+| Deery Brothers Toyota | West Burlington | IA | Deery | med | no |
+| Gregg Young Toyota Ottumwa | Ottumwa | IA | Gregg Young | low | no |
+| LeadCar Toyota Mankato | Mankato | MN | LeadCar | med | no |
+| Luther Brookdale Toyota | Brooklyn Center | MN | Luther | high | no |
+| Rudy Luther Toyota | Golden Valley | MN | Luther | high | no |
+| Walser Bloomington Toyota | Bloomington | MN | Walser | high | yes |
+| Anderson-Weber Toyota | Dubuque | IA | — | med | no |
+| Burnsville Toyota | Burnsville | MN | — | med | no |
+| Carlson Toyota | Coon Rapids | MN | — | med | no |
+| Cedar Rapids Toyota, Inc. | Hiawatha | IA | — | med | no |
+| Cedric Theel Toyota | Bismarck | ND | — | med | no |
+| Chester Berg Toyota | Bemidji | MN | — | low | no |
+| Dan Porter Honda-Toyota | Dickinson | ND | — | med | no |
+| Fort Dodge Ford, Lincoln, Toyota | Fort Dodge | IA | — | low | no |
+| Hosmer Toyota | Mason City | IA | — | med | no |
+| Inver Grove Toyota | Inver Grove Heights | MN | — | high | no |
+| Iron Trail Toyota | Virginia | MN | — | med | no |
+| Kolar Toyota | Duluth | MN | — | high | no |
+| Lake Country Toyota | Baxter | MN | — | low | no |
+| Lake Toyota | Devils Lake | ND | — | low | no |
+| Lloyds Toyota | Jamestown | ND | — | low | no |
+| Maplewood Toyota | Maplewood | MN | — | high | yes |
+| McGrath Toyota of Iowa City | Iowa City | IA | — | med | no |
+| Mills Toyota | Willmar | MN | — | med | yes |
+| Minot Toyota | Minot | ND | — | med | no |
+| Motor Inn Toyota of Carroll | Carroll | IA | — | low | no |
+| Okoboji Toyota | Spirit Lake | IA | — | low | no |
+| Quality Toyota | Fergus Falls | MN | — | low | no |
+| Rick Collins Toyota | Sioux City | IA | — | high | no |
+| Rochester Toyota | Rochester | MN | — | high | no |
+| Rydell Toyota of Grand Forks | Grand Forks | ND | — | med | no |
+| Smart Toyota of Quad Cities | Davenport | IA | — | high | no |
+| St. Cloud Toyota | Waite Park | MN | — | high | yes |
+| Toyota of Des Moines | Grimes | IA | — | high | no |
+| Toyota of Muscatine | Muscatine | IA | — | low | no |
+| Wilson Toyota of Ames | Ames | IA | — | high | yes |
 
 ## Noah (23)
 
 | Dealer | City | ST | Group | Truck Volume | Enthusiast? |
 |---|---|---|---|---|---|
-| Dahl Toyota Sheboygan | Sheboygan | WI | Dahl |  |  |
-| LeadCar Toyota La Crosse | La Crosse | WI | LeadCar |  |  |
-| LeadCar Toyota Wausau | Wausau | WI | LeadCar |  |  |
-| Bergstrom Toyota of Oshkosh | Oshkosh | WI | — |  |  |
-| East Madison Toyota | Madison | WI | — |  |  |
-| Heiser Toyota | Milwaukee | WI | — |  |  |
-| Hesser Toyota | Janesville | WI | — |  |  |
-| Kari Toyota | Superior | WI | — |  |  |
-| Kenosha Toyota | Kenosha | WI | — |  |  |
-| Kolosso Toyota | Appleton | WI | — |  |  |
-| Le Mieux & Son Toyota | Green Bay | WI | — |  |  |
-| Mark Toyota of Plover | Plover | WI | — |  |  |
-| Markquart Toyota | Chippewa Falls | WI | — |  |  |
-| Marthaler Toyota of Ashland | Ashland | WI | — |  |  |
-| Rhinelander Toyota | Rhinelander | WI | — |  |  |
-| Ruda Toyota | Monroe | WI | — |  |  |
-| Russ Darrow Toyota | West Bend | WI | — |  |  |
-| Serra Toyota | Milwaukee | WI | — |  |  |
-| Smart Motors Toyota | Madison | WI | — |  |  |
-| Toyota of Brookfield | Brookfield | WI | — |  |  |
-| Umansky Toyota | Glendale | WI | — |  |  |
-| Wilde Toyota | West Allis | WI | — |  |  |
-| Zeigler Toyota of Racine | Mount Pleasant | WI | — |  |  |
+| Dahl Toyota Sheboygan | Sheboygan | WI | Dahl | med | no |
+| LeadCar Toyota La Crosse | La Crosse | WI | LeadCar | med | no |
+| LeadCar Toyota Wausau | Wausau | WI | LeadCar | med | yes |
+| Bergstrom Toyota of Oshkosh | Oshkosh | WI | — | med | no |
+| East Madison Toyota | Madison | WI | — | med | no |
+| Heiser Toyota | Milwaukee | WI | — | high | yes |
+| Hesser Toyota | Janesville | WI | — | med | no |
+| Kari Toyota | Superior | WI | — | med | no |
+| Kenosha Toyota | Kenosha | WI | — | high | no |
+| Kolosso Toyota | Appleton | WI | — | med | no |
+| Le Mieux & Son Toyota | Green Bay | WI | — | high | no |
+| Mark Toyota of Plover | Plover | WI | — | low | no |
+| Markquart Toyota | Chippewa Falls | WI | — | med | yes |
+| Marthaler Toyota of Ashland | Ashland | WI | — | med | no |
+| Rhinelander Toyota | Rhinelander | WI | — | med | yes |
+| Ruda Toyota | Monroe | WI | — | low | no |
+| Russ Darrow Toyota | West Bend | WI | — | high | yes |
+| Serra Toyota | Milwaukee | WI | — | high | no |
+| Smart Motors Toyota | Madison | WI | — | high | no |
+| Toyota of Brookfield | Brookfield | WI | — | high | no |
+| Umansky Toyota | Glendale | WI | — | high | no |
+| Wilde Toyota | West Allis | WI | — | high | yes |
+| Zeigler Toyota of Racine | Mount Pleasant | WI | — | high | yes |
 
 ## Cody (14)
 
 | Dealer | City | ST | Group | Truck Volume | Enthusiast? |
 |---|---|---|---|---|---|
-| Baxter Toyota of La Vista | La Vista | NE | Baxter |  |  |
-| Baxter Toyota of Lincoln | Lincoln | NE | Baxter |  |  |
-| Billion Toyota | Sioux Falls | SD | Billion |  |  |
-| Corwin Toyota of Bellevue | Bellevue | NE | Corwin |  |  |
-| Gregg Young Toyota of Columbus | Columbus | NE | Gregg Young |  |  |
-| Capital City Toyota | Pierre | SD | — |  |  |
-| Cornhusker Toyota | Grand Island | NE | — |  |  |
-| Denny Menholt Toyota | Rapid City | SD | — |  |  |
-| Harr Toyota | Aberdeen | SD | — |  |  |
-| Premier Toyota | North Platte | NE | — |  |  |
-| Sharp Chevrolet-Toyota | Watertown | SD | — |  |  |
-| Team Toyota | Scottsbluff | NE | — |  |  |
-| Village Pointe Toyota | Omaha | NE | — |  |  |
-| Wagner Toyota | McCook | NE | — |  |  |
+| Baxter Toyota of La Vista | La Vista | NE | Baxter | high | no |
+| Baxter Toyota of Lincoln | Lincoln | NE | Baxter | high | no |
+| Billion Toyota | Sioux Falls | SD | Billion | high | no |
+| Corwin Toyota of Bellevue | Bellevue | NE | Corwin | high | no |
+| Gregg Young Toyota of Columbus | Columbus | NE | Gregg Young | low | no |
+| Capital City Toyota | Pierre | SD | — | low | no |
+| Cornhusker Toyota | Grand Island | NE | — | med | no |
+| Denny Menholt Toyota | Rapid City | SD | — | med | no |
+| Harr Toyota | Aberdeen | SD | — | low | no |
+| Premier Toyota | North Platte | NE | — | med | no |
+| Sharp Chevrolet-Toyota | Watertown | SD | — | low | no |
+| Team Toyota | Scottsbluff | NE | — | med | no |
+| Village Pointe Toyota | Omaha | NE | — | high | no |
+| Wagner Toyota | McCook | NE | — | low | no |
 
