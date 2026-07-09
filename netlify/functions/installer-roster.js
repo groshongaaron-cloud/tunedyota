@@ -14,22 +14,21 @@ async function buildRoster(deps) {
   const recs = await list({ token: c.token, baseId: c.baseId, table: c.bookings,
     filterByFormula: `AND({Installer}="${key}",{Status}!="Cancelled")` });
   const today = now.toISOString().slice(0, 10);
-  const rows = recs.map((r) => ({ ...r.fields, id: r.id })).filter((f) => dateOnly(f["Event Date"]) >= today);
-  const events = new Map();
-  for (const f of rows) {
-    const ek = `${f.City}|${dateOnly(f["Event Date"])}`;
-    if (!events.has(ek)) events.set(ek, { city: f.City, dateISO: dateOnly(f["Event Date"]), bookings: [] });
-    events.get(ek).bookings.push({
-      id: f.id, slot: f.Slot || "", slotLabel: f.Slot ? formatSlot(f.Slot) : "",
+  const bookings = recs.map((r) => {
+    const f = r.fields || {};
+    const src = String(f.Source || "");
+    return {
+      id: r.id, city: f.City || "", dateISO: dateOnly(f["Event Date"]),
+      slot: f.Slot || "", slotLabel: f.Slot ? formatSlot(f.Slot) : "",
       name: f.Name || "", vehicle: f.Vehicle || "", phone: f.Phone || "", email: f.Email || "",
-      mods: f.Modifications || "", status: f.Status || "Booked", calibration: f["OTT Calibration"] || "",
-      vin: f.VIN || "", tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
+      mods: f.Modifications || "", status: f.Status || "Booked",
+      isWalkin: /^(intake|installer):walk-in/i.test(src),
+      calibration: f["OTT Calibration"] || "", vin: f.VIN || "",
+      tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
-    });
-  }
-  const out = [...events.values()].sort((a, b) => a.dateISO.localeCompare(b.dateISO));
-  out.forEach((e) => e.bookings.sort(bySlot));
-  return { installer: key, events: out };
+    };
+  }).sort((a, b) => a.dateISO.localeCompare(b.dateISO) || bySlot(a, b));
+  return { installer: key, today, bookings };
 }
 
 async function handler(event) {
