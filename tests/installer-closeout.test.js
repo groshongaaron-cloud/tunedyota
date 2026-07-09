@@ -107,12 +107,52 @@ test("complete still persists when the base lacks the OTT columns (tolerant)", a
   assert.equal(updates[0].Status, "Completed");                // completion persisted on retry
 });
 
-test("noshow just sets Status", async () => {
-  const updates = [];
-  const out = await processCloseout({ recordId: "rec1", action: "noshow" },
-    { env, key: "cody", get: async () => recFor("cody"), update: async (a) => { updates.push(a.fields); return {}; }, send: async () => ({}) });
+test("noshow requires confirmation", async () => {
+  const out = await processCloseout({ recordId: "rec1", action: "noshow" }, {
+    key: "cody", env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    get: async () => ({ id: "rec1", fields: { Installer: "cody" } }),
+    update: async () => ({}), create: async () => ({ id: "x" }), send: async () => ({}), log: { error() {} },
+  });
+  assert.equal(out.status, "error");
+  assert.equal(out.error, "unconfirmed");
+});
+
+test("confirmed noshow sets Status No-show and waitlists the customer", async () => {
+  const updates = [], created = [];
+  const out = await processCloseout({ recordId: "rec1", action: "noshow", confirmed: true }, {
+    key: "cody", env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    get: async () => ({ id: "rec1", fields: { Installer: "cody", Name: "Jo", Phone: "555", City: "Omaha", "Event Date": "2026-07-03", Vehicle: "Tundra" } }),
+    update: async (a) => { updates.push(a.fields); return {}; },
+    create: async (a) => { created.push(a); return { id: "pr1" }; },
+    send: async () => ({}), log: { error() {} },
+  });
   assert.equal(out.status, "noshow");
+  assert.equal(out.waitlisted, true);
   assert.equal(updates[0].Status, "No-show");
+  assert.equal(created[0].fields.Source, "installer:no-show");
+  assert.equal(created[0].fields.Installer, "cody");
+  assert.match(created[0].fields.Reason, /No-show/);
+});
+
+test("re-noshow on an already No-show booking does not re-waitlist", async () => {
+  let creates = 0;
+  const out = await processCloseout({ recordId: "rec1", action: "noshow", confirmed: true }, {
+    key: "cody", env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    get: async () => ({ id: "rec1", fields: { Installer: "cody", Status: "No-show" } }),
+    update: async () => ({}), create: async () => { creates++; return { id: "x" }; }, send: async () => ({}), log: { error() {} },
+  });
+  assert.equal(out.alreadyWaitlisted, true);
+  assert.equal(creates, 0);
+});
+
+test("noshow still succeeds if the waitlist write fails", async () => {
+  const out = await processCloseout({ recordId: "rec1", action: "noshow", confirmed: true }, {
+    key: "cody", env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    get: async () => ({ id: "rec1", fields: { Installer: "cody", City: "Omaha", "Event Date": "2026-07-03" } }),
+    update: async () => ({}), create: async () => { throw new Error("boom"); }, send: async () => ({}), log: { error() {} },
+  });
+  assert.equal(out.status, "noshow");
+  assert.equal(out.waitlisted, false);
 });
 
 test("a cert-send failure still leaves the booking Completed, certSent false", async () => {

@@ -2,7 +2,7 @@
 // Per-installer close-out: mark a booking Completed (+ OTT Calibration) or No-show.
 // On completion, emails the Certificate of Calibration immediately (daily
 // certificate-dispatch backstops any send failure). Ownership is re-checked server-side.
-const { cfg, getRecord, updateRecord, updateTolerant } = require("./lib/airtable.js");
+const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate.js");
@@ -10,11 +10,13 @@ const { sendEmail } = require("./lib/resend.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
+const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 
 async function processCloseout(body, deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key,
           get = (a) => getRecord({ fetchImpl, ...a }),
           update = (a) => updateRecord({ fetchImpl, ...a }),
+          create = (a) => createRecord({ fetchImpl, ...a }),
           send = sendEmail, log = console } = deps;
   const d = body || {};
   if (!d.recordId) return { status: "error", error: "missing-record" };
@@ -30,9 +32,19 @@ async function processCloseout(body, deps) {
   if (owner !== key) return { status: "error", error: "not-yours" };
 
   if (d.action === "noshow") {
+    if (d.confirmed !== true) return { status: "error", error: "unconfirmed" };
+    if (f.Status === "No-show") return { status: "noshow", alreadyWaitlisted: true };
     try { await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: { Status: "No-show" } }); }
     catch (e) { if (log.error) log.error("closeout noshow", e.message); return { status: "error", error: "store-unavailable" }; }
-    return { status: "noshow" };
+    let waitlisted = false;
+    try {
+      const fields = { City: f.City || "", Name: f.Name || "", Phone: f.Phone || "", Email: f.Email || "",
+        Vehicle: f.Vehicle || "", Modifications: f.Modifications || "", Installer: key,
+        Reason: `No-show — ${f.City || ""} ${dateOnly(f["Event Date"])}`.trim(), Source: "installer:no-show" };
+      await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields }, ["Modifications", "Source"]);
+      waitlisted = true;
+    } catch (e) { if (log.error) log.error("closeout waitlist", e.message); }
+    return { status: "noshow", waitlisted };
   }
 
   // complete — idempotent: once the certificate is issued the calibration is
@@ -93,7 +105,7 @@ async function handler(event) {
   const out = await processCloseout(body, { key });
   const code = out.status !== "error" ? 200
     : out.error === "not-yours" ? 403
-    : (out.error === "bad-calibration" || out.error === "missing-record") ? 400 : 502;
+    : (out.error === "bad-calibration" || out.error === "missing-record" || out.error === "unconfirmed") ? 400 : 502;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 module.exports = { handler, processCloseout };
