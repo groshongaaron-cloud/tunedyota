@@ -16,18 +16,32 @@
   *{box-sizing:border-box;} body{font-family:-apple-system,Arial,sans-serif;color:var(--ink);margin:0;background:#faf8f5;}
   main{max-width:640px;margin:0 auto;padding:16px 14px 60px;}
   h1{font-size:19px;color:var(--accent);margin:6px 0 10px;}
-  h2{font-size:16px;color:var(--accent);margin:20px 0 6px;border-bottom:1px solid var(--line);padding-bottom:4px;}
   input{width:100%;padding:12px;font-size:16px;border:1px solid var(--line);border-radius:8px;}
-  .btn{padding:12px;font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:8px;}
+  .btn{padding:12px;font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:8px;cursor:pointer;}
+  .btn[disabled]{opacity:.45;}
   .link{display:inline-block;margin:2px 0 8px;color:#2f5d8a;font-size:14px;}
   .card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;background:#fff;}
   .top{display:flex;justify-content:space-between;gap:8px;font-size:14px;}
   .who{font-weight:700;} .meta{color:var(--muted);font-size:13px;margin:2px 0 6px;}
   select{padding:9px;font-size:15px;border:1px solid var(--line);border-radius:8px;width:100%;margin:6px 0;}
-  .row-actions{display:flex;gap:8px;} .row-actions .btn{flex:1;}
+  .row-actions{display:flex;gap:8px;margin-top:6px;} .row-actions .btn{flex:1;}
   .ns{background:#8a6a3a;} .done{color:#2f5d2a;font-weight:700;} .noshow{color:#8a2a2a;font-weight:700;}
   .hidden{display:none;} .msg{margin-top:8px;font-size:13px;} .err{color:#8a2a2a;}
   .otthdr{font-size:11px;color:var(--muted);margin:10px 0 0;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+  .nsconfirm{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:8px;color:#8a2a2a;}
+  .nsconfirm input{width:auto;}
+  .banner{background:#fff4e5;border:1px solid #e0b877;border-radius:10px;padding:4px 12px;margin:10px 0;}
+  .mnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 6px;}
+  .mnav .lbl{font-weight:800;color:var(--accent);font-size:16px;}
+  .mnav button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:16px;cursor:pointer;}
+  details{border:1px solid var(--line);border-radius:10px;background:#fff;margin:8px 0;}
+  summary{padding:12px;font-weight:700;font-size:14px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:8px;}
+  summary::-webkit-details-marker{display:none;}
+  details[open]>summary{border-bottom:1px solid var(--line);}
+  .dbody{padding:2px 12px 8px;}
+  .count{color:var(--muted);font-weight:600;}
+  .sec-h{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:12px 0 2px;}
+  .walkform input{margin:5px 0;}
 </style>
 </head>
 <body>
@@ -39,10 +53,11 @@
     <button class="btn" id="unlock" style="width:100%">Unlock</button>
   </div>
   <div id="app" class="hidden">
-    <a class="link" href="/intake.html">+ Add a walk-in (intake form)</a>
-    <a class="link" href="/calibration.html" style="margin-left:14px">Calibration reference (cal ID · TSB)</a>
+    <a class="link" href="/calibration.html">Calibration reference (cal ID · TSB)</a>
     <a class="link" href="#" id="logout" style="margin-left:14px;color:#8a2a2a">Log out</a>
-    <div id="events"></div>
+    <div id="needs"></div>
+    <div id="monthnav"></div>
+    <div id="monthbody"></div>
     <div id="msg" class="msg"></div>
   </div>
 </main>
@@ -50,50 +65,131 @@
   var CAL = ["Light","Mild","Medium","Spicy","SS","Light and Mild","Mild and Medium","Medium and Spicy","Spicy and SS"];
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var STATE = { today:'', bookings:[], month:'' };
+
   function sel(id,list,ph){ return '<select id="'+id+'"><option value="" disabled selected>'+ph+'…</option>'+list.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>'; }
   function val(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
   function tok(){ return localStorage.getItem('ty_installer_token') || ''; }
   function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
+  function ym(iso){ return (iso||'').slice(0,7); }
+  function isOpen(b){ return b.status!=='Completed' && b.status!=='No-show' && b.status!=='Cancelled'; }
+  function monthLabel(m){ var p=m.split('-'); return MONTHS[parseInt(p[1],10)-1]+' '+p[0]; }
+  function addMonth(m,delta){ var y=parseInt(m.slice(0,4),10), mo=parseInt(m.slice(5,7),10)-1+delta; y+=Math.floor(mo/12); mo=((mo%12)+12)%12; return y+'-'+String(mo+1).padStart(2,'0'); }
 
-  document.getElementById('unlock').onclick=function(){
-    var v=document.getElementById('tok').value.trim(); if(!v) return;
-    localStorage.setItem('ty_installer_token', v); showApp();
-  };
+  document.getElementById('unlock').onclick=function(){ var v=document.getElementById('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
   if(tok()) showApp();
-
-  document.getElementById('logout').onclick=function(e){
-    e.preventDefault();
-    localStorage.removeItem('ty_installer_token');
-    location.reload();
-  };
-
+  document.getElementById('logout').onclick=function(e){ e.preventDefault(); localStorage.removeItem('ty_installer_token'); location.reload(); };
   function showApp(){ document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
   function fail(m){ var el=document.getElementById('msg'); el.className='msg err'; el.textContent=m; }
+  function clearMsg(){ var el=document.getElementById('msg'); el.className='msg'; el.textContent=''; }
 
   async function load(){
-    document.getElementById('events').innerHTML='Loading…';
+    document.getElementById('needs').textContent='Loading…';
     var res = await fetch('/.netlify/functions/installer-roster', { headers:{ 'x-installer-token':tok() } });
     if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
-    if(!res.ok){ document.getElementById('events').textContent='Could not load roster.'; return; }
+    if(!res.ok){ document.getElementById('needs').textContent='Could not load roster.'; return; }
     var data = await res.json();
-    render(data);
+    STATE.today = data.today; STATE.bookings = data.bookings||[]; STATE.month = ym(data.today);
+    renderAll();
   }
 
-  function render(data){
-    var host=document.getElementById('events'); host.innerHTML='';
-    if(!data.events.length){ host.textContent='No upcoming events assigned to you.'; return; }
-    data.events.forEach(function(ev){
-      var h=document.createElement('h2'); h.textContent=ev.city+' · '+ev.dateISO; host.appendChild(h);
-      ev.bookings.forEach(function(b){ host.appendChild(rowCard(b)); });
+  function renderAll(){ renderNeeds(); renderMonthNav(); renderMonth(); }
+
+  function eventsOf(list){
+    var map={};
+    list.forEach(function(b){ var k=b.city+'|'+b.dateISO; (map[k]=map[k]||{city:b.city,dateISO:b.dateISO,bookings:[]}).bookings.push(b); });
+    return Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return a.dateISO.localeCompare(b.dateISO);});
+  }
+  function bySlot(a,b){ return String(a.slot||'').localeCompare(String(b.slot||''),undefined,{numeric:true}); }
+
+  function renderNeeds(){
+    var host=document.getElementById('needs'); host.innerHTML='';
+    var open = STATE.bookings.filter(function(b){ return b.dateISO < STATE.today && isOpen(b); });
+    if(!open.length) return;
+    var wrap=document.createElement('div'); wrap.className='banner';
+    var det=document.createElement('details'); det.open=true;
+    var sum=document.createElement('summary'); sum.innerHTML='<span>⚠ '+open.length+' booking'+(open.length>1?'s':'')+' still open from past events</span><span class="count">close out ▾</span>';
+    det.appendChild(sum);
+    var body=document.createElement('div'); body.className='dbody';
+    eventsOf(open).forEach(function(ev){
+      var h=document.createElement('div'); h.className='sec-h'; h.textContent=ev.city+' · '+ev.dateISO; body.appendChild(h);
+      ev.bookings.slice().sort(bySlot).forEach(function(b){ body.appendChild(rowCard(b)); });
     });
+    det.appendChild(body); wrap.appendChild(det); host.appendChild(wrap);
+  }
+
+  function renderMonthNav(){
+    var host=document.getElementById('monthnav'); host.innerHTML='';
+    var nav=document.createElement('div'); nav.className='mnav';
+    nav.innerHTML='<button id="mprev" aria-label="Previous month">◀</button><span class="lbl">'+monthLabel(STATE.month)+'</span><button id="mnext" aria-label="Next month">▶</button>';
+    host.appendChild(nav);
+    document.getElementById('mprev').onclick=function(){ STATE.month=addMonth(STATE.month,-1); renderMonthNav(); renderMonth(); };
+    document.getElementById('mnext').onclick=function(){ STATE.month=addMonth(STATE.month,1); renderMonthNav(); renderMonth(); };
+  }
+
+  function renderMonth(){
+    var host=document.getElementById('monthbody'); host.innerHTML='';
+    var inMonth = STATE.bookings.filter(function(b){ return ym(b.dateISO)===STATE.month; });
+    var events = eventsOf(inMonth.filter(function(b){return !b.isWalkin;}));
+    var walkins = inMonth.filter(function(b){return b.isWalkin;});
+    var completed = inMonth.filter(function(b){return b.status==='Completed';});
+    host.appendChild(walkinBlock(eventsOf(inMonth)));
+    if(!events.length && !walkins.length && !completed.length){
+      var none=document.createElement('div'); none.className='meta'; none.textContent='No bookings this month.'; host.appendChild(none); return;
+    }
+    events.forEach(function(ev){
+      var openN = ev.bookings.filter(isOpen).length;
+      host.appendChild(accordion(ev.city+' · '+ev.dateISO, openN+' open · '+ev.bookings.length+' total', ev.bookings, openN>0));
+    });
+    if(walkins.length){ var openW=walkins.filter(isOpen).length; host.appendChild(accordion('Walk-ins this month', openW+' open · '+walkins.length+' total', walkins, openW>0)); }
+    if(completed.length){ host.appendChild(accordion('Completed this month', String(completed.length), completed, false)); }
+  }
+
+  function accordion(title, countText, bookings, open){
+    var det=document.createElement('details'); if(open) det.open=true;
+    var sum=document.createElement('summary'); sum.innerHTML='<span>'+esc(title)+'</span><span class="count">'+esc(countText)+'</span>'; det.appendChild(sum);
+    var body=document.createElement('div'); body.className='dbody';
+    bookings.slice().sort(bySlot).forEach(function(b){ body.appendChild(rowCard(b)); });
+    det.appendChild(body); return det;
+  }
+
+  function walkinBlock(events){
+    var det=document.createElement('details');
+    var sum=document.createElement('summary'); sum.innerHTML='<span>+ Add a walk-in</span><span class="count">this month</span>'; det.appendChild(sum);
+    var body=document.createElement('div'); body.className='dbody walkform';
+    if(!events.length){ body.innerHTML='<div class="meta">No events this month to attach a walk-in to.</div>'; det.appendChild(body); return det; }
+    var opts=events.map(function(e){ return '<option value="'+esc(e.city+'|'+e.dateISO)+'">'+esc(e.city+' · '+e.dateISO)+'</option>'; }).join('');
+    body.innerHTML=
+      '<input id="w_name" placeholder="Customer name">'+
+      '<input id="w_vehicle" placeholder="Vehicle (e.g. 2021 Tundra)">'+
+      '<input id="w_phone" inputmode="tel" placeholder="Phone">'+
+      '<select id="w_event">'+opts+'</select>'+
+      '<button class="btn" id="w_add" style="width:100%">Add walk-in</button>';
+    det.appendChild(body);
+    body.querySelector('#w_add').onclick=addWalkin;
+    return det;
+  }
+
+  async function addWalkin(){
+    clearMsg();
+    var name=val('w_name'), vehicle=val('w_vehicle'), phone=val('w_phone'), ev=val('w_event');
+    if(!name){ fail('Enter the customer name.'); return; }
+    if(!phone){ fail('Enter a phone number.'); return; }
+    var parts=ev.split('|'), city=parts[0], dateISO=parts[1];
+    var res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({city:city,dateISO:dateISO,name:name,vehicle:vehicle,phone:phone})});
+    if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    var out=await res.json().catch(function(){return{};});
+    if(out.status==='booked' && out.booking){ STATE.bookings.push(out.booking); renderAll(); }
+    else { fail('Could not add walk-in: '+(out.error||'error '+res.status)); }
   }
 
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
-    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+'</span><span>'+esc(b.vehicle)+'</span></div>'+
+    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+'</div>';
     if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'; return c; }
-    if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show</div>'; return c; }
+    if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
       '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
@@ -104,14 +200,18 @@
       '<input id="ecu_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="ECU ID" style="text-transform:uppercase;margin:5px 0">'+
       '<input id="gear_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="Gear ratio (e.g. 4.30)" style="margin:5px 0">'+
       '<input id="mi_'+b.id+'" inputmode="numeric" autocomplete="off" placeholder="Mileage" style="margin:5px 0">'+
-      '<div class="row-actions"><button class="btn" id="ok_'+b.id+'">Mark complete</button>'+
-      '<button class="btn ns" id="ns_'+b.id+'">No-show</button></div>';
+      '<div class="row-actions"><button class="btn" id="ok_'+b.id+'">Mark complete</button></div>'+
+      '<label class="nsconfirm"><input type="checkbox" id="nsc_'+b.id+'"> Customer didn\'t show — add to waitlist</label>'+
+      '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
-    c.querySelector('#ns_'+b.id).onclick=function(){ closeout(b.id,{action:'noshow'}); };
+    var cb=c.querySelector('#nsc_'+b.id), nsb=c.querySelector('#ns_'+b.id);
+    cb.onchange=function(){ nsb.disabled=!cb.checked; };
+    nsb.onclick=function(){ if(cb.checked) closeout(b.id,{action:'noshow',confirmed:true}); };
     return c;
   }
 
   async function complete(id){
+    clearMsg();
     var vin=val('vin_'+id).toUpperCase().replace(/[^A-Z0-9]/g,'');
     if(vin.length!==17){ fail('Enter the full 17-character VIN.'); return; }
     var cal=val('cal_'+id); if(!cal){ fail('Pick an OTT Calibration.'); return; }
@@ -122,16 +222,16 @@
     var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!mi){ fail('Enter the mileage.'); return; }
     closeout(id,{action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi});
   }
+
   async function closeout(id,extra){
+    clearMsg();
     var body=Object.assign({recordId:id},extra);
     var res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(body)});
     if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
     var out=await res.json().catch(function(){return{};});
-    var card=document.getElementById('c_'+id);
-    if(out.status==='completed'){ card.querySelector('select').classList.add('hidden'); card.querySelector('.row-actions').classList.add('hidden');
-      var d=document.createElement('div'); d.className='done'; d.textContent='✓ Completed · '+(out.certSent?'certificate sent':'certificate will send shortly'); card.appendChild(d); }
-    else if(out.status==='noshow'){ card.querySelector('.row-actions').classList.add('hidden'); if(card.querySelector('select')) card.querySelector('select').classList.add('hidden');
-      var n=document.createElement('div'); n.className='noshow'; n.textContent='No-show'; card.appendChild(n); }
+    var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
+    if(out.status==='completed'){ if(b){ b.status='Completed'; if(extra.calibration)b.calibration=extra.calibration; if(extra.vin)b.vin=extra.vin; if(extra.tuningPlatform)b.tuningPlatform=extra.tuningPlatform; if(extra.calibrationType)b.calibrationType=extra.calibrationType; } renderAll(); }
+    else if(out.status==='noshow'){ if(b){ b.status='No-show'; } renderAll(); }
     else { fail('Could not save: '+(out.error||'error '+res.status)); }
   }
 </script>
