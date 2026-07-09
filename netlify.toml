@@ -39,3 +39,9 @@
   from = "/get-ott-now"
   to = "/find-your-exact-tune?utm_source=share&utm_medium=social&utm_campaign=get-ott-now"
   status = 302
+
+# Serve the PWA manifest with the correct MIME (Netlify defaults .webmanifest to octet-stream).
+[[headers]]
+  for = "/site.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
