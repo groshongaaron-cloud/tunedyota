@@ -105,7 +105,7 @@
 
   function renderNeeds(){
     var host=document.getElementById('needs'); host.innerHTML='';
-    var open = STATE.bookings.filter(function(b){ return b.dateISO < STATE.today && isOpen(b); });
+    var open = STATE.bookings.filter(function(b){ return b.dateISO && b.dateISO < STATE.today && isOpen(b); });
     if(!open.length) return;
     var wrap=document.createElement('div'); wrap.className='banner';
     var det=document.createElement('details'); det.open=true;

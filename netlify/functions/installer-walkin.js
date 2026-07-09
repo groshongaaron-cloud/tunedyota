@@ -6,9 +6,10 @@ const { cfg, createRecord, createTolerant } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
+const EVENTS = require("./lib/events-data.js");
 
 async function processWalkin(body, deps) {
-  const { env = process.env, fetchImpl = fetch, key,
+  const { env = process.env, fetchImpl = fetch, key, events = EVENTS,
           create = (a) => createRecord({ fetchImpl, ...a }) } = deps;
   const d = body || {};
   const name = String(d.name || "").trim();
@@ -20,6 +21,8 @@ async function processWalkin(body, deps) {
   if (keyToInstaller(market.inst).key !== key) return { status: "error", error: "not-your-market" };
   const dateISO = String(d.dateISO || "").trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) return { status: "error", error: "bad-date" };
+  const cityEvents = events[market.city.toLowerCase()] || [];
+  if (!cityEvents.some((e) => e.dateISO === dateISO)) return { status: "error", error: "unknown-event" };
 
   const c = cfg(env);
   const vehicle = String(d.vehicle || "").trim();
