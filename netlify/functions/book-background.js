@@ -9,6 +9,7 @@ const { cfg, updateRecord } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { pingN8n } = require("./lib/n8n.js");
+const { sendPush } = require("./lib/push.js");
 const { buildIcs } = require("./lib/ics.js");
 const tpl = require("./lib/templates.js");
 
@@ -38,7 +39,7 @@ async function reportEmailFailure({ fetchImpl, env, notify, update, c, table, id
 //   { kind:"priority", d, inst, market, reason, recordId }
 async function processNotifications(job, deps) {
   const { fetchImpl = fetch, env = process.env, send = sendEmail, log = console,
-          notify = notifyOwner, update = updateRecord, ping = pingN8n } = deps;
+          notify = notifyOwner, update = updateRecord, ping = pingN8n, push = sendPush } = deps;
   const c = cfg(env);
   const d = (job && job.d) || {};
   const inst = job && job.inst;
@@ -58,6 +59,9 @@ async function processNotifications(job, deps) {
   const event = job.event;
   let instOk = true, custOk = true, why = "";
   try { const m = tpl.buildBookingInstallerEmail(d, inst, market, event); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { instOk = false; why = e.message; if (log.error) log.error("inst email", e.message); }
+  try {
+    if (inst && inst.key) await push(inst.key, { title: "New booking", body: `${d.name || "A customer"} — ${market.city}`, data: { recordId: job.recordId || "" } });
+  } catch (e) { if (log.error) log.error("booking push", e.message); }
   if (d.email) {
     try {
       const ics = buildIcs({ uid: `${event.dateISO}-${d.slot}-${job.stamp}@tunedyota.com`, dateISO: event.dateISO, slot: d.slot, summary: `Tuned Yota — ${market.city} OTT Tune`, location: `${market.city}, ${market.state}`, description: `Your ${d.vehicle || "vehicle"} tune with ${inst.name}. Questions: ${inst.phone}`, stamp: job.stamp });
