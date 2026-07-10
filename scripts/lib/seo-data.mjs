@@ -25,6 +25,7 @@ export const HEAD_PAGES = [
   "magnuson-supercharger-pricing.html",
   "toyota-tundra-supercharger.html","toyota-tacoma-supercharger.html","toyota-4runner-supercharger.html",
   "toyota-fj-cruiser-supercharger.html","toyota-land-cruiser-supercharger.html","lexus-lx570-supercharger.html","toyota-sequoia-supercharger.html",
+  "amsoil-garage.html",
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 
@@ -33,6 +34,7 @@ export const PRIORITY = {
   "index.html": "1.0", "find-your-exact-tune.html": "0.9", "supercharger.html": "0.9",
   "magnuson-supercharger-pricing.html": "0.9",
   "faq.html": "0.7", "ott-tune.html": "0.7", "team.html": "0.7",
+  "amsoil-garage.html": "0.9",
 };
 // loc path for a filename (index -> "/", others -> "/name" without .html).
 export function locFor(file) {
