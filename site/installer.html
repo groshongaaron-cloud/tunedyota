@@ -85,9 +85,31 @@
   document.getElementById('unlock').onclick=function(){ var v=document.getElementById('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
   if(tok()) showApp();
   document.getElementById('logout').onclick=function(e){ e.preventDefault(); localStorage.removeItem('ty_installer_token'); location.reload(); };
-  function showApp(){ document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
+  async function showApp(){ if(!(await nativeLock())) return; document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
   function fail(m){ var el=document.getElementById('msg'); el.className='msg err'; el.textContent=m; }
   function clearMsg(){ var el=document.getElementById('msg'); el.className='msg'; el.textContent=''; }
+
+  // --- Native (Capacitor) helpers — no-ops on the plain website ---
+  function isNative(){ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
+  async function nativeLock(){
+    if(!isNative()) return true;
+    var B = window.Capacitor.Plugins && window.Capacitor.Plugins.BiometricAuth;
+    if(!B) return true;
+    try{ await B.authenticate({ reason:'Unlock Tuned Yota', allowDeviceCredential:true }); return true; }
+    catch(e){ return false; }
+  }
+  async function registerPush(){
+    if(!isNative()) return;
+    var P = window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
+    if(!P) return;
+    try{
+      var perm = await P.requestPermissions(); if(perm.receive!=='granted') return;
+      P.addListener('registration', function(t){
+        fetch('/.netlify/functions/push-register',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({token:t.value,platform:(window.Capacitor.getPlatform&&window.Capacitor.getPlatform())||''})});
+      });
+      await P.register();
+    }catch(e){}
+  }
 
   async function load(){
     document.getElementById('needs').textContent='Loading…';
@@ -97,6 +119,7 @@
     var data = await res.json();
     STATE.today = data.today; STATE.bookings = data.bookings||[]; STATE.month = ym(data.today);
     renderAll();
+    registerPush();
   }
 
   function renderAll(){ renderNeeds(); renderMonthNav(); renderMonth(); }
@@ -219,6 +242,15 @@
     var b=document.getElementById('scan_'+id); if(b) b.style.display='';
   }
   async function startScan(id){
+    if(isNative() && window.Capacitor.Plugins && window.Capacitor.Plugins.BarcodeScanner){
+      try{
+        var nres=await window.Capacitor.Plugins.BarcodeScanner.scan();
+        var ncodes=(nres&&nres.barcodes)||[];
+        for(var ni=0;ni<ncodes.length;ni++){ var nvin=normalizeScannedVin(ncodes[ni].rawValue||ncodes[ni].displayValue); if(nvin){ onVin(id,nvin); return; } }
+        fail('No VIN barcode found — try again or type it.');
+      }catch(e){ /* cancelled */ }
+      return;
+    }
     if(!canScan()) return;
     var card=document.getElementById('c_'+id); if(!card) return;
     if(document.getElementById('scanov_'+id)) return;
