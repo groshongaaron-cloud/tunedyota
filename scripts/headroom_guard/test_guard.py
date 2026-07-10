@@ -22,5 +22,37 @@ class TestSavings(unittest.TestCase):
         self.assertIn("suspicious", r.detail.lower())
 
 
+class TestQuality(unittest.TestCase):
+    # Fake probe: the "model" simply echoes the context, so a fact is "answered"
+    # iff it is present in the context. This tests the CHECK logic, not a real LLM.
+    @staticmethod
+    def echo_probe(question, context):
+        return context
+
+    def test_fact_survives_passes(self):
+        original = "VIN is 5TFDY5F17MX000123 and price is 4200."
+        compressed = "VIN 5TFDY5F17MX000123 price 4200"
+        probes = [{"q": "vin?", "expect": "5TFDY5F17MX000123"},
+                  {"q": "price?", "expect": "4200"}]
+        r = guard.check_quality(self.echo_probe, original, compressed, probes)
+        self.assertEqual(r.status, "pass")
+
+    def test_lost_fact_fails(self):
+        original = "VIN is 5TFDY5F17MX000123 and price is 4200."
+        compressed = "price 4200"           # VIN dropped by compression
+        probes = [{"q": "vin?", "expect": "5TFDY5F17MX000123"}]
+        r = guard.check_quality(self.echo_probe, original, compressed, probes)
+        self.assertEqual(r.status, "fail")
+        self.assertIn("5TFDY5F17MX000123", r.detail)
+
+    def test_control_failure_is_inconclusive(self):
+        # Fact not even in the original → probe is unreliable, not a compression bug.
+        original = "no vin here"
+        compressed = "no vin here"
+        probes = [{"q": "vin?", "expect": "5TFDY5F17MX000123"}]
+        r = guard.check_quality(self.echo_probe, original, compressed, probes)
+        self.assertEqual(r.status, "inconclusive")
+
+
 if __name__ == "__main__":
     unittest.main()

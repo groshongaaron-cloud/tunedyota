@@ -35,3 +35,28 @@ def check_savings(original, compressed, band):
         return CheckResult("savings", "fail",
                            f"suspiciously high: {reduction:.1f}% > {max_pct}%", data)
     return CheckResult("savings", "pass", f"{reduction:.1f}% reduction", data)
+
+
+def check_quality(probe_fn, original, compressed, probes):
+    """Differential probe: each expected fact must be recoverable from the
+    COMPRESSED text. If a fact is missing even from the ORIGINAL, the probe is
+    unreliable (inconclusive), not a compression failure."""
+    misses, inconclusive = [], []
+    for p in probes:
+        exp = p["expect"].lower()
+        if exp not in probe_fn(p["q"], original).lower():
+            inconclusive.append(p["expect"])   # control failed
+            continue
+        if exp not in probe_fn(p["q"], compressed).lower():
+            misses.append(p["expect"])
+    if misses:
+        return CheckResult("quality", "fail",
+                           f"facts lost after compression: {misses}",
+                           {"lost": misses, "inconclusive": inconclusive})
+    if inconclusive and len(inconclusive) == len(probes):
+        return CheckResult("quality", "inconclusive",
+                           f"all probes failed the original-control: {inconclusive}",
+                           {"inconclusive": inconclusive})
+    return CheckResult("quality", "pass",
+                       f"{len(probes) - len(inconclusive)} fact(s) preserved",
+                       {"inconclusive": inconclusive})
