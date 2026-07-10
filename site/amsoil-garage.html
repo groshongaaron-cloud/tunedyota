@@ -80,13 +80,23 @@
 <script src="amsoil-garage-render.js"></script>
 <script>
 (async function () {
-  var CAT = await fetch("amsoil-garage.json").then(function (r) { return r.json(); });
   var el = function (id) { return document.getElementById(id); };
   var CUR = new Date().getFullYear();
 
   el("full-catalog").href = amsoilUrl("/shop/");
   el("cta-pc").href = amsoilUrl("/offers/pc/");
   el("cta-dealer").href = amsoilUrl("/lander/join/");
+
+  var CAT;
+  try {
+    CAT = await fetch("amsoil-garage.json").then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+  } catch (e) {
+    el("garage").innerHTML = '<p style="color:var(--sage-d)">We couldn\'t load the fluid catalog just now — browse the full AMSOIL catalog above, or check back shortly.</p>';
+    return;
+  }
 
   function money(n) { return "$" + n.toFixed(2); }
 
