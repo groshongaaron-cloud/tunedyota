@@ -27,6 +27,7 @@ NAP (use this EXACT format everywhere — consistency matters):
 - [ ] Upload real photos: installs, dyno/5-gas analyzer, trucks before/after, event setups, team headshots. Add new photos monthly.
 - [ ] Verify (video verification is common for SABs — have a Tuned Yota branded item + tools ready).
 - [ ] Reality check: Google expects a SAB to cluster near a base location. A single profile centered on your MN base with regional service areas is realistic; coverage in far states (NE/SD) builds as you get reviews/photos from those events.
+- [ ] **AMSOIL angle:** paste the ready-made Services, Products, Posts, and Q&A from [`marketing/amsoil-gbp-kit.md`](marketing/amsoil-gbp-kit.md) so the profile also ranks for "AMSOIL dealer near me" / "AMSOIL for my Toyota." (Kit's honest-category note: do NOT add a physical retail category for a ships-direct dealer.)
 
 ## 3. Reviews (the #1 ongoing driver — local pack + AI answers)
 - [ ] Get your GBP "review short link" (g.page/r/…). 
