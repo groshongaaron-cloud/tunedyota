@@ -7,9 +7,25 @@ metadata:
   originSessionId: ec9367c4-ebd8-461c-b97d-adb480111c0a
 ---
 
-**► NEXT-SESSION NOTE (owner request 2026-07-07):** at the start of the next session,
-proactively SHOW the owner the pipeline dashboard `docs/dealers/dealer-pipeline.md`
-(read + present it). Then clear this note.
+**SIGNAL FILL WORKFLOW (BUILT 2026-07-09, master @ 8892ee0)** — the tier-unblocker.
+Sub-project C (digest) stays deferred as premature (no active dealers); instead built the
+thing that actually unblocks everything: a fast round-trip to collect the two owner signals.
+- `npm run build:signals` → `docs/dealers/dealer-signals.xlsx` (one row/dealer, clustered
+  rep → group → name so a whole group fills in one Excel pass; existing values pre-filled).
+- Owner fills Truck Volume (high/med/low) + Enthusiast? (yes/no), saves.
+- `npm run ingest:signals` → validates (fails closed on bad value), matches by dealer name
+  (unmatched rows reported, never dropped), blank = leave as-is, writes signals + re-scores.
+- `rescoreAll()` extracted from `score-dealers.js` (shared pass). 6 tests in
+  `tests/dealer-signals.test.js`. Dependency-free (reuses xlsx-reader/writer).
+- **SIGNALS NOW FILLED (2026-07-09, master @ e2cde76)** via WEB RESEARCH (owner asked Claude to
+  fill "based on what you know" → refused to fabricate, ran ~parallel research agents over dealer
+  sites + Google Business + market/scale). All 77 set → **tiers finalized A 13 · B 42 · C 22**
+  (0 provisional). Per-rep: Aaron A5, Noah A7 (richest WI territory), Cody A1. Evidence + confidence
+  per dealer in `docs/dealers/signal-research-2026-07-09.md`. **These are ESTIMATES, not owner-
+  confirmed** — owner should REVIEW/override (edit `dealer-signals.xlsx` → `npm run ingest:signals`),
+  not re-fill from scratch. enthusiast=yes bar = dealer-driven custom/upfit/lift program, TRD-
+  specialist branding, or off-road content (not just stocking TRD trims). (Pipeline dashboard shown
+  to owner 2026-07-09; old show-dashboard note cleared.)
 
 B2B initiative to convert the 77 Toyota franchise dealers (MN/IA/WI/ND/SD/NE) into a
 referral/F&I channel by "selling certainty, not performance" (lead with compliance
@@ -55,6 +71,17 @@ paperwork). Full brainstorm→spec→2 plans→subagent-TDD flow, 2026-07-07.
   referral economics (T1–T4), turnaround, contact routing, **COI attach**, **reproduce OTT's written
   cal warranty terms**, **CARB/state-specific wording (+counsel)**. Counsel must bless artifacts 01 & 02
   before any letterhead/dealer distribution. Fill tokens → `npm run render:dealer-kit` → final PDFs.
+
+**OUTREACH KIT BUILT (2026-07-09, sub-project D groundwork).** In `docs/marketing/dealer-kit/`:
+`outreach-templates.md` (cold email/call/voicemail/follow-up in the "sell certainty" voice),
+`tier-a-contacts.md` (researched GM/GSM/F&I contacts + lines for all 13 Tier-A dealers, 7 high-
+conf / 6 med), `tier-a-outreach-filled.md` (ready-to-send cold email + voicemail per dealer,
+contact + hook pre-filled; only rep phone/email + meeting days left). Reps can start dialing to
+BOOK meetings now. **Kit-completion open items tracked in `docs/marketing/dealer-kit/OPEN-ITEMS.md`**
+— the 9 unfilled `{{OWNER:…}}` tokens (A: 3 proposed fills awaiting owner OK; B: 3 economics
+DECISIONS owner-only — rev-share T1/T2 + payment flow; C: OTT warranty verbatim + COI) + D: counsel
+sign-off on DRAFT artifacts 01/02. Owner will supply data later; don't fabricate economics/warranty.
+Close-out = fill token → `npm run render:dealer-kit`.
 
 **State 2026-07-07:** 321 tests green (307 prior + 11 pipeline + 3 kit). All committed to master
 (`6425918`..`151de0c`), **not yet pushed**. Both sub-projects passed spec + code/content review clean.

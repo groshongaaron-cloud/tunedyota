@@ -6,6 +6,9 @@ desktop.ini
 # Netlify
 .netlify/
 
+# Superpowers brainstorming/visual-companion scratch (local, per-session)
+.superpowers/
+
 # Node (if tooling is added later)
 node_modules/
 
