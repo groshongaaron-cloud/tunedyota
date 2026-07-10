@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import { parsePrice } from "./lib/price-parse.mjs";
 import { decide, applyToProduct } from "./lib/sync.mjs";
-import { withBrowser, fetchProductHtml } from "./lib/browser-fetch.mjs";
+import { fetchProductHtml } from "./lib/browser-fetch.mjs";
 import { chromium } from "playwright";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
