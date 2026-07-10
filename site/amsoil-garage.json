@@ -1,14 +1,192 @@
 {
-  "updated": "2026-07-09",
+  "updated": "2026-07-10",
   "products": {
     "SS-0W20-QT": { "sku": "SS-0W20-QT", "name": "Signature Series 0W-20 Synthetic Motor Oil", "productPath": "/p/signature-series-0w-20-synthetic-motor-oil-asm/", "image": "/images/amsoil/ss-0w20.png", "retailPrice": 16.15, "salePrice": null, "priceVerifiedAt": "2026-07-09" },
+    "SS-5W30-QT": { "sku": "SS-5W30-QT", "name": "Signature Series 5W-30 Synthetic Motor Oil", "productPath": "/p/signature-series-5w-30-synthetic-motor-oil-asl/", "image": "/images/amsoil/ss-5w30.png", "retailPrice": 15.30, "salePrice": null, "priceVerifiedAt": "DRAFT" },
+    "SS-5W20-QT": { "sku": "SS-5W20-QT", "name": "Signature Series 5W-20 Synthetic Motor Oil", "productPath": "/p/signature-series-5w-20-synthetic-motor-oil-asm/", "image": "/images/amsoil/ss-5w20.png", "retailPrice": 15.30, "salePrice": null, "priceVerifiedAt": "DRAFT" },
     "EA15K34": { "sku": "EA15K34", "name": "Ea Oil Filter EA15K34", "productPath": "/p/ea-oil-filters-ea15k34/", "image": "/images/amsoil/ea15k34.png", "retailPrice": 18.99, "salePrice": null, "priceVerifiedAt": "2026-07-09" },
+    "EAO-116": { "sku": "EAO-116", "name": "Ea Oil Filter EAO-116", "productPath": "/p/ea-oil-filters-eao116/", "image": "/images/amsoil/eao116.png", "retailPrice": 12.50, "salePrice": null, "priceVerifiedAt": "DRAFT" },
+    "EAO-57": { "sku": "EAO-57", "name": "Ea Oil Filter EAO-57", "productPath": "/p/ea-oil-filters-eao57/", "image": "/images/amsoil/eao57.png", "retailPrice": 12.50, "salePrice": null, "priceVerifiedAt": "DRAFT" },
     "SVG-75W90-QT": { "sku": "SVG-75W90-QT", "name": "SEVERE GEAR 75W-90 Synthetic Gear Lube", "productPath": "/p/severe-gear-synthetic-gear-lube-75w-90/", "image": "/images/amsoil/svg-75w90.png", "retailPrice": 23.60, "salePrice": null, "priceVerifiedAt": "2026-07-09" },
     "SVG-75W140-QT": { "sku": "SVG-75W140-QT", "name": "SEVERE GEAR 75W-140 Synthetic Gear Lube", "productPath": "/p/severe-gear-synthetic-gear-lube-75w-140/", "image": "/images/amsoil/svg-75w140.png", "retailPrice": 25.50, "salePrice": null, "priceVerifiedAt": "2026-07-09" },
     "ATL-QT": { "sku": "ATL-QT", "name": "Signature Series Multi-Vehicle Synthetic ATF", "productPath": "/p/signature-series-multi-vehicle-synthetic-automatic-transmission-fluid-atl/", "image": "/images/amsoil/atl.png", "retailPrice": 19.20, "salePrice": null, "priceVerifiedAt": "2026-07-09" }
   },
   "vehicles": {
     "Toyota": {
+      "Tacoma": [
+        {
+          "y": "2024+",
+          "e": "2.4L-T I4",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 4.8, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-116", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.0, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-116", "SVG-75W90-QT", "ATL-QT"]
+        },
+        {
+          "y": "2016-2023",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-57", "SVG-75W90-QT", "ATL-QT"]
+        },
+        {
+          "y": "2016-2023",
+          "e": "2.7L I4",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.0, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-116", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-116", "SVG-75W90-QT", "ATL-QT"]
+        },
+        {
+          "y": "2005-2015",
+          "e": "4.0L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "ATL-QT"]
+        },
+        {
+          "y": "2005-2015",
+          "e": "2.7L I4",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-116", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-116", "SVG-75W90-QT", "ATL-QT"]
+        }
+      ],
+      "4Runner": [
+        {
+          "y": "2025+",
+          "e": "2.4L-T I4",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 4.8, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-116", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.0, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-116", "SVG-75W90-QT", "ATL-QT"]
+        },
+        {
+          "y": "2020-2024",
+          "e": "4.0L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "ATL-QT"]
+        },
+        {
+          "y": "2010-2019",
+          "e": "4.0L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "ATL-QT"]
+        },
+        {
+          "y": "2005-2009",
+          "e": "4.0L V6 / 4.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "ATL-QT"]
+        }
+      ],
+      "FJ Cruiser": [
+        {
+          "y": "2010-2014",
+          "e": "4.0L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2007-2009",
+          "e": "4.0L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2007-2008",
+          "e": "4.0L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        }
+      ],
       "Tundra": [
         {
           "y": "2022+",
@@ -22,6 +200,321 @@
             { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 11, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
           ],
           "bundle": ["SS-0W20-QT", "EA15K34", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2007-2021",
+          "e": "5.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.8, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2010-2019",
+          "e": "4.6L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.8, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2000-2009",
+          "e": "4.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.8, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2005-2009",
+          "e": "4.0L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 5.5, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 2.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "ATL-QT"]
+        }
+      ],
+      "Sequoia": [
+        {
+          "y": "2008-2022",
+          "e": "5.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 3.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2010-2019",
+          "e": "4.6L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 3.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2001-2009",
+          "e": "4.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 3.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        }
+      ],
+      "Land Cruiser": [
+        {
+          "y": "2025+",
+          "e": "2.4L-T I4",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 4.8, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-116", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.4, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 8.0, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-116", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2016-2021",
+          "e": "5.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2008-2015",
+          "e": "5.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2006-2007",
+          "e": "4.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        }
+      ],
+      "RAV4": [
+        {
+          "y": "2006-2012",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W20-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W20-QT", "EAO-57", "ATL-QT"]
+        }
+      ],
+      "Highlander": [
+        {
+          "y": "2017-2019",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-57", "ATL-QT"]
+        },
+        {
+          "y": "2008-2016",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W20-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W20-QT", "EAO-57", "ATL-QT"]
+        }
+      ],
+      "Camry": [
+        {
+          "y": "2018-2024",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-57", "ATL-QT"]
+        },
+        {
+          "y": "2007-2017",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "ATL-QT"]
+        }
+      ]
+    },
+    "Lexus": {
+      "GX": [
+        {
+          "y": "2019+",
+          "e": "4.6L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W20-QT", "unit": "qt", "capacity": 6.9, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W20-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2010-2018",
+          "e": "4.6L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W20-QT", "unit": "qt", "capacity": 6.9, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W20-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        },
+        {
+          "y": "2005-2009",
+          "e": "4.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.0, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
+        }
+      ],
+      "RX350": [
+        {
+          "y": "2015-2022",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-57", "ATL-QT"]
+        },
+        {
+          "y": "2006-2012",
+          "e": "3.5L V6",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 6.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "ATL-QT"]
+        }
+      ],
+      "LS460": [
+        {
+          "y": "2007-2017",
+          "e": "4.6L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-0W20-QT", "unit": "qt", "capacity": 8.5, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "10,000 mi", "tunedInterval": "7,500 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "severe: inspect", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-0W20-QT", "EAO-57", "SVG-75W90-QT", "ATL-QT"]
+        }
+      ],
+      "LX570": [
+        {
+          "y": "2008-2021",
+          "e": "5.7L V8",
+          "verified": false,
+          "systems": [
+            { "system": "Engine Oil", "sku": "SS-5W30-QT", "unit": "qt", "capacity": 7.4, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Engine Oil Filter", "sku": "EAO-57", "unit": "ea", "capacity": 1, "factoryInterval": "5,000 mi", "tunedInterval": "5,000 mi" },
+            { "system": "Front Differential", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.9, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Rear Differential", "sku": "SVG-75W140-QT", "unit": "qt", "capacity": 2.4, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transfer Case", "sku": "SVG-75W90-QT", "unit": "qt", "capacity": 1.5, "factoryInterval": "30,000 mi", "tunedInterval": "30,000 mi" },
+            { "system": "Transmission", "sku": "ATL-QT", "unit": "qt", "capacity": 9.8, "factoryInterval": "severe service", "tunedInterval": "60,000 mi" }
+          ],
+          "bundle": ["SS-5W30-QT", "EAO-57", "SVG-75W90-QT", "SVG-75W140-QT", "ATL-QT"]
         }
       ]
     }
