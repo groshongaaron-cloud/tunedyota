@@ -60,8 +60,13 @@ def run_all(probeless=False, adapter=None, probe_fn=None):
     for item in manifest["items"]:
         text = (CORPUS / item["file"]).read_text(encoding="utf-8")
         comp = adapter.compress(text, item["type"])
+        band = config.SAVINGS_BANDS[item["type"]]
+        if comp.tokens_before is not None and comp.tokens_after is not None:
+            savings = guard.check_savings_tokens(comp.tokens_before, comp.tokens_after, band)
+        else:
+            savings = guard.check_savings(text, comp.text, band)
         checks = [
-            guard.check_savings(text, comp.text, config.SAVINGS_BANDS[item["type"]]),
+            savings,
             guard.check_reversibility(adapter, text, comp),
         ]
         if probe_fn is None:

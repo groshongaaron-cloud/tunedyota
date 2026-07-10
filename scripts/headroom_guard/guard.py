@@ -23,18 +23,21 @@ def count_tokens(text):
     return max(1, len(text) // 4)
 
 
-def check_savings(original, compressed, band):
+def _evaluate_savings(o_tokens, c_tokens, band):
     min_pct, max_pct = band
-    o, c = count_tokens(original), count_tokens(compressed)
-    reduction = (o - c) / o * 100 if o else 0.0
-    data = {"orig_tokens": o, "comp_tokens": c, "reduction_pct": round(reduction, 1)}
+    reduction = (o_tokens - c_tokens) / o_tokens * 100 if o_tokens else 0.0
+    data = {"orig_tokens": o_tokens, "comp_tokens": c_tokens, "reduction_pct": round(reduction, 1)}
     if reduction < min_pct:
-        return CheckResult("savings", "fail",
-                           f"too little: {reduction:.1f}% < {min_pct}%", data)
+        return CheckResult("savings", "fail", f"too little: {reduction:.1f}% < {min_pct}%", data)
     if reduction > max_pct:
-        return CheckResult("savings", "fail",
-                           f"suspiciously high: {reduction:.1f}% > {max_pct}%", data)
+        return CheckResult("savings", "fail", f"suspiciously high: {reduction:.1f}% > {max_pct}%", data)
     return CheckResult("savings", "pass", f"{reduction:.1f}% reduction", data)
+
+def check_savings(original, compressed, band):
+    return _evaluate_savings(count_tokens(original), count_tokens(compressed), band)
+
+def check_savings_tokens(o_tokens, c_tokens, band):
+    return _evaluate_savings(o_tokens, c_tokens, band)
 
 
 def check_quality(probe_fn, original, compressed, probes):

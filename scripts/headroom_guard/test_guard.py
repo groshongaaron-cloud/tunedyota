@@ -22,6 +22,16 @@ class TestSavings(unittest.TestCase):
         self.assertIn("suspicious", r.detail.lower())
 
 
+class TestSavingsTokens(unittest.TestCase):
+    def test_token_savings_in_band(self):
+        r = guard.check_savings_tokens(1000, 500, (20.0, 97.0))
+        self.assertEqual(r.status, "pass")
+        self.assertEqual(r.data["reduction_pct"], 50.0)
+    def test_token_savings_too_little(self):
+        r = guard.check_savings_tokens(1000, 990, (20.0, 97.0))
+        self.assertEqual(r.status, "fail")
+
+
 class TestQuality(unittest.TestCase):
     # Fake probe: the "model" simply echoes the context, so a fact is "answered"
     # iff it is present in the context. This tests the CHECK logic, not a real LLM.
@@ -131,7 +141,8 @@ class _FakeAdapter:
 
 class TestRunnerAbsent(unittest.TestCase):
     def test_absent_run_is_skipped_and_green(self):
-        report = runner.run_all(probeless=True)   # Headroom absent -> detect() absent
+        from adapter import AbsentAdapter
+        report = runner.run_all(probeless=True, adapter=AbsentAdapter())
         self.assertEqual(report["status"], "skipped")
         self.assertEqual(runner.exit_code(report), 0)
 
