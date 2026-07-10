@@ -1,0 +1,34 @@
+# Codemagic cloud build for the Tuned Yota app (Capacitor). Compiles iOS + Android
+# on a Mac runner so no Mac is needed locally. Signing + store publishing are wired
+# in the Codemagic UI (App Store Connect API key + Play service account) per
+# docs/app/RUNBOOK.md. Exact build commands are validated/adjusted on the first run.
+workflows:
+  tunedyota-app:
+    name: Tuned Yota App
+    instance_type: mac_mini_m2
+    environment:
+      node: 20
+      vars:
+        BUNDLE_ID: "com.tunedyota.app"
+    scripts:
+      - name: Install root + app deps
+        script: |
+          npm ci
+          cd app && npm install
+      - name: Assemble web + native projects
+        script: |
+          node app/scripts/sync-web.mjs
+          cd app
+          npx cap add ios || true
+          npx cap add android || true
+          npx cap sync
+      - name: Build Android (.aab)
+        script: |
+          cd app/android && ./gradlew bundleRelease
+      - name: Build iOS (.ipa)
+        script: |
+          cd app/ios/App
+          xcode-project build-ipa --workspace App.xcworkspace --scheme App
+    artifacts:
+      - app/android/app/build/outputs/**/*.aab
+      - app/ios/App/build/ios/ipa/*.ipa
