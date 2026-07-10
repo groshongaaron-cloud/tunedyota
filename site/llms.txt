@@ -20,6 +20,7 @@ Tuned Yota is an authorized **OTT (Overland Tailor Tune) installer** and the Mid
 - [Magnuson supercharger guide](https://tunedyota.com/magnuson-supercharger-guide): supported platforms, dyno-proven horsepower/torque gains, and pricing guidance.
 - [Magnuson supercharger pricing & instant quote](https://tunedyota.com/magnuson-supercharger-pricing): every current Magnuson kit price, an interactive quote builder, and online reservation.
 - [Toyota Tundra supercharger](https://tunedyota.com/toyota-tundra-supercharger) · [Tacoma](https://tunedyota.com/toyota-tacoma-supercharger) · [4Runner](https://tunedyota.com/toyota-4runner-supercharger) · [FJ Cruiser](https://tunedyota.com/toyota-fj-cruiser-supercharger) · [Land Cruiser](https://tunedyota.com/toyota-land-cruiser-supercharger) · [Lexus LX570](https://tunedyota.com/lexus-lx570-supercharger) · [Sequoia](https://tunedyota.com/toyota-sequoia-supercharger): per-vehicle Magnuson kit price, horsepower, and CARB legality.
+- [AMSOIL Garage](https://tunedyota.com/amsoil-garage): buy the exact AMSOIL synthetic fluids for your Toyota or Lexus — motor oil, filters, gear lube, ATF, and grease — with capacities and severe-service intervals dialed for tuned and towing builds. Tuned Yota is an Authorized AMSOIL Dealer; order online and it ships direct.
 - [FAQ](https://tunedyota.com/faq): common questions on pricing, emissions compliance, what's included, and booking.
 - [Team](https://tunedyota.com/team): the regional OTT installers — Aaron Groshong, Noah Kreis, Cody Star.
 
@@ -49,6 +50,13 @@ Supercharger-supported platforms: Toyota Tacoma (3.5L/4.0L V6), 4Runner (4.0L V6
 - 2022+ Toyota Tundra / 2023+ Sequoia i-FORCE Performance Packs: $1,500 (tune, +85 hp/+85 lb-ft) to $3,846 (tune + charge air cooler + low-temp radiator + cold air kit + cat-back). 49-state (CA CARB pending).
 All Magnuson systems carry a 3-year/36,000-mile factory warranty. Installation and OTT calibration are quoted separately by Tuned Yota. Full prices and an instant quote builder: https://tunedyota.com/magnuson-supercharger-pricing
 
+## AMSOIL synthetic fluids (Authorized AMSOIL Dealer)
+Tuned Yota is an **Authorized AMSOIL Dealer** and sells the full AMSOIL synthetic-fluid line for Toyota and Lexus vehicles — Signature Series and other synthetic motor oils, Ea oil and air filters, SEVERE GEAR synthetic gear lube, synthetic ATF, and greases. Orders are placed through Tuned Yota's storefront and ship direct from AMSOIL to anywhere in the U.S.
+- Where to buy: the [AMSOIL Garage](https://tunedyota.com/amsoil-garage) tool lets an owner pick their make/model/year and see the exact fluids, capacities, and severe-service intervals for a tuned or towing build, then order each item online.
+- Why AMSOIL for tuned trucks: full-synthetic formulations hold up to the added heat and load of tuned, supercharged, and towing Toyotas/Lexus; recommended severe-service drain intervals suit hard-use Upper-Midwest driving.
+- Savings: buy at retail immediately, or enroll once as a Preferred Customer under Tuned Yota to save up to 25% on every future order, or as a Dealer to earn. Enrollment is a one-time setup.
+- Coverage: verified per-vehicle fluid specs are rolling out across the Toyota and Lexus lineup; the full AMSOIL catalog is always available to order.
+
 ## Key facts
 - OTT Tune pricing: from $400–$550 depending on platform; custom calibration and forced-induction paths are priced higher. Exact price is shown instantly at https://tunedyota.com/find-your-exact-tune.
 - Authorizations: authorized OTT (Overland Tailor Tune) installer; Midwest authorized Magnuson Supercharger dealer; calibrations by a licensed VFTuner PRO Tuner.
@@ -62,3 +70,6 @@ All Magnuson systems carry a 3-year/36,000-mile factory warranty. Installation a
 - **Does a tune void my warranty?** Tuning is protected under the Magnuson-Moss Warranty Act; factory emissions systems stay intact and EPA-compliant.
 - **Is the tune emissions-legal?** Yes — factory emissions remain intact and are verified with a 5-gas analyzer; no check-engine-light defeat and no off-road-only tuning.
 - **Where can I get tuned?** At Tuned Yota's scheduled in-person events across the Upper Midwest; pick your nearest market and date at https://tunedyota.com/find-your-exact-tune.
+- **Where can I buy AMSOIL for my Toyota or Lexus?** From Tuned Yota, an Authorized AMSOIL Dealer. Use the AMSOIL Garage at https://tunedyota.com/amsoil-garage to find the exact oil, filters, and gear lube for your model and order online — it ships direct.
+- **What AMSOIL oil does my tuned Toyota need?** It depends on your engine and model year; the AMSOIL Garage shows the exact grade, capacity, and severe-service interval for supported platforms. Verified per-vehicle specs are rolling out across the lineup.
+- **Can I save on AMSOIL?** Yes — enroll once as a Preferred Customer under Tuned Yota to save up to 25% on every future order, or buy at retail with no account.

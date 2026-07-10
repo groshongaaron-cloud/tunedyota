@@ -23,6 +23,26 @@
 {"@context":"https://schema.org","@type":"AutomotiveBusiness","@id":"https://tunedyota.com/#business","name":"Tuned Yota","url":"https://tunedyota.com/","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","slogan":"Undeniable Performance","logo":{"@type":"ImageObject","url":"https://tunedyota.com/logo.png","width":512,"height":512},"image":"https://tunedyota.com/og-image.png","areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"}],"sameAs":["https://www.facebook.com/TunedYota/","https://www.instagram.com/tunedyota/","https://www.facebook.com/groups/501008078456222"]}
 </script>
 <!-- SEO:BUSINESS:END -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"Home","item":"https://tunedyota.com/"},
+ {"@type":"ListItem","position":2,"name":"AMSOIL Garage","item":"https://tunedyota.com/amsoil-garage"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Store","@id":"https://tunedyota.com/amsoil-garage#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"https://tunedyota.com/amsoil-garage","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"Country","name":"United States"},"description":"Authorized AMSOIL Dealer selling synthetic motor oil, oil and air filters, gear lube, ATF, and grease for Toyota and Lexus vehicles, with capacities and severe-service intervals for tuned and towing builds.","hasOfferCatalog":{"@type":"OfferCatalog","name":"AMSOIL synthetic fluids for Toyota & Lexus","itemListElement":[
+ {"@type":"Offer","itemOffered":{"@type":"Product","name":"AMSOIL Signature Series Synthetic Motor Oil","brand":{"@type":"Brand","name":"AMSOIL"},"category":"Synthetic Motor Oil"}},
+ {"@type":"Offer","itemOffered":{"@type":"Product","name":"AMSOIL Ea Oil Filter","brand":{"@type":"Brand","name":"AMSOIL"},"category":"Oil Filter"}},
+ {"@type":"Offer","itemOffered":{"@type":"Product","name":"AMSOIL SEVERE GEAR Synthetic Gear Lube","brand":{"@type":"Brand","name":"AMSOIL"},"category":"Gear Lube"}},
+ {"@type":"Offer","itemOffered":{"@type":"Product","name":"AMSOIL Synthetic Automatic Transmission Fluid","brand":{"@type":"Brand","name":"AMSOIL"},"category":"Automatic Transmission Fluid"}},
+ {"@type":"Offer","itemOffered":{"@type":"Product","name":"AMSOIL Synthetic Grease","brand":{"@type":"Brand","name":"AMSOIL"},"category":"Grease"}}]}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+ {"@type":"Question","name":"Where can I buy AMSOIL for my Toyota or Lexus?","acceptedAnswer":{"@type":"Answer","text":"From Tuned Yota, an Authorized AMSOIL Dealer. Use the AMSOIL Garage to pick your make, model, and year, see the exact oil, filters, and gear lube for your vehicle, and order online. Products ship direct from AMSOIL to anywhere in the United States."}},
+ {"@type":"Question","name":"What AMSOIL oil does my tuned Toyota need?","acceptedAnswer":{"@type":"Answer","text":"It depends on your engine and model year. The AMSOIL Garage shows the correct grade, capacity, and severe-service interval for supported Toyota and Lexus platforms. Verified per-vehicle specs are rolling out across the lineup, and the full catalog is always available to order."}},
+ {"@type":"Question","name":"Is AMSOIL worth it for a tuned or towing truck?","acceptedAnswer":{"@type":"Answer","text":"Full-synthetic AMSOIL fluids are formulated to handle the extra heat and load of tuned, supercharged, and towing Toyotas and Lexus vehicles, with severe-service drain intervals suited to hard use and Upper-Midwest conditions."}},
+ {"@type":"Question","name":"How do I save on AMSOIL orders?","acceptedAnswer":{"@type":"Answer","text":"Buy at retail with no account, or enroll once as a Preferred Customer under Tuned Yota to save up to 25% on every future order. Dealer enrollment is also available for those who want to earn."}}]}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -41,11 +61,21 @@
   .bundle{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 18px;margin:14px 0}
   .convert{background:var(--ink);color:#F3EFEA;border-radius:16px;padding:20px 22px;margin:26px 0}
   .convert a{display:inline-block;margin:8px 8px 0 0}
+  .ag-prose{margin:30px 0 6px}
+  .ag-prose h2{font-family:'Spectral',serif;font-weight:600;color:var(--ink);font-size:clamp(20px,4vw,26px);margin:26px 0 8px}
+  .ag-prose p{line-height:1.6;margin:0 0 12px}
+  .ag-prose a{color:var(--sage-d);font-weight:700}
+  .ag-prose details{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;background:var(--white)}
+  .ag-prose summary{font-weight:800;color:var(--ink);cursor:pointer;list-style:none}
+  .ag-prose summary::-webkit-details-marker{display:none}
+  .ag-prose summary::after{content:"+";float:right;color:var(--sage-d);font-weight:900}
+  .ag-prose details[open] summary::after{content:"\2013"}
+  .ag-prose details p{margin:10px 0 2px;font-size:14px;color:var(--brown2)}
 </style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>
+<header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>
 <a id="main" tabindex="-1"></a>
 <main class="ag">
   <div class="ag-eyebrow">Tuned Yota · Authorized AMSOIL Dealer</div>
@@ -62,6 +92,18 @@
 
   <p style="margin-top:18px"><a id="full-catalog" class="btn outline" href="#">Browse the full AMSOIL catalog →</a></p>
 
+  <section class="ag-prose" aria-labelledby="why-amsoil">
+    <h2 id="why-amsoil">Why AMSOIL for a tuned Toyota or Lexus</h2>
+    <p>A tuned, supercharged, or towing build asks more of every fluid it runs. AMSOIL's 100% synthetic motor oils, gear lubes, and transmission fluids are built to hold their protective film under the extra heat, load, and rpm that come with more power — which is exactly why our own installers run them. As an <strong>Authorized AMSOIL Dealer</strong>, Tuned Yota lets you order the right fluids for your truck and have them shipped direct.</p>
+    <p>The <a href="#garage">AMSOIL Garage</a> above pairs your make, model, and year with the correct grade, capacity, and <strong>severe-service drain interval</strong> — the schedule AMSOIL recommends for hard use, heat, towing, and short-trip Upper-Midwest driving. Verified per-vehicle specs are rolling out across the Toyota and Lexus lineup; the full catalog is always available to order.</p>
+
+    <h2 id="amsoil-faq">AMSOIL ordering — common questions</h2>
+    <details><summary>Where can I buy AMSOIL for my Toyota or Lexus?</summary><p>From Tuned Yota, an Authorized AMSOIL Dealer. Use the garage tool above to pick your vehicle, see the exact oil, filters, and gear lube it needs, and order online — products ship direct from AMSOIL anywhere in the U.S.</p></details>
+    <details><summary>What AMSOIL oil does my tuned Toyota need?</summary><p>It depends on your engine and model year. The garage shows the correct grade, capacity, and severe-service interval for supported platforms as verified specs roll out. When your exact configuration isn't listed yet, browse the full catalog or call and we'll point you to the right fluids.</p></details>
+    <details><summary>Is AMSOIL worth it for a tuned or towing truck?</summary><p>Full-synthetic AMSOIL fluids are formulated for the added heat and load of tuned, supercharged, and towing Toyotas and Lexus vehicles, with severe-service drain intervals suited to hard, real-world use.</p></details>
+    <details><summary>How do I save on AMSOIL orders?</summary><p>Buy at retail with no account, or enroll once as a Preferred Customer under Tuned Yota to save up to 25% on every future order. Dealer enrollment is available too if you'd rather earn.</p></details>
+  </section>
+
   <div class="convert">
     <strong>Buy retail today — or lock in bigger savings.</strong>
     <p style="margin:6px 0 0;opacity:.9">Become a Preferred Customer to save up to 25% on every future order, or a Dealer to earn. Enroll under Tuned Yota once and you're set for life.</p>
@@ -70,7 +112,7 @@
   </div>
 </main>
 <footer class="sfoot"><div class="fmark">Tuned Yota</div><div class="ftag">Undeniable Performance</div>
-  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></div>
+  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></div>
   <div class="fcon">Call or text <a href="tel:+16124067117">(612) 406-7117</a> &nbsp;·&nbsp; <a href="mailto:info@tunedyota.com">info@tunedyota.com</a><br>
   Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
