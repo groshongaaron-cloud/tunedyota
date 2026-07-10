@@ -43,5 +43,17 @@ test("each generation has a year range, engine, verified flag, systems, and bund
     assert.equal(typeof gen.verified, "boolean", `${mk} ${md} ${gen.y}: verified must be boolean`);
     assert.ok(Array.isArray(gen.systems) && gen.systems.length, `${mk} ${md} ${gen.y}: needs systems`);
     assert.ok(Array.isArray(gen.bundle) && gen.bundle.length, `${mk} ${md} ${gen.y}: needs a bundle`);
+    for (const s of gen.systems) {
+      assert.equal(typeof s.capacity, "number", `${mk} ${md} ${gen.y} ${s.system}: capacity must be a number`);
+      assert.ok(s.capacity > 0, `${mk} ${md} ${gen.y} ${s.system}: capacity must be > 0`);
+      assert.equal(typeof s.unit, "string", `${mk} ${md} ${gen.y} ${s.system}: unit must be a string`);
+      assert.ok(s.unit.length > 0, `${mk} ${md} ${gen.y} ${s.system}: unit must not be empty`);
+    }
+  });
+});
+
+test("no bundle lists a duplicate SKU", () => {
+  eachGeneration((mk, md, gen) => {
+    assert.equal(new Set(gen.bundle).size, gen.bundle.length, `${mk} ${md} ${gen.y}: bundle has duplicate SKUs`);
   });
 });
