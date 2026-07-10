@@ -42,6 +42,11 @@
   .count{color:var(--muted);font-weight:600;}
   .sec-h{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:12px 0 2px;}
   .walkform input{margin:5px 0;}
+  .scanvin{background:#5B4B42;margin:0 0 6px;width:100%;}
+  .scanwrap{position:relative;margin:6px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#000;}
+  .scanwrap video{width:100%;display:block;max-height:60vh;object-fit:cover;}
+  .scanhint{color:#fff;font-size:12px;text-align:center;padding:6px;background:rgba(0,0,0,.55);position:absolute;top:0;left:0;right:0;}
+  .scanmsg{color:#ffe;font-size:12px;text-align:center;padding:4px 4px 8px;background:#000;}
 </style>
 </head>
 <body>
@@ -184,6 +189,74 @@
     else { fail('Could not add walk-in: '+(out.error||'error '+res.status)); }
   }
 
+  // --- VIN scan (mirror of netlify/functions/lib/vin.js — keep in sync) ---
+  function normalizeScannedVin(raw){
+    var s=String(raw==null?'':raw).toUpperCase().replace(/[^A-Z0-9]/g,'');
+    return /^[A-HJ-NPR-Z0-9]{17}$/.test(s)?s:'';
+  }
+  function canScan(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
+  var scanState=null, zxingLoading=null;
+  function loadZXing(){
+    if(window.ZXing) return Promise.resolve();
+    if(zxingLoading) return zxingLoading;
+    zxingLoading=new Promise(function(resolve,reject){
+      var s=document.createElement('script'); s.src='/vendor/zxing.min.js';
+      s.onload=function(){ resolve(); }; s.onerror=function(){ reject(new Error('zxing load failed')); };
+      document.head.appendChild(s);
+    });
+    return zxingLoading;
+  }
+  function setScanMsg(id,m){ var el=document.getElementById('scanmsg_'+id); if(el) el.textContent=m; }
+  function onVin(id,vin){ var i=document.getElementById('vin_'+id); if(i) i.value=vin; stopScan(id); }
+  function stopScan(id){
+    if(scanState && scanState.id===id){
+      if(scanState.raf) cancelAnimationFrame(scanState.raf);
+      if(scanState.reader && scanState.reader.reset){ try{ scanState.reader.reset(); }catch(e){} }
+      if(scanState.stream){ scanState.stream.getTracks().forEach(function(t){ t.stop(); }); }
+      scanState=null;
+    }
+    var o=document.getElementById('scanov_'+id); if(o) o.remove();
+    var b=document.getElementById('scan_'+id); if(b) b.style.display='';
+  }
+  async function startScan(id){
+    if(!canScan()) return;
+    var card=document.getElementById('c_'+id); if(!card) return;
+    if(document.getElementById('scanov_'+id)) return;
+    var ov=document.createElement('div'); ov.id='scanov_'+id; ov.className='scanwrap';
+    ov.innerHTML='<video id="scanvid_'+id+'" playsinline autoplay muted></video>'+
+      '<div class="scanhint">Point at the VIN barcode — door jamb or windshield</div>'+
+      '<div id="scanmsg_'+id+'" class="scanmsg"></div>'+
+      '<button type="button" class="btn" id="scancx_'+id+'" style="width:100%;background:#8a2a2a">Cancel</button>';
+    card.appendChild(ov);
+    var sbtn=document.getElementById('scan_'+id); if(sbtn) sbtn.style.display='none';
+    document.getElementById('scancx_'+id).onclick=function(){ stopScan(id); };
+    var video=document.getElementById('scanvid_'+id);
+    var stream;
+    try{ stream=await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } }); }
+    catch(e){ setScanMsg(id,'Camera unavailable — type the VIN.'); return; }
+    scanState={ id:id, stream:stream, raf:null, reader:null };
+    video.srcObject=stream;
+    if('BarcodeDetector' in window){
+      var det=new window.BarcodeDetector({ formats:['code_39','data_matrix'] });
+      var tick=async function(){
+        if(!scanState || scanState.id!==id) return;
+        try{ var codes=await det.detect(video);
+          for(var i=0;i<codes.length;i++){ var vin=normalizeScannedVin(codes[i].rawValue); if(vin){ onVin(id,vin); return; } }
+        }catch(e){}
+        scanState.raf=requestAnimationFrame(tick);
+      };
+      scanState.raf=requestAnimationFrame(tick);
+    } else {
+      try{ await loadZXing(); }catch(e){ setScanMsg(id,'Scanner unavailable — type the VIN.'); return; }
+      if(!scanState || scanState.id!==id) return;
+      var reader=new window.ZXing.BrowserMultiFormatReader();
+      scanState.reader=reader;
+      reader.decodeFromVideoDevice(null, video, function(result){
+        if(result){ var vin=normalizeScannedVin(result.getText?result.getText():result.text); if(vin){ onVin(id,vin); } }
+      });
+    }
+  }
+
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
@@ -193,6 +266,7 @@
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
       '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
+      (canScan()?'<button type="button" class="btn scanvin" id="scan_'+b.id+'">📷 Scan VIN</button>':'')+
       '<select id="cal_'+b.id+'">'+opts+'</select>'+
       '<div class="otthdr">OTT commission report</div>'+
       sel('tp_'+b.id, TP, 'Tuning Platform')+
@@ -204,6 +278,7 @@
       '<label class="nsconfirm"><input type="checkbox" id="nsc_'+b.id+'"> Customer didn\'t show — add to waitlist</label>'+
       '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
+    if(canScan()){ var sb=c.querySelector('#scan_'+b.id); if(sb) sb.onclick=function(){ startScan(b.id); }; }
     var cb=c.querySelector('#nsc_'+b.id), nsb=c.querySelector('#ns_'+b.id);
     cb.onchange=function(){ nsb.disabled=!cb.checked; };
     nsb.onclick=function(){ if(cb.checked) closeout(b.id,{action:'noshow',confirmed:true}); };
