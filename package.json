@@ -19,6 +19,7 @@
     "sharp": "^0.35.2"
   },
   "devDependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "playwright": "^1.61.1"
   }
 }

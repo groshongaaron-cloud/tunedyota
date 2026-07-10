@@ -1,7 +1,8 @@
 // scripts/amsoil/price-sync.mjs
-// Weekly price-sync agent. Fetches each garage SKU's amsoil.com product page, parses
-// retail/sale, applies within the ±40% guardrail, writes site/amsoil-garage.json,
-// posts a summary to the /notify Slack relay. Pass --commit to git commit+push.
+// Weekly price-sync agent. Launches ONE headless Chromium session, fetches each
+// garage SKU's amsoil.com product page (bypassing Cloudflare), parses retail/sale,
+// applies within the ±40% guardrail, writes site/amsoil-garage.json, posts a
+// summary to the /notify Slack relay. Pass --commit to git commit+push.
 // Schedule locally with Windows Task Scheduler (same host as scripts/measure/).
 import fs from "node:fs";
 import path from "node:path";
@@ -9,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import { parsePrice } from "./lib/price-parse.mjs";
 import { decide, applyToProduct } from "./lib/sync.mjs";
+import { withBrowser, fetchProductHtml } from "./lib/browser-fetch.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DATA = path.join(ROOT, "site", "amsoil-garage.json");
@@ -28,19 +30,30 @@ async function notify(text) {
 async function main() {
   const cat = JSON.parse(fs.readFileSync(DATA, "utf8"));
   const applied = [], held = [];
-  for (const sku of Object.keys(cat.products)) {
-    const p = cat.products[sku];
-    if (!p.productPath) continue;
-    let html = "";
-    try {
-      const res = await fetch(BASE + p.productPath, { headers: { "user-agent": "TunedYotaPriceSync/1.0 (+https://tunedyota.com)" } });
-      html = await res.text();
-    } catch (e) { held.push(`${sku}: fetch failed (${e.message})`); continue; }
-    const parsed = parsePrice(html);
-    const d = decide(p, parsed);
-    if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
-    else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
-  }
+
+  await withBrowser(async (page) => {
+    for (const sku of Object.keys(cat.products)) {
+      const p = cat.products[sku];
+      if (!p.productPath) continue;
+
+      const { html, blocked } = await fetchProductHtml(page, BASE + p.productPath);
+      if (blocked) {
+        held.push(`${sku}: HELD — blocked/challenge (len<20k or 403)`);
+        // politeness delay before next product even when blocked
+        await page.waitForTimeout(1500);
+        continue;
+      }
+
+      const parsed = parsePrice(html);
+      const d = decide(p, parsed);
+      if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
+      else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
+
+      // politeness delay between products
+      await page.waitForTimeout(1500);
+    }
+  });
+
   if (applied.length) {
     cat.updated = TODAY;
     fs.writeFileSync(DATA, JSON.stringify(cat, null, 2) + "\n");
