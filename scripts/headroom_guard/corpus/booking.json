@@ -1,0 +1,17 @@
+{
+  "booking_id": "BK-2024-000123",
+  "customer": {"name": "Sample Owner", "email": "sample@example.com", "phone": "000-000-0000"},
+  "vehicle": {"make": "Toyota", "model": "Tundra", "model_year": 2024, "vin": "5TFDY5F17MX000123"},
+  "event": {"city": "Sioux Falls", "date": "2026-08-15", "installer": "Cody"},
+  "order": {"tune": "OTT medium", "price_usd": 4200, "status": "confirmed"},
+  "history": [
+    {"ts": "2026-07-01T10:00:00Z", "action": "created", "by": "system", "note": "lead captured from funnel"},
+    {"ts": "2026-07-01T10:00:01Z", "action": "created", "by": "system", "note": "lead captured from funnel"},
+    {"ts": "2026-07-01T10:00:02Z", "action": "created", "by": "system", "note": "lead captured from funnel"},
+    {"ts": "2026-07-01T10:00:03Z", "action": "created", "by": "system", "note": "lead captured from funnel"},
+    {"ts": "2026-07-01T10:00:04Z", "action": "created", "by": "system", "note": "lead captured from funnel"},
+    {"ts": "2026-07-01T10:00:05Z", "action": "created", "by": "system", "note": "lead captured from funnel"},
+    {"ts": "2026-07-01T10:00:06Z", "action": "created", "by": "system", "note": "lead captured from funnel"},
+    {"ts": "2026-07-01T10:00:07Z", "action": "created", "by": "system", "note": "lead captured from funnel"}
+  ]
+}
