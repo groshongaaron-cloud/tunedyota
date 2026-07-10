@@ -249,7 +249,15 @@
     } else {
       try{ await loadZXing(); }catch(e){ setScanMsg(id,'Scanner unavailable — type the VIN.'); return; }
       if(!scanState || scanState.id!==id) return;
-      var reader=new window.ZXing.BrowserMultiFormatReader();
+      var Z=window.ZXing, reader;
+      try{
+        if(Z.DecodeHintType && Z.BarcodeFormat){
+          var hints=new Map();
+          hints.set(Z.DecodeHintType.POSSIBLE_FORMATS,[Z.BarcodeFormat.CODE_39,Z.BarcodeFormat.DATA_MATRIX]);
+          hints.set(Z.DecodeHintType.TRY_HARDER,true);
+          reader=new Z.BrowserMultiFormatReader(hints);
+        } else { reader=new Z.BrowserMultiFormatReader(); }
+      }catch(e){ reader=new Z.BrowserMultiFormatReader(); }
       scanState.reader=reader;
       reader.decodeFromVideoDevice(null, video, function(result){
         if(result){ var vin=normalizeScannedVin(result.getText?result.getText():result.text); if(vin){ onVin(id,vin); } }
