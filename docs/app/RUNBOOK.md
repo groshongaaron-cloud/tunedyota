@@ -54,9 +54,11 @@ Do them in this order (roughly slowest-to-verify first).
 
 ## 6. Store listings + submit  (after the first build)
 When the app builds and lands in TestFlight / Play internal testing:
-1. In **App Store Connect** and **Play Console**, fill the listing: name (Tuned Yota),
-   description, screenshots (I'll generate templates), **privacy policy URL** (I'll host one on the
-   site), category, contact.
+1. In **App Store Connect** and **Play Console**, fill the listing from
+   `docs/app/store-listing.md` (paste-ready): name, description, category, contact. **Privacy
+   policy URL is live: https://tunedyota.com/privacy** (review with counsel before relying on it).
+   Screenshots: I'll generate templates once the app builds.
+   **Put a demo installer passcode in the App Review notes** so reviewers get past sign-in.
 2. Add yourself/installers as internal testers → verify on real phones (camera, Face ID, push).
 3. **Submit for review.** Apple's first review is the pickiest; our native features (camera scan,
    push, biometric) are the defense against a "just a website" rejection.
