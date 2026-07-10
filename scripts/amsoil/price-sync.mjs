@@ -11,6 +11,7 @@ import { execSync } from "node:child_process";
 import { parsePrice } from "./lib/price-parse.mjs";
 import { decide, applyToProduct } from "./lib/sync.mjs";
 import { withBrowser, fetchProductHtml } from "./lib/browser-fetch.mjs";
+import { chromium } from "playwright";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DATA = path.join(ROOT, "site", "amsoil-garage.json");
@@ -31,28 +32,39 @@ async function main() {
   const cat = JSON.parse(fs.readFileSync(DATA, "utf8"));
   const applied = [], held = [];
 
-  await withBrowser(async (page) => {
+  // Use a fresh browser context per product to avoid Cloudflare session fingerprinting.
+  // A single shared page gets flagged after the first hit; fresh contexts reset the CF cookie.
+  const browser = await chromium.launch({ headless: true });
+  const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
+  try {
     for (const sku of Object.keys(cat.products)) {
       const p = cat.products[sku];
       if (!p.productPath) continue;
 
-      const { html, blocked } = await fetchProductHtml(page, BASE + p.productPath);
-      if (blocked) {
-        held.push(`${sku}: HELD — blocked/challenge (len<20k or 403)`);
-        // politeness delay before next product even when blocked
-        await page.waitForTimeout(1500);
-        continue;
+      const ctx = await browser.newContext({ userAgent: UA, locale: "en-US" });
+      const page = await ctx.newPage();
+      let html, blocked;
+      try {
+        ({ html, blocked } = await fetchProductHtml(page, BASE + p.productPath, 5000));
+      } finally {
+        await ctx.close();
       }
 
-      const parsed = parsePrice(html);
-      const d = decide(p, parsed);
-      if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
-      else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
+      if (blocked) {
+        held.push(`${sku}: HELD — blocked/challenge (len<20k or 403)`);
+      } else {
+        const parsed = parsePrice(html);
+        const d = decide(p, parsed);
+        if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
+        else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
+      }
 
-      // politeness delay between products
-      await page.waitForTimeout(1500);
+      // Polite delay between products to avoid rate-limiting
+      await new Promise(r => setTimeout(r, 8000));
     }
-  });
+  } finally {
+    await browser.close();
+  }
 
   if (applied.length) {
     cat.updated = TODAY;
