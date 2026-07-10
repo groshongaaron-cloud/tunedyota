@@ -21,8 +21,8 @@ const COMMIT = process.argv.includes("--commit");
 
 async function notify(text) {
   const url = process.env.NOTIFY_URL || "https://tunedyota.com/notify";
-  const token = process.env.NOTIFY_TOKEN;
-  if (!token) { console.log("[notify skipped: no NOTIFY_TOKEN]\n" + text); return; }
+  const token = process.env.NOTIFY_TOKEN || process.env.TY_NOTIFY_TOKEN;
+  if (!token) { console.log("[notify skipped: no NOTIFY_TOKEN/TY_NOTIFY_TOKEN]\n" + text); return; }
   try {
     await fetch(url, { method: "POST", headers: { "content-type": "application/json", "x-ty-notify": token }, body: JSON.stringify({ text }) });
   } catch (e) { console.error("notify failed:", e.message); }
