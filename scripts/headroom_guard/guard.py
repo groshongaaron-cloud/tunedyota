@@ -60,3 +60,34 @@ def check_quality(probe_fn, original, compressed, probes):
     return CheckResult("quality", "pass",
                        f"{len(probes) - len(inconclusive)} fact(s) preserved",
                        {"inconclusive": inconclusive})
+
+
+def check_reversibility(adapter, original, compressed):
+    if not compressed.reversible:
+        return CheckResult("reversibility", "skipped", "not a reversible payload")
+    restored = adapter.retrieve(compressed)
+    if restored == original:
+        return CheckResult("reversibility", "pass", "byte-exact roundtrip")
+    return CheckResult("reversibility", "fail",
+                       "retrieve() did not reconstruct the original")
+
+
+def check_health_version(adapter, pinned_version):
+    if not adapter.doctor():
+        return CheckResult("health", "fail", "doctor() reported unhealthy",
+                           {"version": adapter.version()})
+    v = adapter.version()
+    if pinned_version and v != pinned_version:
+        return CheckResult("health", "pass",
+                           f"version changed {pinned_version} -> {v}; re-verify",
+                           {"version": v, "changed": True})
+    return CheckResult("health", "pass", f"healthy @ {v}", {"version": v})
+
+
+def preflight_ok(adapter, probe_fn, item_text, one_probe, content_type):
+    """Fast subset for scripts: health + one quality probe. Returns bool."""
+    if not adapter.installed or not adapter.doctor():
+        return False
+    comp = adapter.compress(item_text, content_type)
+    r = check_quality(probe_fn, item_text, comp.text, [one_probe])
+    return r.status == "pass"

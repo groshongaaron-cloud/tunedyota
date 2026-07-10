@@ -54,5 +54,64 @@ class TestQuality(unittest.TestCase):
         self.assertEqual(r.status, "inconclusive")
 
 
+class _MockAdapter:
+    installed = True
+    def __init__(self, *, retrieves, version="1.0.0", healthy=True):
+        self._retrieves = retrieves      # what retrieve() returns
+        self._version = version
+        self._healthy = healthy
+    def retrieve(self, compressed):
+        return self._retrieves
+    def version(self):
+        return self._version
+    def doctor(self):
+        return self._healthy
+
+
+class TestReversibility(unittest.TestCase):
+    def test_exact_roundtrip_passes(self):
+        a = _MockAdapter(retrieves="ORIGINAL")
+        c = Compressed(text="cmp", handle=object(), reversible=True)
+        r = guard.check_reversibility(a, "ORIGINAL", c)
+        self.assertEqual(r.status, "pass")
+
+    def test_drift_fails(self):
+        a = _MockAdapter(retrieves="ORIGIN")   # lost a byte
+        c = Compressed(text="cmp", handle=object(), reversible=True)
+        r = guard.check_reversibility(a, "ORIGINAL", c)
+        self.assertEqual(r.status, "fail")
+
+    def test_non_reversible_skips(self):
+        a = _MockAdapter(retrieves="")
+        c = Compressed(text="cmp", reversible=False)
+        r = guard.check_reversibility(a, "ORIGINAL", c)
+        self.assertEqual(r.status, "skipped")
+
+
+class TestHealthVersion(unittest.TestCase):
+    def test_unhealthy_fails(self):
+        r = guard.check_health_version(_MockAdapter(retrieves="", healthy=False), "1.0.0")
+        self.assertEqual(r.status, "fail")
+
+    def test_same_version_passes(self):
+        r = guard.check_health_version(_MockAdapter(retrieves="", version="1.0.0"), "1.0.0")
+        self.assertEqual(r.status, "pass")
+
+    def test_version_change_flags_reverify(self):
+        r = guard.check_health_version(_MockAdapter(retrieves="", version="2.0.0"), "1.0.0")
+        self.assertEqual(r.status, "pass")
+        self.assertIn("changed", r.detail.lower())
+        self.assertEqual(r.data["version"], "2.0.0")
+
+
+class TestPreflight(unittest.TestCase):
+    def test_absent_adapter_returns_false(self):
+        from adapter import AbsentAdapter
+        ok = guard.preflight_ok(AbsentAdapter(), TestQuality.echo_probe,
+                                "vin 5TFDY5F17MX000123", {"q": "vin?", "expect": "5TFDY5F17MX000123"},
+                                "prose")
+        self.assertFalse(ok)
+
+
 if __name__ == "__main__":
     unittest.main()
