@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import sharp from "sharp";
 import * as SD from "./lib/seo-data.mjs";
+import { buildAmsoilPages } from "./build-amsoil-pages.mjs";
 
 const require = createRequire(import.meta.url);
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -122,6 +123,7 @@ function writeSitemap() {
 
 async function main() {
   await writeImages();
+  console.log(`amsoil pages: regenerated ${buildAmsoilPages()}`);
   for (const f of SD.HEAD_PAGES) processHead(f);
   fixBreadcrumbs();
   processEvents();

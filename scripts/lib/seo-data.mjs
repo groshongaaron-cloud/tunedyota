@@ -26,6 +26,9 @@ export const HEAD_PAGES = [
   "toyota-tundra-supercharger.html","toyota-tacoma-supercharger.html","toyota-4runner-supercharger.html",
   "toyota-fj-cruiser-supercharger.html","toyota-land-cruiser-supercharger.html","lexus-lx570-supercharger.html","toyota-sequoia-supercharger.html",
   "amsoil-garage.html",
+  "amsoil-toyota-tundra.html","amsoil-toyota-tacoma.html","amsoil-toyota-4runner.html","amsoil-toyota-sequoia.html",
+  "amsoil-toyota-land-cruiser.html","amsoil-toyota-fj-cruiser.html","amsoil-toyota-rav4.html","amsoil-toyota-highlander.html","amsoil-toyota-camry.html",
+  "amsoil-lexus-gx.html","amsoil-lexus-lx570.html","amsoil-lexus-rx350.html","amsoil-lexus-ls460.html",
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 

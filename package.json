@@ -7,6 +7,7 @@
     "test": "node --test",
     "test:smoke": "node --test tests/mcp-smoke.mjs",
     "build:seo": "node scripts/build-seo.mjs",
+    "build:amsoil": "node scripts/build-amsoil-pages.mjs",
     "ingest:dealers": "node scripts/ingest-dealers.js",
     "score:dealers": "node scripts/score-dealers.js",
     "build:signals": "node scripts/build-signals-sheet.js",
