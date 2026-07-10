@@ -1,0 +1,322 @@
+[
+{
+"event_id": "EV-0000",
+"city": "Sioux Falls",
+"date": "2026-08-01",
+"capacity": 12,
+"booked": 0,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0001",
+"city": "Twin Cities",
+"date": "2026-08-02",
+"capacity": 12,
+"booked": 1,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0002",
+"city": "Sheboygan",
+"date": "2026-08-03",
+"capacity": 12,
+"booked": 2,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0003",
+"city": "Sioux Falls",
+"date": "2026-08-04",
+"capacity": 12,
+"booked": 3,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0004",
+"city": "Twin Cities",
+"date": "2026-08-05",
+"capacity": 12,
+"booked": 4,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0005",
+"city": "Sheboygan",
+"date": "2026-08-06",
+"capacity": 12,
+"booked": 5,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0006",
+"city": "Sioux Falls",
+"date": "2026-08-07",
+"capacity": 12,
+"booked": 6,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0007",
+"city": "Twin Cities",
+"date": "2026-08-08",
+"capacity": 12,
+"booked": 7,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0008",
+"city": "Sheboygan",
+"date": "2026-08-09",
+"capacity": 12,
+"booked": 8,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0009",
+"city": "Sioux Falls",
+"date": "2026-08-10",
+"capacity": 12,
+"booked": 9,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0010",
+"city": "Twin Cities",
+"date": "2026-08-11",
+"capacity": 12,
+"booked": 10,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0011",
+"city": "Sheboygan",
+"date": "2026-08-12",
+"capacity": 12,
+"booked": 11,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0012",
+"city": "Sioux Falls",
+"date": "2026-08-13",
+"capacity": 12,
+"booked": 12,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0013",
+"city": "Twin Cities",
+"date": "2026-08-14",
+"capacity": 12,
+"booked": 0,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0014",
+"city": "Sheboygan",
+"date": "2026-08-15",
+"capacity": 12,
+"booked": 1,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0015",
+"city": "Sioux Falls",
+"date": "2026-08-16",
+"capacity": 12,
+"booked": 2,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0016",
+"city": "Twin Cities",
+"date": "2026-08-17",
+"capacity": 12,
+"booked": 3,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0017",
+"city": "Sheboygan",
+"date": "2026-08-18",
+"capacity": 12,
+"booked": 4,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0018",
+"city": "Sioux Falls",
+"date": "2026-08-19",
+"capacity": 12,
+"booked": 5,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0019",
+"city": "Twin Cities",
+"date": "2026-08-20",
+"capacity": 12,
+"booked": 6,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0020",
+"city": "Sheboygan",
+"date": "2026-08-21",
+"capacity": 12,
+"booked": 7,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0021",
+"city": "Sioux Falls",
+"date": "2026-08-22",
+"capacity": 12,
+"booked": 8,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0022",
+"city": "Twin Cities",
+"date": "2026-08-23",
+"capacity": 12,
+"booked": 9,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0023",
+"city": "Sheboygan",
+"date": "2026-08-24",
+"capacity": 12,
+"booked": 10,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0024",
+"city": "Sioux Falls",
+"date": "2026-08-25",
+"capacity": 12,
+"booked": 11,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0025",
+"city": "Twin Cities",
+"date": "2026-08-26",
+"capacity": 12,
+"booked": 12,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0026",
+"city": "Sheboygan",
+"date": "2026-08-27",
+"capacity": 12,
+"booked": 0,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0027",
+"city": "Sioux Falls",
+"date": "2026-08-28",
+"capacity": 12,
+"booked": 1,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0028",
+"city": "Twin Cities",
+"date": "2026-08-01",
+"capacity": 12,
+"booked": 2,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0029",
+"city": "Sheboygan",
+"date": "2026-08-02",
+"capacity": 12,
+"booked": 3,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0030",
+"city": "Sioux Falls",
+"date": "2026-08-03",
+"capacity": 12,
+"booked": 4,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0031",
+"city": "Twin Cities",
+"date": "2026-08-04",
+"capacity": 12,
+"booked": 5,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0032",
+"city": "Sheboygan",
+"date": "2026-08-05",
+"capacity": 12,
+"booked": 6,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0033",
+"city": "Sioux Falls",
+"date": "2026-08-06",
+"capacity": 12,
+"booked": 7,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0034",
+"city": "Twin Cities",
+"date": "2026-08-07",
+"capacity": 12,
+"booked": 8,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0035",
+"city": "Sheboygan",
+"date": "2026-08-08",
+"capacity": 12,
+"booked": 9,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0036",
+"city": "Sioux Falls",
+"date": "2026-08-09",
+"capacity": 12,
+"booked": 10,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0037",
+"city": "Twin Cities",
+"date": "2026-08-10",
+"capacity": 12,
+"booked": 11,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0038",
+"city": "Sheboygan",
+"date": "2026-08-11",
+"capacity": 12,
+"booked": 12,
+"status": "scheduled"
+},
+{
+"event_id": "EV-0039",
+"city": "Sioux Falls",
+"date": "2026-08-12",
+"capacity": 12,
+"booked": 0,
+"status": "scheduled"
+}
+]

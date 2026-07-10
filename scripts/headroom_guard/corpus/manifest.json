@@ -1,32 +1,20 @@
 {
   "items": [
     {
-      "file": "booking.json",
+      "file": "bookings.json",
       "type": "json",
-      "reversible": true,
+      "reversible": false,
       "probes": [
-        {"q": "What is the vehicle VIN?", "expect": "5TFDY5F17MX000123"},
-        {"q": "What is the total order price in US dollars?", "expect": "4200"},
-        {"q": "Which city is the install event in?", "expect": "Sioux Falls"},
-        {"q": "What is the vehicle model year?", "expect": "2024"}
+        {"q": "What is the VIN for booking_id BK-0000?", "expect": "5TFDY5F17MX000000"},
+        {"q": "Which booking_id has status NEEDS_REVIEW?", "expect": "BK-ERR-999"}
       ]
     },
     {
-      "file": "code_sample.py",
-      "type": "code",
+      "file": "events.json",
+      "type": "json",
       "reversible": false,
       "probes": [
-        {"q": "What is the name of the main function?", "expect": "resolve_calibration"},
-        {"q": "What does the function return when the tier is unknown?", "expect": "None"}
-      ]
-    },
-    {
-      "file": "prose_sample.txt",
-      "type": "prose",
-      "reversible": false,
-      "probes": [
-        {"q": "What supercharger brand is named?", "expect": "Magnuson"},
-        {"q": "How many horsepower gain is claimed?", "expect": "150"}
+        {"q": "What is the event_id of the first event?", "expect": "EV-0000"}
       ]
     }
   ]

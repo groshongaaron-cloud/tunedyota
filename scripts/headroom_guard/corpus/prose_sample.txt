@@ -1,5 +1,0 @@
-The Magnuson supercharger system for the Toyota Tundra is a positive-displacement
-roots-style blower that bolts to the factory engine. On a supported platform it
-delivers a claimed gain of roughly 150 horsepower at the crank while keeping the
-emissions equipment intact. Installation is handled at a scheduled event by a
-certified installer, and every build ships with a serialized certificate.
