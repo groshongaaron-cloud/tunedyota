@@ -20,3 +20,7 @@ assets-source/
 # (margin data). Local internal reference only; never served, never committed.
 data/magnuson-catalog.json
 app/www/
+
+# Python bytecode (last30days digest tooling)
+__pycache__/
+*.pyc
