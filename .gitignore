@@ -19,3 +19,4 @@ assets-source/
 # Confidential Magnuson price-file extract — carries dealer/jobber cost tiers
 # (margin data). Local internal reference only; never served, never committed.
 data/magnuson-catalog.json
+app/www/
