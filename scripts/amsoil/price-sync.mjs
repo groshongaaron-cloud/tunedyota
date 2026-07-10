@@ -28,42 +28,58 @@ async function notify(text) {
   } catch (e) { console.error("notify failed:", e.message); }
 }
 
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
+
+// Stability flags keep headless Chromium from crashing its network service on a
+// constrained/unattended host; the log flags keep it from spamming the task log.
+function launchBrowser() {
+  return chromium.launch({
+    headless: true,
+    args: ["--disable-dev-shm-usage", "--disable-gpu", "--disable-logging", "--log-level=3"],
+  });
+}
+
 async function main() {
   const cat = JSON.parse(fs.readFileSync(DATA, "utf8"));
   const applied = [], held = [];
 
-  // Use a fresh browser context per product to avoid Cloudflare session fingerprinting.
-  // A single shared page gets flagged after the first hit; fresh contexts reset the CF cookie.
-  const browser = await chromium.launch({ headless: true });
-  const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
+  // Fresh browser context per product to reset the Cloudflare cookie (a reused session
+  // gets fingerprinted + blocked). Each product is isolated in its own try/catch so one
+  // Chromium hiccup can't abort the whole run; the browser is relaunched if it dies.
+  let browser = await launchBrowser();
   try {
     for (const sku of Object.keys(cat.products)) {
       const p = cat.products[sku];
       if (!p.productPath) continue;
 
-      const ctx = await browser.newContext({ userAgent: UA, locale: "en-US" });
-      const page = await ctx.newPage();
-      let html, blocked;
       try {
-        ({ html, blocked } = await fetchProductHtml(page, BASE + p.productPath, 5000));
-      } finally {
-        await ctx.close();
-      }
+        if (!browser.isConnected()) browser = await launchBrowser();
+        const ctx = await browser.newContext({ userAgent: UA, locale: "en-US" });
+        let html, blocked;
+        try {
+          const page = await ctx.newPage();
+          ({ html, blocked } = await fetchProductHtml(page, BASE + p.productPath, 5000));
+        } finally {
+          await ctx.close().catch(() => {});
+        }
 
-      if (blocked) {
-        held.push(`${sku}: HELD — blocked/challenge (len<20k or 403)`);
-      } else {
-        const parsed = parsePrice(html);
-        const d = decide(p, parsed);
-        if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
-        else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
+        if (blocked) {
+          held.push(`${sku}: HELD — blocked/challenge (len<20k or 403)`);
+        } else {
+          const parsed = parsePrice(html);
+          const d = decide(p, parsed);
+          if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
+          else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
+        }
+      } catch (e) {
+        held.push(`${sku}: HELD — error ${String(e.message || e).split("\n")[0].slice(0, 120)}`);
       }
 
       // Polite delay between products to avoid rate-limiting
       await new Promise(r => setTimeout(r, 8000));
     }
   } finally {
-    await browser.close();
+    await browser.close().catch(() => {});
   }
 
   if (applied.length) {
