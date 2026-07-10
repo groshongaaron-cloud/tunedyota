@@ -113,5 +113,42 @@ class TestPreflight(unittest.TestCase):
         self.assertFalse(ok)
 
 
+import runner
+
+class _FakeAdapter:
+    installed = True
+    def __init__(self, version="1.0.0", healthy=True):
+        self._v = version
+        self._h = healthy
+    def compress(self, text, ctype):
+        from adapter import Compressed
+        half = text[: max(1, len(text) // 2)]
+        return Compressed(text=half, handle=None, reversible=False)
+    def version(self):
+        return self._v
+    def doctor(self):
+        return self._h
+
+class TestRunnerAbsent(unittest.TestCase):
+    def test_absent_run_is_skipped_and_green(self):
+        report = runner.run_all(probeless=True)   # Headroom absent -> detect() absent
+        self.assertEqual(report["status"], "skipped")
+        self.assertEqual(runner.exit_code(report), 0)
+
+class TestRunnerEscalation(unittest.TestCase):
+    def test_blind_probe_escalates_to_fail(self):
+        blind = lambda q, ctx: "unknown"          # never finds any fact
+        report = runner.run_all(adapter=_FakeAdapter(), probe_fn=blind)
+        self.assertTrue(report["probe_blind"])
+        self.assertEqual(report["status"], "fail")
+        self.assertEqual(runner.exit_code(report), 1)
+
+    def test_probeless_does_not_fail_on_quality(self):
+        report = runner.run_all(probeless=True, adapter=_FakeAdapter())
+        self.assertFalse(report["probe_blind"])
+        self.assertEqual(report["status"], "pass")
+        self.assertEqual(runner.exit_code(report), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
