@@ -150,5 +150,28 @@ class TestRunnerEscalation(unittest.TestCase):
         self.assertEqual(runner.exit_code(report), 0)
 
 
+class TestStatePath(unittest.TestCase):
+    def test_env_override_is_honored(self):
+        import os
+        prev = os.environ.get("HEADROOM_GUARD_STATE")
+        os.environ["HEADROOM_GUARD_STATE"] = r"C:\some\custom\state.json"
+        try:
+            self.assertEqual(str(runner._state_path()), r"C:\some\custom\state.json")
+        finally:
+            if prev is None:
+                os.environ.pop("HEADROOM_GUARD_STATE", None)
+            else:
+                os.environ["HEADROOM_GUARD_STATE"] = prev
+
+    def test_default_state_path_when_no_override(self):
+        import os
+        prev = os.environ.pop("HEADROOM_GUARD_STATE", None)
+        try:
+            self.assertTrue(str(runner._state_path()).endswith("state.json"))
+        finally:
+            if prev is not None:
+                os.environ["HEADROOM_GUARD_STATE"] = prev
+
+
 if __name__ == "__main__":
     unittest.main()

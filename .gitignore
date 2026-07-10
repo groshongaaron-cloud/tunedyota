@@ -27,3 +27,6 @@ app/www/
 # Python bytecode (last30days digest tooling)
 __pycache__/
 *.pyc
+
+# Headroom Guardian runtime state (version pin)
+scripts/headroom_guard/state.json

@@ -16,17 +16,24 @@ from adapter import detect
 
 HERE = Path(__file__).resolve().parent
 CORPUS = HERE / config.CORPUS_DIRNAME
-STATE = HERE / config.STATE_FILENAME
+
+
+def _state_path():
+    """State lives next to the package by default, or at HEADROOM_GUARD_STATE
+    (used by the scheduled launcher so the version-pin survives ephemeral runs)."""
+    override = os.environ.get("HEADROOM_GUARD_STATE")
+    return Path(override) if override else (HERE / config.STATE_FILENAME)
 
 
 def _load_state():
-    if STATE.exists():
-        return json.loads(STATE.read_text(encoding="utf-8"))
+    p = _state_path()
+    if p.exists():
+        return json.loads(p.read_text(encoding="utf-8"))
     return {"pinned_version": ""}
 
 
 def _save_state(version):
-    STATE.write_text(json.dumps({"pinned_version": version}, indent=2), encoding="utf-8")
+    _state_path().write_text(json.dumps({"pinned_version": version}, indent=2), encoding="utf-8")
 
 
 def _probe_fn():
