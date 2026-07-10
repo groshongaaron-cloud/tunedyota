@@ -7,6 +7,27 @@ Branch: `amsoil-fluid-data`
 
 ---
 
+## How to verify a platform (one command)
+
+Flipping a platform to `verified: true` publishes its capacities + severe-service intervals to
+both the AMSOIL Garage picker and the per-vehicle SEO page. Use the helper — review first, correct
+any capacity, then confirm:
+
+```
+node scripts/amsoil/verify-platform.mjs list                    # what's live vs draft
+node scripts/amsoil/verify-platform.mjs review "Toyota Tundra"  # see the draft specs to check
+node scripts/amsoil/verify-platform.mjs set-cap "Toyota Tundra" "2007-2021" "Engine Oil" 7.9   # fix a number
+node scripts/amsoil/verify-platform.mjs confirm "Toyota Tundra" --build   # go live (regenerates pages)
+```
+
+`confirm` takes an optional `--year "<year>"` to verify a single generation, and `--build` to
+regenerate the pages immediately. After confirming: `npm test`, then commit `site/amsoil-garage.json`
++ the regenerated `site/amsoil-*.html` and push master. Revert with `unverify`. Until a platform is
+confirmed, its product/viscosity/filter recommendations still show — only the capacities/intervals
+are withheld. Logic lives in `scripts/amsoil/lib/verify.mjs` (tested by `tests/amsoil-verify.test.js`).
+
+---
+
 ## AMSOIL Guide Data — Source & Coverage
 
 **Source:** AMSOIL official Auto & Light Truck fitment API (`https://api-1.amsoil.com/api/`) queried 2026-07-10 via the `Fitment/GetRecommendations` endpoint. This is the same data engine that powers the AMSOIL vehicle lookup at amsoil.com/lookup/auto-and-light-truck/. Values here are **authoritative for product family, viscosity, and product code**. They represent AMSOIL's official recommendation for each vehicle.
