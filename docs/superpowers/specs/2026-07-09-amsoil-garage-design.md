@@ -187,3 +187,22 @@ Unit tests in the existing `tests/` harness:
 - Decide the agent's host: local Windows Task Scheduler (like the search-visibility engine) vs a
   Netlify scheduled function. Both are viable; pick during planning.
 - Product bottle imagery: source authentic AMSOIL product images permitted for dealer use.
+
+### 5.1 BLOCKER discovered during implementation (2026-07-10): AMSOIL is behind Cloudflare
+
+The Task 7 price-sync runner is built, tested, and handles failures gracefully — but a live smoke
+test proved **amsoil.com sits behind Cloudflare bot-management**: any server-side `fetch` (any
+User-Agent) receives a **403 challenge page**, not product HTML. The parser is structurally fine; the
+scrape approach itself is blocked. The automated retail-price monitoring the owner requested needs a
+different data source. Options (owner decision required):
+- **(a) AMSOIL dealer data feed / API** — ask the AMSOIL dealer rep whether the ZO/dealer account
+  exposes a price feed. Most robust + durable if it exists. *Recommended to pursue first.*
+- **(b) Local headless browser** (Puppeteer/Playwright) with cookie/challenge solving, run on the
+  same Task Scheduler host. Works but heavier + more fragile.
+- **(c) Manual price maintenance** — owner edits the catalog periodically; the agent only *flags*
+  staleness (via `priceVerifiedAt`) rather than scraping.
+- **(d) Don't display price on our side** — "Order ▸" only, price shows on amsoil.com at checkout
+  (zero staleness/scrape risk; weaker conversion). This reverses the earlier "Option A" pricing call.
+
+Until this is resolved, the catalog carries owner-verified prices (via Task 8) and the Garage is fully
+functional for ordering; only the *automated* refresh is pending.
