@@ -43,23 +43,31 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { processNotifications } = require("../netlify/functions/book-background.js");
 
-// A booking job should fire a push to the assigned installer (non-blocking).
-test("a completed booking notification pushes the installer", async () => {
+// A booking job (job.inst/market/event/d — NOT job.kind "priority") fires a push
+// to the assigned installer after the installer email. Real email templates run
+// but `send` is mocked so nothing is actually sent.
+const bookingJob = () => ({
+  inst: { key: "aaron", name: "Aaron", email: "a@x.com", phone: "555" },
+  market: { city: "Fargo", state: "ND" },
+  event: { dateISO: "2026-07-11", slot: "9:00" },
+  d: { name: "Jo", email: "j@x.com", vehicle: "Tundra", slot: "9:00" },
+  recordId: "rec1", stamp: "s1",
+});
+
+test("a new booking pushes the assigned installer", async () => {
   const pushes = [];
-  const job = { mode: "book", d: { name: "Jo", city: "Fargo", email: "j@x.com" }, recordId: "rec1" };
-  await processNotifications(job, {
+  await processNotifications(bookingJob(), {
     env: {}, send: async () => ({}), notify: async () => ({}), update: async () => ({}),
     ping: async () => ({}), log: { error() {}, log() {} },
     push: async (key, msg) => { pushes.push({ key, msg }); return { sent: 1, failed: 0 }; },
   });
   assert.equal(pushes.length, 1);
-  assert.match(pushes[0].msg.title, /booking/i);
+  assert.equal(pushes[0].key, "aaron");
   assert.match(pushes[0].msg.body, /Jo/);
 });
 
 test("a push failure never breaks the notification flow", async () => {
-  const job = { mode: "book", d: { name: "Jo", city: "Fargo" }, recordId: "rec1" };
-  const out = await processNotifications(job, {
+  const out = await processNotifications(bookingJob(), {
     env: {}, send: async () => ({}), notify: async () => ({}), update: async () => ({}),
     ping: async () => ({}), log: { error() {}, log() {} },
     push: async () => { throw new Error("fcm down"); },
@@ -88,11 +96,11 @@ const { sendPush } = require("./lib/push.js");
 3c. Immediately AFTER the booking installer-email block (the `try { ... buildBookingInstallerEmail ... }` at ~line 60), add — using the installer object already in scope (`inst`) and its key:
 ```js
     try {
-      const instKey = Array.isArray(inst && inst.key) ? inst.key[0] : (inst && inst.key);
-      if (instKey) await push(instKey, { title: "New booking", body: `${d.name || "A customer"} — ${city || d.city || ""}`, data: { recordId: job.recordId || "" } });
+      if (inst && inst.key) await push(inst.key, { title: "New booking", body: `${d.name || "A customer"} — ${market.city}`, data: { recordId: job.recordId || "" } });
     } catch (e) { if (log.error) log.error("booking push", e.message); }
 ```
-*(If `inst` has no `.key` in this codebase, use whatever installer-key variable is in scope at that point — confirm by reading the surrounding code; the roster/close-out functions use `keyToInstaller(...).key`.)*
+*(Confirmed: in `processNotifications`, `inst = job.inst` carries `.key`/`.name`/`.email` and
+`market = job.market` carries `.city` — both already used by the surrounding email code.)*
 
 - [ ] **Step 4: Run tests**
 
