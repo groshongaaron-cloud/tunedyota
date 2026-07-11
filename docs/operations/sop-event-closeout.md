@@ -27,13 +27,19 @@ For each customer, after the calibration is written and road-verified:
 2. Choose the **OTT Calibration** that was actually flashed:
    **Light · Mild · Medium · Spicy · SS**, or an adjacent combo
    (**Light and Mild · Mild and Medium · Medium and Spicy · Spicy and SS**).
-3. Tap **Mark complete**.
+3. Enter the **OTT commission fields** for the monthly report (SOP 9):
+   **Tuning Platform, Calibration Type, ECU ID, Gear Size, Mileage**. These are stored on the
+   booking for OTT reporting only — they never appear on the customer certificate.
+4. Tap **Mark complete**.
 
 What happens automatically (`installer-closeout.js`):
-- The booking is set `Status: Completed`, with `OTT Calibration`, `Calibration Date` (today), and **VIN**.
+- The booking is set `Status: Completed`, with `OTT Calibration`, **VIN**, the OTT commission fields,
+  and `Calibration Date` = **the event day** (the booking's `Event Date`, not the day you close out),
+  so a late close-out still reports under the correct OTT month.
 - The **Certificate of Calibration** is generated and **emailed to you immediately** (CC `info@`)
   as `certificate.html`, pre-filled with the customer, vehicle, VIN, calibration, your name/region,
-  and a unique serial (`TY-<year>-<id>`).
+  and a unique serial (`TY-<year>-<id>`). The vehicle line shows the customer's **exact model year**
+  (captured at booking), and "Date Calibrated" is the event day.
 - Ownership is re-checked server-side — you can only close out **your own** bookings.
 
 > **VIN accuracy matters.** It appears on the customer's certificate and is reported to OTT.

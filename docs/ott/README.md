@@ -24,13 +24,22 @@ Calibration Type · Commission`
 - **Vehicle Type** (12): 4Runner, Camry, FJ Cruiser, GX460, GX470, Highlander, Land Cruiser, LX470, LX570, Sequoia, Tacoma, Tundra
 - **Tuning Platform**: VFT, HPT, PCM, BB
 - **Calibration Type**: Basic, MAF, Basic + MAF, Supercharger, CARB Update, 9.2 New, 9.2 Update, TCM Update, Custom, K-Line
-- **Commission**: `$` owed to OTT — resolved by `lib/ott-commission.js` from the price sheet; the owner confirms each on the monthly draft.
+- **Commission**: `$` owed to OTT — auto-resolved by `lib/ott-commission.js` from the price sheet.
+  The owner reviews and edits each on the **review console** (`ott-report-review.js`); a saved value
+  is stored as the booking's **`Commission Override`** (Number) and wins over the auto amount in the
+  workbook, the send, and the monthly draft. Rows the sheet can't map (owner-confirmed cal types,
+  superchargers, bench BB) start blank for the owner to enter.
+- **Vehicle Year**: the **exact model year** captured at booking (`Model Year`), not the platform
+  range's start; legacy rows without it fall back to the range-start from the vehicle text.
+- **Date Calibration Applied**: the **event day** (`Calibration Date` = the booking's `Event Date`),
+  so a late close-out reports under the correct month.
 
 **OTT-facing → Tuned Yota customer brand rules do NOT apply here** (Stage 0–3 / MAF terminology is
 mandatory as OTT writes it). COBB / Accessport rows are excluded (Tuned Yota doesn't sell COBB).
 
 ## Data capture (installer close-out)
 
-Derived from the booking's vehicle text: Vehicle Type, Vehicle Year, Engine Size.
-Installer-entered at close-out (Airtable Bookings, not on the customer certificate):
-**Tuning Platform, Calibration Type, ECU ID, Gear Size, Mileage** (+ VIN, already captured).
+Derived from the booking's vehicle text: Vehicle Type, Engine Size (and Vehicle Year when no exact
+`Model Year` was captured). Installer-entered at close-out (Airtable Bookings, not on the customer
+certificate): **Tuning Platform, Calibration Type, ECU ID, Gear Size, Mileage** (+ VIN, already
+captured). The owner's **`Commission Override`** is set later on the review console.

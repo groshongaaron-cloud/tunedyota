@@ -62,6 +62,7 @@ Calibration"; emissions-intact positioning) — grep before shipping copy.
 | Booking flow | `/find-your-exact-tune` | Public |
 | Staff intake (walk-in/phone/DM) | `/intake.html` | Passcode (`INTAKE_SECRET`) |
 | Installer console | `/installer.html` | Per-installer passcode (`INSTALLER_TOKENS`) |
+| OTT Commission Report console | `/.netlify/functions/ott-report-review?token=` | Owner (token `OTT_APPROVE_SECRET`) |
 | Slot availability API | `/.netlify/functions/availability?city=` | Public |
 | Airtable | Bookings · Priority List · Funnel Events | Owner |
 | Alerts | Slack (via `/notify` relay) | Owner |
