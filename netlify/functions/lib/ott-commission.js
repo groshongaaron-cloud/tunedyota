@@ -132,4 +132,21 @@ function lookupCommission({ vehicleType: vt, year, engine, tuningPlatform, calib
   return { commission: null, confidence: amounts.length ? "ambiguous" : "none", candidates };
 }
 
-module.exports = { deriveVehicle, vehicleType, vehicleYear, engineSize, lookupCommission };
+// Selectable commission tiers for a vehicle, most-likely (default) first. 4th Gen
+// Tacoma (2024+, 2.4T/2.4TH, VFT — we don't do COBB) defaults to Stage 1 and lets
+// the owner pick the customs. Amounts from the 4th Gen Tacoma price-sheet tab.
+// Empty array → no tier picker (commission comes from the normal lookup/override).
+function commissionCandidates({ vehicleType, engine, year, tuningPlatform } = {}) {
+  const y = Number(year), eng = engineSize(engine);
+  const tp = String(tuningPlatform == null ? "VFT" : tuningPlatform).toUpperCase();
+  if (vehicleType === "Tacoma" && (eng === "2.4T" || eng === "2.4TH") && y >= 2024 && tp !== "COBB") {
+    return [
+      { label: "Stage 1", amount: 160 },
+      { label: "Stage 1 Custom", amount: 250 },
+      { label: "Stage 3 Custom", amount: 350 },
+    ];
+  }
+  return [];
+}
+
+module.exports = { deriveVehicle, vehicleType, vehicleYear, engineSize, lookupCommission, commissionCandidates };

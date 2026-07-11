@@ -69,7 +69,7 @@ function page(title, body) {
     `.obf input,.wkf input{width:110px}.wkf input.wide{width:170px}` +
     `.tblwrap{overflow-x:auto}input.ecu{width:78px;text-transform:uppercase;padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit}` +
     `input.gear{width:56px;padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit}` +
-    `input.auto{color:#7c8472;font-style:italic;background:#f7f5f1}select.ecu-pick,select.gear-pick{margin-left:3px;padding:5px 2px;border:1px solid #cbc4ba;border-radius:5px;font-size:12px}</style>` +
+    `input.auto{color:#7c8472;font-style:italic;background:#f7f5f1}select.ecu-pick,select.gear-pick,select.comm-pick{margin-left:3px;padding:5px 2px;border:1px solid #cbc4ba;border-radius:5px;font-size:12px}</style>` +
     `<body><h1>${esc(title)}</h1>${body}</body>`;
 }
 
@@ -94,11 +94,14 @@ function completedSection(subRows, month, env) {
     }
     const gearCell = `<input class="gear${r._gearAuto ? " auto" : ""}" data-rec="${rec}" value="${esc(r.gearSize || "")}">`
       + `<select class="gear-pick" data-rec="${rec}"><option value="">↕</option>` + GEAR_OPTIONS.map((g) => `<option>${g}</option>`).join("") + `</select>`;
+    let commCell = `<input class="comm${need ? " need" : ""}" type="number" min="0" step="1" inputmode="numeric" data-rec="${rec}" value="${val}">${flag}`;
+    if (r._commCandidates && r._commCandidates.length) {
+      commCell += `<select class="comm-pick" data-rec="${rec}"><option value="">↕</option>`
+        + r._commCandidates.map((c) => `<option value="${c.amount}">${esc(c.label)} · $${c.amount}</option>`).join("") + `</select>`;
+    }
     h += `<tr><td>${esc(r.dateCalibrationApplied)}</td><td>${esc(r.customer)}</td><td>${esc(r.vin || "—")}</td>`
       + `<td>${esc(veh)}</td><td>${esc(r.tuningPlatform || "—")}</td><td>${esc(r.calibrationType || "—")}</td>`
-      + `<td>${ecuCell}</td><td>${gearCell}</td>`
-      + `<td><input class="comm${need ? " need" : ""}" type="number" min="0" step="1" inputmode="numeric" `
-      + `data-rec="${rec}" value="${val}">${flag}</td></tr>`;
+      + `<td>${ecuCell}</td><td>${gearCell}</td><td>${commCell}</td></tr>`;
   }
   h += `</table></div>`;
   h += `<div style="margin:22px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center">`
@@ -178,6 +181,9 @@ function consoleScript(env, month) {
   }); });
   document.querySelectorAll('select.gear-pick').forEach(function(s){ s.addEventListener('change',function(){
     var gi=document.querySelector('input.gear[data-rec="'+s.dataset.rec+'"]'); if(gi && s.value){ gi.value=s.value; gi.classList.remove('auto'); }
+  }); });
+  document.querySelectorAll('select.comm-pick').forEach(function(s){ s.addEventListener('change',function(){
+    var ci=document.querySelector('input.comm[data-rec="'+s.dataset.rec+'"]'); if(ci && s.value){ ci.value=s.value; ci.classList.remove('need'); }
   }); });
   var save=document.getElementById('save');
   if(save) save.addEventListener('click',function(){

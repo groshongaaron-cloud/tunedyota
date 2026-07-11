@@ -17,6 +17,16 @@ test("vehicleType matches Policy 0012 picklist incl. the space in 'RAV 4', ES350
   assert.equal(vehicleType("2020 Toyota Land Cruiser 5.7L"), "Land Cruiser");
 });
 
+test("commissionCandidates: 4th Gen Tacoma offers Stage 1 (default) / Stage 1 Custom / Stage 3 Custom", () => {
+  const { commissionCandidates } = require("../netlify/functions/lib/ott-commission.js");
+  const c = commissionCandidates({ vehicleType: "Tacoma", engine: "2.4T", year: 2024, tuningPlatform: "VFT" });
+  assert.deepEqual(c.map((x) => [x.label, x.amount]), [["Stage 1", 160], ["Stage 1 Custom", 250], ["Stage 3 Custom", 350]]);
+  assert.equal(c[0].amount, 160, "Stage 1 is the default");
+  assert.deepEqual(commissionCandidates({ vehicleType: "Tacoma", engine: "2.4TH", year: 2025, tuningPlatform: "VFT" }).length, 3);   // hybrid too
+  assert.deepEqual(commissionCandidates({ vehicleType: "Tacoma", engine: "3.5", year: 2021 }), []);   // not 4th gen
+  assert.deepEqual(commissionCandidates({ vehicleType: "Tundra", engine: "5.7", year: 2020 }), []);
+});
+
 test("engine round-trips: the DERIVED 2.4T engine resolves the 4th Gen Tacoma commission (regression)", () => {
   // deriveVehicle emits "2.4T"; feeding that straight back to lookupCommission must
   // still match the price sheet (it silently returned nothing before the idempotency fix).

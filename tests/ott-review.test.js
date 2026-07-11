@@ -84,6 +84,18 @@ test("the completed row shows an ECU dropdown for a 3rd Gen Tacoma 3.5L and a ge
     });
 });
 
+test("a 4th Gen Tacoma row shows the commission tier dropdown, defaulting to Stage 1 ($160)", () => {
+  const t4 = { id: "recT4", Name: "Val", Vehicle: "2024 Toyota Tacoma 2.4L-T I4", "Model Year": "2024",
+    "OTT Calibration": "", "Calibration Type": "Basic", "Calibration Date": "2026-06-27", Installer: ["noah"], Status: "Completed", "Tuning Platform": "VFT" };
+  return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([t4]) })
+    .then((r) => {
+      assert.equal(r.subRows[0].commission, 160, "defaults to Stage 1");
+      const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
+      assert.ok(html.includes('class="comm-pick"'), "commission tier dropdown present");
+      assert.ok(html.includes("Stage 1 Custom · $250") && html.includes("Stage 3 Custom · $350"), "custom tiers offered");
+    });
+});
+
 test("POST reports a not-yet-added column so the owner can create it", async () => {
   const out = await saveOverrides({ month: "2026-06", token: "sec", overrides: { recA: 275 } },
     { env, log: { error() {} }, update: async () => { throw new Error(`Unknown field name: "${OVERRIDE_FIELD}"`); } });

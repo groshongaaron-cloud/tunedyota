@@ -4,7 +4,7 @@
 // No I/O. Commission is resolved by lib/ott-commission.js; the owner confirms
 // every amount on the draft (rule #1), so an unresolved amount is left blank +
 // flagged rather than guessed. Format: docs/ott/README.md.
-const { deriveVehicle, lookupCommission } = require("./ott-commission.js");
+const { deriveVehicle, lookupCommission, commissionCandidates } = require("./ott-commission.js");
 const { buildXlsx } = require("./xlsx-writer.js");
 const { INSTALLERS } = require("./routing.js");
 const { ecuCandidates, defaultGear, is3rdGenTacoma35 } = require("./ecu-ids.js");
@@ -95,7 +95,10 @@ function buildSubmissionRows(bookings, month, opts = {}) {
     // Accessport-only row). A blank/non-numeric override falls back to the lookup.
     const ov = b["Commission Override"];
     const overridden = typeof ov === "number" || (typeof ov === "string" && ov.trim() !== "" && !isNaN(Number(ov)));
-    const commission = overridden ? Number(ov) : look.commission;
+    // Selectable commission tiers (4th Gen Tacoma: Stage 1 / Stage 1 Custom / Stage
+    // 3 Custom). When present, the default is the first tier (Stage 1).
+    const commCands = commissionCandidates({ vehicleType: dv.vehicleType, engine: dv.engine, year, tuningPlatform });
+    const commission = overridden ? Number(ov) : (commCands.length ? commCands[0].amount : look.commission);
     // ECU ID: prefer what the installer entered; otherwise auto-fill the most-likely
     // candidate for the model+year (Auto). Gear Size: prefer entered; else the owner
     // default rule. Both are editable/overridable on the console.
@@ -113,7 +116,7 @@ function buildSubmissionRows(bookings, month, opts = {}) {
       mileage: (b.Mileage === 0 || b.Mileage) ? Number(b.Mileage) : "",
       tuningPlatform, calibrationType, commission, notes: String(b.Notes || "").trim(),
       _confidence: look.confidence, _candidates: look.candidates, _tier: tier,
-      _autoCommission: look.commission, _overridden: overridden,
+      _autoCommission: look.commission, _overridden: overridden, _commCandidates: commCands,
       _ecuCandidates: ecuCands, _ecuAuto: !storedEcu && !!ecuId,
       _gearAuto: !storedGear, _is3gt: is3rdGenTacoma35(veh),   // section = 3.5L only
     });
