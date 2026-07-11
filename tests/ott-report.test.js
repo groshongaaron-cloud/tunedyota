@@ -85,6 +85,40 @@ test("a blank/non-numeric Commission Override falls back to the lookup, and an o
   assert.equal(fixed._overridden, true);
 });
 
+test("auto-fills ECU ID + Gear for a 3rd Gen Tacoma when not entered; keeps stored values", () => {
+  // no ECU / no gear entered → auto-fill most-likely ECU (Auto) + gear 3.90
+  const [a] = buildSubmissionRows([{ id: "r1", ...bookingFields({
+    Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2022", "ECU ID": "", "Gear Size": "" }) }], JUNE, {});
+  assert.equal(a.ecuId, "04C22"); assert.equal(a._ecuAuto, true);
+  assert.equal(a.gearSize, "3.90"); assert.equal(a._is3gt, true);
+  assert.equal(a._ecuCandidates.length, 2);
+  // stored values win
+  const [b] = buildSubmissionRows([{ id: "r2", ...bookingFields({
+    Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2022", "ECU ID": "04C31", "Gear Size": "4.30" }) }], JUNE, {});
+  assert.equal(b.ecuId, "04C31"); assert.equal(b._ecuAuto, false); assert.equal(b.gearSize, "4.30");
+  // non-Tacoma defaults gear to 4.30, no ECU auto-fill
+  const [c] = buildSubmissionRows([{ id: "r3", ...bookingFields({ Vehicle: "2015 Toyota Tundra 5.7L V8", "ECU ID": "", "Gear Size": "" }) }], JUNE, {});
+  assert.equal(c.gearSize, "4.30"); assert.equal(c.ecuId, ""); assert.equal(c._is3gt, false);
+});
+
+test("a completed row with a Calibration Type but no customer tier is still reportable", () => {
+  const rows = buildSubmissionRows([{ id: "r1", ...bookingFields({ "OTT Calibration": "", "Calibration Type": "9.2 New" }) }], JUNE, {});
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].calibrationType, "9.2 New");
+  // neither tier nor cal type → excluded
+  assert.equal(buildSubmissionRows([{ id: "r2", ...bookingFields({ "OTT Calibration": "", "Calibration Type": "" }) }], JUNE, {}).length, 0);
+});
+
+test("renderOttXlsx sections 3rd Gen Tacomas first, 2 blank rows, then others", () => {
+  const rows = buildSubmissionRows([
+    { id: "o1", ...bookingFields({ Name: "Otto Other", Vehicle: "2015 Toyota Tundra 5.7L V8", "Calibration Date": "2026-06-10" }) },
+    { id: "t1", ...bookingFields({ Name: "Tara Taco", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2022", "Calibration Type": "9.2 New", "Calibration Date": "2026-06-20" }) },
+  ], JUNE, {});
+  const buf = renderOttXlsx(rows);
+  const s = buf.toString("latin1");
+  assert.ok(s.indexOf("Tara Taco") < s.indexOf("Otto Other"), "3rd Gen Tacoma section comes before others");
+});
+
 test("buildOpenBookings lists only overdue, not-completed bookings (the chase list)", () => {
   const NOW = new Date("2026-07-10T12:00:00Z");
   const rows = buildOpenBookings([

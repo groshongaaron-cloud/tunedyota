@@ -7,6 +7,7 @@
 const { deriveVehicle, lookupCommission } = require("./ott-commission.js");
 const { buildXlsx } = require("./xlsx-writer.js");
 const { INSTALLERS } = require("./routing.js");
+const { ecuCandidates, defaultGear, is3rdGenTacoma } = require("./ecu-ids.js");
 
 // OTT requires the retailer tagged per installer: "Tuned Yota - <first name>"
 // (Aaron / Cody / Noah), derived from the booking's Installer. Unknown/blank
@@ -71,7 +72,11 @@ function buildSubmissionRows(bookings, month, opts = {}) {
   for (const b of bookings || []) {
     if (String(b.Status || "").trim().toLowerCase() !== "completed") continue;
     const tier = String(b["OTT Calibration"] || "").trim();
-    if (!tier) continue;
+    const calibrationType = String(b["Calibration Type"] || "").trim();
+    // A completed calibration is reportable once it carries EITHER the customer
+    // tier (from the funnel close-out) OR the OTT Calibration Type (from a direct/
+    // reconciled entry). Both empty → not yet closed out, skip.
+    if (!tier && !calibrationType) continue;
     const calDate = b["Calibration Date"] || "";
     if (monthOf(calDate) !== month.key) continue;
     const dv = deriveVehicle(b.Vehicle);
@@ -84,7 +89,6 @@ function buildSubmissionRows(bookings, month, opts = {}) {
       ? +String(b["Model Year"]).trim() : null;
     const year = capturedYear || dv.year;
     const tuningPlatform = String(b["Tuning Platform"] || "").trim().toUpperCase();
-    const calibrationType = String(b["Calibration Type"] || "").trim();
     const look = lookupCommission({ vehicleType: dv.vehicleType, year, engine: dv.engine, tuningPlatform, calibrationType });
     // The owner's manual Commission Override (saved from the review page) always
     // wins over the auto-resolved amount — including a legitimate $0 (e.g. a COBB
@@ -92,15 +96,26 @@ function buildSubmissionRows(bookings, month, opts = {}) {
     const ov = b["Commission Override"];
     const overridden = typeof ov === "number" || (typeof ov === "string" && ov.trim() !== "" && !isNaN(Number(ov)));
     const commission = overridden ? Number(ov) : look.commission;
+    // ECU ID: prefer what the installer entered; otherwise auto-fill the most-likely
+    // candidate for the model+year (Auto). Gear Size: prefer entered; else the owner
+    // default rule. Both are editable/overridable on the console.
+    const veh = { vehicleType: dv.vehicleType, engine: dv.engine, year };
+    const storedEcu = String(b["ECU ID"] || "").trim().toUpperCase();
+    const ecuCands = ecuCandidates(veh);
+    const ecuId = storedEcu || (ecuCands[0] ? ecuCands[0].id : "");
+    const storedGear = fmtGear(b["Gear Size"]);
+    const gearSize = storedGear || defaultGear(veh);
     out.push({
       recordId: b.id || "", dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailerFor(b, retailer),
       customer: b.Name || "", vin: String(b.VIN || "").toUpperCase(),
       vehicleYear: year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
-      ecuId: String(b["ECU ID"] || "").toUpperCase(), gearSize: fmtGear(b["Gear Size"]),
+      ecuId, gearSize,
       mileage: (b.Mileage === 0 || b.Mileage) ? Number(b.Mileage) : "",
       tuningPlatform, calibrationType, commission, notes: String(b.Notes || "").trim(),
       _confidence: look.confidence, _candidates: look.candidates, _tier: tier,
       _autoCommission: look.commission, _overridden: overridden,
+      _ecuCandidates: ecuCands, _ecuAuto: !storedEcu && !!ecuId,
+      _gearAuto: !storedGear, _is3gt: is3rdGenTacoma(veh),
     });
   }
   out.sort((a, b) => String(a.dateCalibrationApplied).localeCompare(String(b.dateCalibrationApplied)) || String(a.customer).localeCompare(String(b.customer)));
@@ -142,13 +157,19 @@ function rowToArray(r) {
     r.vehicleYear, r.vehicleType, r.engineSize, r.ecuId, r.gearSize, r.mileage,
     r.tuningPlatform, r.calibrationType, fmtCommission(r.commission), r.notes || ""];
 }
-// Filled .xlsx in OTT's exact 15-column order (Policy 0012). Returns a Buffer.
-// Policy 0012 permits "no colors, formulas, or additional formatting" and warns
-// any deviation breaks reporting — so the submitted file is a CLEAN data table
-// with NO grand-total row. The owner sees the running commission total on the
-// review console instead.
+// Filled .xlsx in OTT's exact 15-column order (Policy 0012). Two sections, each
+// ordered by Date Calibration Applied: (1) 3rd Gen Tacomas, then TWO blank spacer
+// rows, then (2) all other vehicles. No colors/formulas/totals.
+const byCalDate = (a, b) => String(a.dateCalibrationApplied).localeCompare(String(b.dateCalibrationApplied)) || String(a.customer).localeCompare(String(b.customer));
 function renderOttXlsx(subRows) {
-  return buildXlsx("OTT Commissions", [SUBMISSION_HEADERS, ...subRows.map(rowToArray)]);
+  const tacomas = subRows.filter((r) => r._is3gt).slice().sort(byCalDate);
+  const others = subRows.filter((r) => !r._is3gt).slice().sort(byCalDate);
+  const rows = [SUBMISSION_HEADERS, ...tacomas.map(rowToArray)];
+  if (tacomas.length && others.length) {
+    rows.push(new Array(SUBMISSION_HEADERS.length).fill(""), new Array(SUBMISSION_HEADERS.length).fill(""));
+  }
+  rows.push(...others.map(rowToArray));
+  return buildXlsx("OTT Commissions", rows);
 }
 
 function totalCommission(subRows) { return subRows.reduce((s, r) => s + (typeof r.commission === "number" ? r.commission : 0), 0); }
