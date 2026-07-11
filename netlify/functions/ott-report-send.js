@@ -31,7 +31,7 @@ async function approveAndSend(params, deps) {
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to, cc: OWNER, replyTo: OWNER,
       subject: `Tuned Yota — OTT Commission Submission (${month.label})`,
       html: renderOttEmailHtml(subRows, month),
-      text: `${subRows.length} completed calibration(s) for ${month.label}, commission total $${total}. Full submission attached (.xlsx) in OTT's 14-column format.`,
+      text: `${subRows.length} completed calibration(s) for ${month.label}, commission total $${total}. Full submission attached (.xlsx) in OTT's 15-column format.`,
       attachments: [{ filename: `ott-commissions-${month.key}.xlsx`, content: Buffer.from(xlsx).toString("base64") }] });
   } catch (e) {
     if (log.error) log.error("ott send", e.message);

@@ -213,7 +213,7 @@ function renderOwnerDraftHtml(subRows, month, approveUrl) {
   let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:820px">`;
   html += `<h1 style="color:#3A2E26">OTT Commission Submission — DRAFT for your approval</h1>`;
   html += `<p style="color:#7c8472">${esc(month.label)} · ${subRows.length} calibration${subRows.length === 1 ? "" : "s"} · commission total <strong>$${total}</strong></p>`;
-  html += `<p><strong>Nothing has been sent to OTT yet.</strong> Review the attached workbook (OTT's exact 14-column format) or open the online review to check it, download the Excel, and send.</p>`;
+  html += `<p><strong>Nothing has been sent to OTT yet.</strong> Review the attached workbook (OTT's exact 15-column format) or open the online review to check it, download the Excel, and send.</p>`;
   if (u.length) html += `<p style="color:#8a2a2a"><strong>${u.length} row(s) need a commission confirmed</strong> — the amount was ambiguous or the platform was bench (BB). Fill those cells in the attached .xlsx before submitting, or fix the close-out data.</p>`;
   html += `<p style="margin:18px 0"><a href="${esc(approveUrl)}" style="background:#5B4B42;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">Review &amp; send to OTT</a></p>`;
   html += `<p style="color:#7c8472;font-size:13px">This review link is private to you — do not forward it. Vehicle Type/Year/Engine are auto-derived; verify them in the sheet.</p>`;
@@ -227,7 +227,7 @@ function renderOttEmailHtml(subRows, month) {
   let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:820px">`;
   html += `<h1 style="color:#3A2E26">Tuned Yota — OTT Commission Submission</h1>`;
   html += `<p style="color:#7c8472">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong>$${total}</strong></p>`;
-  html += `<p>Tuned Yota, an authorized Overland Tailor Tune installer, submits the following completed calibrations for ${esc(month.label)}. The full submission is attached as a workbook in OTT's standard 14-column format.</p>`;
+  html += `<p>Tuned Yota, an authorized Overland Tailor Tuning installer, submits the following completed calibrations for ${esc(month.label)}. The full submission is attached as a workbook in OTT's standard 15-column format.</p>`;
   html += subTable(subRows);
   html += `</div>`;
   return html;
