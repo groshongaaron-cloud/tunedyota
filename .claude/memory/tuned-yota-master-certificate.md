@@ -44,6 +44,8 @@ owner gets one Slack nudge per run listing held names. So a blank-calibration ce
 never reaches a customer. The `docs/brand/` HTML remains the
 canonical design source to evolve. Related: [[event-reminders-automation]].
 
+**DESIGN UPDATE 2026-07-10 (master @ dd8b9c8, screenshot-verified):** (1) **Title** dropped "Complete" — now a uniform "Certificate of Calibration" (thin steel "Certificate of" + bold ink "Calibration") + an ember brand rule (`.title-rule`) beneath; the old `.eyebrow` "Certificate of" kicker was removed. (2) Attest text + header brand-sub now say **"Overland Tailor Tuning"** (was "Overland Tailor Tune"). (3) **Installer row = NAME ONLY** (no cities/region); `installerRegion` param still accepted but not displayed. (4) **Model year now REPLACES the platform range** in the Vehicle line (formatVehicle → "2021 Toyota Tacoma 2.7L I4"), NOT appended as "(YYYY)" — the append note below is STALE (changed 2026-07-10 @ a8ab5d0; also drops the "what are you after?" goals). ⚠ **FOLLOW-UP (deferred by owner 2026-07-10):** add a **QR code** to the vehicle-specific AMSOIL page (`/amsoil-<make>-<model>.html`, per-vehicle pages exist for all 13 platforms) so the client sees products tailored to their model/year — to be done in a later revision. Both `certificate.js` + `docs/brand/tuned-yota-master-certificate.html` kept in sync.
+
 **Fields added back since the "dropped" note above (that line is now stale):**
 - **VIN** — re-added to the cert readout 2026-07-02 (captured at installer close-out).
 - **Model year** — added 2026-07-04 (master @ ff05111). NOT a separate field: the exact
