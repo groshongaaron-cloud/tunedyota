@@ -65,7 +65,13 @@ async function processCloseout(body, deps) {
   const gearSize = String(d.gearSize || "").trim();
   const mileage = String(d.mileage == null ? "" : d.mileage).replace(/[^0-9]/g, "");
   const issueDate = now.toISOString().slice(0, 10);
-  const completeFields = { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": issueDate };
+  // Calibration Date = the day the calibration was actually applied (the event
+  // day), NOT the day the installer closes it out. The monthly OTT report buckets
+  // by this date, so a late close-out (e.g. a June 28 event closed out in July)
+  // must still report under June. Falls back to today only when there's no event
+  // date (e.g. a walk-in with no scheduled event).
+  const calibrationDate = String(f["Event Date"] || "").slice(0, 10) || issueDate;
+  const completeFields = { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": calibrationDate };
   if (vin) completeFields.VIN = vin;
   if (tuningPlatform) completeFields["Tuning Platform"] = tuningPlatform;
   if (calibrationType) completeFields["Calibration Type"] = calibrationType;
@@ -82,10 +88,10 @@ async function processCloseout(body, deps) {
   let certSent = false;
   try {
     const inst = keyToInstaller(owner);
-    const certNo = certSerial(d.recordId, issueDate, issueDate);
+    const certNo = certSerial(d.recordId, calibrationDate, issueDate);
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin, calibration, installer: inst.name,
-      installerRegion: inst.region, calibrationDate: issueDate, certNo, issueDate });
+      installerRegion: inst.region, calibrationDate, certNo, issueDate });
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email,
       cc: inst.email === OWNER ? undefined : OWNER, replyTo: OWNER, subject,
       text: `Attached is the Tuned Yota Certificate of Calibration for ${f.Name || "your customer"}. Open certificate.html, confirm the OTT Calibration, then Print -> Save as PDF and send it to the customer.`,

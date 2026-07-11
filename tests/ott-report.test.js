@@ -80,7 +80,7 @@ test("runOttReport drafts the .xlsx to the OWNER with an approve link (never OTT
   assert.match(d._sends[0].subject, /DRAFT — OTT Commissions \(June 2026\)/);
   assert.equal(d._sends[0].attachments[0].filename, "ott-commissions-2026-06.xlsx");
   assert.equal(Buffer.from(d._sends[0].attachments[0].content, "base64")[0], 0x50); // real xlsx
-  assert.match(d._sends[0].html, /ott-report-send\?month=2026-06&amp;token=s3cret/);
+  assert.match(d._sends[0].html, /ott-report-review\?month=2026-06&amp;token=s3cret/); // draft links to the online review, not straight to send
   assert.match(d._notifies[0].text, /DRAFTED.*June 2026.*awaiting your approval/s);
 });
 

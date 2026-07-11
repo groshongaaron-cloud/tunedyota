@@ -35,12 +35,19 @@ Each completed booking carries everything needed, captured at close-out (SOP 4):
 
 The report is **never auto-sent to OTT**. The Owner approves first.
 
+**Submission is due to OTT by the 7th of each month.** The draft lands on the 1st;
+a reminder fires on the 5th if it still hasn't been submitted.
+
 | Stage | Function | Trigger | Recipients |
 |-------|----------|---------|-----------|
-| **1. Draft** | `ott-report.js` (scheduled) | 1st of month, for the month just closed | **Owner only** (`info@tunedyota.com`) — draft email + CSV + a private "Approve & send" link; Slack "awaiting approval" |
-| **2. Review** | — | Owner opens the draft, checks the CSV | — |
-| **3. Approve & send** | `ott-report-send.js` (HTTP, token-gated) | Owner clicks the approve link | **OTT:** `info@overlandtailor.com` + `hgobbels@me.com`, CC `info@tunedyota.com`; Slack "SENT (approved by owner)" |
+| **1. Draft** | `ott-report.js` (scheduled) | 1st of month, for the month just closed | **Owner only** (`info@tunedyota.com`) — draft email + `.xlsx` + a private "Approve & send" link; Slack "awaiting approval" |
+| **2. Review** | — | Owner opens the draft, checks the workbook | — |
+| **3. Reminder** | `ott-report-reminder.js` (scheduled) | **5th of month** (2 days before the deadline) | **Owner only** — re-surfaces the approve link + Slack "due by the 7th" if the month has calibrations |
+| **4. Approve & send** | `ott-report-send.js` (HTTP, token-gated) | Owner clicks the approve link | **OTT:** `info@overlandtailor.com` + `hgobbels@me.com`, CC `info@tunedyota.com`; Slack "SENT (approved by owner)" |
 
+- **Deadline: the 7th.** (Prior practice was the 10th; moved to the 7th 2026-07-10.)
+- **`Calibration Date` = the event day, not the close-out day.** Close-out stamps the booking's Event Date so a late close-out still reports under the correct month. (Fixed 2026-07-10 — before this, June 28 installs closed out in July were landing on July's report.)
+- The reminder is a deadline nudge; it fires whenever the month has calibrations, so ignore it if you've already submitted.
 - The approve link carries a secret token (`OTT_APPROVE_SECRET`); a bad/missing token fails closed.
 - Zero-calibration months draft nothing — just a Slack note.
 - A send failure is surfaced (never reported as success), and nothing reaches OTT.

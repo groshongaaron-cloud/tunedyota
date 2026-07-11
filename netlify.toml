@@ -24,6 +24,12 @@
 [functions."ott-report"]
   schedule = "0 13 1 * *"
 
+# OTT submission DEADLINE REMINDER on the 5th (netlify/functions/ott-report-reminder.js).
+# Submission is due by the 7th; this nudges the owner (email + Slack, never OTT) two
+# days ahead if the prior month has calibrations, re-surfacing the approve link.
+[functions."ott-report-reminder"]
+  schedule = "0 13 5 * *"
+
 # Annual private OTT rollup (Tuned Yota internal) on Jan 1 for the prior year
 # (netlify/functions/ott-annual.js). Emails info@ only — never OTT. Also on-demand
 # via a token-gated HTTP call (?year=YYYY&token=OTT_APPROVE_SECRET).

@@ -35,6 +35,28 @@ test("complete sets fields, sends the cert, marks Certificate Sent", async () =>
   assert.ok(sent.attachments && sent.attachments[0].filename === "certificate.html");
 });
 
+test("Calibration Date is the event date (not the close-out day), for the correct OTT report month", async () => {
+  const updates = []; let sent = null;
+  await processCloseout({ recordId: "rec1", action: "complete", calibration: "Medium" },
+    { env, key: "cody", now: new Date("2026-07-10T18:00:00Z"),  // closed out in July...
+      get: async () => recFor("cody", { "Event Date": "2026-06-28" }),  // ...for a June 28 event
+      update: async (a) => { updates.push(a.fields); return {}; },
+      send: async (m) => { sent = m; return { ok: true }; } });
+  assert.equal(updates[0]["Calibration Date"], "2026-06-28", "reports under the event month, not the close-out month");
+  const certHtml = Buffer.from(sent.attachments[0].content, "base64").toString();
+  assert.ok(certHtml.includes("June 28, 2026"), "certificate 'Date Calibrated' shows the event day");
+});
+
+test("Calibration Date falls back to the close-out day when there is no event date", async () => {
+  const updates = [];
+  await processCloseout({ recordId: "rec1", action: "complete", calibration: "Medium" },
+    { env, key: "cody", now: new Date("2026-07-10T18:00:00Z"),
+      get: async () => recFor("cody"),  // no Event Date (e.g. a walk-in)
+      update: async (a) => { updates.push(a.fields); return {}; },
+      send: async () => ({ ok: true }) });
+  assert.equal(updates[0]["Calibration Date"], "2026-07-10", "no event date → today");
+});
+
 test("stamps the exact model year on the certificate (replacing the platform range)", async () => {
   let sent = null;
   await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },

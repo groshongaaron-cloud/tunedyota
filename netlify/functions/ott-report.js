@@ -11,9 +11,11 @@ const { priorMonth, buildSubmissionRows, renderOttXlsx, renderOwnerDraftHtml, to
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
 
+// Points at the online REVIEW page (review → download .xlsx → send), not straight
+// at the send endpoint, so the owner reviews before anything reaches OTT.
 function approveUrl(env, monthKey) {
   const base = env.SITE_URL || "https://tunedyota.com";
-  return `${base}/.netlify/functions/ott-report-send?month=${monthKey}&token=${encodeURIComponent(env.OTT_APPROVE_SECRET || "")}`;
+  return `${base}/.netlify/functions/ott-report-review?month=${monthKey}&token=${encodeURIComponent(env.OTT_APPROVE_SECRET || "")}`;
 }
 
 async function runOttReport(deps) {
@@ -40,7 +42,7 @@ async function runOttReport(deps) {
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: OWNER, replyTo: OWNER,
       subject: `DRAFT — OTT Commissions (${month.label}) — review & approve`,
       html: renderOwnerDraftHtml(subRows, month, approveUrl(env, month.key)),
-      text: `${subRows.length} completed calibration(s) for ${month.label}, commission total $${total}${u ? `, ${u} needing confirmation` : ""}. Review the attached .xlsx, then use the approve link to send to OTT. Nothing has been sent yet.`,
+      text: `${subRows.length} completed calibration(s) for ${month.label}, commission total $${total}${u ? `, ${u} needing confirmation` : ""}. Review the attached .xlsx or open the online review link to check it, download the Excel, and send to OTT. Nothing has been sent yet.`,
       attachments: [{ filename: `ott-commissions-${month.key}.xlsx`, content: Buffer.from(xlsx).toString("base64") }] });
   } catch (e) { draftFailed = true; if (log.error) log.error("ott draft email", e.message); }
 
