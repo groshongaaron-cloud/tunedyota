@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { priorMonth, monthFromKey, buildSubmissionRows, renderOttXlsx, SUBMISSION_HEADERS } = require("../netlify/functions/lib/ott-report.js");
+const { priorMonth, monthFromKey, buildSubmissionRows, buildOpenBookings, renderOttXlsx, SUBMISSION_HEADERS } = require("../netlify/functions/lib/ott-report.js");
 const { runOttReport } = require("../netlify/functions/ott-report.js");
 const { approveAndSend } = require("../netlify/functions/ott-report-send.js");
 
@@ -63,6 +63,40 @@ test("a garbage Model Year is ignored in favor of the derived year", () => {
   const rows = buildSubmissionRows([{ id: "r1", ...bookingFields({
     Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "n/a" }) }], JUNE, {});
   assert.equal(rows[0].vehicleYear, 2016);
+});
+
+test("a manual Commission Override wins over the auto-resolved amount (incl. $0)", () => {
+  const [r] = buildSubmissionRows([{ id: "r1", ...bookingFields({ "Commission Override": 275 }) }], JUNE, {});
+  assert.equal(r.commission, 275);
+  assert.equal(r._overridden, true);
+  assert.equal(r._autoCommission, 160, "the auto amount is still tracked");
+  const [z] = buildSubmissionRows([{ id: "r2", ...bookingFields({ "Commission Override": 0 }) }], JUNE, {});
+  assert.equal(z.commission, 0, "a legitimate $0 override is honored, not treated as blank");
+  assert.equal(z._overridden, true);
+});
+
+test("a blank/non-numeric Commission Override falls back to the lookup, and an override resolves an otherwise-unresolvable row", () => {
+  const [blank] = buildSubmissionRows([{ id: "r1", ...bookingFields({ "Commission Override": "" }) }], JUNE, {});
+  assert.equal(blank.commission, 160);
+  assert.equal(blank._overridden, false);
+  const [fixed] = buildSubmissionRows([{ id: "r2", ...bookingFields({ "Tuning Platform": "BB", "Commission Override": 190 }) }], JUNE, {});
+  assert.equal(fixed.commission, 190, "override rescues a bench-BB row the lookup couldn't resolve");
+  assert.equal(fixed._overridden, true);
+});
+
+test("buildOpenBookings lists only overdue, not-completed bookings (the chase list)", () => {
+  const NOW = new Date("2026-07-10T12:00:00Z");
+  const rows = buildOpenBookings([
+    { id: "a", Name: "Overdue Olga", Vehicle: "2015 Tundra 5.7L V8 · More power", City: "Omaha", "Event Date": "2026-06-28", Status: "Booked", Installer: ["cody"] },
+    { id: "b", Name: "Done Dan", "Event Date": "2026-06-28", Status: "Completed", Installer: ["cody"] },      // completed → excluded
+    { id: "c", Name: "Future Fred", "Event Date": "2026-08-01", Status: "Booked", Installer: ["aaron"] },    // future → excluded
+    { id: "d", Name: "Noshow Ned", "Event Date": "2026-06-28", Status: "No-show", Installer: ["cody"] },     // no-show → excluded
+  ], NOW);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].customer, "Overdue Olga");
+  assert.equal(rows[0].vehicle, "2015 Tundra 5.7L V8", "goals stripped from the vehicle line");
+  assert.equal(rows[0].installerKey, "cody");
+  assert.equal(rows[0].daysOverdue, 12);
 });
 
 test("renderOttXlsx produces a real .xlsx with the header row + data", () => {

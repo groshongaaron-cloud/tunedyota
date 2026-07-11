@@ -65,17 +65,54 @@ function buildSubmissionRows(bookings, month, opts = {}) {
     const tuningPlatform = String(b["Tuning Platform"] || "").trim().toUpperCase();
     const calibrationType = String(b["Calibration Type"] || "").trim();
     const look = lookupCommission({ vehicleType: dv.vehicleType, year, engine: dv.engine, tuningPlatform, calibrationType });
+    // The owner's manual Commission Override (saved from the review page) always
+    // wins over the auto-resolved amount — including a legitimate $0 (e.g. a COBB
+    // Accessport-only row). A blank/non-numeric override falls back to the lookup.
+    const ov = b["Commission Override"];
+    const overridden = typeof ov === "number" || (typeof ov === "string" && ov.trim() !== "" && !isNaN(Number(ov)));
+    const commission = overridden ? Number(ov) : look.commission;
     out.push({
-      dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailer,
+      recordId: b.id || "", dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailer,
       customer: b.Name || "", vin: String(b.VIN || "").toUpperCase(),
       vehicleYear: year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
       ecuId: String(b["ECU ID"] || "").toUpperCase(), gearSize: b["Gear Size"] || "",
       mileage: (b.Mileage === 0 || b.Mileage) ? Number(b.Mileage) : "",
-      tuningPlatform, calibrationType, commission: look.commission,
+      tuningPlatform, calibrationType, commission,
       _confidence: look.confidence, _candidates: look.candidates, _tier: tier,
+      _autoCommission: look.commission, _overridden: overridden,
     });
   }
   out.sort((a, b) => String(a.dateCalibrationApplied).localeCompare(String(b.dateCalibrationApplied)) || String(a.customer).localeCompare(String(b.customer)));
+  return out;
+}
+
+// Bookings that are overdue for close-out: an event whose date has already
+// passed but the installer hasn't marked Completed (and it isn't Cancelled/
+// No-show). This is the owner's "chase list" — never submitted to OTT. Returns
+// installerKey raw; the caller resolves the display name/region.
+const NON_OPEN = new Set(["completed", "cancelled", "no-show"]);
+function daysBetween(fromISO, toISO) {
+  const a = Date.parse(`${fromISO}T00:00:00Z`), b = Date.parse(`${toISO}T00:00:00Z`);
+  return (Number.isNaN(a) || Number.isNaN(b)) ? "" : Math.round((b - a) / 86400000);
+}
+function buildOpenBookings(bookings, now = new Date()) {
+  const today = now.toISOString().slice(0, 10);
+  const out = [];
+  for (const b of bookings || []) {
+    if (NON_OPEN.has(String(b.Status || "").trim().toLowerCase())) continue;
+    const event = String(b["Event Date"] || "").slice(0, 10);
+    if (!event || event >= today) continue;                 // overdue only: event in the past
+    out.push({
+      recordId: b.id || "", customer: b.Name || "",
+      vehicle: String(b.Vehicle || "").split(/\s*·\s*/)[0].trim(),   // drop the "what are you after?" goals
+      city: b.City || "", eventDate: event,
+      installerKey: Array.isArray(b.Installer) ? b.Installer[0] : (b.Installer || ""),
+      status: b.Status || "Booked", daysOverdue: daysBetween(event, today),
+    });
+  }
+  out.sort((a, b) => String(a.installerKey).localeCompare(String(b.installerKey))
+    || String(a.eventDate).localeCompare(String(b.eventDate))
+    || String(a.customer).localeCompare(String(b.customer)));
   return out;
 }
 
@@ -131,6 +168,6 @@ function renderOttEmailHtml(subRows, month) {
 
 module.exports = {
   priorMonth, monthFromKey, recipients, SUBMISSION_HEADERS,
-  buildSubmissionRows, renderOttXlsx, renderOwnerDraftHtml, renderOttEmailHtml,
+  buildSubmissionRows, buildOpenBookings, renderOttXlsx, renderOwnerDraftHtml, renderOttEmailHtml,
   totalCommission, unresolved, subTable,
 };

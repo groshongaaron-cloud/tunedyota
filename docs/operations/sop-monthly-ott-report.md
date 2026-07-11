@@ -64,12 +64,31 @@ month). This is built once the pricing sheet is loaded (below).
 
 ---
 
-## 4. Pricing — PENDING
+## 3a. The always-on review console (`ott-report-review.js`)
 
-Tuned Yota pays OTT a price per calibration tier (Light / Mild / Medium / Spicy / SS + combos).
-Those prices come from the Owner's pricing spreadsheet. Once loaded, a **price column + totals**
-are added to the reports and the annual cost rollup is completed. Until then the reports list
-calibrations without pricing.
+Open the token-gated **OTT Commission Report** page any time (bookmark the review
+link — it defaults to the prior reporting month, `?month=YYYY-MM` to switch). It shows:
+
+- **① Completed calibrations = the submission.** Commission auto-fills from the price
+  sheet and is **editable per row**. Type in / correct any amount (rows the lookup
+  couldn't resolve — e.g. VFT "9.2 New", bench BB — start blank and are flagged red),
+  then **Save**. Saved amounts persist to the booking's **`Commission Override`** column
+  and win over the auto amount everywhere (download, send, and the monthly draft).
+- **② Overdue / incomplete bookings.** Past events not yet closed out by the installer,
+  grouped by installer/territory with days-overdue — the chase list. Never submitted.
+- **Download Excel** (the exact `.xlsx`) and **Finalize & Send to OTT** (owner-approved).
+
+**One-time setup:** add a **Number** field named **`Commission Override`** to the Airtable
+Bookings table. Until it exists, editing still works but a Save shows "add the column"
+(the metadata API can't create it — the Netlify token lacks schema scope).
+
+## 4. Pricing — auto from the OTT price sheet + manual override
+
+The commission engine (`lib/ott-commission.js`) resolves the **OTT Commission** per
+calibration from the April 2026 OTT price sheet (`lib/ott-commission-template.json`),
+matching vehicle type / year / engine / tuning platform / calibration type. Anything the
+sheet can't map (owner-confirmed cal types, superchargers, bench BB) is left blank and
+the owner enters it on the review console (§3a), saved as `Commission Override`.
 
 ---
 
