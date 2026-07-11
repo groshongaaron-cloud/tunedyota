@@ -96,8 +96,11 @@ function calibrationMatches(row, calType) {
   const isMaf = /maf\s*scale/i.test(tp) || /\bmaf\b/i.test(model);
   const isCustom = /custom/i.test(tp);
   const isSuper = /supercharg/i.test(model);
+  const isCe = /ce update|carb/i.test(model);
   switch (String(calType || "").trim().toLowerCase()) {
-    case "basic": return !isMaf && !isCustom && !isSuper;
+    // "Basic" = the plain Base tune (owner: VFT/PCM default to Base). Exclude the
+    // CE/CARB-update variant so a Base resolves cleanly instead of going ambiguous.
+    case "basic": return !isMaf && !isCustom && !isSuper && !isCe;
     case "maf":
     case "basic + maf": return isMaf && !isSuper;
     case "custom": return isCustom && !isSuper;
@@ -149,4 +152,12 @@ function commissionCandidates({ vehicleType, engine, year, tuningPlatform } = {}
   return [];
 }
 
-module.exports = { deriveVehicle, vehicleType, vehicleYear, engineSize, lookupCommission, commissionCandidates };
+// One-shot commission resolution for the console auto-populate: owner rule "9.2
+// Update is a free service → $0"; otherwise the normal price-sheet lookup (which
+// now resolves VFT/PCM Basic to the Base amount). Returns a number or null.
+function resolveCommission({ vehicleType, engine, year, tuningPlatform, calibrationType } = {}) {
+  if (/9\.2\s*update/i.test(String(calibrationType || ""))) return 0;
+  return lookupCommission({ vehicleType, year, engine, tuningPlatform, calibrationType }).commission;
+}
+
+module.exports = { deriveVehicle, vehicleType, vehicleYear, engineSize, lookupCommission, commissionCandidates, resolveCommission };

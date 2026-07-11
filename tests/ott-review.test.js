@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { review, saveOverrides, completeBooking, addWalkin, deleteBooking, noShow, reviewPageHtml, OVERRIDE_FIELD } = require("../netlify/functions/ott-report-review.js");
+const { review, saveOverrides, completeBooking, addWalkin, deleteBooking, noShow, resolveFields, reviewPageHtml, OVERRIDE_FIELD } = require("../netlify/functions/ott-report-review.js");
 
 const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", OTT_APPROVE_SECRET: "sec", SITE_URL: "https://tunedyota.com" };
 const completed = (extra = {}) => ({
@@ -137,8 +137,22 @@ test("the overdue form has a model-year picker with per-year auto-fill data", ()
       const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
       assert.ok(html.includes('class="ob-year"'), "model-year picker present");
       assert.ok(html.includes(">2021<") && html.includes(">2016<"), "years from the platform range listed");
-      assert.ok(/data-fill="[^"]*04B34[^"]*"/.test(html), "per-year ECU auto-fill embedded (2019 → 04B34)");
+      assert.ok(html.includes('data-vt="Tacoma"') && html.includes('data-eng="3.5"'), "vehicle type/engine embedded for resolve");
+      assert.ok(!html.includes(">COBB<"), "COBB removed from the platform list");
     });
+});
+
+test("op:resolve returns ECU/gear from model+year and commission once platform+cal type set", async () => {
+  const deps = { env };
+  const y = resolveFields({ token: "sec", veh: { vehicleType: "Tacoma", engine: "3.5", year: 2019 } }, deps);
+  assert.equal(y.ecu, "04B34"); assert.equal(y.gear, "3.90"); assert.equal(y.commission, null);   // no platform/caltype yet
+  const full = resolveFields({ token: "sec", veh: { vehicleType: "Tacoma", engine: "3.5", year: 2019, tuningPlatform: "VFT", calibrationType: "Basic" } }, deps);
+  assert.equal(full.commission, 110, "VFT Basic resolves to Base");
+  const upd = resolveFields({ token: "sec", veh: { vehicleType: "Tacoma", engine: "3.5", year: 2019, tuningPlatform: "VFT", calibrationType: "9.2 Update" } }, deps);
+  assert.equal(upd.commission, 0, "9.2 Update is free");
+  const g4 = resolveFields({ token: "sec", veh: { vehicleType: "Tacoma", engine: "2.4T", year: 2024, tuningPlatform: "VFT", calibrationType: "Basic" } }, deps);
+  assert.equal(g4.commission, 160, "4th Gen Tacoma → Stage 1");
+  assert.equal(resolveFields({ token: "bad", veh: {} }, deps).code, 401);
 });
 
 test("completeBooking rejects a bad calibration and a bad token", async () => {

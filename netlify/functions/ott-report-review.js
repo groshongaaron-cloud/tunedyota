@@ -16,12 +16,12 @@ const { flattenRecords } = require("./lib/report-sources.js");
 const { keyToInstaller, INSTALLERS } = require("./lib/routing.js");
 const { CAL_OPTIONS } = require("./lib/certificate.js");
 const { ecuCandidates, defaultGear } = require("./lib/ecu-ids.js");
-const { commissionCandidates } = require("./lib/ott-commission.js");
+const { commissionCandidates, resolveCommission } = require("./lib/ott-commission.js");
 const { monthFromKey, priorMonth, buildSubmissionRows, buildOpenBookings, renderOttXlsx, totalCommission, unresolved, recipients } = require("./lib/ott-report.js");
 
 const OVERRIDE_FIELD = "Commission Override";
 // OTT report picklists (Policy 0012).
-const TP_OPTIONS = ["VFT", "HPT", "PCM", "BB", "COBB"];
+const TP_OPTIONS = ["VFT", "HPT", "PCM", "BB"];   // no COBB — Tuned Yota doesn't do COBB
 const CT_OPTIONS = ["9.2 New", "9.2 Update", "CARB New", "CARB Update", "Custom", "SEMA CE", "Basic", "TCM Update", "Supercharger", "THR Adjust"];
 const GEAR_OPTIONS = ["3.90", "3.58", "3.73", "4.10", "4.30", "4.88", "5.29", "Stock"];   // Policy 0012
 const INSTALLER_KEYS = Object.keys(INSTALLERS);
@@ -129,23 +129,10 @@ function editorFields(prefix) {
     + inp(`${prefix}-ecu`, "ECU ID") + inp(`${prefix}-gear`, "Gear") + inp(`${prefix}-mi`, "Mileage");
 }
 
-// Per-year auto-fill for the overdue form: from model + year we know the ECU
-// (most-likely), the gear default, and (4th Gen Tacoma) the Stage 1 commission.
-function autoFillMap(r) {
-  const map = {};
-  if (!r.yearLo || !r.yearHi) return map;
-  for (let y = r.yearHi; y >= r.yearLo; y--) {
-    const veh = { vehicleType: r.vehicleType, engine: r.engine, year: y };
-    const ecu = ecuCandidates(veh), comm = commissionCandidates(veh);
-    map[y] = { ecu: ecu[0] ? ecu[0].id : "", gear: defaultGear(veh), comm: comm[0] ? comm[0].amount : "" };
-  }
-  return map;
-}
-
 function openSection(openRows) {
   let h = `<h2>Overdue / incomplete bookings${openRows.length ? ` <span class="muted">(${openRows.length})</span>` : ""}</h2>`;
   if (!openRows.length) return h + `<p class="muted">None — every past event has been closed out. 🎉</p>`;
-  h += `<p class="muted">Past events not yet closed out (any installer). Pick the <strong>model year</strong> to auto-fill ECU / gear / commission, set the calibration, then <strong>Complete</strong> — it joins the submission for that event's month.</p>`;
+  h += `<p class="muted">Past events not yet closed out (any installer). Pick the <strong>model year</strong> and <strong>platform</strong> — the ECU, gear, cal type, and commission auto-fill. Set the calibration, then <strong>Complete</strong> — it joins the submission for that event's month.</p>`;
   let curKey = null;
   for (const r of openRows) {
     if (r.installerKey !== curKey) {
@@ -154,11 +141,11 @@ function openSection(openRows) {
       h += `<div class="grp">${esc(inst.name ? `${inst.name}${inst.region ? ` · ${inst.region}` : ""}` : (curKey || "Unassigned"))}</div>`;
     }
     const od = r.daysOverdue === "" ? "" : ` · ${r.daysOverdue}d overdue`;
-    const fill = autoFillMap(r), yrs = Object.keys(fill).map(Number).sort((a, b) => b - a);
+    const yrs = (r.yearLo && r.yearHi) ? Array.from({ length: r.yearHi - r.yearLo + 1 }, (_, i) => r.yearHi - i) : [];
     const yearSel = yrs.length
       ? `<select class="ob-year"><option value="">Model year…</option>` + yrs.map((y) => `<option${String(r.modelYear) === String(y) ? " selected" : ""}>${y}</option>`).join("") + `</select>`
       : `<input class="ob-year" placeholder="Model year" value="${esc(r.modelYear || "")}" style="width:100px">`;
-    h += `<div class="ob" data-rec="${esc(r.recordId)}" data-event="${esc(r.eventDate)}" data-fill="${esc(JSON.stringify(fill))}">`
+    h += `<div class="ob" data-rec="${esc(r.recordId)}" data-event="${esc(r.eventDate)}" data-vt="${esc(r.vehicleType || "")}" data-eng="${esc(r.engine || "")}">`
       + `<div><strong>${esc(r.customer || "—")}</strong> · ${esc(r.vehicle || "—")} · ${esc(r.city || "")} · ${esc(r.eventDate)}${od} <span class="warn">(${esc(r.status)})</span></div>`
       + `<div class="obf">${yearSel}${editorFields("ob")}<button class="btn btn-save btn-sm ob-go">Complete →</button>`
       + `<label class="ns-l"><input type="checkbox" class="ob-noshow"> No-show → waitlist</label>`
@@ -225,15 +212,25 @@ function consoleScript(env, month) {
     });
   });
   document.querySelectorAll('.ob').forEach(function(ob){
-    var ys=ob.querySelector('.ob-year'), fill={};
-    try{ fill=JSON.parse(ob.dataset.fill||'{}'); }catch(e){}
-    // Pick a model year → auto-fill the ECU / gear / commission we can derive.
-    if(ys && ys.tagName==='SELECT') ys.addEventListener('change',function(){
-      var f=fill[ys.value]; if(!f) return;
-      var e=ob.querySelector('.ob-ecu'); if(e && f.ecu) e.value=f.ecu;
-      var g=ob.querySelector('.ob-gear'); if(g && f.gear) g.value=f.gear;
-      var c=ob.querySelector('.ob-comm'); if(c && f.comm!==''&&f.comm!=null) c.value=f.comm;
+    var ys=ob.querySelector('.ob-year'), tp=ob.querySelector('.ob-tp'), ct=ob.querySelector('.ob-ct');
+    // Ask the server for the fields we can derive from the current selections
+    // (ECU + gear from model/year; commission once platform + cal type are set).
+    function resolveOb(){
+      var veh={ vehicleType:ob.dataset.vt, engine:ob.dataset.eng, year:(ys&&ys.value)||'',
+        tuningPlatform:tp?tp.value:'', calibrationType:ct?ct.value:'' };
+      fetch(URL_,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'resolve',token:TOKEN_,veh:veh})})
+        .then(function(r){return r.json();}).then(function(o){ if(!o||!o.ok) return;
+          var e=ob.querySelector('.ob-ecu'); if(e && o.ecu) e.value=o.ecu;
+          var g=ob.querySelector('.ob-gear'); if(g && o.gear) g.value=o.gear;
+          var c=ob.querySelector('.ob-comm'); if(c && o.commission!=null && o.commission!=='') c.value=o.commission;
+        }).catch(function(){});
+    }
+    if(ys) ys.addEventListener('change',resolveOb);
+    if(tp) tp.addEventListener('change',function(){
+      if(ct && !ct.value && (tp.value==='VFT'||tp.value==='PCM')) ct.value='Basic';   // default cal type
+      resolveOb();
     });
+    if(ct) ct.addEventListener('change',resolveOb);
     ob.querySelector('.ob-go').addEventListener('click',function(){
       var b=fields_(ob,'ob'); if(!b.calibration){ ob.querySelector('.ob-msg').textContent='Pick an OTT Calibration'; ob.querySelector('.ob-msg').className='ob-msg warn'; return; }
       b.recordId=ob.dataset.rec; b.eventDate=ob.dataset.event; b.modelYear=ys?(ys.value||'').trim():'';
@@ -416,7 +413,23 @@ async function noShow(params, deps) {
   return { status: "ok", code: 200, ok: true, noshow: id, waitlisted };
 }
 
+// POST op:resolve — given the current overdue-form selections, return the fields
+// we can derive: ECU (most-likely for model+year), gear default, and commission
+// (once platform + cal type are known). No writes.
+function resolveFields(params, deps) {
+  const { env = process.env } = deps;
+  if (!authOk(env, params.token)) return { status: "error", code: 401, error: "unauthorized" };
+  const v = params.veh || {};
+  const veh = { vehicleType: v.vehicleType, engine: v.engine, year: v.year };
+  const ecu = ecuCandidates(veh), comm = commissionCandidates(veh);
+  const commission = comm.length ? comm[0].amount
+    : (v.tuningPlatform && v.calibrationType ? resolveCommission({ ...veh, tuningPlatform: v.tuningPlatform, calibrationType: v.calibrationType }) : null);
+  return { status: "ok", code: 200, ok: true,
+    ecu: ecu[0] ? ecu[0].id : "", gear: v.year ? defaultGear(veh) : "", commission };
+}
+
 async function dispatchPost(b, deps) {
+  if (b.op === "resolve") return resolveFields({ token: b.token, veh: b.veh }, deps);
   if (b.op === "complete") return completeBooking({ token: b.token, booking: b.booking }, deps);
   if (b.op === "walkin") return addWalkin({ token: b.token, booking: b.booking }, deps);
   if (b.op === "delete") return deleteBooking({ token: b.token, recordId: b.recordId }, deps);
@@ -447,4 +460,4 @@ async function handler(event) {
   return { statusCode: out.code || 500, headers: { "Content-Type": "text/html; charset=utf-8" }, body: html };
 }
 
-module.exports = { handler, review, saveOverrides, completeBooking, addWalkin, deleteBooking, noShow, reviewPageHtml, reviewUrl, OVERRIDE_FIELD };
+module.exports = { handler, review, saveOverrides, completeBooking, addWalkin, deleteBooking, noShow, resolveFields, reviewPageHtml, reviewUrl, OVERRIDE_FIELD };

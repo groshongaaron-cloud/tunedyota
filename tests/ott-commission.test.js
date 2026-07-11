@@ -44,12 +44,18 @@ test("lookupCommission resolves an unambiguous Basic calibration to its OTT Comm
   assert.equal(lookupCommission({ vehicleType: "Tundra", year: 2015, engine: "5.7", tuningPlatform: "PCM", calibrationType: "Basic" }).commission, 160);
 });
 
-test("lookupCommission returns null + candidates when the amount is ambiguous", () => {
-  // 3rd Gen Tacoma 3.5 VFT Base spans a plain Base (110) and a CE Update (35) -> owner picks
-  const r = lookupCommission({ vehicleType: "Tacoma", year: 2018, engine: "3.5", tuningPlatform: "VFT", calibrationType: "Basic" });
-  assert.equal(r.commission, null);
-  assert.equal(r.confidence, "ambiguous");
-  assert.ok(r.candidates.length >= 2);
+test("VFT/PCM Basic resolves to the plain Base amount (CE/CARB-update row excluded)", () => {
+  // 3rd Gen Tacoma 3.5 VFT Basic = Base $110 (the $35 CE Update variant is not "Basic")
+  assert.equal(lookupCommission({ vehicleType: "Tacoma", year: 2018, engine: "3.5", tuningPlatform: "VFT", calibrationType: "Basic" }).commission, 110);
+  // 3rd Gen Tacoma 2.7 has PCM Base = $160 (the 3.5L has no PCM option)
+  assert.equal(lookupCommission({ vehicleType: "Tacoma", year: 2018, engine: "2.7", tuningPlatform: "PCM", calibrationType: "Basic" }).commission, 160);
+});
+
+test("resolveCommission: 9.2 Update is free ($0); otherwise the price-sheet amount", () => {
+  const { resolveCommission } = require("../netlify/functions/lib/ott-commission.js");
+  assert.equal(resolveCommission({ vehicleType: "Tacoma", year: 2019, engine: "3.5", tuningPlatform: "VFT", calibrationType: "9.2 Update" }), 0);
+  assert.equal(resolveCommission({ vehicleType: "Tacoma", year: 2019, engine: "3.5", tuningPlatform: "VFT", calibrationType: "Basic" }), 110);
+  assert.equal(resolveCommission({ vehicleType: "Tacoma", year: 2024, engine: "2.4T", tuningPlatform: "VFT", calibrationType: "Basic" }), 160);
 });
 
 test("lookupCommission won't auto-match a bench (BB) platform", () => {
