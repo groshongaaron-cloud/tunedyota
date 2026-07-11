@@ -234,13 +234,14 @@ function renderOwnerDraftHtml(subRows, month, approveUrl) {
   return html;
 }
 
+// Cover email to OTT — a short transmittal only. The line-by-line detail lives in
+// the attached workbook (OTT's 15-column format), so it is NOT repeated here.
 function renderOttEmailHtml(subRows, month) {
   const total = totalCommission(subRows);
   let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:820px">`;
   html += `<h1 style="color:#3A2E26">Tuned Yota — OTT Commission Submission</h1>`;
   html += `<p style="color:#7c8472">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong>$${total}</strong></p>`;
-  html += `<p>Tuned Yota, an authorized Overland Tailor Tuning installer, submits the following completed calibrations for ${esc(month.label)}. The full submission is attached as a workbook in OTT's standard 15-column format.</p>`;
-  html += subTable(subRows);
+  html += `<p>Tuned Yota, an authorized Overland Tailor Tuning installer, submits its completed calibrations for ${esc(month.label)}. The full submission — every calibration with its details — is attached as a workbook in OTT's standard 15-column format.</p>`;
   html += `</div>`;
   return html;
 }
