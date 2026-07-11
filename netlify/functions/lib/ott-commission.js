@@ -37,8 +37,11 @@ function vehicleYear(s) {
 // Max), else T = Turbo (gas).
 function engineSize(s) {
   const t = String(s == null ? "" : s);
-  if (/\b2\.4\b|2\.4\s*l/i.test(t)) {
-    return /hybrid|iforce\s*max|\b2\.4\s*l?-?th\b|\bth\b/i.test(t) ? "2.4TH" : "2.4T";
+  // Any 2.4L form (raw "2.4", "2.4L-T", or an already-normalized "2.4T"/"2.4TH")
+  // maps to 2.4T / 2.4TH — idempotent so the value round-trips through the
+  // commission lookup (a 4th Gen Tacoma resolved to nothing before this).
+  if (/2\.4/.test(t)) {
+    return /hybrid|iforce\s*max|2\.4\s*l?-?th\b|2\.4th\b/i.test(t) ? "2.4TH" : "2.4T";
   }
   const m = /(\d\.\d)\s*L?/i.exec(t);
   return m ? m[1] : "";

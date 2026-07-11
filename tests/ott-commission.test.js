@@ -17,6 +17,14 @@ test("vehicleType matches Policy 0012 picklist incl. the space in 'RAV 4', ES350
   assert.equal(vehicleType("2020 Toyota Land Cruiser 5.7L"), "Land Cruiser");
 });
 
+test("engine round-trips: the DERIVED 2.4T engine resolves the 4th Gen Tacoma commission (regression)", () => {
+  // deriveVehicle emits "2.4T"; feeding that straight back to lookupCommission must
+  // still match the price sheet (it silently returned nothing before the idempotency fix).
+  const dv = deriveVehicle("2024 Toyota Tacoma 2.4L-T I4");
+  assert.equal(dv.engine, "2.4T");
+  assert.equal(lookupCommission({ vehicleType: "Tacoma", year: 2024, engine: dv.engine, tuningPlatform: "VFT", calibrationType: "Basic" }).commission, 160);
+});
+
 test("lookupCommission resolves an unambiguous Basic calibration to its OTT Commission", () => {
   // 4th Gen Tacoma 2.4 VFT Base (OE Spec + Stage 1 both = 160; the MAF upgrade row is excluded)
   const a = lookupCommission({ vehicleType: "Tacoma", year: 2024, engine: "2.4", tuningPlatform: "VFT", calibrationType: "Basic" });
