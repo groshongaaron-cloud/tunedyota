@@ -24,15 +24,18 @@ function fromRow(row) {
   ];
 }
 
-function is3rdGenTacoma({ vehicleType, engine, year } = {}) {
+// A 3rd Gen Tacoma is the 2016–2023 platform — BOTH the 3.5L V6 and 2.7L I4.
+// Used for report sectioning and the gear-ratio default.
+function is3rdGenTacoma({ vehicleType, year } = {}) {
   const y = Number(year);
-  return vehicleType === "Tacoma" && String(engine == null ? "" : engine).trim() === "3.5" && y >= 2016 && y <= 2023;
+  return vehicleType === "Tacoma" && y >= 2016 && y <= 2023;
 }
 
+// ECU candidates are engine-specific — we only have the 3.5L map so far.
 function ecuCandidates({ vehicleType, engine, year } = {}) {
   const y = Number(year);
   if (!y) return [];
-  if (is3rdGenTacoma({ vehicleType, engine, year })) {
+  if (vehicleType === "Tacoma" && String(engine == null ? "" : engine).trim() === "3.5" && y >= 2016 && y <= 2023) {
     const row = TACOMA_35.find((r) => y >= r.lo && y <= r.hi);
     if (row) return fromRow(row);
   }

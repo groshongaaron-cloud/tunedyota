@@ -19,8 +19,10 @@ test("ecuCandidates returns [] for vehicles we have no data for", () => {
 
 test("is3rdGenTacoma + gear defaults follow the owner rule", () => {
   assert.equal(is3rdGenTacoma({ vehicleType: "Tacoma", engine: "3.5", year: 2021 }), true);
-  assert.equal(is3rdGenTacoma({ vehicleType: "Tacoma", engine: "2.7", year: 2021 }), false);
+  assert.equal(is3rdGenTacoma({ vehicleType: "Tacoma", engine: "2.7", year: 2019 }), true);   // 2.7L 3rd gen counts
+  assert.equal(is3rdGenTacoma({ vehicleType: "Tacoma", engine: "2.4T", year: 2024 }), false);  // 4th gen
   assert.equal(defaultGear({ vehicleType: "Tacoma", engine: "3.5", year: 2021 }), "3.90");  // auto 3rd gen Tacoma
+  assert.equal(defaultGear({ vehicleType: "Tacoma", engine: "2.7", year: 2019 }), "3.90");  // 2.7L 3rd gen too
   assert.equal(defaultGear({ vehicleType: "Tundra", engine: "5.7", year: 2020 }), "4.30");  // everything else
   assert.equal(gearForTransmission({ vehicleType: "Tacoma", engine: "3.5", year: 2021 }, "Manual"), "4.30");
   assert.equal(gearForTransmission({ vehicleType: "Tacoma", engine: "3.5", year: 2021 }, "Auto"), "3.90");
