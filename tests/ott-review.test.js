@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { review, saveOverrides, reviewPageHtml, OVERRIDE_FIELD } = require("../netlify/functions/ott-report-review.js");
+const { review, saveOverrides, completeBooking, addWalkin, reviewPageHtml, OVERRIDE_FIELD } = require("../netlify/functions/ott-report-review.js");
 
 const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", OTT_APPROVE_SECRET: "sec", SITE_URL: "https://tunedyota.com" };
 const completed = (extra = {}) => ({
@@ -66,6 +66,67 @@ test("POST reports a not-yet-added column so the owner can create it", async () 
     { env, log: { error() {} }, update: async () => { throw new Error(`Unknown field name: "${OVERRIDE_FIELD}"`); } });
   assert.equal(out.error, "missing-column");
   assert.equal(out.code, 200);
+});
+
+test("completeBooking closes out ANY installer's booking with the OTT fields (owner-authorized)", async () => {
+  let wrote = null;
+  const out = await completeBooking({ token: "sec", booking: {
+    recordId: "recOPEN1", eventDate: "2026-06-28", calibration: "Medium",
+    tuningPlatform: "vft", calibrationType: "9.2 New", commission: 110, vin: "3tmcz5an0mm417034",
+    ecuId: "cm5201", gearSize: "4.30", mileage: "51,481",
+  } }, { env, update: async (a) => { wrote = a.fields; return {}; } });
+  assert.equal(out.ok, true);
+  assert.equal(wrote.Status, "Completed");
+  assert.equal(wrote["OTT Calibration"], "Medium");
+  assert.equal(wrote["Calibration Date"], "2026-06-28", "reports under the event month");
+  assert.equal(wrote["Tuning Platform"], "VFT");
+  assert.equal(wrote["Calibration Type"], "9.2 New");
+  assert.equal(wrote[OVERRIDE_FIELD], 110);
+  assert.equal(wrote.VIN, "3TMCZ5AN0MM417034");
+  assert.equal(wrote.Mileage, 51481, "commas stripped");
+});
+
+test("completeBooking rejects a bad calibration and a bad token", async () => {
+  const bad = await completeBooking({ token: "sec", booking: { recordId: "r1", calibration: "Nope" } }, { env, update: async () => ({}) });
+  assert.equal(bad.error, "bad-calibration");
+  const un = await completeBooking({ token: "x", booking: { recordId: "r1", calibration: "Medium" } }, { env, update: async () => ({}) });
+  assert.equal(un.code, 401);
+});
+
+test("addWalkin creates a completed walk-in record for the report", async () => {
+  let created = null;
+  const out = await addWalkin({ token: "sec", booking: {
+    name: "Walk Inn", vehicle: "2021 Toyota Tacoma 2.7L", city: "Omaha", dateISO: "2026-06-28",
+    installer: "cody", calibration: "Light and Mild", tuningPlatform: "VFT", calibrationType: "9.2 New", commission: 110,
+  } }, { env, create: async (a) => { created = a.fields; return { id: "recNEW" }; } });
+  assert.equal(out.ok, true);
+  assert.equal(out.created, "recNEW");
+  assert.equal(created.Name, "Walk Inn");
+  assert.equal(created.Status, "Completed");
+  assert.equal(created["Calibration Date"], "2026-06-28");
+  assert.equal(created["OTT Calibration"], "Light and Mild");
+  assert.equal(created.Installer, "cody");
+  assert.equal(created.Source, "owner:walk-in");
+  assert.equal(created[OVERRIDE_FIELD], 110);
+});
+
+test("addWalkin requires a name and a valid calibration", async () => {
+  const noName = await addWalkin({ token: "sec", booking: { calibration: "Medium" } }, { env, create: async () => ({}) });
+  assert.equal(noName.error, "missing-name");
+  const badCal = await addWalkin({ token: "sec", booking: { name: "A", calibration: "Nope" } }, { env, create: async () => ({}) });
+  assert.equal(badCal.error, "bad-calibration");
+});
+
+test("the page renders the editable overdue rows and the walk-in form", () => {
+  return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([completed(), overdue()]) })
+    .then((r) => {
+      const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
+      assert.ok(html.includes('class="ob"'), "overdue rows are editable blocks");
+      assert.ok(html.includes("ob-go"), "each overdue row has a Complete button");
+      assert.ok(html.includes("Add a walk-in"), "walk-in section present");
+      assert.ok(html.includes("wk-go"), "walk-in add button present");
+      assert.ok(html.includes("OTT Calibration…"), "calibration picker present");
+    });
 });
 
 test("an override flows through to the workbook download", async () => {
