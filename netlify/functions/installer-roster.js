@@ -3,6 +3,7 @@
 const { cfg, listRecords } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { formatSlot } = require("./lib/slots.js");
+const { flexFuelNote } = require("./lib/flex-fuel.js");
 
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 const bySlot = (a, b) => String(a.slot || "").localeCompare(String(b.slot || ""), undefined, { numeric: true });
@@ -22,6 +23,7 @@ async function buildRoster(deps) {
       slot: f.Slot || "", slotLabel: f.Slot ? formatSlot(f.Slot) : "",
       name: f.Name || "", vehicle: f.Vehicle || "", phone: f.Phone || "", email: f.Email || "",
       mods: f.Modifications || "", status: f.Status || "Booked",
+      flexFuelNote: flexFuelNote(f.Vehicle),   // Policy 0011 day-of reminder for Tundras
       isWalkin: /^(intake|installer):walk-in/i.test(src),
       calibration: f["OTT Calibration"] || "", vin: f.VIN || "",
       tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",

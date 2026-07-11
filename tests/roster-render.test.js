@@ -29,6 +29,23 @@ test("roster appends the exact model year to the vehicle cell when present", () 
   assert.ok(text.includes("(2015)"));
   assert.ok(!/2\.4L-T I4 \(\)/.test(html), "no dangling parens when blank");
 });
+test("roster flags flex-fuel Tundras with a Policy 0011 callout + marker; nothing for non-Tundras", () => {
+  const b = [
+    { Slot: "9:00", Name: "Tim Tundra", Vehicle: "2015 Toyota Tundra 5.7L V8", Phone: "p1", Email: "t@x.com" },
+    { Slot: "9:20", Name: "Tara Taco", Vehicle: "2020 Toyota Tacoma 3.5L V6", Phone: "p2", Email: "ta@x.com" },
+  ];
+  const { html, text } = renderRosterEmail(event, b, []);
+  assert.match(html, /Flex Fuel Tundra/);
+  assert.match(html, /reset ethanol content to 0%/i);
+  assert.ok(html.includes("9:00 AM Tim Tundra"), "callout lists the applicable booking");
+  assert.ok(html.includes("2015 Toyota Tundra 5.7L V8 ⚠"), "inline marker on the Tundra cell");
+  assert.ok(!html.includes("2020 Toyota Tacoma 3.5L V6 ⚠"), "no marker on the Tacoma cell");
+  assert.match(text, /FLEX FUEL TUNDRA/);
+});
+test("roster shows no flex-fuel callout when there are no Tundras", () => {
+  const { html } = renderRosterEmail(event, bookings, []);   // Tacoma + 4Runner only
+  assert.doesNotMatch(html, /Flex Fuel Tundra/);
+});
 test("roster handles empty bookings + empty waitlist", () => {
   const { html } = renderRosterEmail(event, [], []);
   assert.ok(/no bookings/i.test(html));

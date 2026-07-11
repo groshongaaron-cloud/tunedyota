@@ -27,4 +27,6 @@ test("scopes to installer, includes past + future, flags walk-ins, sorts by date
   const reg = out.bookings.find((b) => b.name === "B");
   assert.equal(reg.isWalkin, false);
   assert.equal(reg.slotLabel, "9:40 AM");
+  assert.match(reg.flexFuelNote, /Flex Fuel Tundra/);        // Policy 0011: B drives a Tundra
+  assert.equal(out.bookings.find((b) => b.name === "Old").flexFuelNote, "");   // non-Tundra → no note
 });

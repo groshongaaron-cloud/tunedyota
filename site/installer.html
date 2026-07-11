@@ -23,6 +23,7 @@
   .card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;background:#fff;}
   .top{display:flex;justify-content:space-between;gap:8px;font-size:14px;}
   .who{font-weight:700;} .meta{color:var(--muted);font-size:13px;margin:2px 0 6px;}
+  .ffnote{background:#fdf3e3;border:1px solid #e6c99a;color:#8a5a12;border-radius:7px;padding:6px 8px;font-size:12.5px;line-height:1.35;margin:2px 0 8px;}
   select{padding:9px;font-size:15px;border:1px solid var(--line);border-radius:8px;width:100%;margin:6px 0;}
   .row-actions{display:flex;gap:8px;margin-top:6px;} .row-actions .btn{flex:1;}
   .ns{background:#8a6a3a;} .done{color:#2f5d2a;font-weight:700;} .noshow{color:#8a2a2a;font-weight:700;}
@@ -300,7 +301,8 @@
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
-      '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+'</div>';
+      '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+'</div>'+
+      (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'');
     if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'; return c; }
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
