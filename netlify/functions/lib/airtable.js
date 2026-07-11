@@ -92,4 +92,10 @@ async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSiz
   } while (offset);
   return out;
 }
-module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, updateTolerant, listAllRecords, getRecord };
+async function deleteRecord({ fetchImpl = fetch, token, baseId, table, id }) {
+  const url = `${API}/${baseId}/${encodeURIComponent(table)}/${id}`;
+  const res = await fetchImpl(url, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new Error(`airtable delete ${res.status}: ${await res.text().catch(() => "")}`);
+  return res.json();
+}
+module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, updateTolerant, listAllRecords, getRecord, deleteRecord };

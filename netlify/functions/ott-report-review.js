@@ -11,7 +11,7 @@
 //   GET  ?month=YYYY-MM&token=…             → review page (defaults to prior month)
 //   GET  ?month=YYYY-MM&token=…&format=xlsx → downloads the OTT workbook
 //   POST { token, op, ... }                 → op: "overrides" | "complete" | "walkin"
-const { cfg, listAllRecords, updateRecord, createRecord, updateTolerant, createTolerant } = require("./lib/airtable.js");
+const { cfg, listAllRecords, updateRecord, createRecord, updateTolerant, createTolerant, getRecord, deleteRecord } = require("./lib/airtable.js");
 const { flattenRecords } = require("./lib/report-sources.js");
 const { keyToInstaller, INSTALLERS } = require("./lib/routing.js");
 const { CAL_OPTIONS } = require("./lib/certificate.js");
@@ -72,7 +72,9 @@ function page(title, body) {
     `.obf input,.wkf input{width:110px}.wkf input.wide{width:170px}` +
     `.tblwrap{overflow-x:auto}input.ecu{width:78px;text-transform:uppercase;padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit}` +
     `input.gear{width:56px;padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit}` +
-    `input.auto{color:#7c8472;font-style:italic;background:#f7f5f1}select.ecu-pick,select.gear-pick,select.comm-pick{margin-left:3px;padding:5px 2px;border:1px solid #cbc4ba;border-radius:5px;font-size:12px}</style>` +
+    `input.auto{color:#7c8472;font-style:italic;background:#f7f5f1}select.ecu-pick,select.gear-pick,select.comm-pick{margin-left:3px;padding:5px 2px;border:1px solid #cbc4ba;border-radius:5px;font-size:12px}` +
+    `.btn-del{background:none;border:0;color:#8a2a2a;cursor:pointer;font-size:13px;padding:4px 6px;border-radius:5px}.btn-del:hover{background:#fdecea}` +
+    `.ns-l{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#8a5a12;cursor:pointer}.ns-l input{margin:0}</style>` +
     `<body><h1>${esc(title)}</h1>${body}</body>`;
 }
 
@@ -84,7 +86,7 @@ function completedSection(subRows, month, env) {
   let h = `<p class="muted">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong id="tot">$${total}</strong></p>`;
   h += `<p><strong>Nothing has been sent to OTT yet.</strong> Adjust commission / ECU ID / gear below, <strong>Save</strong>, then download or send. <span class="muted">Italic values are auto-filled suggestions — Save to lock them.</span></p>`;
   if (u) h += `<p class="warn"><strong>${u} row(s) need a commission</strong> — the amount was ambiguous or the platform was bench (BB). Type it in and Save.</p>`;
-  h += `<div class="tblwrap"><table><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Vehicle</th><th>Platform</th><th>Cal Type</th><th>ECU ID</th><th>Gear</th><th>Commission&nbsp;($)</th></tr>`;
+  h += `<div class="tblwrap"><table><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Vehicle</th><th>Platform</th><th>Cal Type</th><th>ECU ID</th><th>Gear</th><th>Commission&nbsp;($)</th><th></th></tr>`;
   for (const r of subRows) {
     const rec = esc(r.recordId);
     const veh = [r.vehicleYear, r.vehicleType, r.engineSize].filter(Boolean).join(" ") || "—";
@@ -104,7 +106,8 @@ function completedSection(subRows, month, env) {
     }
     h += `<tr><td>${esc(r.dateCalibrationApplied)}</td><td>${esc(r.customer)}</td><td>${esc(r.vin || "—")}</td>`
       + `<td>${esc(veh)}</td><td>${esc(r.tuningPlatform || "—")}</td><td>${esc(r.calibrationType || "—")}</td>`
-      + `<td>${ecuCell}</td><td>${gearCell}</td><td>${commCell}</td></tr>`;
+      + `<td>${ecuCell}</td><td>${gearCell}</td><td>${commCell}</td>`
+      + `<td><button class="btn-del row-del" data-rec="${rec}" title="Delete this entry">✕</button></td></tr>`;
   }
   h += `</table></div>`;
   h += `<div style="margin:22px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center">`
@@ -157,7 +160,9 @@ function openSection(openRows) {
       : `<input class="ob-year" placeholder="Model year" value="${esc(r.modelYear || "")}" style="width:100px">`;
     h += `<div class="ob" data-rec="${esc(r.recordId)}" data-event="${esc(r.eventDate)}" data-fill="${esc(JSON.stringify(fill))}">`
       + `<div><strong>${esc(r.customer || "—")}</strong> · ${esc(r.vehicle || "—")} · ${esc(r.city || "")} · ${esc(r.eventDate)}${od} <span class="warn">(${esc(r.status)})</span></div>`
-      + `<div class="obf">${yearSel}${editorFields("ob")}<button class="btn btn-save btn-sm ob-go">Complete →</button><span class="ob-msg muted"></span></div>`
+      + `<div class="obf">${yearSel}${editorFields("ob")}<button class="btn btn-save btn-sm ob-go">Complete →</button>`
+      + `<label class="ns-l"><input type="checkbox" class="ob-noshow"> No-show → waitlist</label>`
+      + `<button class="btn-del ob-del" title="Delete this booking">✕ Delete</button><span class="ob-msg muted"></span></div>`
       + `</div>`;
   }
   return h;
@@ -235,6 +240,20 @@ function consoleScript(env, month) {
       post_({op:'complete',booking:b}, ob.querySelector('.ob-msg'), function(){ location.reload(); });
     });
   });
+  // Delete an entry (completed row or overdue booking).
+  document.querySelectorAll('.row-del,.ob-del').forEach(function(btn){ btn.addEventListener('click',function(){
+    if(!confirm('Delete this entry permanently? This removes the booking record.')) return;
+    var ob=btn.closest('.ob'); var rec=(btn.dataset.rec)||(ob&&ob.dataset.rec);
+    var msg=ob?ob.querySelector('.ob-msg'):document.getElementById('saveMsg');
+    post_({op:'delete',recordId:rec}, msg, function(){ location.reload(); });
+  }); });
+  // No-show checkbox → mark No-show + add to the priority waitlist.
+  document.querySelectorAll('.ob-noshow').forEach(function(cb){ cb.addEventListener('change',function(){
+    if(!cb.checked) return;
+    if(!confirm('Mark as No-show and add the customer to the priority waitlist?')){ cb.checked=false; return; }
+    var ob=cb.closest('.ob');
+    post_({op:'noshow',recordId:ob.dataset.rec}, ob.querySelector('.ob-msg'), function(){ location.reload(); });
+  }); });
   var wk=document.getElementById('wk-go');
   if(wk) wk.addEventListener('click',function(){
     var scope=wk.closest('.wk'), msg=document.getElementById('wk-msg');
@@ -359,9 +378,49 @@ async function addWalkin(params, deps) {
   }
 }
 
+// POST op:delete — permanently remove a booking record (owner-initiated).
+async function deleteBooking(params, deps) {
+  const { env = process.env, fetchImpl = fetch, del = (a) => deleteRecord({ fetchImpl, ...a }), log = console } = deps;
+  if (!authOk(env, params.token)) return { status: "error", code: 401, error: "unauthorized" };
+  const id = String(params.recordId || "").trim();
+  if (!id) return { status: "error", code: 400, error: "missing-record" };
+  const c = cfg(env);
+  try { await del({ token: c.token, baseId: c.baseId, table: c.bookings, id }); return { status: "ok", code: 200, ok: true, deleted: id }; }
+  catch (e) { if (log.error) log.error("ott delete", e.message); return { status: "error", code: 502, error: "delete-failed", detail: e.message }; }
+}
+
+// POST op:noshow — mark a booking No-show and add the customer to the Priority
+// waitlist (mirrors the installer console's no-show flow).
+async function noShow(params, deps) {
+  const { env = process.env, fetchImpl = fetch, now = new Date(),
+          get = (a) => getRecord({ fetchImpl, ...a }), update = (a) => updateRecord({ fetchImpl, ...a }),
+          create = (a) => createRecord({ fetchImpl, ...a }), log = console } = deps;
+  if (!authOk(env, params.token)) return { status: "error", code: 401, error: "unauthorized" };
+  const id = String(params.recordId || "").trim();
+  if (!id) return { status: "error", code: 400, error: "missing-record" };
+  const c = cfg(env);
+  let f = {};
+  try { f = (await get({ token: c.token, baseId: c.baseId, table: c.bookings, id })).fields || {}; }
+  catch (e) { if (log.error) log.error("ott noshow get", e.message); return { status: "error", code: 502, error: "store-unavailable" }; }
+  try { await update({ token: c.token, baseId: c.baseId, table: c.bookings, id, fields: { Status: "No-show" } }); }
+  catch (e) { if (log.error) log.error("ott noshow", e.message); return { status: "error", code: 502, error: "save-failed", detail: e.message }; }
+  let waitlisted = false;
+  try {
+    const inst = Array.isArray(f.Installer) ? f.Installer[0] : (f.Installer || "");
+    const fields = { City: f.City || "", Name: f.Name || "", Phone: f.Phone || "", Email: f.Email || "",
+      Vehicle: f.Vehicle || "", Modifications: f.Modifications || "", Installer: inst,
+      Reason: `No-show — ${f.City || ""} ${String(f["Event Date"] || "").slice(0, 10)}`.trim(), Source: "owner:no-show" };
+    await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields }, ["Modifications", "Source"]);
+    waitlisted = true;
+  } catch (e) { if (log.error) log.error("ott noshow waitlist", e.message); }
+  return { status: "ok", code: 200, ok: true, noshow: id, waitlisted };
+}
+
 async function dispatchPost(b, deps) {
   if (b.op === "complete") return completeBooking({ token: b.token, booking: b.booking }, deps);
   if (b.op === "walkin") return addWalkin({ token: b.token, booking: b.booking }, deps);
+  if (b.op === "delete") return deleteBooking({ token: b.token, recordId: b.recordId }, deps);
+  if (b.op === "noshow") return noShow({ token: b.token, recordId: b.recordId }, deps);
   return saveOverrides({ token: b.token, overrides: b.overrides }, deps);
 }
 
@@ -388,4 +447,4 @@ async function handler(event) {
   return { statusCode: out.code || 500, headers: { "Content-Type": "text/html; charset=utf-8" }, body: html };
 }
 
-module.exports = { handler, review, saveOverrides, completeBooking, addWalkin, reviewPageHtml, reviewUrl, OVERRIDE_FIELD };
+module.exports = { handler, review, saveOverrides, completeBooking, addWalkin, deleteBooking, noShow, reviewPageHtml, reviewUrl, OVERRIDE_FIELD };

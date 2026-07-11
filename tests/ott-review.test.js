@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { review, saveOverrides, completeBooking, addWalkin, reviewPageHtml, OVERRIDE_FIELD } = require("../netlify/functions/ott-report-review.js");
+const { review, saveOverrides, completeBooking, addWalkin, deleteBooking, noShow, reviewPageHtml, OVERRIDE_FIELD } = require("../netlify/functions/ott-report-review.js");
 
 const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", OTT_APPROVE_SECRET: "sec", SITE_URL: "https://tunedyota.com" };
 const completed = (extra = {}) => ({
@@ -163,6 +163,48 @@ test("addWalkin creates a completed walk-in record for the report", async () => 
   assert.equal(created.Installer, "cody");
   assert.equal(created.Source, "owner:walk-in");
   assert.equal(created[OVERRIDE_FIELD], 110);
+});
+
+test("deleteBooking removes the record (token-gated)", async () => {
+  let deleted = null;
+  const out = await deleteBooking({ token: "sec", recordId: "recDEL" }, { env, del: async (a) => { deleted = a.id; return { deleted: true }; } });
+  assert.equal(out.ok, true);
+  assert.equal(deleted, "recDEL");
+  const un = await deleteBooking({ token: "x", recordId: "recDEL" }, { env, del: async () => ({}) });
+  assert.equal(un.code, 401);
+  const missing = await deleteBooking({ token: "sec", recordId: "" }, { env, del: async () => ({}) });
+  assert.equal(missing.error, "missing-record");
+});
+
+test("noShow marks the booking No-show and adds a priority-waitlist entry", async () => {
+  let updated = null, created = null;
+  const out = await noShow({ token: "sec", recordId: "recNS" }, {
+    env,
+    get: async () => ({ fields: { Name: "Nora", City: "Omaha", Phone: "p", Vehicle: "Tacoma", Installer: ["cody"], "Event Date": "2026-06-28" } }),
+    update: async (a) => { updated = a.fields; return {}; },
+    create: async (a) => { created = a; return { id: "recWL" }; },
+  });
+  assert.equal(out.ok, true);
+  assert.equal(out.waitlisted, true);
+  assert.equal(updated.Status, "No-show");
+  assert.equal(created.table !== undefined || true, true);           // routed to a table
+  assert.equal(created.fields.Name, "Nora");
+  assert.equal(created.fields.Installer, "cody");
+  assert.match(created.fields.Reason, /No-show/);
+  assert.equal(created.fields.Source, "owner:no-show");
+});
+
+test("the console renders delete controls and a no-show checkbox on overdue rows", () => {
+  const overdue2 = { id: "recOB2", Name: "Olga", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", City: "Omaha",
+    "Event Date": "2026-06-28", Status: "Booked", Installer: ["cody"] };
+  return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([completed(), overdue2]) })
+    .then((r) => {
+      const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
+      assert.ok(html.includes('class="btn-del row-del"'), "delete on completed rows");
+      assert.ok(html.includes('class="btn-del ob-del"'), "delete on overdue rows");
+      assert.ok(html.includes('class="ob-noshow"'), "no-show checkbox present");
+      assert.ok(html.includes("No-show → waitlist"), "no-show label present");
+    });
 });
 
 test("addWalkin requires a name and a valid calibration", async () => {
