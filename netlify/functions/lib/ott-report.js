@@ -6,6 +6,16 @@
 // flagged rather than guessed. Format: docs/ott/README.md.
 const { deriveVehicle, lookupCommission } = require("./ott-commission.js");
 const { buildXlsx } = require("./xlsx-writer.js");
+const { INSTALLERS } = require("./routing.js");
+
+// OTT requires the retailer tagged per installer: "Tuned Yota - <first name>"
+// (Aaron / Cody / Noah), derived from the booking's Installer. Unknown/blank
+// installer falls back to the plain retailer name.
+function retailerFor(booking, fallback) {
+  const key = Array.isArray(booking.Installer) ? booking.Installer[0] : booking.Installer;
+  const inst = key && INSTALLERS[key];
+  return inst ? `${fallback} - ${inst.name.split(" ")[0]}` : fallback;
+}
 
 const MONTHS = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"];
@@ -72,7 +82,7 @@ function buildSubmissionRows(bookings, month, opts = {}) {
     const overridden = typeof ov === "number" || (typeof ov === "string" && ov.trim() !== "" && !isNaN(Number(ov)));
     const commission = overridden ? Number(ov) : look.commission;
     out.push({
-      recordId: b.id || "", dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailer,
+      recordId: b.id || "", dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailerFor(b, retailer),
       customer: b.Name || "", vin: String(b.VIN || "").toUpperCase(),
       vehicleYear: year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
       ecuId: String(b["ECU ID"] || "").toUpperCase(), gearSize: b["Gear Size"] || "",
@@ -121,9 +131,19 @@ function rowToArray(r) {
     r.vehicleYear, r.vehicleType, r.engineSize, r.ecuId, r.gearSize, r.mileage,
     r.tuningPlatform, r.calibrationType, (r.commission == null ? "" : r.commission)];
 }
-// Filled .xlsx in OTT's exact 14-column order. Returns a Buffer.
+// Filled .xlsx in OTT's exact 14-column order. Returns a Buffer. Per OTT's
+// reporting standard, a GRAND TOTAL of the Commission column (N) is written two
+// rows below the last record (one blank spacer row, then the total).
 function renderOttXlsx(subRows) {
-  return buildXlsx("OTT Commissions", [SUBMISSION_HEADERS, ...subRows.map(rowToArray)]);
+  const rows = [SUBMISSION_HEADERS, ...subRows.map(rowToArray)];
+  if (subRows.length) {
+    const total = new Array(SUBMISSION_HEADERS.length).fill("");
+    total[12] = "GRAND TOTAL";                 // column M label
+    total[13] = totalCommission(subRows);      // column N — Commission grand total
+    rows.push(new Array(SUBMISSION_HEADERS.length).fill(""));   // blank spacer row
+    rows.push(total);
+  }
+  return buildXlsx("OTT Commissions", rows);
 }
 
 function totalCommission(subRows) { return subRows.reduce((s, r) => s + (typeof r.commission === "number" ? r.commission : 0), 0); }

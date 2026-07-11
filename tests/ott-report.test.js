@@ -28,7 +28,7 @@ test("buildSubmissionRows derives vehicle basics + resolves the commission", () 
   const rows = buildSubmissionRows([{ id: "recABCDE12345", ...bookingFields() }], JUNE, { retailer: "Tuned Yota" });
   assert.equal(rows.length, 1);
   const r = rows[0];
-  assert.equal(r.ottRetailer, "Tuned Yota");
+  assert.equal(r.ottRetailer, "Tuned Yota - Cody");   // tagged per installer (bookingFields → cody)
   assert.equal(r.customer, "Jane");
   assert.equal(r.vin, "5TFDW5F17MX000000");
   assert.equal(r.vehicleYear, 2015);
@@ -106,6 +106,28 @@ test("renderOttXlsx produces a real .xlsx with the header row + data", () => {
   assert.ok(buf.includes(Buffer.from("Date of Submission")));          // header present (STORE = searchable)
   assert.ok(buf.includes(Buffer.from("5TFDW5F17MX000000")));           // VIN present
   assert.ok(buf.includes(Buffer.from("Tundra")));
+});
+
+test("OTT Retailer (col C) is tagged per installer; falls back to plain name", () => {
+  const [cody] = buildSubmissionRows([{ id: "r1", ...bookingFields({ Installer: ["cody"] }) }], JUNE, { retailer: "Tuned Yota" });
+  assert.equal(cody.ottRetailer, "Tuned Yota - Cody");
+  const [aaron] = buildSubmissionRows([{ id: "r2", ...bookingFields({ Installer: "aaron" }) }], JUNE, { retailer: "Tuned Yota" });
+  assert.equal(aaron.ottRetailer, "Tuned Yota - Aaron");
+  const [noah] = buildSubmissionRows([{ id: "r3", ...bookingFields({ Installer: ["noah"] }) }], JUNE, { retailer: "Tuned Yota" });
+  assert.equal(noah.ottRetailer, "Tuned Yota - Noah");
+  const [none] = buildSubmissionRows([{ id: "r4", ...bookingFields({ Installer: "" }) }], JUNE, { retailer: "Tuned Yota" });
+  assert.equal(none.ottRetailer, "Tuned Yota", "no installer → plain retailer");
+});
+
+test("renderOttXlsx appends a GRAND TOTAL of the Commission column two rows below the last record", () => {
+  const rows = buildSubmissionRows([
+    { id: "r1", ...bookingFields({ Name: "A" }) },
+    { id: "r2", ...bookingFields({ Name: "B", "Commission Override": 90 }) },
+  ], JUNE, {});
+  const buf = renderOttXlsx(rows);
+  assert.ok(buf.includes(Buffer.from("GRAND TOTAL")), "label present");
+  assert.ok(buf.includes(Buffer.from("250")), "grand total present (160 + 90)");
+  assert.equal(rows.reduce((s, r) => s + (r.commission || 0), 0), 250);   // sanity
 });
 
 function deps(overrides = {}) {
