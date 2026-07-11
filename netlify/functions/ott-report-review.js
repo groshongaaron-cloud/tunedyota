@@ -25,7 +25,7 @@ const TP_OPTIONS = ["VFT", "HPT", "PCM", "BB"];   // no COBB — Tuned Yota does
 const CT_OPTIONS = ["9.2 New", "9.2 Update", "CARB New", "CARB Update", "Custom", "SEMA CE", "Basic", "TCM Update", "Supercharger", "THR Adjust"];
 const GEAR_OPTIONS = ["3.90", "3.58", "3.73", "4.10", "4.30", "4.88", "5.29", "Stock"];   // Policy 0012
 const INSTALLER_KEYS = Object.keys(INSTALLERS);
-const OPT_FIELDS = ["Model Year", "VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", OVERRIDE_FIELD];
+const OPT_FIELDS = ["Model Year", "VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Notes", OVERRIDE_FIELD];
 
 const authOk = (env, token) => !!env.OTT_APPROVE_SECRET && String(token || "") === env.OTT_APPROVE_SECRET;
 const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || ""));
@@ -59,6 +59,7 @@ function reportFields(d) {
   const ecu = String(d.ecuId || "").trim().toUpperCase(); if (ecu) f["ECU ID"] = ecu;
   const gear = String(d.gearSize || "").trim(); if (gear) f["Gear Size"] = gear;
   const mi = String(d.mileage == null ? "" : d.mileage).replace(/[^0-9]/g, ""); if (mi) f.Mileage = Number(mi);
+  const notes = String(d.notes || "").trim(); if (notes) f.Notes = notes;
   const comm = d.commission;
   if (comm != null && comm !== "" && Number.isFinite(Number(comm))) f[OVERRIDE_FIELD] = Number(comm);
   return f;
@@ -84,7 +85,7 @@ function page(title, body) {
     `.btn-del{background:none;border:0;color:#8a2a2a;cursor:pointer;font-size:13px;padding:4px 6px;border-radius:5px}.btn-del:hover{background:#fdecea}` +
     `.ns-l{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#8a5a12;cursor:pointer}.ns-l input{margin:0}` +
     `input.f,select.f{padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit;font-size:12.5px}input.f{width:112px}` +
-    `input.f-vin{width:150px}input.f-vt{width:96px}input.f-eng{width:62px}input.f-my{width:56px}input.f-mi{width:78px}input.f-date{width:130px}#ctab td{vertical-align:top}</style>` +
+    `input.f-vin{width:150px}input.f-vt{width:96px}input.f-eng{width:62px}input.f-my{width:56px}input.f-mi{width:78px}input.f-date{width:130px}input.f-notes{width:170px}#ctab td{vertical-align:top}</style>` +
     `<body><h1>${esc(title)}</h1>${body}</body>`;
 }
 
@@ -96,7 +97,7 @@ function completedSection(subRows, month, env) {
   let h = `<p class="muted">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong id="tot">$${total}</strong></p>`;
   h += `<p><strong>Nothing has been sent to OTT yet.</strong> Every field below is editable — change anything, then <strong>Save</strong>. <span class="muted">Italic values are auto-filled suggestions; Save to lock them.</span></p>`;
   if (u) h += `<p class="warn"><strong>${u} row(s) need a commission</strong> — the amount was ambiguous or the platform was bench (BB). Type it in and Save.</p>`;
-  h += `<div class="tblwrap"><table id="ctab"><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Model&nbsp;Yr</th><th>Vehicle&nbsp;Type</th><th>Engine</th><th>Platform</th><th>Cal&nbsp;Type</th><th>ECU&nbsp;ID</th><th>Gear</th><th>Mileage</th><th>Commission&nbsp;($)</th><th></th></tr>`;
+  h += `<div class="tblwrap"><table id="ctab"><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Model&nbsp;Yr</th><th>Vehicle&nbsp;Type</th><th>Engine</th><th>Platform</th><th>Cal&nbsp;Type</th><th>ECU&nbsp;ID</th><th>Gear</th><th>Mileage</th><th>Commission&nbsp;($)</th><th>Notes</th><th></th></tr>`;
   for (const r of subRows) {
     const rec = esc(r.recordId);
     const need = r.commission == null, val = r.commission == null ? "" : r.commission;
@@ -125,6 +126,7 @@ function completedSection(subRows, month, env) {
       + `<td>${ecuCell}</td><td>${gearCell}</td>`
       + `<td><input class="f f-mi" value="${r.mileage === "" || r.mileage == null ? "" : esc(r.mileage)}"></td>`
       + `<td>${commCell}</td>`
+      + `<td><input class="f f-notes" value="${esc(r.notes || "")}" placeholder="MAF scale, SC type, bench…"></td>`
       + `<td><button class="btn-del row-del" data-rec="${rec}" title="Delete this entry">✕</button></td></tr>`;
   }
   h += `</table></div>`;
@@ -144,7 +146,8 @@ function editorFields(prefix) {
     + sel(`${prefix}-ct`, CT_OPTIONS, "Cal Type…")
     + inp(`${prefix}-comm`, "$ Comm", 'type="number" min="0" step="1" style="width:80px"')
     + inp(`${prefix}-vin`, "VIN", 'maxlength="17" style="text-transform:uppercase"')
-    + inp(`${prefix}-ecu`, "ECU ID") + inp(`${prefix}-gear`, "Gear") + inp(`${prefix}-mi`, "Mileage");
+    + inp(`${prefix}-ecu`, "ECU ID") + inp(`${prefix}-gear`, "Gear") + inp(`${prefix}-mi`, "Mileage")
+    + inp(`${prefix}-notes`, "Notes", 'style="width:170px"');
 }
 
 function openSection(openRows) {
@@ -200,7 +203,7 @@ function consoleScript(env, month) {
   function fields_(scope, p){
     var q=function(c){var el=scope.querySelector('.'+p+'-'+c);return el?el.value.trim():'';};
     return { calibration:q('cal'), tuningPlatform:q('tp'), calibrationType:q('ct'), commission:q('comm'),
-      vin:q('vin'), ecuId:q('ecu'), gearSize:q('gear'), mileage:q('mi') };
+      vin:q('vin'), ecuId:q('ecu'), gearSize:q('gear'), mileage:q('mi'), notes:q('notes') };
   }
   // Rebuild a Vehicle string from the editable type/engine/year (so Vehicle Type,
   // Engine, and Vehicle Year are all directly editable and round-trip on save).
@@ -217,7 +220,7 @@ function consoleScript(env, month) {
     return { commission:(comm===''?null:Number(comm)), ecu:q('input.ecu'), gear:q('input.gear'),
       date:q('input.f-date'), name:q('input.f-name'), vin:q('input.f-vin'),
       vehicle:mkVeh(q('input.f-vt'),q('input.f-eng'),q('input.f-my')),
-      modelYear:q('input.f-my'), platform:q('select.f-tp'), calType:q('select.f-ct'), mileage:q('input.f-mi') };
+      modelYear:q('input.f-my'), platform:q('select.f-tp'), calType:q('select.f-ct'), mileage:q('input.f-mi'), notes:q('input.f-notes') };
   }
   // platform / cal type / model year / type / engine change → re-resolve ECU/gear/commission.
   function resolveRow(tr){
@@ -372,9 +375,12 @@ async function saveOverrides(params, deps) {
     if ("platform" in v) fields["Tuning Platform"] = String(v.platform || "").trim().toUpperCase();
     if ("calType" in v) fields["Calibration Type"] = String(v.calType || "").trim();
     if ("mileage" in v) { const mi = String(v.mileage == null ? "" : v.mileage).replace(/[^0-9]/g, ""); fields.Mileage = mi ? Number(mi) : null; }
+    if ("notes" in v) fields.Notes = String(v.notes || "");
     if (!Object.keys(fields).length) continue;
     try {
-      await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: recordId, fields });
+      // Notes is an optional column — if the base hasn't added it yet, drop it and
+      // still save the rest (unlike Commission Override, whose absence we surface).
+      await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: recordId, fields }, ["Notes"]);
       saved++;
     } catch (e) {
       if (/unknown[_ ]field/i.test(e.message) && new RegExp(OVERRIDE_FIELD, "i").test(e.message)) return { status: "error", code: 200, error: "missing-column" };

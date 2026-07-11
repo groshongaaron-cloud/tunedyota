@@ -101,6 +101,7 @@ test("saveOverrides persists ALL editable fields on a completed row", async () =
   const out = await saveOverrides({ token: "sec", overrides: { recA: {
     commission: 110, ecu: "04c22", gear: "3.90", date: "2026-06-20", name: "New Name", vin: "3tmcz5an0mm417034",
     vehicle: "2021 Toyota Tacoma 3.5L", modelYear: "2021", platform: "vft", calType: "9.2 New", mileage: "51,481",
+    notes: "MAF scale 1.05 · SS supercharger",
   } } }, { env, update: async (a) => { wrote = a.fields; return {}; } });
   assert.equal(out.ok, true);
   assert.equal(wrote.Name, "New Name");
@@ -111,14 +112,26 @@ test("saveOverrides persists ALL editable fields on a completed row", async () =
   assert.equal(wrote["Tuning Platform"], "VFT");
   assert.equal(wrote["Calibration Type"], "9.2 New");
   assert.equal(wrote.Mileage, 51481);
+  assert.equal(wrote.Notes, "MAF scale 1.05 · SS supercharger");
   assert.equal(wrote[OVERRIDE_FIELD], 110);
+});
+
+test("saveOverrides tolerates a not-yet-added Notes column — saves the rest, keeps the note out", async () => {
+  const writes = [];
+  const out = await saveOverrides({ token: "sec", overrides: { recA: { commission: 110, notes: "bench flash" } } },
+    { env, log: { error() {} }, update: async (a) => {
+      if ("Notes" in a.fields) throw new Error('Unknown field name: "Notes"');   // column not created yet
+      writes.push(a.fields); return {};
+    } });
+  assert.equal(out.ok, true, "the save still succeeds without the Notes column");
+  assert.deepEqual(writes[0], { [OVERRIDE_FIELD]: 110 }, "commission persisted; Notes dropped, not fatal");
 });
 
 test("the completed table renders an editable input for every field", () => {
   return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([completed()]) })
     .then((r) => {
       const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
-      ["f-date", "f-name", "f-vin", "f-my", "f-vt", "f-eng", "f-tp", "f-ct", "f-mi"].forEach((c) =>
+      ["f-date", "f-name", "f-vin", "f-my", "f-vt", "f-eng", "f-tp", "f-ct", "f-mi", "f-notes"].forEach((c) =>
         assert.ok(html.includes(`${c}"`) || html.includes(`${c} `), `editable field ${c} present`));
       assert.ok(/id="ctab"/.test(html), "completed table is the editable ctab");
       assert.ok(/<tr data-rec="recABCDE12345"/.test(html), "row keyed by record id for saving");
