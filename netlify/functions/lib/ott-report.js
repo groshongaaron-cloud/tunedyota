@@ -142,19 +142,13 @@ function rowToArray(r) {
     r.vehicleYear, r.vehicleType, r.engineSize, r.ecuId, r.gearSize, r.mileage,
     r.tuningPlatform, r.calibrationType, fmtCommission(r.commission), r.notes || ""];
 }
-// Filled .xlsx in OTT's exact 15-column order (Policy 0012). Returns a Buffer. A
-// GRAND TOTAL of the Commission column (N) is written two rows below the last
-// record (one blank spacer row, then the total), formatted as "$X.00".
+// Filled .xlsx in OTT's exact 15-column order (Policy 0012). Returns a Buffer.
+// Policy 0012 permits "no colors, formulas, or additional formatting" and warns
+// any deviation breaks reporting — so the submitted file is a CLEAN data table
+// with NO grand-total row. The owner sees the running commission total on the
+// review console instead.
 function renderOttXlsx(subRows) {
-  const rows = [SUBMISSION_HEADERS, ...subRows.map(rowToArray)];
-  if (subRows.length) {
-    const total = new Array(SUBMISSION_HEADERS.length).fill("");
-    total[12] = "GRAND TOTAL";                          // column M label
-    total[13] = fmtCommission(totalCommission(subRows)); // column N — Commission grand total
-    rows.push(new Array(SUBMISSION_HEADERS.length).fill(""));   // blank spacer row
-    rows.push(total);
-  }
-  return buildXlsx("OTT Commissions", rows);
+  return buildXlsx("OTT Commissions", [SUBMISSION_HEADERS, ...subRows.map(rowToArray)]);
 }
 
 function totalCommission(subRows) { return subRows.reduce((s, r) => s + (typeof r.commission === "number" ? r.commission : 0), 0); }

@@ -120,15 +120,15 @@ test("OTT Retailer (col C) is tagged per installer; falls back to plain name", (
   assert.equal(none.ottRetailer, "Tuned Yota", "no installer → plain retailer");
 });
 
-test("renderOttXlsx appends a GRAND TOTAL of the Commission column two rows below the last record", () => {
+test("the submitted workbook is a clean data table — no grand-total row (Policy 0012)", () => {
   const rows = buildSubmissionRows([
     { id: "r1", ...bookingFields({ Name: "A" }) },
     { id: "r2", ...bookingFields({ Name: "B", "Commission Override": 90 }) },
   ], JUNE, {});
   const buf = renderOttXlsx(rows);
-  assert.ok(buf.includes(Buffer.from("GRAND TOTAL")), "label present");
-  assert.ok(buf.includes(Buffer.from("$250.00")), "grand total present, $ format (160 + 90)");
-  assert.equal(rows.reduce((s, r) => s + (r.commission || 0), 0), 250);   // sanity
+  assert.ok(!buf.includes(Buffer.from("GRAND TOTAL")), "no extra total row in the OTT file");
+  assert.ok(buf.includes(Buffer.from("$160.00")) && buf.includes(Buffer.from("$90.00")), "still contains the data rows");
+  assert.equal(rows.reduce((s, r) => s + (r.commission || 0), 0), 250);   // total lives on the console instead
 });
 
 test("Commission and Gear Size follow Policy 0012 formatting in the workbook", () => {
