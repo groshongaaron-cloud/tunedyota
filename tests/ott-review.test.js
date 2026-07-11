@@ -61,6 +61,29 @@ test("POST saves numeric overrides (and clears with null), writing to Airtable",
   assert.deepEqual(writes.find((w) => w.id === "recC").fields, { [OVERRIDE_FIELD]: 0 }, "zero is a real value");
 });
 
+test("POST saves ECU + Gear alongside commission (object value)", async () => {
+  const writes = [];
+  const out = await saveOverrides({ token: "sec", overrides: { recA: { commission: 110, ecu: "04c22", gear: "3.90" }, recB: { ecu: "", gear: "Stock" } } },
+    { env, update: async (a) => { writes.push({ id: a.id, fields: a.fields }); return {}; } });
+  assert.equal(out.ok, true);
+  assert.deepEqual(writes.find((w) => w.id === "recA").fields, { [OVERRIDE_FIELD]: 110, "ECU ID": "04C22", "Gear Size": "3.90" });
+  assert.deepEqual(writes.find((w) => w.id === "recB").fields, { "ECU ID": null, "Gear Size": "Stock" }, "blank ECU clears; gear word kept");
+});
+
+test("the completed row shows an ECU dropdown for a 3rd Gen Tacoma 3.5L and a gear dropdown", () => {
+  const taco = (f = {}) => ({ id: "recT", Name: "Tara", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2022",
+    "OTT Calibration": "", "Calibration Type": "9.2 New", "Calibration Date": "2026-06-20", Installer: ["cody"], Status: "Completed", "Tuning Platform": "VFT", ...f });
+  return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([taco()]) })
+    .then((r) => {
+      const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
+      assert.ok(html.includes('class="ecu-pick"'), "ECU candidate dropdown present");
+      assert.ok(html.includes("04C22") && html.includes("04C31"), "both ECU candidates listed");
+      assert.ok(html.includes('data-gt="1"'), "row flagged for gear coupling");
+      assert.ok(html.includes('class="gear-pick"'), "gear ratio dropdown present");
+      assert.ok(html.includes('class="ecu auto"'), "auto-filled ECU is marked");
+    });
+});
+
 test("POST reports a not-yet-added column so the owner can create it", async () => {
   const out = await saveOverrides({ month: "2026-06", token: "sec", overrides: { recA: 275 } },
     { env, log: { error() {} }, update: async () => { throw new Error(`Unknown field name: "${OVERRIDE_FIELD}"`); } });

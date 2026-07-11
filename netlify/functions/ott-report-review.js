@@ -21,6 +21,7 @@ const OVERRIDE_FIELD = "Commission Override";
 // OTT report picklists (Policy 0012).
 const TP_OPTIONS = ["VFT", "HPT", "PCM", "BB", "COBB"];
 const CT_OPTIONS = ["9.2 New", "9.2 Update", "CARB New", "CARB Update", "Custom", "SEMA CE", "Basic", "TCM Update", "Supercharger", "THR Adjust"];
+const GEAR_OPTIONS = ["3.90", "3.58", "3.73", "4.10", "4.30", "4.88", "5.29", "Stock"];   // Policy 0012
 const INSTALLER_KEYS = Object.keys(INSTALLERS);
 const OPT_FIELDS = ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", OVERRIDE_FIELD];
 
@@ -65,7 +66,10 @@ function page(title, body) {
     `.ob,.wk{border:1px solid #e0dacf;border-radius:9px;padding:10px 12px;margin:8px 0;background:#fbfaf7}` +
     `.obf,.wkf{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}` +
     `.obf select,.obf input,.wkf select,.wkf input{padding:6px 7px;font:inherit;border:1px solid #cbc4ba;border-radius:6px}` +
-    `.obf input,.wkf input{width:110px}.wkf input.wide{width:170px}</style>` +
+    `.obf input,.wkf input{width:110px}.wkf input.wide{width:170px}` +
+    `.tblwrap{overflow-x:auto}input.ecu{width:78px;text-transform:uppercase;padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit}` +
+    `input.gear{width:56px;padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit}` +
+    `input.auto{color:#7c8472;font-style:italic;background:#f7f5f1}select.ecu-pick,select.gear-pick{margin-left:3px;padding:5px 2px;border:1px solid #cbc4ba;border-radius:5px;font-size:12px}</style>` +
     `<body><h1>${esc(title)}</h1>${body}</body>`;
 }
 
@@ -75,21 +79,30 @@ function completedSection(subRows, month, env) {
   const sendUrl = `${base(env)}/.netlify/functions/ott-report-send?month=${month.key}&token=${tok}`;
   const to = recipients(env), total = totalCommission(subRows), u = unresolved(subRows).length;
   let h = `<p class="muted">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong id="tot">$${total}</strong></p>`;
-  h += `<p><strong>Nothing has been sent to OTT yet.</strong> Adjust any commission below, <strong>Save</strong>, then download or send.</p>`;
+  h += `<p><strong>Nothing has been sent to OTT yet.</strong> Adjust commission / ECU ID / gear below, <strong>Save</strong>, then download or send. <span class="muted">Italic values are auto-filled suggestions — Save to lock them.</span></p>`;
   if (u) h += `<p class="warn"><strong>${u} row(s) need a commission</strong> — the amount was ambiguous or the platform was bench (BB). Type it in and Save.</p>`;
-  h += `<table><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Vehicle</th><th>Platform</th><th>Cal Type</th><th>Commission&nbsp;($)</th></tr>`;
+  h += `<div class="tblwrap"><table><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Vehicle</th><th>Platform</th><th>Cal Type</th><th>ECU ID</th><th>Gear</th><th>Commission&nbsp;($)</th></tr>`;
   for (const r of subRows) {
+    const rec = esc(r.recordId);
     const veh = [r.vehicleYear, r.vehicleType, r.engineSize].filter(Boolean).join(" ") || "—";
     const need = r.commission == null, val = r.commission == null ? "" : r.commission;
     const flag = r._overridden ? ` <span class="over" title="Manually set">✎</span>` : "";
+    let ecuCell = `<input class="ecu${r._ecuAuto ? " auto" : ""}" data-rec="${rec}" value="${esc(r.ecuId || "")}"${r._ecuAuto ? ' title="auto-filled from model+year — Save to lock"' : ""}>`;
+    if (r._ecuCandidates && r._ecuCandidates.length) {
+      ecuCell += `<select class="ecu-pick" data-rec="${rec}"${r._is3gt ? ' data-gt="1"' : ""}><option value="">↕</option>`
+        + r._ecuCandidates.map((c) => `<option value="${esc(c.id)}" data-trans="${esc(c.transmission)}">${esc(c.label)}</option>`).join("") + `</select>`;
+    }
+    const gearCell = `<input class="gear${r._gearAuto ? " auto" : ""}" data-rec="${rec}" value="${esc(r.gearSize || "")}">`
+      + `<select class="gear-pick" data-rec="${rec}"><option value="">↕</option>` + GEAR_OPTIONS.map((g) => `<option>${g}</option>`).join("") + `</select>`;
     h += `<tr><td>${esc(r.dateCalibrationApplied)}</td><td>${esc(r.customer)}</td><td>${esc(r.vin || "—")}</td>`
       + `<td>${esc(veh)}</td><td>${esc(r.tuningPlatform || "—")}</td><td>${esc(r.calibrationType || "—")}</td>`
+      + `<td>${ecuCell}</td><td>${gearCell}</td>`
       + `<td><input class="comm${need ? " need" : ""}" type="number" min="0" step="1" inputmode="numeric" `
-      + `data-rec="${esc(r.recordId)}" value="${val}">${flag}</td></tr>`;
+      + `data-rec="${rec}" value="${val}">${flag}</td></tr>`;
   }
-  h += `</table>`;
+  h += `</table></div>`;
   h += `<div style="margin:22px 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center">`
-    + `<button class="btn btn-save" id="save">Save commissions</button>`
+    + `<button class="btn btn-save" id="save">Save</button>`
     + `<a class="btn btn-dl" href="${xlsxUrl}">⬇ Download Excel (.xlsx)</a>`
     + `<a class="btn btn-send" href="${sendUrl}" onclick="return confirm('Send the ${esc(month.label)} OTT submission to ${esc(to.join(', '))}? This emails OTT the workbook.')">Finalize &amp; Send to OTT →</a>`
     + `<span id="saveMsg" class="muted"></span></div>`;
@@ -156,12 +169,26 @@ function consoleScript(env, month) {
     return { calibration:q('cal'), tuningPlatform:q('tp'), calibrationType:q('ct'), commission:q('comm'),
       vin:q('vin'), ecuId:q('ecu'), gearSize:q('gear'), mileage:q('mi') };
   }
+  // ECU dropdown → fills the ECU input; on a 3rd Gen Tacoma, a Manual/Auto pick
+  // also flips the gear (4.30 / 3.90). Gear dropdown → fills the gear input.
+  document.querySelectorAll('select.ecu-pick').forEach(function(s){ s.addEventListener('change',function(){
+    var rec=s.dataset.rec, opt=s.options[s.selectedIndex];
+    var ei=document.querySelector('input.ecu[data-rec="'+rec+'"]'); if(ei && s.value){ ei.value=s.value; ei.classList.remove('auto'); }
+    if(s.dataset.gt && opt && opt.dataset.trans){ var gi=document.querySelector('input.gear[data-rec="'+rec+'"]'); if(gi){ gi.value=(opt.dataset.trans==='Manual'?'4.30':'3.90'); gi.classList.remove('auto'); } }
+  }); });
+  document.querySelectorAll('select.gear-pick').forEach(function(s){ s.addEventListener('change',function(){
+    var gi=document.querySelector('input.gear[data-rec="'+s.dataset.rec+'"]'); if(gi && s.value){ gi.value=s.value; gi.classList.remove('auto'); }
+  }); });
   var save=document.getElementById('save');
   if(save) save.addEventListener('click',function(){
     var msg=document.getElementById('saveMsg'), overrides={};
-    document.querySelectorAll('input.comm').forEach(function(i){ var v=i.value.trim(); overrides[i.dataset.rec]=(v===''?null:Number(v)); });
+    function ov(rec){ return overrides[rec]=overrides[rec]||{}; }
+    document.querySelectorAll('input.comm').forEach(function(i){ var v=i.value.trim(); ov(i.dataset.rec).commission=(v===''?null:Number(v)); });
+    document.querySelectorAll('input.ecu').forEach(function(i){ ov(i.dataset.rec).ecu=i.value.trim(); });
+    document.querySelectorAll('input.gear').forEach(function(i){ ov(i.dataset.rec).gear=i.value.trim(); });
     post_({op:'overrides',month:MONTH_,overrides:overrides}, msg, function(o){
       msg.textContent='Saved '+o.saved+' ✓ — you can download or send now.'; msg.className='over';
+      document.querySelectorAll('input.auto').forEach(function(i){ i.classList.remove('auto'); });
       var t=0; document.querySelectorAll('input.comm').forEach(function(i){ i.classList.remove('need'); if(i.value.trim()!=='')t+=Number(i.value); });
       var tot=document.getElementById('tot'); if(tot)tot.textContent='$'+t;
     });
@@ -224,10 +251,18 @@ async function saveOverrides(params, deps) {
   let saved = 0;
   for (const [recordId, raw] of Object.entries(overrides)) {
     if (!recordId) continue;
-    const val = raw == null || raw === "" ? null : Number(raw);
-    if (val != null && !Number.isFinite(val)) continue;
+    // Value is an object {commission, ecu, gear}; a bare number is back-compat commission.
+    const v = raw && typeof raw === "object" ? raw : { commission: raw };
+    const fields = {};
+    if ("commission" in v) {
+      const n = v.commission == null || v.commission === "" ? null : Number(v.commission);
+      if (n == null || Number.isFinite(n)) fields[OVERRIDE_FIELD] = n;
+    }
+    if ("ecu" in v) fields["ECU ID"] = String(v.ecu || "").trim().toUpperCase() || null;
+    if ("gear" in v) fields["Gear Size"] = String(v.gear || "").trim() || null;
+    if (!Object.keys(fields).length) continue;
     try {
-      await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: recordId, fields: { [OVERRIDE_FIELD]: val } });
+      await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: recordId, fields });
       saved++;
     } catch (e) {
       if (/unknown[_ ]field/i.test(e.message) && new RegExp(OVERRIDE_FIELD, "i").test(e.message)) return { status: "error", code: 200, error: "missing-column" };
