@@ -54,13 +54,21 @@ function buildSubmissionRows(bookings, month, opts = {}) {
     const calDate = b["Calibration Date"] || "";
     if (monthOf(calDate) !== month.key) continue;
     const dv = deriveVehicle(b.Vehicle);
+    // Prefer the exact model year captured at booking (the Model Year dropdown)
+    // over the year derived from the vehicle text, which is only the platform
+    // range's start (e.g. "2016" for a 2016-2023 Tacoma). The exact year is also
+    // the better input for the commission lookup's year-range matching. Falls back
+    // to the derived year for legacy rows booked before model-year capture.
+    const capturedYear = /^(?:19|20)\d{2}$/.test(String(b["Model Year"] == null ? "" : b["Model Year"]).trim())
+      ? +String(b["Model Year"]).trim() : null;
+    const year = capturedYear || dv.year;
     const tuningPlatform = String(b["Tuning Platform"] || "").trim().toUpperCase();
     const calibrationType = String(b["Calibration Type"] || "").trim();
-    const look = lookupCommission({ vehicleType: dv.vehicleType, year: dv.year, engine: dv.engine, tuningPlatform, calibrationType });
+    const look = lookupCommission({ vehicleType: dv.vehicleType, year, engine: dv.engine, tuningPlatform, calibrationType });
     out.push({
       dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailer,
       customer: b.Name || "", vin: String(b.VIN || "").toUpperCase(),
-      vehicleYear: dv.year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
+      vehicleYear: year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
       ecuId: String(b["ECU ID"] || "").toUpperCase(), gearSize: b["Gear Size"] || "",
       mileage: (b.Mileage === 0 || b.Mileage) ? Number(b.Mileage) : "",
       tuningPlatform, calibrationType, commission: look.commission,

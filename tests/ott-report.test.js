@@ -47,6 +47,24 @@ test("buildSubmissionRows leaves an unresolvable commission null (bench BB)", ()
   assert.equal(rows[0].commission, null);
 });
 
+test("Vehicle Year uses the captured Model Year, not the platform range start", () => {
+  const rows = buildSubmissionRows([{ id: "r1", ...bookingFields({
+    Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2021" }) }], JUNE, {});
+  assert.equal(rows[0].vehicleYear, 2021, "exact captured year wins over the 2016 range start");
+});
+
+test("Vehicle Year falls back to the derived range start when Model Year is blank", () => {
+  const rows = buildSubmissionRows([{ id: "r1", ...bookingFields({
+    Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "" }) }], JUNE, {});
+  assert.equal(rows[0].vehicleYear, 2016, "legacy rows still get a year from the vehicle text");
+});
+
+test("a garbage Model Year is ignored in favor of the derived year", () => {
+  const rows = buildSubmissionRows([{ id: "r1", ...bookingFields({
+    Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "n/a" }) }], JUNE, {});
+  assert.equal(rows[0].vehicleYear, 2016);
+});
+
 test("renderOttXlsx produces a real .xlsx with the header row + data", () => {
   const rows = buildSubmissionRows([{ id: "recABCDE12345", ...bookingFields() }], JUNE, {});
   const buf = renderOttXlsx(rows);
