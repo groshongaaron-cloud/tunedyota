@@ -71,5 +71,5 @@ test("POST reports a not-yet-added column so the owner can create it", async () 
 test("an override flows through to the workbook download", async () => {
   const out = await review({ month: "2026-06", token: "sec", format: "xlsx" },
     { env, now: NOW, listAll: async () => recs([completed({ "Commission Override": 999 })]) });
-  assert.ok(out.buffer.includes(Buffer.from("999")), "overridden commission appears in the .xlsx");
+  assert.ok(out.buffer.includes(Buffer.from("$999.00")), "overridden commission appears in the .xlsx ($ format)");
 });

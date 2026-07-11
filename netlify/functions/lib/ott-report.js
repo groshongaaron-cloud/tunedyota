@@ -43,12 +43,23 @@ function recipients(env = {}) {
 
 const monthOf = (iso) => String(iso == null ? "" : iso).slice(0, 7);
 
-// OTT's mandatory submission columns, in exact order (Master OTT Tracker).
+// OTT's mandatory submission columns, in exact order (Policy 0012, v1.2). The
+// 15th "Notes" column is required after Commission (MAF Scale, supercharger type,
+// bench flash, free-form, etc.).
 const SUBMISSION_HEADERS = [
   "Date of Submission", "Date Calibration Applied", "OTT Retailer", "Customer First Last Name",
   "VIN", "Vehicle Year", "Vehicle Type", "Engine Size", "ECU ID", "Gear Size", "Mileage",
-  "Tuning Platform", "Calibration Type", "Commission",
+  "Tuning Platform", "Calibration Type", "Commission", "Notes",
 ];
+
+// Policy 0012: Commission shown with a "$" and two decimals ("$110.00"), "$0.00"
+// for free/no-charge. A null (unresolved) amount stays blank for the owner to fill.
+function fmtCommission(c) { return c == null || c === "" ? "" : `$${Number(c).toFixed(2)}`; }
+// Policy 0012: Gear Size to two decimals (3.90, 4.30 …) or a word like "Stock".
+function fmtGear(g) {
+  const s = String(g == null ? "" : g).trim();
+  return s !== "" && !isNaN(Number(s)) ? Number(s).toFixed(2) : s;
+}
 
 // One submission row per completed calibration in the target month. Vehicle
 // Type/Year/Engine are derived from the booking's vehicle text; the rest come
@@ -85,9 +96,9 @@ function buildSubmissionRows(bookings, month, opts = {}) {
       recordId: b.id || "", dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailerFor(b, retailer),
       customer: b.Name || "", vin: String(b.VIN || "").toUpperCase(),
       vehicleYear: year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
-      ecuId: String(b["ECU ID"] || "").toUpperCase(), gearSize: b["Gear Size"] || "",
+      ecuId: String(b["ECU ID"] || "").toUpperCase(), gearSize: fmtGear(b["Gear Size"]),
       mileage: (b.Mileage === 0 || b.Mileage) ? Number(b.Mileage) : "",
-      tuningPlatform, calibrationType, commission,
+      tuningPlatform, calibrationType, commission, notes: String(b.Notes || "").trim(),
       _confidence: look.confidence, _candidates: look.candidates, _tier: tier,
       _autoCommission: look.commission, _overridden: overridden,
     });
@@ -129,17 +140,17 @@ function buildOpenBookings(bookings, now = new Date()) {
 function rowToArray(r) {
   return [r.dateOfSubmission, r.dateCalibrationApplied, r.ottRetailer, r.customer, r.vin,
     r.vehicleYear, r.vehicleType, r.engineSize, r.ecuId, r.gearSize, r.mileage,
-    r.tuningPlatform, r.calibrationType, (r.commission == null ? "" : r.commission)];
+    r.tuningPlatform, r.calibrationType, fmtCommission(r.commission), r.notes || ""];
 }
-// Filled .xlsx in OTT's exact 14-column order. Returns a Buffer. Per OTT's
-// reporting standard, a GRAND TOTAL of the Commission column (N) is written two
-// rows below the last record (one blank spacer row, then the total).
+// Filled .xlsx in OTT's exact 15-column order (Policy 0012). Returns a Buffer. A
+// GRAND TOTAL of the Commission column (N) is written two rows below the last
+// record (one blank spacer row, then the total), formatted as "$X.00".
 function renderOttXlsx(subRows) {
   const rows = [SUBMISSION_HEADERS, ...subRows.map(rowToArray)];
   if (subRows.length) {
     const total = new Array(SUBMISSION_HEADERS.length).fill("");
-    total[12] = "GRAND TOTAL";                 // column M label
-    total[13] = totalCommission(subRows);      // column N — Commission grand total
+    total[12] = "GRAND TOTAL";                          // column M label
+    total[13] = fmtCommission(totalCommission(subRows)); // column N — Commission grand total
     rows.push(new Array(SUBMISSION_HEADERS.length).fill(""));   // blank spacer row
     rows.push(total);
   }

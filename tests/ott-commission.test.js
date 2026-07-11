@@ -3,13 +3,18 @@ const assert = require("node:assert/strict");
 const { deriveVehicle, vehicleType, lookupCommission } = require("../netlify/functions/lib/ott-commission.js");
 
 test("deriveVehicle parses type/year/engine from a booking's free-text vehicle", () => {
-  assert.deepEqual(deriveVehicle("2024+ Toyota Tacoma 2.4L-T I4"), { vehicleType: "Tacoma", year: 2024, engine: "2.4" });
+  // Policy 0012: the 2.4L turbo trucks report as 2.4T (gas) / 2.4TH (iForce Max hybrid)
+  assert.deepEqual(deriveVehicle("2024+ Toyota Tacoma 2.4L-T I4"), { vehicleType: "Tacoma", year: 2024, engine: "2.4T" });
+  assert.deepEqual(deriveVehicle("2025 Toyota Tundra 2.4L Hybrid iForce Max"), { vehicleType: "Tundra", year: 2025, engine: "2.4TH" });
   assert.deepEqual(deriveVehicle("2007-2021 Toyota Tundra 5.7L V8"), { vehicleType: "Tundra", year: 2007, engine: "5.7" });
   assert.deepEqual(deriveVehicle("2019 Lexus GX 460 4.6L V8"), { vehicleType: "GX460", year: 2019, engine: "4.6" });
 });
 
-test("vehicleType returns '' for models not on OTT's 12-value list (e.g. RAV4)", () => {
-  assert.equal(vehicleType("2010 Toyota RAV4 3.5L"), "");
+test("vehicleType matches Policy 0012 picklist incl. the space in 'RAV 4', ES350, LS460", () => {
+  assert.equal(vehicleType("2010 Toyota RAV4 3.5L"), "RAV 4");
+  assert.equal(vehicleType("2015 Lexus ES350 3.5L V6"), "ES350");
+  assert.equal(vehicleType("2012 Lexus LS460 4.6L V8"), "LS460");
+  assert.equal(vehicleType("2020 Toyota Land Cruiser 5.7L"), "Land Cruiser");
 });
 
 test("lookupCommission resolves an unambiguous Basic calibration to its OTT Commission", () => {

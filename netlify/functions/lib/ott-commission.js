@@ -4,19 +4,22 @@
 // the monthly draft, so an ambiguous lookup returns candidates rather than guessing.
 const TEMPLATE = require("./ott-commission-template.json");
 
-// --- OTT Vehicle Type (the 12 values on the submission's Definitions sheet) ---
+// --- OTT Vehicle Type — the exact picklist from Policy 0012 (capitalization and
+// spacing matter; "RAV 4" has a space). Order matters: match specific before general.
 const VTYPE_PATTERNS = [
   [/\bfj\s*cruiser\b/i, "FJ Cruiser"],
   [/\b4\s*runner\b|\b4runner\b/i, "4Runner"],
   [/\bgx\s*470\b/i, "GX470"],
   [/\bgx\s*460\b/i, "GX460"],
   [/\blx\s*570\b/i, "LX570"],
-  [/\blx\s*470\b/i, "LX470"],
   [/\bland\s*cruiser\b|\blc250\b/i, "Land Cruiser"],
   [/\bsequoia\b/i, "Sequoia"],
   [/\btundra\b/i, "Tundra"],
   [/\btacoma\b/i, "Tacoma"],
   [/\bhighlander\b/i, "Highlander"],
+  [/\brav\s*4\b/i, "RAV 4"],      // Policy 0012 spells it with a space
+  [/\bes\s*350\b/i, "ES350"],
+  [/\bls\s*460\b/i, "LS460"],
   [/\bcamry\b/i, "Camry"],
 ];
 function vehicleType(s) {
@@ -28,9 +31,16 @@ function vehicleYear(s) {
   const m = /\b(19|20)\d{2}\b/.exec(String(s == null ? "" : s));
   return m ? +m[0] : null;
 }
-// Engine size as the sheet writes it: the leading "X.X" litre figure.
+// Engine size as Policy 0012 writes it: 2.4T / 2.4TH for the turbo(-hybrid) 2.4L
+// trucks, otherwise the plain "X.X" litre figure (no extra zeros). The 2.4L on
+// OTT-supported platforms is always forced-induction: TH = Turbo Hybrid (iForce
+// Max), else T = Turbo (gas).
 function engineSize(s) {
-  const m = /(\d\.\d)\s*L?/i.exec(String(s == null ? "" : s));
+  const t = String(s == null ? "" : s);
+  if (/\b2\.4\b|2\.4\s*l/i.test(t)) {
+    return /hybrid|iforce\s*max|\b2\.4\s*l?-?th\b|\bth\b/i.test(t) ? "2.4TH" : "2.4T";
+  }
+  const m = /(\d\.\d)\s*L?/i.exec(t);
   return m ? m[1] : "";
 }
 function deriveVehicle(vehicleStr) {

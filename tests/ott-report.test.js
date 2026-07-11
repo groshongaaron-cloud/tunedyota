@@ -17,10 +17,11 @@ test("priorMonth / monthFromKey", () => {
   assert.deepEqual(monthFromKey("2026-06"), { key: "2026-06", label: "June 2026", year: 2026, month: 6 });
 });
 
-test("SUBMISSION_HEADERS are OTT's 14 columns in exact order", () => {
-  assert.equal(SUBMISSION_HEADERS.length, 14);
+test("SUBMISSION_HEADERS are OTT's 15 columns in exact order (Policy 0012, Notes last)", () => {
+  assert.equal(SUBMISSION_HEADERS.length, 15);
   assert.equal(SUBMISSION_HEADERS[0], "Date of Submission");
   assert.equal(SUBMISSION_HEADERS[13], "Commission");
+  assert.equal(SUBMISSION_HEADERS[14], "Notes");
   assert.deepEqual(SUBMISSION_HEADERS.slice(5, 8), ["Vehicle Year", "Vehicle Type", "Engine Size"]);
 });
 
@@ -126,8 +127,25 @@ test("renderOttXlsx appends a GRAND TOTAL of the Commission column two rows belo
   ], JUNE, {});
   const buf = renderOttXlsx(rows);
   assert.ok(buf.includes(Buffer.from("GRAND TOTAL")), "label present");
-  assert.ok(buf.includes(Buffer.from("250")), "grand total present (160 + 90)");
+  assert.ok(buf.includes(Buffer.from("$250.00")), "grand total present, $ format (160 + 90)");
   assert.equal(rows.reduce((s, r) => s + (r.commission || 0), 0), 250);   // sanity
+});
+
+test("Commission and Gear Size follow Policy 0012 formatting in the workbook", () => {
+  const rows = buildSubmissionRows([
+    { id: "r1", ...bookingFields({ "Gear Size": "4.3" }) },                       // → "4.30"
+    { id: "r2", ...bookingFields({ Name: "Z", "Commission Override": 0 }) },       // → "$0.00"
+  ], JUNE, {});
+  const buf = renderOttXlsx(rows);
+  assert.ok(buf.includes(Buffer.from("$160.00")), "commission shows as $X.00");
+  assert.ok(buf.includes(Buffer.from("$0.00")), "a free/zero commission shows as $0.00");
+  assert.ok(buf.includes(Buffer.from("4.30")), "gear size normalized to two decimals");
+});
+
+test("a Notes value (col 15) flows into the row and workbook", () => {
+  const [r] = buildSubmissionRows([{ id: "r1", ...bookingFields({ Notes: "Maggy SC, bench flash" }) }], JUNE, {});
+  assert.equal(r.notes, "Maggy SC, bench flash");
+  assert.ok(renderOttXlsx([r]).includes(Buffer.from("Maggy SC, bench flash")));
 });
 
 function deps(overrides = {}) {
