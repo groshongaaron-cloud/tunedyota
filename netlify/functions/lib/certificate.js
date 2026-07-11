@@ -51,7 +51,8 @@ function formatVehicle(vehicle, modelYear) {
 function buildCertificate({ name, vehicle, modelYear, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
   const vehicleDisplay = formatVehicle(vehicle, modelYear);
   const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicleDisplay ? ` · ${vehicleDisplay}` : ""}`;
-  const installerLine = `${esc(installer || "")}${installerRegion ? ` &middot; ${esc(installerRegion)}` : ""}`;
+  // Installer row shows the installer's NAME only — no cities/region.
+  const installerLine = esc(installer || "");
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,13 +151,14 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
     color:var(--ember);
   }
   h1{
-    margin:0;
+    margin:28px 0 0;
     font-size:40px;
     font-weight:800;
     letter-spacing:-.01em;
     line-height:1.02;
   }
-  h1 .thin{ font-weight:300; }
+  h1 .thin{ font-weight:300; color:var(--steel); }
+  .title-rule{ width:56px; height:3px; background:var(--ember); border-radius:2px; margin:12px 0 0; }
   .attest{
     margin:22px 0 30px;
     font-size:15px;
@@ -275,7 +277,7 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
             </svg>
             <div class="brand-mark">Tuned Yota</div>
           </div>
-          <div class="brand-sub">Authorized OTT &middot; Overland Tailor Tune Installer</div>
+          <div class="brand-sub">Authorized OTT &middot; Overland Tailor Tuning Installer</div>
         </div>
         <div class="doc-id">
           <div><span class="k">CERT&nbsp;NO&nbsp;</span><span class="v">${esc(certNo || "")}</span></div>
@@ -283,11 +285,11 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
           <div><span class="k">STATUS&nbsp;&nbsp;</span><span class="v" style="color:var(--ember);">VERIFIED</span></div>
         </div>
       </div>
-      <div class="eyebrow">Certificate of</div>
-      <h1>Calibration <span class="thin">Complete</span></h1>
+      <h1><span class="thin">Certificate of</span> Calibration</h1>
+      <div class="title-rule"></div>
       <p class="attest">
         This certifies that the vehicle below received a professional ECU
-        calibration performed by Tuned&nbsp;Yota, an authorized Overland&nbsp;Tailor&nbsp;Tune
+        calibration performed by Tuned&nbsp;Yota, an authorized Overland&nbsp;Tailor&nbsp;Tuning
         installer. The calibration was written, road-verified,
         and confirmed for daily operation. Retain this record with the
         vehicle&rsquo;s documentation — it confirms the work performed for

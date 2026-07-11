@@ -10,12 +10,13 @@ test("renders the Master Certificate with merged booking data", () => {
   });
   assert.match(subject, /Certificate of Calibration/);
   assert.match(subject, /Jane Driver/);
-  assert.match(html, /Certificate of/);
-  assert.match(html, /Complete/);
+  assert.match(html, /Certificate of<\/span> Calibration/);   // uniform title, "Complete" removed
+  assert.ok(!/Calibration Complete/.test(html));
   assert.ok(html.includes("Jane Driver"));
   assert.ok(html.includes("2024+ Toyota Tacoma 2.4L-T I4"));
   assert.ok(html.includes("Cody Star"));
-  assert.ok(html.includes("Sioux Falls, Rapid City &amp; Omaha")); // region, & escaped
+  assert.ok(!html.includes("Sioux Falls"), "installer row shows the name only, no cities/region");
+  assert.match(html, /Overland&nbsp;Tailor&nbsp;Tuning/);      // "Tune" → "Tuning"
   assert.ok(html.includes("TY-2026-AB12C"));      // cert no
   assert.ok(html.includes("2026-09-13"));          // issued date
   assert.ok(html.includes("September 12, 2026"));  // long-formatted calibration date
