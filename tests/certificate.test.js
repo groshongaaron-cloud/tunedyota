@@ -39,13 +39,35 @@ test("renders the VIN when provided, em-dash when blank", () => {
   assert.ok(noVin.includes("&mdash;"));      // value falls back to an em-dash
 });
 
-test("appends the exact model year to the vehicle line when provided, omits it when blank", () => {
+test("renders the exact model year + platform, replacing the year range", () => {
   const withYear = buildCertificate({ name: "A", vehicle: "2016-2023 Toyota Tacoma 3.5L V6", modelYear: "2019" });
-  assert.ok(withYear.html.includes("2016-2023 Toyota Tacoma 3.5L V6 (2019)"), "vehicle line should carry the exact year");
-  assert.ok(withYear.subject.includes("(2019)"), "subject should carry the exact year");
+  assert.ok(withYear.html.includes("2019 Toyota Tacoma 3.5L V6"), "vehicle line should read exact year + platform");
+  assert.ok(!withYear.html.includes("2016-2023"), "the platform year range should be gone");
+  assert.ok(withYear.subject.includes("2019 Toyota Tacoma 3.5L V6"), "subject should carry exact year + platform");
   const noYear = buildCertificate({ name: "A", vehicle: "2016-2023 Toyota Tacoma 3.5L V6" });
-  assert.ok(noYear.html.includes("2016-2023 Toyota Tacoma 3.5L V6"), "vehicle still renders without a year");
+  assert.ok(noYear.html.includes("2016-2023 Toyota Tacoma 3.5L V6"), "range kept as fallback when no exact year");
   assert.ok(!/\(\s*\)/.test(noYear.html), "no dangling empty parens when model year is blank");
+});
+
+test("drops the 'What are you after?' selections from the vehicle line", () => {
+  const { html, subject } = buildCertificate({
+    name: "Louis Arvin Dimaano",
+    vehicle: "2016-2023 Toyota Tacoma 2.7L I4  ·  Better shifting / rev-hang, Larger tires / overland, Sharper daily response, More power & torque",
+    modelYear: "2021",
+  });
+  assert.ok(html.includes("2021 Toyota Tacoma 2.7L I4"), "clean year + platform");
+  assert.ok(!html.includes("Better shifting"), "goal selections must not appear");
+  assert.ok(!html.includes("·"), "the goals separator must not survive into the vehicle line");
+  assert.ok(!subject.includes("Better shifting"), "goal selections must not leak into the subject");
+});
+
+test("drops the goals even when no exact model year was captured", () => {
+  const { html } = buildCertificate({
+    name: "A",
+    vehicle: "2016-2023 Toyota Tacoma 2.7L I4  ·  More power & torque",
+  });
+  assert.ok(html.includes("2016-2023 Toyota Tacoma 2.7L I4"), "platform range retained");
+  assert.ok(!html.includes("More power"), "goals dropped even without an exact year");
 });
 
 test("blank calibration renders an em-dash, not a picker", () => {

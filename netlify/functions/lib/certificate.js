@@ -28,11 +28,28 @@ function certSerial(recordId, dateISO, issueISO) {
 // renders as static, non-editable text (no dropdown). The choosable picker lives
 // only in the design master, docs/brand/tuned-yota-master-certificate.html.
 
+// Render the vehicle line as the EXACT model year + platform, nothing else.
+// The stored vehicle string carries the platform year RANGE plus the customer's
+// "What are you after?" selections (joined with " · "), e.g.
+// "2016-2023 Toyota Tacoma 2.7L I4  ·  Better shifting, Larger tires". Neither
+// belongs on the certificate: drop the selections, and when the exact model year
+// was captured at booking, swap it in for the range → "2021 Toyota Tacoma 2.7L I4".
+// Without a captured year we keep the platform range (goals still dropped).
+function formatVehicle(vehicle, modelYear) {
+  if (!vehicle) return "";
+  const base = String(vehicle).split(/\s*·\s*/)[0].trim();
+  const year = String(modelYear == null ? "" : modelYear).trim();
+  if (!year) return base;
+  // Strip a leading platform year token ("2016-2023", "2024+", "All years") so
+  // the exact year replaces it rather than stacking two years.
+  const platform = base
+    .replace(/^all\s+years\s+/i, "")
+    .replace(/^(?:19|20)\d{2}\s*(?:[-–—]\s*(?:(?:19|20)\d{2})?|\+)?\s+/, "");
+  return `${year} ${platform}`;
+}
+
 function buildCertificate({ name, vehicle, modelYear, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
-  // Append the exact model year to the vehicle string when captured at booking
-  // (the vehicle string itself carries only the platform year range, e.g.
-  // "2016-2023 Toyota Tacoma 3.5L V6"). Empty for single-year vehicles.
-  const vehicleDisplay = vehicle ? `${vehicle}${modelYear ? ` (${modelYear})` : ""}` : "";
+  const vehicleDisplay = formatVehicle(vehicle, modelYear);
   const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicleDisplay ? ` · ${vehicleDisplay}` : ""}`;
   const installerLine = `${esc(installer || "")}${installerRegion ? ` &middot; ${esc(installerRegion)}` : ""}`;
   const html = `<!DOCTYPE html>

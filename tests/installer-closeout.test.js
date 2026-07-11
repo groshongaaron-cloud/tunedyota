@@ -35,7 +35,7 @@ test("complete sets fields, sends the cert, marks Certificate Sent", async () =>
   assert.ok(sent.attachments && sent.attachments[0].filename === "certificate.html");
 });
 
-test("stamps the exact model year on the certificate (appended to the vehicle)", async () => {
+test("stamps the exact model year on the certificate (replacing the platform range)", async () => {
   let sent = null;
   await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
     { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
@@ -43,7 +43,8 @@ test("stamps the exact model year on the certificate (appended to the vehicle)",
       update: async () => ({}),
       send: async (m) => { sent = m; return { ok: true }; } });
   const certHtml = Buffer.from(sent.attachments[0].content, "base64").toString();
-  assert.ok(certHtml.includes("2016-2023 Toyota Tacoma 3.5L V6 (2019)"), "cert shows the exact model year");
+  assert.ok(certHtml.includes("2019 Toyota Tacoma 3.5L V6"), "cert shows the exact model year in place of the range");
+  assert.ok(!certHtml.includes("2016-2023"), "the platform year range is replaced, not appended");
 });
 
 test("complete stores a normalized VIN and stamps it on the certificate", async () => {
