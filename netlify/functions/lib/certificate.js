@@ -310,7 +310,7 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
         </div>
         <div class="row">
           <div class="label">VIN</div>
-          <div class="value">${esc(vin) || "&mdash;"}</div>
+          <div class="value">${esc(String(vin || "").toUpperCase()) || "&mdash;"}</div>
         </div>
         <div class="row">
           <div class="label">OTT Calibration</div>

@@ -40,6 +40,12 @@ test("renders the VIN when provided, em-dash when blank", () => {
   assert.ok(noVin.includes("&mdash;"));      // value falls back to an em-dash
 });
 
+test("renders the VIN in uppercase even if entered lowercase", () => {
+  const html = buildCertificate({ name: "A", vehicle: "V", vin: "5tfdw5f17mx000000" }).html;
+  assert.ok(html.includes("5TFDW5F17MX000000"), "lowercase VIN is upper-cased on the certificate");
+  assert.ok(!html.includes("5tfdw5f17mx000000"), "the lowercase form is not rendered");
+});
+
 test("renders the exact model year + platform, replacing the year range", () => {
   const withYear = buildCertificate({ name: "A", vehicle: "2016-2023 Toyota Tacoma 3.5L V6", modelYear: "2019" });
   assert.ok(withYear.html.includes("2019 Toyota Tacoma 3.5L V6"), "vehicle line should read exact year + platform");
