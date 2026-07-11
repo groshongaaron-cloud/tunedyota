@@ -134,6 +134,18 @@ function daysBetween(fromISO, toISO) {
   const a = Date.parse(`${fromISO}T00:00:00Z`), b = Date.parse(`${toISO}T00:00:00Z`);
   return (Number.isNaN(a) || Number.isNaN(b)) ? "" : Math.round((b - a) / 86400000);
 }
+// The platform year span from a vehicle string, so the overdue form can offer a
+// model-year picker: "2016-2023 …" → {lo:2016,hi:2023}; "2024+ …" → {lo:2024,hi:now}.
+function parseYearRange(s, now = new Date()) {
+  const t = String(s == null ? "" : s);
+  let m = t.match(/((?:19|20)\d{2})\s*(?:-|–|—|to)\s*((?:19|20)\d{2})/i);
+  if (m) return { lo: Math.min(+m[1], +m[2]), hi: Math.max(+m[1], +m[2]) };
+  m = t.match(/((?:19|20)\d{2})\s*\+/);
+  if (m) return { lo: +m[1], hi: now.getUTCFullYear() };
+  m = t.match(/\b((?:19|20)\d{2})\b/);
+  if (m) return { lo: +m[1], hi: +m[1] };
+  return { lo: null, hi: null };
+}
 function buildOpenBookings(bookings, now = new Date()) {
   const today = now.toISOString().slice(0, 10);
   const out = [];
@@ -141,9 +153,14 @@ function buildOpenBookings(bookings, now = new Date()) {
     if (NON_OPEN.has(String(b.Status || "").trim().toLowerCase())) continue;
     const event = String(b["Event Date"] || "").slice(0, 10);
     if (!event || event >= today) continue;                 // overdue only: event in the past
+    const vehicle = String(b.Vehicle || "").split(/\s*·\s*/)[0].trim();   // drop the "what are you after?" goals
+    const dv = deriveVehicle(vehicle);
+    const yr = parseYearRange(vehicle, now);
+    const my = String(b["Model Year"] == null ? "" : b["Model Year"]).trim();
     out.push({
-      recordId: b.id || "", customer: b.Name || "",
-      vehicle: String(b.Vehicle || "").split(/\s*·\s*/)[0].trim(),   // drop the "what are you after?" goals
+      recordId: b.id || "", customer: b.Name || "", vehicle,
+      vehicleType: dv.vehicleType || "", engine: dv.engine || "",
+      yearLo: yr.lo, yearHi: yr.hi, modelYear: /^(?:19|20)\d{2}$/.test(my) ? my : "",
       city: b.City || "", eventDate: event,
       installerKey: Array.isArray(b.Installer) ? b.Installer[0] : (b.Installer || ""),
       status: b.Status || "Booked", daysOverdue: daysBetween(event, today),

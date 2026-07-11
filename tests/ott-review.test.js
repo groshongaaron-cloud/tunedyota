@@ -121,6 +121,26 @@ test("completeBooking closes out ANY installer's booking with the OTT fields (ow
   assert.equal(wrote.Mileage, 51481, "commas stripped");
 });
 
+test("completeBooking saves the selected Model Year", async () => {
+  let wrote = null;
+  await completeBooking({ token: "sec", booking: { recordId: "r1", eventDate: "2026-06-28", calibration: "Medium", modelYear: "2019", ecuId: "04B34", gearSize: "3.90" } },
+    { env, update: async (a) => { wrote = a.fields; return {}; } });
+  assert.equal(wrote["Model Year"], "2019");
+  assert.equal(wrote["ECU ID"], "04B34");
+});
+
+test("the overdue form has a model-year picker with per-year auto-fill data", () => {
+  const overdueTaco = { id: "recOB", Name: "Olga", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6 · goals",
+    City: "Omaha", "Event Date": "2026-06-28", Status: "Booked", Installer: ["cody"] };
+  return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([completed(), overdueTaco]) })
+    .then((r) => {
+      const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
+      assert.ok(html.includes('class="ob-year"'), "model-year picker present");
+      assert.ok(html.includes(">2021<") && html.includes(">2016<"), "years from the platform range listed");
+      assert.ok(/data-fill="[^"]*04B34[^"]*"/.test(html), "per-year ECU auto-fill embedded (2019 → 04B34)");
+    });
+});
+
 test("completeBooking rejects a bad calibration and a bad token", async () => {
   const bad = await completeBooking({ token: "sec", booking: { recordId: "r1", calibration: "Nope" } }, { env, update: async () => ({}) });
   assert.equal(bad.error, "bad-calibration");

@@ -15,6 +15,8 @@ const { cfg, listAllRecords, updateRecord, createRecord, updateTolerant, createT
 const { flattenRecords } = require("./lib/report-sources.js");
 const { keyToInstaller, INSTALLERS } = require("./lib/routing.js");
 const { CAL_OPTIONS } = require("./lib/certificate.js");
+const { ecuCandidates, defaultGear } = require("./lib/ecu-ids.js");
+const { commissionCandidates } = require("./lib/ott-commission.js");
 const { monthFromKey, priorMonth, buildSubmissionRows, buildOpenBookings, renderOttXlsx, totalCommission, unresolved, recipients } = require("./lib/ott-report.js");
 
 const OVERRIDE_FIELD = "Commission Override";
@@ -23,7 +25,7 @@ const TP_OPTIONS = ["VFT", "HPT", "PCM", "BB", "COBB"];
 const CT_OPTIONS = ["9.2 New", "9.2 Update", "CARB New", "CARB Update", "Custom", "SEMA CE", "Basic", "TCM Update", "Supercharger", "THR Adjust"];
 const GEAR_OPTIONS = ["3.90", "3.58", "3.73", "4.10", "4.30", "4.88", "5.29", "Stock"];   // Policy 0012
 const INSTALLER_KEYS = Object.keys(INSTALLERS);
-const OPT_FIELDS = ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", OVERRIDE_FIELD];
+const OPT_FIELDS = ["Model Year", "VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", OVERRIDE_FIELD];
 
 const authOk = (env, token) => !!env.OTT_APPROVE_SECRET && String(token || "") === env.OTT_APPROVE_SECRET;
 const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || ""));
@@ -42,6 +44,7 @@ function inp(cls, ph, attrs) { return `<input class="${cls}" placeholder="${esc(
 // an Airtable fields object. Only sets what's present so a partial entry still saves.
 function reportFields(d) {
   const f = {};
+  const my = String(d.modelYear || "").trim(); if (/^(?:19|20)\d{2}$/.test(my)) f["Model Year"] = my;
   const vin = String(d.vin || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); if (vin) f.VIN = vin;
   const tp = String(d.tuningPlatform || "").trim().toUpperCase(); if (tp) f["Tuning Platform"] = tp;
   const ct = String(d.calibrationType || "").trim(); if (ct) f["Calibration Type"] = ct;
@@ -123,10 +126,23 @@ function editorFields(prefix) {
     + inp(`${prefix}-ecu`, "ECU ID") + inp(`${prefix}-gear`, "Gear") + inp(`${prefix}-mi`, "Mileage");
 }
 
+// Per-year auto-fill for the overdue form: from model + year we know the ECU
+// (most-likely), the gear default, and (4th Gen Tacoma) the Stage 1 commission.
+function autoFillMap(r) {
+  const map = {};
+  if (!r.yearLo || !r.yearHi) return map;
+  for (let y = r.yearHi; y >= r.yearLo; y--) {
+    const veh = { vehicleType: r.vehicleType, engine: r.engine, year: y };
+    const ecu = ecuCandidates(veh), comm = commissionCandidates(veh);
+    map[y] = { ecu: ecu[0] ? ecu[0].id : "", gear: defaultGear(veh), comm: comm[0] ? comm[0].amount : "" };
+  }
+  return map;
+}
+
 function openSection(openRows) {
   let h = `<h2>Overdue / incomplete bookings${openRows.length ? ` <span class="muted">(${openRows.length})</span>` : ""}</h2>`;
   if (!openRows.length) return h + `<p class="muted">None — every past event has been closed out. 🎉</p>`;
-  h += `<p class="muted">Past events not yet closed out (any installer). Set the calibration + OTT fields and <strong>Complete</strong> — it joins the submission for that event's month.</p>`;
+  h += `<p class="muted">Past events not yet closed out (any installer). Pick the <strong>model year</strong> to auto-fill ECU / gear / commission, set the calibration, then <strong>Complete</strong> — it joins the submission for that event's month.</p>`;
   let curKey = null;
   for (const r of openRows) {
     if (r.installerKey !== curKey) {
@@ -135,9 +151,13 @@ function openSection(openRows) {
       h += `<div class="grp">${esc(inst.name ? `${inst.name}${inst.region ? ` · ${inst.region}` : ""}` : (curKey || "Unassigned"))}</div>`;
     }
     const od = r.daysOverdue === "" ? "" : ` · ${r.daysOverdue}d overdue`;
-    h += `<div class="ob" data-rec="${esc(r.recordId)}" data-event="${esc(r.eventDate)}">`
+    const fill = autoFillMap(r), yrs = Object.keys(fill).map(Number).sort((a, b) => b - a);
+    const yearSel = yrs.length
+      ? `<select class="ob-year"><option value="">Model year…</option>` + yrs.map((y) => `<option${String(r.modelYear) === String(y) ? " selected" : ""}>${y}</option>`).join("") + `</select>`
+      : `<input class="ob-year" placeholder="Model year" value="${esc(r.modelYear || "")}" style="width:100px">`;
+    h += `<div class="ob" data-rec="${esc(r.recordId)}" data-event="${esc(r.eventDate)}" data-fill="${esc(JSON.stringify(fill))}">`
       + `<div><strong>${esc(r.customer || "—")}</strong> · ${esc(r.vehicle || "—")} · ${esc(r.city || "")} · ${esc(r.eventDate)}${od} <span class="warn">(${esc(r.status)})</span></div>`
-      + `<div class="obf">${editorFields("ob")}<button class="btn btn-save btn-sm ob-go">Complete →</button><span class="ob-msg muted"></span></div>`
+      + `<div class="obf">${yearSel}${editorFields("ob")}<button class="btn btn-save btn-sm ob-go">Complete →</button><span class="ob-msg muted"></span></div>`
       + `</div>`;
   }
   return h;
@@ -200,9 +220,18 @@ function consoleScript(env, month) {
     });
   });
   document.querySelectorAll('.ob').forEach(function(ob){
+    var ys=ob.querySelector('.ob-year'), fill={};
+    try{ fill=JSON.parse(ob.dataset.fill||'{}'); }catch(e){}
+    // Pick a model year → auto-fill the ECU / gear / commission we can derive.
+    if(ys && ys.tagName==='SELECT') ys.addEventListener('change',function(){
+      var f=fill[ys.value]; if(!f) return;
+      var e=ob.querySelector('.ob-ecu'); if(e && f.ecu) e.value=f.ecu;
+      var g=ob.querySelector('.ob-gear'); if(g && f.gear) g.value=f.gear;
+      var c=ob.querySelector('.ob-comm'); if(c && f.comm!==''&&f.comm!=null) c.value=f.comm;
+    });
     ob.querySelector('.ob-go').addEventListener('click',function(){
       var b=fields_(ob,'ob'); if(!b.calibration){ ob.querySelector('.ob-msg').textContent='Pick an OTT Calibration'; ob.querySelector('.ob-msg').className='ob-msg warn'; return; }
-      b.recordId=ob.dataset.rec; b.eventDate=ob.dataset.event;
+      b.recordId=ob.dataset.rec; b.eventDate=ob.dataset.event; b.modelYear=ys?(ys.value||'').trim():'';
       post_({op:'complete',booking:b}, ob.querySelector('.ob-msg'), function(){ location.reload(); });
     });
   });

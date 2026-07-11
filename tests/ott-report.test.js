@@ -134,6 +134,20 @@ test("buildOpenBookings lists only overdue, not-completed bookings (the chase li
   assert.equal(rows[0].daysOverdue, 12);
 });
 
+test("buildOpenBookings exposes vehicle type/engine + the platform year range for the model-year picker", () => {
+  const NOW = new Date("2026-07-10T12:00:00Z");
+  const [r] = buildOpenBookings([
+    { id: "a", Name: "Ann", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6 · More power", City: "Omaha", "Event Date": "2026-06-28", Status: "Booked", Installer: ["cody"] },
+  ], NOW);
+  assert.equal(r.vehicleType, "Tacoma");
+  assert.equal(r.engine, "3.5");
+  assert.equal(r.yearLo, 2016);
+  assert.equal(r.yearHi, 2023);
+  // "2024+" open range resolves hi to the current year
+  const [o] = buildOpenBookings([{ id: "b", Name: "Bo", Vehicle: "2024+ Toyota Tacoma 2.4L-T I4", "Event Date": "2026-06-28", Status: "Booked", Installer: ["noah"] }], NOW);
+  assert.equal(o.yearLo, 2024); assert.equal(o.yearHi, 2026);
+});
+
 test("renderOttXlsx produces a real .xlsx with the header row + data", () => {
   const rows = buildSubmissionRows([{ id: "recABCDE12345", ...bookingFields() }], JUNE, {});
   const buf = renderOttXlsx(rows);
