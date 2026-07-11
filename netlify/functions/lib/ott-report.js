@@ -7,7 +7,7 @@
 const { deriveVehicle, lookupCommission } = require("./ott-commission.js");
 const { buildXlsx } = require("./xlsx-writer.js");
 const { INSTALLERS } = require("./routing.js");
-const { ecuCandidates, defaultGear, is3rdGenTacoma } = require("./ecu-ids.js");
+const { ecuCandidates, defaultGear, is3rdGenTacoma35 } = require("./ecu-ids.js");
 
 // OTT requires the retailer tagged per installer: "Tuned Yota - <first name>"
 // (Aaron / Cody / Noah), derived from the booking's Installer. Unknown/blank
@@ -115,7 +115,7 @@ function buildSubmissionRows(bookings, month, opts = {}) {
       _confidence: look.confidence, _candidates: look.candidates, _tier: tier,
       _autoCommission: look.commission, _overridden: overridden,
       _ecuCandidates: ecuCands, _ecuAuto: !storedEcu && !!ecuId,
-      _gearAuto: !storedGear, _is3gt: is3rdGenTacoma(veh),
+      _gearAuto: !storedGear, _is3gt: is3rdGenTacoma35(veh),   // section = 3.5L only
     });
   }
   out.sort((a, b) => String(a.dateCalibrationApplied).localeCompare(String(b.dateCalibrationApplied)) || String(a.customer).localeCompare(String(b.customer)));

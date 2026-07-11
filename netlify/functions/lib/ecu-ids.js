@@ -25,10 +25,14 @@ function fromRow(row) {
 }
 
 // A 3rd Gen Tacoma is the 2016–2023 platform — BOTH the 3.5L V6 and 2.7L I4.
-// Used for report sectioning and the gear-ratio default.
+// Used for the gear-ratio default (owner rule: "3rd generation tacomas → 3.90").
 function is3rdGenTacoma({ vehicleType, year } = {}) {
   const y = Number(year);
   return vehicleType === "Tacoma" && y >= 2016 && y <= 2023;
+}
+// The report's break-out SECTION is the 3rd Gen Tacoma 3.5L ONLY (owner, 2026-07-11).
+function is3rdGenTacoma35({ vehicleType, engine, year } = {}) {
+  return is3rdGenTacoma({ vehicleType, year }) && String(engine == null ? "" : engine).trim() === "3.5";
 }
 
 // ECU candidates are engine-specific — we only have the 3.5L map so far.
@@ -53,4 +57,4 @@ function gearForTransmission(v, transmission) {
   return is3rdGenTacoma(v) ? (/manual/i.test(transmission || "") ? GEAR_DEFAULT : GEAR_AUTO_3GT) : GEAR_DEFAULT;
 }
 
-module.exports = { ecuCandidates, is3rdGenTacoma, defaultGear, gearForTransmission, GEAR_AUTO_3GT, GEAR_DEFAULT };
+module.exports = { ecuCandidates, is3rdGenTacoma, is3rdGenTacoma35, defaultGear, gearForTransmission, GEAR_AUTO_3GT, GEAR_DEFAULT };
