@@ -111,6 +111,7 @@ function buildSubmissionRows(bookings, month, opts = {}) {
     out.push({
       recordId: b.id || "", dateOfSubmission: sendDate, dateCalibrationApplied: calDate, ottRetailer: retailerFor(b, retailer),
       customer: b.Name || "", vin: String(b.VIN || "").toUpperCase(),
+      vehicle: String(b.Vehicle || "").split(/\s*·\s*/)[0].trim(),   // raw string (goals dropped), editable on the console
       vehicleYear: year || "", vehicleType: dv.vehicleType || "", engineSize: dv.engine || "",
       ecuId, gearSize,
       mileage: (b.Mileage === 0 || b.Mileage) ? Number(b.Mileage) : "",

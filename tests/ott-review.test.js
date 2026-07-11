@@ -96,6 +96,35 @@ test("a 4th Gen Tacoma row shows the commission tier dropdown, defaulting to Sta
     });
 });
 
+test("saveOverrides persists ALL editable fields on a completed row", async () => {
+  let wrote = null;
+  const out = await saveOverrides({ token: "sec", overrides: { recA: {
+    commission: 110, ecu: "04c22", gear: "3.90", date: "2026-06-20", name: "New Name", vin: "3tmcz5an0mm417034",
+    vehicle: "2021 Toyota Tacoma 3.5L", modelYear: "2021", platform: "vft", calType: "9.2 New", mileage: "51,481",
+  } } }, { env, update: async (a) => { wrote = a.fields; return {}; } });
+  assert.equal(out.ok, true);
+  assert.equal(wrote.Name, "New Name");
+  assert.equal(wrote.VIN, "3TMCZ5AN0MM417034");
+  assert.equal(wrote["Calibration Date"], "2026-06-20");
+  assert.equal(wrote.Vehicle, "2021 Toyota Tacoma 3.5L");
+  assert.equal(wrote["Model Year"], "2021");
+  assert.equal(wrote["Tuning Platform"], "VFT");
+  assert.equal(wrote["Calibration Type"], "9.2 New");
+  assert.equal(wrote.Mileage, 51481);
+  assert.equal(wrote[OVERRIDE_FIELD], 110);
+});
+
+test("the completed table renders an editable input for every field", () => {
+  return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([completed()]) })
+    .then((r) => {
+      const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
+      ["f-date", "f-name", "f-vin", "f-veh", "f-my", "f-tp", "f-ct", "f-mi"].forEach((c) =>
+        assert.ok(html.includes(`${c}"`) || html.includes(`${c} `), `editable field ${c} present`));
+      assert.ok(/id="ctab"/.test(html), "completed table is the editable ctab");
+      assert.ok(/<tr data-rec="recABCDE12345"/.test(html), "row keyed by record id for saving");
+    });
+});
+
 test("POST reports a not-yet-added column so the owner can create it", async () => {
   const out = await saveOverrides({ month: "2026-06", token: "sec", overrides: { recA: 275 } },
     { env, log: { error() {} }, update: async () => { throw new Error(`Unknown field name: "${OVERRIDE_FIELD}"`); } });

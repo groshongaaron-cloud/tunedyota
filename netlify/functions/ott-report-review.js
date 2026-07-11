@@ -39,6 +39,14 @@ function sel(cls, options, ph, cur) {
     options.map((o) => `<option${String(cur) === String(o) ? " selected" : ""}>${esc(o)}</option>`).join("") + `</select>`;
 }
 function inp(cls, ph, attrs) { return `<input class="${cls}" placeholder="${esc(ph)}" ${attrs || ""}>`; }
+// A select that always keeps the current value selectable (even if it's not a
+// standard option) so editing never silently drops a stored value.
+function selCur(cls, options, cur) {
+  const c = String(cur == null ? "" : cur);
+  const opts = c && !options.includes(c) ? [c, ...options] : options;
+  return `<select class="${cls}"><option value="">—</option>` +
+    opts.map((o) => `<option${String(o) === c ? " selected" : ""}>${esc(o)}</option>`).join("") + `</select>`;
+}
 
 // The OTT report fields, gathered from a booking-completion / walk-in payload into
 // an Airtable fields object. Only sets what's present so a partial entry still saves.
@@ -74,7 +82,9 @@ function page(title, body) {
     `input.gear{width:56px;padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit}` +
     `input.auto{color:#7c8472;font-style:italic;background:#f7f5f1}select.ecu-pick,select.gear-pick,select.comm-pick{margin-left:3px;padding:5px 2px;border:1px solid #cbc4ba;border-radius:5px;font-size:12px}` +
     `.btn-del{background:none;border:0;color:#8a2a2a;cursor:pointer;font-size:13px;padding:4px 6px;border-radius:5px}.btn-del:hover{background:#fdecea}` +
-    `.ns-l{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#8a5a12;cursor:pointer}.ns-l input{margin:0}</style>` +
+    `.ns-l{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#8a5a12;cursor:pointer}.ns-l input{margin:0}` +
+    `input.f,select.f{padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit;font-size:12.5px}input.f{width:112px}` +
+    `input.f-vin{width:150px}input.f-veh{width:190px}input.f-my{width:56px}input.f-mi{width:78px}input.f-date{width:130px}#ctab td{vertical-align:top}</style>` +
     `<body><h1>${esc(title)}</h1>${body}</body>`;
 }
 
@@ -84,29 +94,36 @@ function completedSection(subRows, month, env) {
   const sendUrl = `${base(env)}/.netlify/functions/ott-report-send?month=${month.key}&token=${tok}`;
   const to = recipients(env), total = totalCommission(subRows), u = unresolved(subRows).length;
   let h = `<p class="muted">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong id="tot">$${total}</strong></p>`;
-  h += `<p><strong>Nothing has been sent to OTT yet.</strong> Adjust commission / ECU ID / gear below, <strong>Save</strong>, then download or send. <span class="muted">Italic values are auto-filled suggestions — Save to lock them.</span></p>`;
+  h += `<p><strong>Nothing has been sent to OTT yet.</strong> Every field below is editable — change anything, then <strong>Save</strong>. <span class="muted">Italic values are auto-filled suggestions; Save to lock them.</span></p>`;
   if (u) h += `<p class="warn"><strong>${u} row(s) need a commission</strong> — the amount was ambiguous or the platform was bench (BB). Type it in and Save.</p>`;
-  h += `<div class="tblwrap"><table><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Vehicle</th><th>Platform</th><th>Cal Type</th><th>ECU ID</th><th>Gear</th><th>Commission&nbsp;($)</th><th></th></tr>`;
+  h += `<div class="tblwrap"><table id="ctab"><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Vehicle</th><th>Model&nbsp;Yr</th><th>Platform</th><th>Cal&nbsp;Type</th><th>ECU&nbsp;ID</th><th>Gear</th><th>Mileage</th><th>Commission&nbsp;($)</th><th></th></tr>`;
   for (const r of subRows) {
     const rec = esc(r.recordId);
-    const veh = [r.vehicleYear, r.vehicleType, r.engineSize].filter(Boolean).join(" ") || "—";
     const need = r.commission == null, val = r.commission == null ? "" : r.commission;
     const flag = r._overridden ? ` <span class="over" title="Manually set">✎</span>` : "";
-    let ecuCell = `<input class="ecu${r._ecuAuto ? " auto" : ""}" data-rec="${rec}" value="${esc(r.ecuId || "")}"${r._ecuAuto ? ' title="auto-filled from model+year — Save to lock"' : ""}>`;
+    let ecuCell = `<input class="ecu${r._ecuAuto ? " auto" : ""}" value="${esc(r.ecuId || "")}"${r._ecuAuto ? ' title="auto-filled from model+year — Save to lock"' : ""}>`;
     if (r._ecuCandidates && r._ecuCandidates.length) {
-      ecuCell += `<select class="ecu-pick" data-rec="${rec}"${r._is3gt ? ' data-gt="1"' : ""}><option value="">↕</option>`
+      ecuCell += `<select class="ecu-pick"${r._is3gt ? ' data-gt="1"' : ""}><option value="">↕</option>`
         + r._ecuCandidates.map((c) => `<option value="${esc(c.id)}" data-trans="${esc(c.transmission)}">${esc(c.label)}</option>`).join("") + `</select>`;
     }
-    const gearCell = `<input class="gear${r._gearAuto ? " auto" : ""}" data-rec="${rec}" value="${esc(r.gearSize || "")}">`
-      + `<select class="gear-pick" data-rec="${rec}"><option value="">↕</option>` + GEAR_OPTIONS.map((g) => `<option>${g}</option>`).join("") + `</select>`;
-    let commCell = `<input class="comm${need ? " need" : ""}" type="number" min="0" step="1" inputmode="numeric" data-rec="${rec}" value="${val}">${flag}`;
+    const gearCell = `<input class="gear${r._gearAuto ? " auto" : ""}" value="${esc(r.gearSize || "")}">`
+      + `<select class="gear-pick"><option value="">↕</option>` + GEAR_OPTIONS.map((g) => `<option>${g}</option>`).join("") + `</select>`;
+    let commCell = `<input class="comm${need ? " need" : ""}" type="number" min="0" step="1" inputmode="numeric" value="${val}">${flag}`;
     if (r._commCandidates && r._commCandidates.length) {
-      commCell += `<select class="comm-pick" data-rec="${rec}"><option value="">↕</option>`
+      commCell += `<select class="comm-pick"><option value="">↕</option>`
         + r._commCandidates.map((c) => `<option value="${c.amount}">${esc(c.label)} · $${c.amount}</option>`).join("") + `</select>`;
     }
-    h += `<tr><td>${esc(r.dateCalibrationApplied)}</td><td>${esc(r.customer)}</td><td>${esc(r.vin || "—")}</td>`
-      + `<td>${esc(veh)}</td><td>${esc(r.tuningPlatform || "—")}</td><td>${esc(r.calibrationType || "—")}</td>`
-      + `<td>${ecuCell}</td><td>${gearCell}</td><td>${commCell}</td>`
+    h += `<tr data-rec="${rec}" data-vt="${esc(r.vehicleType || "")}" data-eng="${esc(r.engineSize || "")}">`
+      + `<td><input type="date" class="f f-date" value="${esc(r.dateCalibrationApplied || "")}"></td>`
+      + `<td><input class="f f-name" value="${esc(r.customer || "")}"></td>`
+      + `<td><input class="f f-vin" style="text-transform:uppercase" value="${esc(r.vin || "")}"></td>`
+      + `<td><input class="f f-veh" value="${esc(r.vehicle || "")}"></td>`
+      + `<td><input class="f f-my" value="${esc(r.vehicleYear || "")}"></td>`
+      + `<td>${selCur("f f-tp", TP_OPTIONS, r.tuningPlatform)}</td>`
+      + `<td>${selCur("f f-ct", CT_OPTIONS, r.calibrationType)}</td>`
+      + `<td>${ecuCell}</td><td>${gearCell}</td>`
+      + `<td><input class="f f-mi" value="${r.mileage === "" || r.mileage == null ? "" : esc(r.mileage)}"></td>`
+      + `<td>${commCell}</td>`
       + `<td><button class="btn-del row-del" data-rec="${rec}" title="Delete this entry">✕</button></td></tr>`;
   }
   h += `</table></div>`;
@@ -184,30 +201,52 @@ function consoleScript(env, month) {
     return { calibration:q('cal'), tuningPlatform:q('tp'), calibrationType:q('ct'), commission:q('comm'),
       vin:q('vin'), ecuId:q('ecu'), gearSize:q('gear'), mileage:q('mi') };
   }
-  // ECU dropdown → fills the ECU input; on a 3rd Gen Tacoma, a Manual/Auto pick
-  // also flips the gear (4.30 / 3.90). Gear dropdown → fills the gear input.
-  document.querySelectorAll('select.ecu-pick').forEach(function(s){ s.addEventListener('change',function(){
-    var rec=s.dataset.rec, opt=s.options[s.selectedIndex];
-    var ei=document.querySelector('input.ecu[data-rec="'+rec+'"]'); if(ei && s.value){ ei.value=s.value; ei.classList.remove('auto'); }
-    if(s.dataset.gt && opt && opt.dataset.trans){ var gi=document.querySelector('input.gear[data-rec="'+rec+'"]'); if(gi){ gi.value=(opt.dataset.trans==='Manual'?'4.30':'3.90'); gi.classList.remove('auto'); } }
-  }); });
-  document.querySelectorAll('select.gear-pick').forEach(function(s){ s.addEventListener('change',function(){
-    var gi=document.querySelector('input.gear[data-rec="'+s.dataset.rec+'"]'); if(gi && s.value){ gi.value=s.value; gi.classList.remove('auto'); }
-  }); });
-  document.querySelectorAll('select.comm-pick').forEach(function(s){ s.addEventListener('change',function(){
-    var ci=document.querySelector('input.comm[data-rec="'+s.dataset.rec+'"]'); if(ci && s.value){ ci.value=s.value; ci.classList.remove('need'); }
-  }); });
+  // Every completed row (#ctab tr) is fully editable. Gather its fields:
+  function rowFields(tr){
+    var q=function(sel){ var el=tr.querySelector(sel); return el?el.value.trim():''; };
+    var comm=q('input.comm');
+    return { commission:(comm===''?null:Number(comm)), ecu:q('input.ecu'), gear:q('input.gear'),
+      date:q('input.f-date'), name:q('input.f-name'), vin:q('input.f-vin'), vehicle:q('input.f-veh'),
+      modelYear:q('input.f-my'), platform:q('select.f-tp'), calType:q('select.f-ct'), mileage:q('input.f-mi') };
+  }
+  // platform / cal type / model year change on a completed row → re-resolve ECU/gear/commission.
+  function resolveRow(tr){
+    var veh={ vehicleType:tr.dataset.vt, engine:tr.dataset.eng, year:(tr.querySelector('input.f-my')||{}).value||'',
+      tuningPlatform:(tr.querySelector('select.f-tp')||{}).value||'', calibrationType:(tr.querySelector('select.f-ct')||{}).value||'' };
+    fetch(URL_,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'resolve',token:TOKEN_,veh:veh})})
+      .then(function(r){return r.json();}).then(function(o){ if(!o||!o.ok) return;
+        // Only fill ECU/gear when empty (don't clobber a value already on the row);
+        // commission always re-resolves since it depends on platform + cal type.
+        var e=tr.querySelector('input.ecu'); if(e && o.ecu && !e.value.trim()) e.value=o.ecu;
+        var g=tr.querySelector('input.gear'); if(g && o.gear && !g.value.trim()) g.value=o.gear;
+        var c=tr.querySelector('input.comm'); if(c && o.commission!=null && o.commission!=='') { c.value=o.commission; c.classList.remove('need'); }
+      }).catch(function(){});
+  }
+  var ctab=document.getElementById('ctab');
+  if(ctab){
+    ['input','change'].forEach(function(ev){ ctab.addEventListener(ev,function(e){ var tr=e.target.closest('tr[data-rec]'); if(tr) tr.dataset.dirty='1'; }); });
+    ctab.querySelectorAll('tr[data-rec]').forEach(function(tr){
+      var ep=tr.querySelector('select.ecu-pick'); if(ep) ep.addEventListener('change',function(){
+        var opt=ep.options[ep.selectedIndex]; var ei=tr.querySelector('input.ecu'); if(ei&&ep.value){ei.value=ep.value;ei.classList.remove('auto');}
+        if(ep.dataset.gt&&opt&&opt.dataset.trans){var gi=tr.querySelector('input.gear'); if(gi){gi.value=(opt.dataset.trans==='Manual'?'4.30':'3.90');gi.classList.remove('auto');}}
+      });
+      var gp=tr.querySelector('select.gear-pick'); if(gp) gp.addEventListener('change',function(){var gi=tr.querySelector('input.gear'); if(gi&&gp.value){gi.value=gp.value;gi.classList.remove('auto');}});
+      var cp=tr.querySelector('select.comm-pick'); if(cp) cp.addEventListener('change',function(){var ci=tr.querySelector('input.comm'); if(ci&&cp.value){ci.value=cp.value;ci.classList.remove('need');}});
+      var tp=tr.querySelector('select.f-tp'); if(tp) tp.addEventListener('change',function(){var ct=tr.querySelector('select.f-ct'); if(ct&&!ct.value&&(tp.value==='VFT'||tp.value==='PCM'))ct.value='Basic'; resolveRow(tr);});
+      var ct=tr.querySelector('select.f-ct'); if(ct) ct.addEventListener('change',function(){resolveRow(tr);});
+      var my=tr.querySelector('input.f-my'); if(my) my.addEventListener('change',function(){resolveRow(tr);});
+    });
+  }
   var save=document.getElementById('save');
   if(save) save.addEventListener('click',function(){
-    var msg=document.getElementById('saveMsg'), overrides={};
-    function ov(rec){ return overrides[rec]=overrides[rec]||{}; }
-    document.querySelectorAll('input.comm').forEach(function(i){ var v=i.value.trim(); ov(i.dataset.rec).commission=(v===''?null:Number(v)); });
-    document.querySelectorAll('input.ecu').forEach(function(i){ ov(i.dataset.rec).ecu=i.value.trim(); });
-    document.querySelectorAll('input.gear').forEach(function(i){ ov(i.dataset.rec).gear=i.value.trim(); });
+    var msg=document.getElementById('saveMsg'), overrides={}, n=0;
+    document.querySelectorAll('#ctab tr[data-dirty="1"]').forEach(function(tr){ overrides[tr.dataset.rec]=rowFields(tr); n++; });
+    if(!n){ msg.textContent='No changes to save.'; msg.className='muted'; return; }
     post_({op:'overrides',month:MONTH_,overrides:overrides}, msg, function(o){
       msg.textContent='Saved '+o.saved+' ✓ — you can download or send now.'; msg.className='over';
+      document.querySelectorAll('#ctab tr[data-dirty]').forEach(function(tr){ tr.removeAttribute('data-dirty'); });
       document.querySelectorAll('input.auto').forEach(function(i){ i.classList.remove('auto'); });
-      var t=0; document.querySelectorAll('input.comm').forEach(function(i){ i.classList.remove('need'); if(i.value.trim()!=='')t+=Number(i.value); });
+      var t=0; document.querySelectorAll('#ctab input.comm').forEach(function(i){ i.classList.remove('need'); if(i.value.trim()!=='')t+=Number(i.value); });
       var tot=document.getElementById('tot'); if(tot)tot.textContent='$'+t;
     });
   });
@@ -311,6 +350,15 @@ async function saveOverrides(params, deps) {
     }
     if ("ecu" in v) fields["ECU ID"] = String(v.ecu || "").trim().toUpperCase() || null;
     if ("gear" in v) fields["Gear Size"] = String(v.gear || "").trim() || null;
+    // Full-row edits from the completed table.
+    if ("date" in v && isDate(v.date)) fields["Calibration Date"] = v.date;
+    if ("name" in v) fields.Name = String(v.name || "");
+    if ("vin" in v) fields.VIN = String(v.vin || "").toUpperCase().replace(/[^A-Z0-9]/g, "") || null;
+    if ("vehicle" in v) fields.Vehicle = String(v.vehicle || "");
+    if ("modelYear" in v) { const my = String(v.modelYear || "").trim(); fields["Model Year"] = /^(?:19|20)\d{2}$/.test(my) ? my : null; }
+    if ("platform" in v) fields["Tuning Platform"] = String(v.platform || "").trim().toUpperCase();
+    if ("calType" in v) fields["Calibration Type"] = String(v.calType || "").trim();
+    if ("mileage" in v) { const mi = String(v.mileage == null ? "" : v.mileage).replace(/[^0-9]/g, ""); fields.Mileage = mi ? Number(mi) : null; }
     if (!Object.keys(fields).length) continue;
     try {
       await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: recordId, fields });
