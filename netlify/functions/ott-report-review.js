@@ -84,7 +84,7 @@ function page(title, body) {
     `.btn-del{background:none;border:0;color:#8a2a2a;cursor:pointer;font-size:13px;padding:4px 6px;border-radius:5px}.btn-del:hover{background:#fdecea}` +
     `.ns-l{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#8a5a12;cursor:pointer}.ns-l input{margin:0}` +
     `input.f,select.f{padding:5px 6px;border:1px solid #cbc4ba;border-radius:5px;font:inherit;font-size:12.5px}input.f{width:112px}` +
-    `input.f-vin{width:150px}input.f-veh{width:190px}input.f-my{width:56px}input.f-mi{width:78px}input.f-date{width:130px}#ctab td{vertical-align:top}</style>` +
+    `input.f-vin{width:150px}input.f-vt{width:96px}input.f-eng{width:62px}input.f-my{width:56px}input.f-mi{width:78px}input.f-date{width:130px}#ctab td{vertical-align:top}</style>` +
     `<body><h1>${esc(title)}</h1>${body}</body>`;
 }
 
@@ -96,7 +96,7 @@ function completedSection(subRows, month, env) {
   let h = `<p class="muted">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong id="tot">$${total}</strong></p>`;
   h += `<p><strong>Nothing has been sent to OTT yet.</strong> Every field below is editable — change anything, then <strong>Save</strong>. <span class="muted">Italic values are auto-filled suggestions; Save to lock them.</span></p>`;
   if (u) h += `<p class="warn"><strong>${u} row(s) need a commission</strong> — the amount was ambiguous or the platform was bench (BB). Type it in and Save.</p>`;
-  h += `<div class="tblwrap"><table id="ctab"><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Vehicle</th><th>Model&nbsp;Yr</th><th>Platform</th><th>Cal&nbsp;Type</th><th>ECU&nbsp;ID</th><th>Gear</th><th>Mileage</th><th>Commission&nbsp;($)</th><th></th></tr>`;
+  h += `<div class="tblwrap"><table id="ctab"><tr><th>Date</th><th>Customer</th><th>VIN</th><th>Model&nbsp;Yr</th><th>Vehicle&nbsp;Type</th><th>Engine</th><th>Platform</th><th>Cal&nbsp;Type</th><th>ECU&nbsp;ID</th><th>Gear</th><th>Mileage</th><th>Commission&nbsp;($)</th><th></th></tr>`;
   for (const r of subRows) {
     const rec = esc(r.recordId);
     const need = r.commission == null, val = r.commission == null ? "" : r.commission;
@@ -117,8 +117,9 @@ function completedSection(subRows, month, env) {
       + `<td><input type="date" class="f f-date" value="${esc(r.dateCalibrationApplied || "")}"></td>`
       + `<td><input class="f f-name" value="${esc(r.customer || "")}"></td>`
       + `<td><input class="f f-vin" style="text-transform:uppercase" value="${esc(r.vin || "")}"></td>`
-      + `<td><input class="f f-veh" value="${esc(r.vehicle || "")}"></td>`
       + `<td><input class="f f-my" value="${esc(r.vehicleYear || "")}"></td>`
+      + `<td><input class="f f-vt" value="${esc(r.vehicleType || "")}"></td>`
+      + `<td><input class="f f-eng" value="${esc(r.engineSize || "")}"></td>`
       + `<td>${selCur("f f-tp", TP_OPTIONS, r.tuningPlatform)}</td>`
       + `<td>${selCur("f f-ct", CT_OPTIONS, r.calibrationType)}</td>`
       + `<td>${ecuCell}</td><td>${gearCell}</td>`
@@ -201,18 +202,28 @@ function consoleScript(env, month) {
     return { calibration:q('cal'), tuningPlatform:q('tp'), calibrationType:q('ct'), commission:q('comm'),
       vin:q('vin'), ecuId:q('ecu'), gearSize:q('gear'), mileage:q('mi') };
   }
+  // Rebuild a Vehicle string from the editable type/engine/year (so Vehicle Type,
+  // Engine, and Vehicle Year are all directly editable and round-trip on save).
+  function mkVeh(vt,eng,my){
+    if(!(vt||eng||my)) return '';
+    var make=/^(gx|lx|rx|ls|es)/i.test(vt)?'Lexus':'Toyota';
+    var e=/^\d\.\d$/.test(eng)?eng+'L':(eng==='2.4T'?'2.4L-T':(eng==='2.4TH'?'2.4L-TH':eng));
+    return ((my?my+' ':'')+make+' '+vt+(e?' '+e:'')).replace(/\s+/g,' ').trim();
+  }
   // Every completed row (#ctab tr) is fully editable. Gather its fields:
   function rowFields(tr){
     var q=function(sel){ var el=tr.querySelector(sel); return el?el.value.trim():''; };
     var comm=q('input.comm');
     return { commission:(comm===''?null:Number(comm)), ecu:q('input.ecu'), gear:q('input.gear'),
-      date:q('input.f-date'), name:q('input.f-name'), vin:q('input.f-vin'), vehicle:q('input.f-veh'),
+      date:q('input.f-date'), name:q('input.f-name'), vin:q('input.f-vin'),
+      vehicle:mkVeh(q('input.f-vt'),q('input.f-eng'),q('input.f-my')),
       modelYear:q('input.f-my'), platform:q('select.f-tp'), calType:q('select.f-ct'), mileage:q('input.f-mi') };
   }
-  // platform / cal type / model year change on a completed row → re-resolve ECU/gear/commission.
+  // platform / cal type / model year / type / engine change → re-resolve ECU/gear/commission.
   function resolveRow(tr){
-    var veh={ vehicleType:tr.dataset.vt, engine:tr.dataset.eng, year:(tr.querySelector('input.f-my')||{}).value||'',
-      tuningPlatform:(tr.querySelector('select.f-tp')||{}).value||'', calibrationType:(tr.querySelector('select.f-ct')||{}).value||'' };
+    var gv=function(sel){var el=tr.querySelector(sel);return el?el.value:'';};
+    var veh={ vehicleType:gv('input.f-vt'), engine:gv('input.f-eng'), year:gv('input.f-my'),
+      tuningPlatform:gv('select.f-tp'), calibrationType:gv('select.f-ct') };
     fetch(URL_,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({op:'resolve',token:TOKEN_,veh:veh})})
       .then(function(r){return r.json();}).then(function(o){ if(!o||!o.ok) return;
         // Only fill ECU/gear when empty (don't clobber a value already on the row);
@@ -235,6 +246,8 @@ function consoleScript(env, month) {
       var tp=tr.querySelector('select.f-tp'); if(tp) tp.addEventListener('change',function(){var ct=tr.querySelector('select.f-ct'); if(ct&&!ct.value&&(tp.value==='VFT'||tp.value==='PCM'))ct.value='Basic'; resolveRow(tr);});
       var ct=tr.querySelector('select.f-ct'); if(ct) ct.addEventListener('change',function(){resolveRow(tr);});
       var my=tr.querySelector('input.f-my'); if(my) my.addEventListener('change',function(){resolveRow(tr);});
+      var vt=tr.querySelector('input.f-vt'); if(vt) vt.addEventListener('change',function(){resolveRow(tr);});
+      var eng=tr.querySelector('input.f-eng'); if(eng) eng.addEventListener('change',function(){resolveRow(tr);});
     });
   }
   var save=document.getElementById('save');

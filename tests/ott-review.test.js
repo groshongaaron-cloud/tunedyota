@@ -118,7 +118,7 @@ test("the completed table renders an editable input for every field", () => {
   return review({ month: "2026-06", token: "sec" }, { env, now: NOW, listAll: async () => recs([completed()]) })
     .then((r) => {
       const html = reviewPageHtml(r.subRows, r.openRows, r.month, env);
-      ["f-date", "f-name", "f-vin", "f-veh", "f-my", "f-tp", "f-ct", "f-mi"].forEach((c) =>
+      ["f-date", "f-name", "f-vin", "f-my", "f-vt", "f-eng", "f-tp", "f-ct", "f-mi"].forEach((c) =>
         assert.ok(html.includes(`${c}"`) || html.includes(`${c} `), `editable field ${c} present`));
       assert.ok(/id="ctab"/.test(html), "completed table is the editable ctab");
       assert.ok(/<tr data-rec="recABCDE12345"/.test(html), "row keyed by record id for saving");
