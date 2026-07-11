@@ -53,7 +53,18 @@ function cell(v, ref) {
   if (typeof v === "number" && isFinite(v)) return `<c r="${ref}"><v>${v}</v></c>`;
   return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${esc(v)}</t></is></c>`;
 }
-function sheetXml(aoa) {
+// Optional column widths (in Excel character units). `cols` is an array where
+// index i is the width for column i+1; a null/0 entry leaves that column default.
+function colsXml(cols) {
+  if (!Array.isArray(cols) || !cols.some((w) => w)) return "";
+  let out = "";
+  for (let i = 0; i < cols.length; i++) {
+    const w = cols[i];
+    if (w) out += `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`;
+  }
+  return `<cols>${out}</cols>`;
+}
+function sheetXml(aoa, cols) {
   let rows = "";
   for (let r = 0; r < aoa.length; r++) {
     let cells = "";
@@ -61,7 +72,7 @@ function sheetXml(aoa) {
     rows += `<row r="${r + 1}">${cells}</row>`;
   }
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
-    `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${rows}</sheetData></worksheet>`;
+    `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${colsXml(cols)}<sheetData>${rows}</sheetData></worksheet>`;
 }
 
 // Excel sheet names: <=31 chars, no : \ / ? * [ ], unique within the workbook.
@@ -77,7 +88,7 @@ function sheetName(name, used) {
 function buildWorkbook(sheets) {
   const P = "http://schemas.openxmlformats.org/";
   const used = new Set();
-  const norm = (sheets || []).map((s) => ({ name: sheetName(s.name, used), aoa: s.aoa || [] }));
+  const norm = (sheets || []).map((s) => ({ name: sheetName(s.name, used), aoa: s.aoa || [], cols: s.cols }));
   const overrides = norm.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("");
   const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
     `<Types xmlns="${P}package/2006/content-types">` +
@@ -97,11 +108,11 @@ function buildWorkbook(sheets) {
     { name: "_rels/.rels", data: Buffer.from(rels, "utf8") },
     { name: "xl/workbook.xml", data: Buffer.from(wb, "utf8") },
     { name: "xl/_rels/workbook.xml.rels", data: Buffer.from(wbRels, "utf8") },
-    ...norm.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: Buffer.from(sheetXml(s.aoa), "utf8") })),
+    ...norm.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: Buffer.from(sheetXml(s.aoa, s.cols), "utf8") })),
   ]);
 }
 
-// Single-sheet convenience (unchanged API).
-function buildXlsx(name, aoa) { return buildWorkbook([{ name, aoa }]); }
+// Single-sheet convenience. `cols` (optional) = per-column widths.
+function buildXlsx(name, aoa, cols) { return buildWorkbook([{ name, aoa, cols }]); }
 
 module.exports = { buildXlsx, buildWorkbook };

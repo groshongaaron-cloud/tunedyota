@@ -332,7 +332,10 @@ async function loadMonth(params, deps) {
   if (!month) return { error: "bad-month" };
   const c = cfg(env);
   const recs = flattenRecords(await listAll({ token: c.token, baseId: c.baseId, table: c.bookings }));
-  return { month, subRows: buildSubmissionRows(recs, month, { retailer: env.OTT_RETAILER }), openRows: buildOpenBookings(recs, now) };
+  // Stamp Date of Submission = today so a downloaded workbook is submission-ready
+  // (the Finalize & Send path stamps its own send date the same way).
+  const sendDate = now.toISOString().slice(0, 10);
+  return { month, subRows: buildSubmissionRows(recs, month, { retailer: env.OTT_RETAILER, sendDate }), openRows: buildOpenBookings(recs, now) };
 }
 
 // GET — page or xlsx.

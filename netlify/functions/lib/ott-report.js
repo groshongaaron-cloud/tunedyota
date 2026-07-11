@@ -178,9 +178,13 @@ function rowToArray(r) {
     r.vehicleYear, r.vehicleType, r.engineSize, r.ecuId, r.gearSize, r.mileage,
     r.tuningPlatform, r.calibrationType, fmtCommission(r.commission), r.notes || ""];
 }
+// Column widths (Excel character units), in SUBMISSION_HEADERS order, so every
+// column is legible without manual resizing in OTT's copy.
+const COL_WIDTHS = [18, 22, 20, 24, 20, 12, 13, 12, 11, 10, 11, 16, 17, 13, 34];
 // Filled .xlsx in OTT's exact 15-column order (Policy 0012). Two sections, each
-// ordered by Date Calibration Applied: (1) 3rd Gen Tacomas, then TWO blank spacer
-// rows, then (2) all other vehicles. No colors/formulas/totals.
+// ordered by Date Calibration Applied: (1) 3rd Gen Tacoma 3.5L, then TWO blank
+// spacer rows, then (2) all other vehicles. A GRAND TOTAL of Commission (col N)
+// sits two rows below the final entry (owner-requested, 2026-07-11).
 const byCalDate = (a, b) => String(a.dateCalibrationApplied).localeCompare(String(b.dateCalibrationApplied)) || String(a.customer).localeCompare(String(b.customer));
 function renderOttXlsx(subRows) {
   const tacomas = subRows.filter((r) => r._is3gt).slice().sort(byCalDate);
@@ -190,7 +194,15 @@ function renderOttXlsx(subRows) {
     rows.push(new Array(SUBMISSION_HEADERS.length).fill(""), new Array(SUBMISSION_HEADERS.length).fill(""));
   }
   rows.push(...others.map(rowToArray));
-  return buildXlsx("OTT Commissions", rows);
+  // Grand total two rows below the final entry: one blank spacer row, then the
+  // total in column N (Commission), labelled in column M.
+  if (subRows.length) {
+    const total = new Array(SUBMISSION_HEADERS.length).fill("");
+    total[12] = "Grand Total";
+    total[13] = fmtCommission(totalCommission(subRows));
+    rows.push(new Array(SUBMISSION_HEADERS.length).fill(""), total);
+  }
+  return buildXlsx("OTT Commissions", rows, COL_WIDTHS);
 }
 
 function totalCommission(subRows) { return subRows.reduce((s, r) => s + (typeof r.commission === "number" ? r.commission : 0), 0); }

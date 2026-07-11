@@ -168,15 +168,25 @@ test("OTT Retailer (col C) is tagged per installer; falls back to plain name", (
   assert.equal(none.ottRetailer, "Tuned Yota", "no installer → plain retailer");
 });
 
-test("the submitted workbook is a clean data table — no grand-total row (Policy 0012)", () => {
+test("the submitted workbook lists a Grand Total two rows below the final entry (col N)", () => {
   const rows = buildSubmissionRows([
     { id: "r1", ...bookingFields({ Name: "A" }) },
     { id: "r2", ...bookingFields({ Name: "B", "Commission Override": 90 }) },
   ], JUNE, {});
   const buf = renderOttXlsx(rows);
-  assert.ok(!buf.includes(Buffer.from("GRAND TOTAL")), "no extra total row in the OTT file");
-  assert.ok(buf.includes(Buffer.from("$160.00")) && buf.includes(Buffer.from("$90.00")), "still contains the data rows");
-  assert.equal(rows.reduce((s, r) => s + (r.commission || 0), 0), 250);   // total lives on the console instead
+  const xml = buf.toString("latin1");
+  assert.ok(/r="M\d+"[^>]*><is><t[^>]*>Grand Total</.test(xml), "labelled 'Grand Total' in column M");
+  const nCell = xml.match(/r="N(\d+)"[^>]*><is><t[^>]*>\$250\.00</);
+  assert.ok(nCell, "grand total ($250.00 = sum of commissions) sits in column N");
+  const entryRows = [...xml.matchAll(/r="E(\d+)"[^>]*><is><t[^>]*>[0-9A-Z]{17}</g)].map((m) => +m[1]);
+  assert.equal(+nCell[1], Math.max(...entryRows) + 2, "grand total is exactly two rows below the final entry");
+  assert.ok(buf.includes(Buffer.from("$160.00")) && buf.includes(Buffer.from("$90.00")), "data rows intact");
+});
+
+test("the workbook sets legible column widths", () => {
+  const rows = buildSubmissionRows([{ id: "r1", ...bookingFields() }], JUNE, {});
+  const xml = renderOttXlsx(rows).toString("latin1");
+  assert.ok(/<cols>.*<col min="1" max="1" width="18"[^>]*customWidth="1"/.test(xml), "column widths applied");
 });
 
 test("Commission and Gear Size follow Policy 0012 formatting in the workbook", () => {
