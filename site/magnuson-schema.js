@@ -21,6 +21,25 @@
     "url": "https://tunedyota.com/"
   };
 
+  // Real Magnuson product photo per application (required "image" for Merchant-
+  // listing rich results; self-hosted from magnusonsuperchargers.com as an
+  // authorized dealer). Keyed by engine + vehicle + kit system so new apps inherit
+  // the right image automatically.
+  function imageForApp(app) {
+    var base = "https://tunedyota.com/images/magnuson/";
+    var e = app.engine, v = app.vehicle;
+    var names = app.kits.map(function (k) { return k.name; }).join(" ");
+    var f;
+    if (/i-FORCE/i.test(e)) f = "tundra-sequoia-34-perfpack.jpg";
+    else if (/5\.7L/.test(e)) f = /Tundra/i.test(v) ? "tundra-57-tvs2650.jpg" : "lc-sequoia-lx570-tvs2650.jpg";
+    else if (/4\.5L/.test(e)) f = "landcruiser-45-classic.jpg";
+    else if (/3\.5L/.test(e)) f = "tacoma-35-tvs1900.jpg";
+    else if (/3\.4L/.test(e)) f = "toyota-34-tvs1320.jpg";
+    else if (/4\.0L/.test(e)) f = /TVS1320/i.test(names) ? "4runner-fj-40-tvs1320.jpg"
+      : (/Tacoma/i.test(v) ? "tacoma-40-mp90.jpg" : "mp90-40-box.jpg");
+    return f ? base + f : "https://tunedyota.com/og-image.png";
+  }
+
   function productFor(app, kit) {
     return {
       "@type": "Product",
@@ -29,6 +48,7 @@
       "mpn": kit.sku,
       "brand": { "@type": "Brand", "name": "Magnuson Superchargers" },
       "category": "Vehicle Superchargers & Parts",
+      "image": imageForApp(app),
       "description": kit.name + " for " + app.years + " " + app.vehicle + " with the " + app.engine +
         ". Genuine Magnuson hardware sold by Tuned Yota, an authorized Magnuson dealer, installer, servicer and calibrator specializing in Toyota and Lexus. Ships to the lower 48; installation and OTT calibration available in the Upper Midwest.",
       "offers": {
