@@ -140,8 +140,20 @@ function page(model, models) {
     return `<div class="gen"><div class="eng">${ESC(g.y)}</div><h3>${ESC(name)} <span style="color:var(--sage-d);font-weight:600">${ESC(g.e)}</span></h3>${rows}${capNote}</div>`;
   }).join("\n");
 
-  // Schema: Store + OfferCatalog of this platform's products (no price → no drift).
-  const offers = products.map((p) => `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))}}}`).join(",");
+  // Schema: Store + OfferCatalog of this platform's products. Each Product carries
+  // its own real offer (satisfies Google's Product requirement: one of
+  // offers/review/aggregateRating). Price = live retail from the auto-synced
+  // catalog (salePrice wins); the weekly price-sync regenerates these pages so it
+  // never drifts. A product without a synced price is left out of the schema (it
+  // still appears in the visible fluid cards) rather than emitting a bare Product.
+  const priceOf = (p) => (typeof p.salePrice === "number" && p.salePrice > 0 ? p.salePrice
+    : typeof p.retailPrice === "number" && p.retailPrice > 0 ? p.retailPrice : null);
+  const offers = products.map((p) => {
+    const price = priceOf(p);
+    if (price == null) return null;
+    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."}}`;
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
+  }).filter(Boolean).join(",");
 
   const faqs = [
     [`Where can I buy AMSOIL for my ${name}?`, `From Tuned Yota, an Authorized AMSOIL Dealer. Use the AMSOIL Garage to see the exact oil, filter, and gear lube for your ${name} and order online — products ship direct from AMSOIL anywhere in the U.S.`],
@@ -164,7 +176,7 @@ function page(model, models) {
 <meta name="description" content="${desc}">
 <link rel="canonical" href="${url}">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","@id":"${url}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${url}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"Country","name":"United States"},"description":${JSON.stringify(`AMSOIL synthetic motor oil, filters, gear lube, and ATF for the ${name}, sold by Tuned Yota, an Authorized AMSOIL Dealer.`)},"hasOfferCatalog":{"@type":"OfferCatalog","name":${JSON.stringify(`AMSOIL fluids for the ${name}`)},"itemListElement":[${offers}]}}
+{"@context":"https://schema.org","@type":"Store","@id":"${url}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${url}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"Country","name":"United States"},"description":${JSON.stringify(`AMSOIL synthetic motor oil, filters, gear lube, and ATF for the ${name}, sold by Tuned Yota, an Authorized AMSOIL Dealer.`)}${offers ? `,"hasOfferCatalog":{"@type":"OfferCatalog","name":${JSON.stringify(`AMSOIL fluids for the ${name}`)},"itemListElement":[${offers}]}` : ""}}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[${faqSchema}]}

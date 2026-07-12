@@ -11,6 +11,7 @@ import { execSync } from "node:child_process";
 import { parsePrice } from "./lib/price-parse.mjs";
 import { decide, applyToProduct } from "./lib/sync.mjs";
 import { fetchProductHtml } from "./lib/browser-fetch.mjs";
+import { buildAmsoilPages, AMSOIL_PAGE_FILES } from "../build-amsoil-pages.mjs";
 import { chromium } from "playwright";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -85,12 +86,18 @@ async function main() {
   if (applied.length) {
     cat.updated = TODAY;
     fs.writeFileSync(DATA, JSON.stringify(cat, null, 2) + "\n");
+    // Regenerate the per-platform landing pages so their embedded Product
+    // offer prices (JSON-LD) stay in lockstep with the synced catalog.
+    buildAmsoilPages();
   }
   const summary = `AMSOIL price-sync ${TODAY}\nApplied: ${applied.length}\n${applied.join("\n") || "  (none)"}\nHeld: ${held.length}\n${held.join("\n") || "  (none)"}`;
   console.log(summary);
   await notify(summary);
   if (COMMIT && applied.length) {
-    execSync(`git add ${JSON.stringify(DATA)}`, { cwd: ROOT });
+    // Stage the catalog plus exactly the regenerated landing pages (never a broad
+    // glob — this repo folder is shared with a separate AMSOIL session).
+    const pageArgs = AMSOIL_PAGE_FILES.map((f) => JSON.stringify(path.join("site", f))).join(" ");
+    execSync(`git add ${JSON.stringify(DATA)} ${pageArgs}`, { cwd: ROOT });
     execSync(`git commit -m "chore(amsoil): weekly retail price sync (${applied.length} updated)"`, { cwd: ROOT });
     execSync("git push", { cwd: ROOT });
   }
