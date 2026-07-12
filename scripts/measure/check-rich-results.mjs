@@ -19,6 +19,9 @@ const cfg = JSON.parse(fs.readFileSync(CONFIG, "utf8"));
 const credentials = JSON.parse(fs.readFileSync(cfg.gscKeyFile, "utf8"));
 const siteUrl = cfg.gscProperty || "https://tunedyota.com/";
 const ORIGIN = "https://tunedyota.com";
+// Baseline of already-known ERROR signatures, so the scheduled job alerts only on
+// NEW problems (regressions) — not on known errors still awaiting Google re-crawl.
+const STATE = path.join(os.homedir(), ".tunedyota", "rich-results-state.json");
 
 const AMSOIL = [
   "/amsoil-garage",
@@ -80,12 +83,15 @@ function summarize(rr) {
 console.log(`property: ${siteUrl}  (Google's last-crawled view; not live)\n`);
 let totalErr = 0, totalWarn = 0;
 const failing = [];
+const errorSigs = []; // "path :: Type — item: message" for each ERROR-severity issue
 for (const url of targets) {
   const s = summarize(await inspect(url));
+  const p = url.replace(ORIGIN, "") || "/";
   totalErr += s.errors.length; totalWarn += s.warnings.length;
-  if (s.errors.length) failing.push(url.replace(ORIGIN, "") || "/");
+  if (s.errors.length) failing.push(p);
+  for (const e of s.errors) errorSigs.push(`${p} :: ${e}`);
   const tag = s.verdict === "PASS" ? "PASS " : s.verdict.padEnd(5);
-  console.log(`${tag} err:${s.errors.length} warn:${s.warnings.length}  ${url.replace(ORIGIN, "") || "/"}`);
+  console.log(`${tag} err:${s.errors.length} warn:${s.warnings.length}  ${p}`);
   for (const e of s.errors) console.log(`   ✖ ${e}`);
   // Show the first couple of warnings only, to keep output readable.
   for (const w of s.warnings.slice(0, 2)) console.log(`   ~ ${w}`);
@@ -95,9 +101,26 @@ for (const url of targets) {
 console.log(`\n${targets.length} URLs · ${totalErr} error(s) · ${totalWarn} warning(s)`);
 if (failing.length) console.log(`ERROR-severity on: ${failing.join(", ")}`);
 
-// Slack only when opted in (--notify) AND there is a real ERROR-severity problem.
-if (NOTIFY && cfg.notifyToken && totalErr > 0) {
-  const text = `⚠️ TunedYota rich-results check — ${totalErr} structured-data ERROR(s) across ${failing.length} page(s): ${failing.join(", ")}. (warnings ${totalWarn}, informational)`;
+// Diff against the known baseline → alert only on NEW errors. Only maintain the
+// baseline on the canonical full "all" scan; a narrower scan (default AMSOIL set or
+// a single URL) would wrongly forget errors on the pages it didn't inspect.
+const fullScan = args.length === 1 && args[0] === "all";
+let newErrors = errorSigs;
+if (fullScan) {
+  let prev = [];
+  try { prev = JSON.parse(fs.readFileSync(STATE, "utf8")).errors || []; } catch { /* first run */ }
+  const prevSet = new Set(prev);
+  newErrors = errorSigs.filter((s) => !prevSet.has(s));
+  const cleared = prev.filter((s) => !errorSigs.includes(s));
+  fs.writeFileSync(STATE, JSON.stringify({ updated: new Date().toISOString(), errors: errorSigs }, null, 2) + "\n");
+  console.log(`baseline: ${newErrors.length} new, ${cleared.length} cleared since last run`);
+}
+
+// Slack only when opted in (--notify) AND a NEW ERROR-severity problem appeared.
+if (NOTIFY && cfg.notifyToken && newErrors.length > 0) {
+  const pages = [...new Set(newErrors.map((s) => s.split(" :: ")[0]))];
+  const text = `⚠️ TunedYota rich-results — ${newErrors.length} NEW structured-data ERROR(s) on ${pages.join(", ")}:\n` +
+    newErrors.slice(0, 8).map((s) => "• " + s).join("\n") + (newErrors.length > 8 ? `\n…+${newErrors.length - 8} more` : "");
   const resp = await fetch("https://tunedyota.com/.netlify/functions/notify", {
     method: "POST", headers: { "Content-Type": "application/json", "x-ty-notify": cfg.notifyToken },
     body: JSON.stringify({ text }),
