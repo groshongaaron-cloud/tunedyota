@@ -254,9 +254,57 @@ function models() {
 // The list of generated filenames (for HEAD_PAGES registration / tests).
 export const AMSOIL_PAGE_FILES = models().map((m) => `amsoil-${m.slug}.html`);
 
+// The AMSOIL Garage hub (amsoil-garage.html) lists generic category-level products
+// (motor oil, filter, gear lube, ATF). Each needs a real offer or GSC raises the
+// critical "offers/review/aggregateRating required" error. We compute a per-category
+// price RANGE (AggregateOffer) from the same synced catalog and inject it between
+// markers, so it self-maintains and stays honest. A category with no priced product
+// (e.g. grease — none in the catalog) is left out rather than shown without a price.
+const GARAGE_URL = "https://tunedyota.com/amsoil-garage";
+const CAT_LABEL = {
+  "Synthetic Motor Oil": "AMSOIL Signature Series Synthetic Motor Oil",
+  "Oil Filter": "AMSOIL Ea Oil Filter",
+  "Gear Lube": "AMSOIL SEVERE GEAR Synthetic Gear Lube",
+  "Automatic Transmission Fluid": "AMSOIL Synthetic Automatic Transmission Fluid",
+  "Grease": "AMSOIL Synthetic Grease",
+};
+
+function garageOfferCatalog() {
+  const byCat = {};
+  for (const sku of Object.keys(CAT.products)) {
+    const p = CAT.products[sku];
+    const price = typeof p.salePrice === "number" && p.salePrice > 0 ? p.salePrice
+      : typeof p.retailPrice === "number" && p.retailPrice > 0 ? p.retailPrice : null;
+    if (price == null) continue;
+    (byCat[categoryOf(p.name)] ||= []).push(price);
+  }
+  const shopUrl = amsoilUrl("/shop/");
+  const seller = `"seller":{"@type":"Organization","name":"AMSOIL Inc."}`;
+  // Stable display order; only categories with at least one priced product appear.
+  return Object.keys(CAT_LABEL).filter((c) => byCat[c] && byCat[c].length).map((c) => {
+    const ps = byCat[c], low = Math.min(...ps), high = Math.max(...ps);
+    const offer = low === high
+      ? `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(low.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(shopUrl)},${seller}}`
+      : `{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":${JSON.stringify(low.toFixed(2))},"highPrice":${JSON.stringify(high.toFixed(2))},"offerCount":${ps.length},"availability":"https://schema.org/InStock","url":${JSON.stringify(shopUrl)},${seller}}`;
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(CAT_LABEL[c])},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(c)},"offers":${offer}}}`;
+  }).join(",");
+}
+
+export function buildAmsoilGarageStore() {
+  const file = path.join(SITE, "amsoil-garage.html");
+  let html = fs.readFileSync(file, "utf8");
+  const store = `{"@context":"https://schema.org","@type":"Store","@id":"${GARAGE_URL}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${GARAGE_URL}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"Country","name":"United States"},"description":"Authorized AMSOIL Dealer selling synthetic motor oil, oil and air filters, gear lube, and ATF for Toyota and Lexus vehicles, with capacities and severe-service intervals for tuned and towing builds.","hasOfferCatalog":{"@type":"OfferCatalog","name":"AMSOIL synthetic fluids for Toyota & Lexus","itemListElement":[${garageOfferCatalog()}]}}`;
+  const inner = `<script type="application/ld+json">\n${store}\n</script>`;
+  const block = `<!-- SEO:AMSOIL-STORE:START -->\n${inner}\n<!-- SEO:AMSOIL-STORE:END -->`;
+  const re = /<!-- SEO:AMSOIL-STORE:START -->[\s\S]*?<!-- SEO:AMSOIL-STORE:END -->/;
+  if (!re.test(html)) throw new Error("SEO:AMSOIL-STORE markers not found in amsoil-garage.html");
+  fs.writeFileSync(file, html.replace(re, () => block));
+}
+
 export function buildAmsoilPages() {
   const list = models();
   for (const m of list) fs.writeFileSync(path.join(SITE, `amsoil-${m.slug}.html`), page(m, list));
+  buildAmsoilGarageStore();
   return list.length;
 }
 

@@ -14,9 +14,12 @@ const SITE = path.join(__dirname, "..", "site");
 // Read the on-disk pages (produced by `npm run build:seo`, which also injects the
 // OG/twitter tags after this base build). Regenerating here would strip those tags
 // and race other suites — so we only read, matching tests/seo.test.js's convention.
+// Covers both the per-vehicle platform pages and the AMSOIL Garage hub. The hub
+// carries category-level Products whose offer is an AggregateOffer (price range).
 let PAGE_FILES;
 test.before(async () => {
-  ({ AMSOIL_PAGE_FILES: PAGE_FILES } = await import("../scripts/build-amsoil-pages.mjs"));
+  const mod = await import("../scripts/build-amsoil-pages.mjs");
+  PAGE_FILES = [...mod.AMSOIL_PAGE_FILES, "amsoil-garage.html"];
 });
 
 function ldBlocks(html) {
@@ -31,26 +34,36 @@ function collectProducts(node, out = []) {
   }
   return out;
 }
+const price2dp = (v) => /^\d+\.\d{2}$/.test(String(v));
 
-test("every AMSOIL platform page has at least one Product with a valid offer", () => {
+// Asserts a Product satisfies Google's rule (one of offers/review/aggregateRating)
+// and, when it uses offers, that the offer is a well-formed Offer or AggregateOffer.
+function assertValidProduct(f, p) {
+  assert.ok(p.offers || p.review || p.aggregateRating,
+    `${f}: Product "${p.name}" missing offers/review/aggregateRating`);
+  if (!p.offers) return;
+  const offer = Array.isArray(p.offers) ? p.offers[0] : p.offers;
+  assert.equal(offer.priceCurrency, "USD", `${f}: Product "${p.name}" missing USD currency`);
+  assert.ok(/^https?:\/\//.test(offer.url || ""), `${f}: Product "${p.name}" offer missing url`);
+  if (offer["@type"] === "AggregateOffer") {
+    assert.ok(price2dp(offer.lowPrice) && price2dp(offer.highPrice),
+      `${f}: Product "${p.name}" AggregateOffer low/high not "N.NN"`);
+    assert.ok(Number(offer.offerCount) >= 1, `${f}: Product "${p.name}" AggregateOffer offerCount < 1`);
+  } else {
+    assert.equal(offer["@type"], "Offer", `${f}: Product "${p.name}" offer not an Offer/AggregateOffer`);
+    assert.ok(price2dp(offer.price), `${f}: Product "${p.name}" price not "N.NN"`);
+  }
+}
+
+test("every AMSOIL page's Products carry a valid offer (Offer or AggregateOffer)", () => {
   let totalProducts = 0;
   for (const f of PAGE_FILES) {
     const html = fs.readFileSync(path.join(SITE, f), "utf8");
     const products = collectProducts(ldBlocks(html));
     assert.ok(products.length > 0, `${f}: expected Product nodes in JSON-LD`);
-    for (const p of products) {
-      totalProducts++;
-      // Satisfies Google's rule: one of offers/review/aggregateRating.
-      const hasQualifier = p.offers || p.review || p.aggregateRating;
-      assert.ok(hasQualifier, `${f}: Product "${p.name}" missing offers/review/aggregateRating`);
-      const offer = Array.isArray(p.offers) ? p.offers[0] : p.offers;
-      assert.equal(offer["@type"], "Offer", `${f}: Product "${p.name}" offer not an Offer`);
-      assert.match(String(offer.price), /^\d+\.\d{2}$/, `${f}: Product "${p.name}" price not "N.NN"`);
-      assert.equal(offer.priceCurrency, "USD", `${f}: Product "${p.name}" missing USD currency`);
-      assert.ok(/^https?:\/\//.test(offer.url || ""), `${f}: Product "${p.name}" offer missing url`);
-    }
+    for (const p of products) { totalProducts++; assertValidProduct(f, p); }
   }
-  assert.ok(totalProducts >= 13, `expected products across pages, got ${totalProducts}`);
+  assert.ok(totalProducts >= 17, `expected products across pages, got ${totalProducts}`);
 });
 
 test("all AMSOIL page JSON-LD blocks are parseable", () => {
