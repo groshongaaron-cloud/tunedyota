@@ -50,3 +50,32 @@ test("admin roster drops the per-installer filter and tags every owner", async (
   assert.equal(out.bookings.length, 3);                    // sees everyone
   assert.deepEqual(out.bookings.map((b) => b.installer).sort(), ["aaron", "cody", "noah"]);
 });
+
+test("roster returns the installer's own future scheduled events (past excluded, tagged owner)", async () => {
+  const list = async () => [];
+  const loadEvents = async () => [
+    { city: "Omaha", dateISO: "2026-08-01" },        // routes to cody, future → kept
+    { city: "Twin Cities", dateISO: "2026-08-02" },  // aaron's market → dropped for cody
+    { city: "Omaha", dateISO: "2020-01-01" },         // past → excluded
+  ];
+  const out = await buildRoster({ env, key: "cody", now: new Date("2026-07-03T12:00:00Z"), list, loadEvents });
+  assert.deepEqual(out.events, [{ city: "Omaha", dateISO: "2026-08-01", installer: "cody" }]);
+});
+
+test("admin roster returns every market's future scheduled events", async () => {
+  const list = async () => [];
+  const loadEvents = async () => [
+    { city: "Omaha", dateISO: "2026-08-01" },
+    { city: "Twin Cities", dateISO: "2026-08-02" },
+    { city: "Green Bay", dateISO: "2026-08-03" },
+  ];
+  const out = await buildRoster({ env, key: "aaron", admin: true, now: new Date("2026-07-03T12:00:00Z"), list, loadEvents });
+  assert.equal(out.events.length, 3);
+  assert.deepEqual(out.events.map((e) => e.installer).sort(), ["aaron", "cody", "noah"]);
+});
+
+test("a roster events fetch failure degrades to an empty events list (never throws)", async () => {
+  const out = await buildRoster({ env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    list: async () => [], loadEvents: async () => { throw new Error("sheet down"); }, log: { warn() {} } });
+  assert.deepEqual(out.events, []);
+});

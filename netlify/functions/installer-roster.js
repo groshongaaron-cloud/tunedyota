@@ -4,13 +4,18 @@ const { cfg, listRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { formatSlot } = require("./lib/slots.js");
 const { flexFuelNote } = require("./lib/flex-fuel.js");
+const { getAllActiveEvents } = require("./lib/events.js");
+const { getMarket } = require("./lib/markets.js");
+const { keyToInstaller } = require("./lib/routing.js");
+const EVENTS = require("./lib/events-data.js");
 
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 const bySlot = (a, b) => String(a.slot || "").localeCompare(String(b.slot || ""), undefined, { numeric: true });
 
 async function buildRoster(deps) {
-  const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false,
-          list = (a) => listRecords({ fetchImpl, ...a }) } = deps;
+  const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false, log = console,
+          list = (a) => listRecords({ fetchImpl, ...a }),
+          loadEvents = () => getAllActiveEvents({ fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
   const c = cfg(env);
   // Admins see every installer's roster; regular installers are scoped to their own key.
   const filterByFormula = admin
@@ -35,7 +40,28 @@ async function buildRoster(deps) {
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
     };
   }).sort((a, b) => a.dateISO.localeCompare(b.dateISO) || bySlot(a, b));
-  return { installer: key, admin: !!admin, today, bookings };
+
+  // Scheduled events dated today-or-later in the caller's markets (all markets when
+  // admin). Lets the console show upcoming days that have no bookings yet and accept
+  // the first walk-in. Additive + best-effort: a fetch failure just yields no events.
+  let events = [];
+  try {
+    const seen = {};
+    for (const e of await loadEvents()) {
+      if (!e || !e.dateISO || e.dateISO < today) continue;
+      const market = getMarket(e.city);
+      if (!market) continue;
+      const ownerKey = keyToInstaller(market.inst).key;
+      if (!admin && ownerKey !== key) continue;
+      const k = market.city + "|" + e.dateISO;
+      if (seen[k]) continue;
+      seen[k] = 1;
+      events.push({ city: market.city, dateISO: e.dateISO, installer: ownerKey });
+    }
+    events.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  } catch (e) { if (log && log.warn) log.warn("roster events", e.message); events = []; }
+
+  return { installer: key, admin: !!admin, today, bookings, events };
 }
 
 async function handler(event) {
