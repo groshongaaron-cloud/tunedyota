@@ -59,9 +59,18 @@ test("a non-admin still cannot add to a market that isn't theirs", async () => {
   assert.equal(out.error, "not-your-market");
 });
 
-test("rejects an event date not on the city's schedule", async () => {
-  const out = await processWalkin({ city: "Omaha", dateISO: "2099-01-01", name: "Jo", phone: "555" }, {
-    env, key: "cody", create: okCreate, events: { omaha: [{ dateISO: "2026-07-03" }] },
-  });
-  assert.equal(out.error, "unknown-event");
+test("accepts a walk-in on ANY date — everyday business, not only scheduled event days", async () => {
+  let created;
+  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-22", name: "Jo", phone: "555" },
+    { env, key: "cody", create: async (a) => { created = a; return { id: "recX" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(created.fields["Event Date"], "2026-07-22");   // a non-event day is fine now
+  assert.equal(created.fields.Source, "installer:walk-in");
+});
+
+test("defaults the walk-in date to today when none is supplied", async () => {
+  let created;
+  await processWalkin({ city: "Omaha", name: "Jo", phone: "555" },
+    { env, key: "cody", now: new Date("2026-07-12T15:00:00Z"), create: async (a) => { created = a; return { id: "r" }; } });
+  assert.equal(created.fields["Event Date"], "2026-07-12");
 });

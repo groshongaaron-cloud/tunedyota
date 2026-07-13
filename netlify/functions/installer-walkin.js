@@ -1,15 +1,17 @@
 // netlify/functions/installer-walkin.js
-// Installer-scoped walk-in quick-add. Creates a Bookings record for one of the
-// installer's own event markets, tagged Source "installer:walk-in" so the console
-// surfaces it under "Walk-ins this month". Ownership is enforced by market routing.
+// Installer walk-in / call-in quick-add. Walk-ins are EVERYDAY business, not only at
+// scheduled events — a client can call in on ANY day between events. Creates a
+// Bookings record (Source "installer:walk-in") for the installer's market on any
+// date (defaults to today), which then flows through the normal close-out → cert +
+// OTT commission report exactly like an at-event walk-in. Ownership is enforced by
+// market routing. See memory: "walk-ins are EVERYDAY, not event-only".
 const { cfg, createRecord, createTolerant } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
-const EVENTS = require("./lib/events-data.js");
 
 async function processWalkin(body, deps) {
-  const { env = process.env, fetchImpl = fetch, key, admin = false, events = EVENTS,
+  const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false,
           create = (a) => createRecord({ fetchImpl, ...a }) } = deps;
   const d = body || {};
   const name = String(d.name || "").trim();
@@ -23,10 +25,11 @@ async function processWalkin(body, deps) {
   // that market's owning installer, not to the admin).
   const ownerKey = keyToInstaller(market.inst).key;
   if (!admin && ownerKey !== key) return { status: "error", error: "not-your-market" };
-  const dateISO = String(d.dateISO || "").trim();
+  // Any valid date is accepted (everyday walk-ins aren't tied to a scheduled event);
+  // default to today when omitted. Event Date = the tune date, so the OTT report
+  // (which buckets by Calibration Date = Event Date) lands in the correct month.
+  const dateISO = String(d.dateISO || "").trim() || now.toISOString().slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) return { status: "error", error: "bad-date" };
-  const cityEvents = events[market.city.toLowerCase()] || [];
-  if (!cityEvents.some((e) => e.dateISO === dateISO)) return { status: "error", error: "unknown-event" };
 
   const c = cfg(env);
   const vehicle = String(d.vehicle || "").trim();
