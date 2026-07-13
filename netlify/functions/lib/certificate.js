@@ -48,7 +48,63 @@ function formatVehicle(vehicle, modelYear) {
   return `${year} ${platform}`;
 }
 
-function buildCertificate({ name, vehicle, modelYear, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate } = {}) {
+// ---- Page 2 — AMSOIL Maintenance Reference helpers ----
+
+const AMSOIL_LOGO = "https://tunedyota.com/images/amsoil/amsoil-logo.png";
+
+function fluidsRows(fluids) {
+  if (!fluids || !fluids.systems || !fluids.systems.length) return "";
+  const rows = fluids.systems.map((s) => `
+        <tr>
+          <td><span class="sys">${esc(s.system)}</span></td>
+          <td><div class="prod">${esc(s.product)}</div>${s.stockNo ? `<div class="stockno">Stock No. <b>${esc(s.stockNo)}</b></div>` : ""}</td>
+          <td class="num"><span class="cap">${esc(s.capacity)}</span> ${esc(s.unit)}</td>
+          <td class="num intv"><span class="t">${esc(s.tunedInterval)}</span>${s.factoryInterval ? `<span class="f">${esc(s.factoryInterval)}</span>` : ""}</td>
+        </tr>`).join("");
+  return `
+      <table class="fluids">
+        <thead><tr><th>System</th><th>AMSOIL product</th><th class="num">Capacity</th><th class="num">Interval</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+}
+
+function amsoilPage(amsoil, vehicleDisplay) {
+  const fluids = amsoil.fluids;
+  const qr = amsoil.qrSvg || "";
+  const url = (fluids && fluids.garageUrl) || "https://tunedyota.com/amsoil-garage";
+  const veh = esc(vehicleDisplay || "");
+  return `
+  <div class="cert ref">
+    <div class="measure"></div>
+    <div class="pad">
+      <div class="ref-head">
+        <div>
+          <div class="ref-eyebrow">AMSOIL Maintenance Reference</div>
+          <h2>A tuned truck deserves the best fluids in the world — <span class="amsoil-red">AMSOIL</span>.</h2>
+          ${veh ? `<div class="ref-veh">${veh}</div>` : ""}
+        </div>
+        <div class="amsoil-lockup">
+          <span class="amsoil-chip"><img src="${AMSOIL_LOGO}" alt="AMSOIL"></span>
+          <div class="amsoil-dealer">Authorized AMSOIL Dealer</div>
+        </div>
+      </div>
+      <p class="lede">Tuned Yota has organized your vehicle&rsquo;s necessary fluids, fluid capacities, and service intervals! We hope you enjoy this quick reference list of AMSOIL products for your vehicle.</p>
+      ${fluidsRows(fluids)}
+      <div class="order">
+        <span class="qr">${qr}</span>
+        <div class="pitch">
+          <h3>Order your exact fluids</h3>
+          <p>Scan to open <strong>your AMSOIL Garage</strong>${fluids ? " — pre-loaded with these products for your " + esc(fluids.model) : ""}. Add other vehicles, or search the full AMSOIL catalog.</p>
+          <span class="save">Enroll free as a Preferred Customer — save up to 25%</span>
+          <div class="url">${esc(url.replace(/^https?:\/\//, ""))}</div>
+        </div>
+      </div>
+    </div>
+    <div class="ref-fine">Fluids &amp; capacities are a maintenance reference for your vehicle — confirm capacities against your owner&rsquo;s manual before service. &middot; Tuned Yota is an Authorized AMSOIL Dealer. &middot; tunedyota.com/amsoil-garage</div>
+  </div>`;
+}
+
+function buildCertificate({ name, vehicle, modelYear, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate, amsoil } = {}) {
   const vehicleDisplay = formatVehicle(vehicle, modelYear);
   const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicleDisplay ? ` · ${vehicleDisplay}` : ""}`;
   // Installer row shows the installer's NAME only — no cities/region.
@@ -80,6 +136,8 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
     --sand:#DFC4B5;
     --mono: "SFMono-Regular", ui-monospace, "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
     --sans: "Lato", "Helvetica Neue", Arial, sans-serif;
+    /* Official AMSOIL brand colors (Style Guide): Red PMS 485 #ed1c24, Blue PMS 286 #005baa, Cool Gray 6 #bcbec0 */
+    --amsoil:#ed1c24; --amsoil-deep:#b3141b; --amsoil-brand:#ed1c24; --amsoil-blue:#005baa; --amsoil-gray:#bcbec0;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -250,6 +308,45 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
     text-align:center;
   }
   .fine a{ color:var(--steel); text-decoration:none; }
+  /* ---- Page 2 — AMSOIL reference styles ---- */
+  .ref .pad{padding:40px 52px 30px;}
+  .ref .measure{background:repeating-linear-gradient(90deg,var(--amsoil) 0,var(--amsoil) 1px,transparent 1px,transparent 12px);opacity:.85;}
+  .ref-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:1.5px solid var(--ink);padding-bottom:18px;}
+  .ref-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.36em;text-transform:uppercase;color:var(--amsoil);margin-bottom:8px;}
+  .ref-head h2{margin:0;font-size:27px;font-weight:800;letter-spacing:-.01em;line-height:1.08;}
+  .ref-head h2 .thin{font-weight:300;color:var(--steel);}
+  .ref-veh{font-family:var(--mono);font-size:11px;color:var(--steel);margin-top:8px;text-transform:uppercase;letter-spacing:.06em;}
+  .amsoil-red{color:var(--amsoil-brand);}
+  /* Official approved AMSOIL logo — used UNALTERED on a solid white chip with clear
+     space, per the AMSOIL Brand Style Guide (no recreation, recolor, or textured bg). */
+  .amsoil-lockup{flex:0 0 auto;text-align:right;}
+  .amsoil-chip{display:inline-block;background:#fff;border:1px solid var(--hair);border-radius:10px;padding:13px 17px;}
+  .amsoil-chip img{display:block;width:178px;height:auto;}
+  .amsoil-dealer{margin-top:8px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);}
+  .lede{margin:18px 0 20px;font-size:14px;color:var(--steel);}
+  .lede strong{color:var(--ink);}
+  table.fluids{width:100%;border-collapse:collapse;font-size:13px;}
+  table.fluids thead th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);padding:0 12px 8px;border-bottom:1.5px solid var(--ink);}
+  table.fluids thead th.num{text-align:right;}
+  table.fluids tbody td{padding:11px 12px;border-bottom:1px solid var(--hair2);vertical-align:top;}
+  table.fluids tbody tr:last-child td{border-bottom:0;}
+  .sys{font-weight:800;color:var(--ink);}
+  .prod{color:var(--steel);font-size:12px;}
+  .stockno{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.02em;margin-top:3px;}
+  .stockno b{color:var(--amsoil-brand);font-weight:700;letter-spacing:.03em;}
+  .num{text-align:right;font-family:var(--mono);white-space:nowrap;}
+  .num .cap{font-weight:700;color:var(--ink);}
+  .intv .t{font-weight:700;color:var(--amsoil-deep);}
+  .intv .f{display:block;font-size:11px;color:var(--faint);}
+  .order{display:flex;gap:22px;align-items:center;margin:24px 0 6px;background:#FBFAF7;border:1px solid var(--hair);border-radius:14px;padding:20px 22px;}
+  .qr{flex:0 0 132px;width:132px;height:132px;border:1px solid var(--hair);border-radius:10px;background:#fff;padding:8px;display:block;}
+  .qr svg{width:100%;height:auto;display:block;}
+  .order .pitch{flex:1;}
+  .order .pitch h3{margin:0 0 6px;font-size:17px;font-weight:800;}
+  .order .pitch p{margin:0 0 10px;font-size:13px;color:var(--steel);}
+  .order .save{display:inline-block;background:var(--ember-tint);color:var(--amsoil-deep);font-weight:800;font-size:12px;padding:4px 10px;border-radius:20px;letter-spacing:.02em;}
+  .order .url{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:10px;word-break:break-all;}
+  .ref-fine{padding:16px 52px 30px;border-top:1px solid var(--hair2);font-family:var(--mono);font-size:9.5px;line-height:1.7;color:var(--faint);text-align:center;}
   @media (max-width:560px){
     .pad{ padding:30px 24px; }
     h1{ font-size:30px; }
@@ -258,10 +355,16 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
     .row{ grid-template-columns:120px 1fr; }
     .foot{ flex-direction:column; align-items:stretch; }
     .fine{ padding:18px 24px 26px; }
+    .ref .pad{padding:30px 24px;}
+    .ref-head{flex-direction:column;}
+    .order{flex-direction:column;text-align:center;}
+    .qr{margin:0 auto;}
+    .ref-fine{padding:18px 24px 26px;}
   }
   @media print{
     body{ background:#fff; padding:0; }
-    .cert{ box-shadow:none; border:none; max-width:none; }
+    .cert{ box-shadow:none; border:none; max-width:none; margin:0; }
+    .ref{page-break-before:always;}
   }
 </style>
 </head>
@@ -357,6 +460,7 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
       <span>tunedyota.com &middot; Toyota &amp; Lexus performance calibration</span>
     </div>
   </div>
+${amsoil ? amsoilPage(amsoil, vehicleDisplay) : ""}
 </body>
 </html>`;
   return { subject, html };
