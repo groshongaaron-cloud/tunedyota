@@ -91,3 +91,11 @@ test("mapped booking includes certDelivery from the Cert Delivery field", async 
   assert.equal(a.certDelivery, "installer-fallback");
   assert.equal(b.certDelivery, "");
 });
+
+test("roster booking exposes modelYear for the VIN guard", async () => {
+  const out = await buildRoster({ env, key: "aaron",
+    list: async () => ([{ id: "r1", fields: { Installer: "aaron", City: "X", "Event Date": "2026-07-16",
+      Vehicle: "2024 Toyota Tacoma", "Model Year": "2024", Status: "Booked" } }]),
+    loadEvents: async () => [] });
+  assert.equal(out.bookings[0].modelYear, "2024");
+});
