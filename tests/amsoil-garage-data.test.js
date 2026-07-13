@@ -57,3 +57,11 @@ test("no bundle lists a duplicate SKU", () => {
     assert.equal(new Set(gen.bundle).size, gen.bundle.length, `${mk} ${md} ${gen.y}: bundle has duplicate SKUs`);
   });
 });
+
+test("every product carries an official AMSOIL stockNo", () => {
+  const data = require("../site/amsoil-garage.json");
+  for (const [sku, p] of Object.entries(data.products)) {
+    assert.ok(typeof p.stockNo === "string" && p.stockNo.trim().length > 0,
+      `product ${sku} is missing stockNo`);
+  }
+});
