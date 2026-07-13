@@ -17,7 +17,7 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids } = {}) {
     ? (fluids.make + " " + fluids.model + (fluids.engine ? " " + fluids.engine : ""))
     : (vehicle || "your vehicle"));
   const url = (fluids && fluids.garageUrl) || GARAGE;
-  const subject = `Keep your ${fluids && fluids.model ? esc(fluids.model) : "tuned Toyota"} running strong — your AMSOIL fluids`;
+  const subject = `Keep your ${fluids && fluids.model ? esc(fluids.model) : "tuned Toyota"} running strong - your AMSOIL fluids`;
   const th = 'padding:6px 10px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8f94;';
   const td = 'padding:8px 10px;border-bottom:1px solid #e7e3da;';
   const rows = hasFluids ? fluids.systems.map(function (s) {
@@ -31,14 +31,14 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids } = {}) {
   const table = hasFluids ? `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0;">
     <tr><th align="left" style="${th}">System</th><th align="left" style="${th}">AMSOIL product</th><th align="left" style="${th}">Capacity</th><th align="left" style="${th}">Interval</th></tr>
     ${rows}</table>` : "";
-  const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f2ed;">
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#f4f2ed;">
   <div style="max-width:600px;margin:0 auto;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#191c1e;">
     <div style="padding:24px 28px;border-bottom:3px solid #ed1c24;text-align:center;">
       <img src="${LOGO}" alt="AMSOIL" width="200" style="display:inline-block;max-width:200px;height:auto;">
     </div>
     <div style="padding:24px 28px;">
       <p style="font-size:16px;margin:0 0 12px;">Hi ${firstName(name)},</p>
-      <p style="font-size:15px;line-height:1.5;color:#5b6066;margin:0 0 8px;">Your ${veh} is dialed in. A tuned truck asks more of its fluids — here are the exact <strong>AMSOIL</strong> synthetic fluids, capacities, and severe-service intervals for your vehicle, from Tuned&nbsp;Yota, your Authorized AMSOIL Dealer.</p>
+      <p style="font-size:15px;line-height:1.5;color:#5b6066;margin:0 0 8px;">Your ${veh} is dialed in. A tuned truck asks more of its fluids &mdash; here are the exact <strong>AMSOIL</strong> synthetic fluids, capacities, and severe-service intervals for your vehicle, from Tuned&nbsp;Yota, your Authorized AMSOIL Dealer.</p>
       ${table}
       <div style="text-align:center;margin:24px 0 8px;">
         <a href="${url}" style="display:inline-block;background:#191c1e;color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 26px;border-radius:8px;">Shop your fluids &amp; save up to 25% &#9658;</a>
@@ -52,8 +52,8 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids } = {}) {
   </div></body></html>`;
   const text = `Hi ${name ? String(name).trim().split(/\s+/)[0] : "there"},\n\n` +
     `Your ${fluids && fluids.model ? fluids.make + " " + fluids.model : "tuned vehicle"} is dialed in. ` +
-    `Here are the exact AMSOIL synthetic fluids for your vehicle — shop and save up to 25% as a Preferred Customer: ${url}\n\n` +
-    `Reply UNSUBSCRIBE to stop AMSOIL emails.\nTuned Yota — Authorized AMSOIL Dealer`;
+    `Here are the exact AMSOIL synthetic fluids for your vehicle - shop and save up to 25% as a Preferred Customer: ${url}\n\n` +
+    `Reply UNSUBSCRIBE to stop AMSOIL emails.\nTuned Yota - Authorized AMSOIL Dealer`;
   return { subject, html, text };
 }
 module.exports = { buildAmsoilEmail };
