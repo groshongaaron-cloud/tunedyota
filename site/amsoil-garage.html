@@ -71,6 +71,19 @@
   .ag-veh{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
   .ag-veh a{font-size:13.5px;font-weight:700;color:var(--brown2);background:var(--white);border:1.5px solid var(--line);border-radius:99px;padding:8px 14px;text-decoration:none}
   .ag-veh a:hover{background:var(--ink);color:#F3EFEA;border-color:var(--ink)}
+  .ag-my-garage{margin:0 0 14px}
+  .ag-my-garage-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--sage-d);margin-bottom:6px}
+  .ag-my-garage-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+  .ag-chip{font-size:12.5px;font-weight:700;background:var(--white);border:1.5px solid var(--line);border-radius:99px;padding:6px 13px;cursor:pointer;color:var(--brown2);font-family:'Lato',sans-serif;transition:.15s}
+  .ag-chip:hover{background:var(--ink);color:#F3EFEA;border-color:var(--ink)}
+  .ag-add-btn{font-size:12.5px;font-weight:700;font-family:'Lato',sans-serif;background:transparent;border:1.5px dashed var(--line);border-radius:99px;padding:6px 14px;cursor:pointer;color:var(--sage-d);transition:.15s}
+  .ag-add-btn:hover{border-color:var(--brown);color:var(--brown)}
+  .ag-search-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:20px 0 6px}
+  .ag-search-row label{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .ag-search-row input{font:inherit;font-size:14px;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--white);color:var(--ink);flex:1;min-width:160px}
+  .ag-search-row input:focus{outline:2px solid var(--ring);outline-offset:1px;border-color:var(--sage-d)}
+  .ag-search-btn{font-family:'Lato',sans-serif;font-weight:900;font-size:13px;background:var(--ink);color:#F3EFEA;border:none;border-radius:99px;padding:10px 20px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .ag-search-btn:hover{background:var(--brown)}
 </style>
 </head>
 <body>
@@ -88,9 +101,17 @@
     <select id="sel-year" aria-label="Year"></select>
   </div>
 
+  <div class="ag-my-garage" id="ag-my-garage" aria-label="My saved vehicles"></div>
+
   <section id="garage" aria-live="polite"></section>
 
   <p style="margin-top:18px"><a id="full-catalog" class="btn outline" href="#">Browse the full AMSOIL catalog →</a></p>
+
+  <div class="ag-search-row" role="search" aria-label="Search AMSOIL catalog">
+    <label for="ag-search">Search all AMSOIL products</label>
+    <input type="search" id="ag-search" placeholder="e.g. 5W-30 motor oil…" aria-label="Search query">
+    <button class="ag-search-btn" id="ag-search-btn" type="button">Search →</button>
+  </div>
 
   <section class="ag-prose" aria-labelledby="why-amsoil">
     <h2 id="why-amsoil">Why AMSOIL for a tuned Toyota or Lexus</h2>
@@ -191,16 +212,109 @@
   }
   el("sel-make").addEventListener("change", function () { fill(el("sel-model"), modelsFor(el("sel-make").value), "Model"); fill(el("sel-year"), [], "Year"); sync(); });
   el("sel-model").addEventListener("change", function () { fill(el("sel-year"), yearsFor(el("sel-make").value, el("sel-model").value), "Year"); sync(); });
-  el("sel-year").addEventListener("change", sync);
+  el("sel-year").addEventListener("change", function () { sync(); });
 
+  // --- Deep-link pre-fill: support both ?v=Make|Model&y=YEAR and ?make=&model=&year= ---
   var pre = AmsoilGarage.parseVehicleParams(location.search);
-  if (pre.make) {
-    el("sel-make").value = makes.find(function (m) { return m.toLowerCase() === pre.make.toLowerCase(); }) || "";
-    fill(el("sel-model"), modelsFor(el("sel-make").value), "Model");
-    if (pre.model) el("sel-model").value = modelsFor(el("sel-make").value).find(function (m) { return m.toLowerCase().replace(/\s+/g, "") === pre.model.toLowerCase().replace(/\s+/g, ""); }) || "";
-    fill(el("sel-year"), yearsFor(el("sel-make").value, el("sel-model").value), "Year");
+  // Also read flat ?make=&model=&year= params (used by certificate QR links)
+  (function () {
+    var sp = new URLSearchParams(location.search);
+    var qmake = (sp.get("make") || "").trim();
+    var qmodel = (sp.get("model") || "").trim();
+    var qyear = (sp.get("year") || "").trim();
+    if (!pre.make && qmake) {
+      pre = { make: qmake, model: qmodel || null, year: qyear ? parseInt(qyear, 10) : null };
+    }
+  })();
+  function applyPrefill(params) {
+    if (!params || !params.make) return;
+    var matchedMake = makes.find(function (m) { return m.toLowerCase() === params.make.toLowerCase(); }) || "";
+    el("sel-make").value = matchedMake;
+    fill(el("sel-model"), modelsFor(matchedMake), "Model");
+    if (params.model && matchedMake) {
+      var matchedModel = modelsFor(matchedMake).find(function (m) { return m.toLowerCase().replace(/\s+/g, "") === params.model.toLowerCase().replace(/\s+/g, ""); }) || "";
+      el("sel-model").value = matchedModel;
+      fill(el("sel-year"), yearsFor(matchedMake, matchedModel), "Year");
+      if (params.year && matchedModel) {
+        var yr = String(params.year);
+        var matchedYear = yearsFor(matchedMake, matchedModel).find(function (y) { return String(y) === yr; }) || "";
+        el("sel-year").value = matchedYear;
+      }
+    }
   }
+  applyPrefill(pre);
   renderGarage(AmsoilGarage.resolveVehicle(pre, CAT, CUR));
+
+  // --- My Garage (device-local, localStorage) ---
+  var GARAGE_KEY = "ty_amsoil_garage";
+  function savedGarage() {
+    try { return JSON.parse(localStorage.getItem(GARAGE_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function saveGarage(arr) {
+    try { localStorage.setItem(GARAGE_KEY, JSON.stringify(arr)); } catch (e) {}
+  }
+  function currentVehicle() {
+    var mk = el("sel-make").value, md = el("sel-model").value, yr = el("sel-year").value;
+    if (!mk || !md) return null;
+    return { make: mk, model: md, year: yr };
+  }
+  function vehicleKey(v) { return v.make + "|" + v.model + "|" + v.year; }
+  function renderMyGarage() {
+    var saved = savedGarage();
+    var cur = currentVehicle();
+    var container = el("ag-my-garage");
+    if (saved.length === 0 && !cur) { container.innerHTML = ""; return; }
+    var chipsHtml = "";
+    saved.forEach(function (v, i) {
+      var label = v.make + " " + v.model + (v.year ? " " + v.year : "");
+      chipsHtml += '<button class="ag-chip" type="button" data-idx="' + i + '" aria-label="Select ' + label + '">' + label + '</button>';
+    });
+    var addBtn = "";
+    if (cur) {
+      var key = vehicleKey(cur);
+      var already = saved.some(function (v) { return vehicleKey(v) === key; });
+      if (!already) {
+        addBtn = '<button class="ag-add-btn" type="button" id="ag-add-veh" aria-label="Add current vehicle to My Garage">＋ Add this vehicle to my garage</button>';
+      }
+    }
+    container.innerHTML = (saved.length ? '<div class="ag-my-garage-label">My Garage</div><div class="ag-my-garage-chips" id="ag-chips">' + chipsHtml + '</div>' : "") + addBtn;
+    // Wire chip clicks
+    var chips = container.querySelectorAll(".ag-chip");
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var v = saved[parseInt(chip.getAttribute("data-idx"), 10)];
+        if (!v) return;
+        applyPrefill({ make: v.make, model: v.model, year: v.year ? parseInt(v.year, 10) : null });
+        sync();
+        renderMyGarage();
+      });
+    });
+    var addVehBtn = document.getElementById("ag-add-veh");
+    if (addVehBtn) {
+      addVehBtn.addEventListener("click", function () {
+        var v = currentVehicle();
+        if (!v) return;
+        var arr = savedGarage();
+        var key = vehicleKey(v);
+        if (!arr.some(function (s) { return vehicleKey(s) === key; })) { arr.push(v); saveGarage(arr); }
+        renderMyGarage();
+      });
+    }
+  }
+  // Re-render My Garage on picker changes
+  var origSync = sync;
+  sync = function () { origSync(); renderMyGarage(); };
+  renderMyGarage();
+
+  // --- Full-catalog search ---
+  var searchBtn = el("ag-search-btn");
+  searchBtn.addEventListener("click", function () {
+    var q = document.getElementById("ag-search").value.trim();
+    if (q) window.open(window.amsoilUrl("/search?q=" + encodeURIComponent(q)), "_blank");
+  });
+  document.getElementById("ag-search").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { searchBtn.click(); }
+  });
 })();
 </script>
 </body>
