@@ -141,3 +141,16 @@ test("roster vapidPublicKey empty when unset", async () => {
   const out = await buildRoster({ key: "aaron", env: {}, list: async () => [], loadEvents: async () => [] });
   assert.equal(out.vapidPublicKey, "");
 });
+
+test("a booking with a stored signature is marked signed", async () => {
+  const out = await buildRoster({ key: "aaron", env: {}, loadEvents: async () => [],
+    list: async () => ([{ id: "r1", fields: { Installer: "aaron", Status: "Completed", "Customer Signature": "data:image/png;base64,AAAA" } }]) });
+  assert.equal(out.bookings[0].signed, true);
+});
+test("a booking without a signature is not signed, and the roster never ships the image", async () => {
+  const out = await buildRoster({ key: "aaron", env: {}, loadEvents: async () => [],
+    list: async () => ([{ id: "r2", fields: { Installer: "aaron", Status: "Completed" } }]) });
+  assert.equal(out.bookings[0].signed, false);
+  assert.ok(!("Customer Signature" in out.bookings[0]));
+  assert.ok(!("signature" in out.bookings[0]));
+});

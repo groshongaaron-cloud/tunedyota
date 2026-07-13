@@ -292,3 +292,34 @@ test("falls back to the installer when no customer email exists", async () => {
   const all = Object.assign({}, ...updated);
   assert.equal(all["Cert Delivery"], "installer-fallback");
 });
+
+test("complete stores a valid PNG signature", async () => {
+  let written;
+  const deps = { env, key: "aaron", admin: false,
+    get: async () => ({ id: "r1", fields: { Installer: "aaron", Name: "Dana", Vehicle: "2021 Tundra", "Event Date": "2026-08-01" } }),
+    update: async (a) => { if (written === undefined) written = a.fields; return {}; },
+    send: async () => ({}), log: { error() {} } };
+  const sig = "data:image/png;base64,AAAA";
+  const out = await processCloseout({ recordId: "r1", action: "complete", calibration: "Spicy", vin: "1FTFW1E50MFA00001", signature: sig }, deps);
+  assert.equal(out.status, "completed");
+  assert.equal(written["Customer Signature"], sig);
+});
+
+test("complete without a signature omits the field (skip path)", async () => {
+  let written;
+  const deps = { env, key: "aaron", admin: false,
+    get: async () => ({ id: "r1", fields: { Installer: "aaron", Name: "Dana", Vehicle: "2021 Tundra", "Event Date": "2026-08-01" } }),
+    update: async (a) => { if (written === undefined) written = a.fields; return {}; }, send: async () => ({}), log: { error() {} } };
+  await processCloseout({ recordId: "r1", action: "complete", calibration: "Spicy", vin: "1FTFW1E50MFA00001" }, deps);
+  assert.ok(!("Customer Signature" in written));
+});
+
+test("a malformed/oversized signature is ignored, completion still succeeds", async () => {
+  let written;
+  const deps = { env, key: "aaron", admin: false,
+    get: async () => ({ id: "r1", fields: { Installer: "aaron", Name: "Dana", Vehicle: "2021 Tundra", "Event Date": "2026-08-01" } }),
+    update: async (a) => { if (written === undefined) written = a.fields; return {}; }, send: async () => ({}), log: { error() {} } };
+  const out = await processCloseout({ recordId: "r1", action: "complete", calibration: "Spicy", vin: "1FTFW1E50MFA00001", signature: "data:text/html,<script>" }, deps);
+  assert.equal(out.status, "completed");
+  assert.ok(!("Customer Signature" in written));
+});
