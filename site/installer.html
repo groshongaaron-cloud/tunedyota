@@ -24,6 +24,8 @@
   .top{display:flex;justify-content:space-between;gap:8px;font-size:14px;}
   .who{font-weight:700;} .meta{color:var(--muted);font-size:13px;margin:2px 0 6px;}
   .ffnote{background:#fdf3e3;border:1px solid #e6c99a;color:#8a5a12;border-radius:7px;padding:6px 8px;font-size:12.5px;line-height:1.35;margin:2px 0 8px;}
+  .vinwarn{background:#fdf0dd;border:1px solid #e6c99a;color:#8a5a12;border-radius:7px;padding:8px 10px;font-size:12.5px;line-height:1.35;margin:2px 0 8px;}
+  .vinwarn-h{font-weight:700;margin-bottom:2px;} .vinwarn ul{margin:2px 0 4px;padding-left:18px;}
   select{padding:9px;font-size:15px;border:1px solid var(--line);border-radius:8px;width:100%;margin:6px 0;}
   .row-actions{display:flex;gap:8px;margin-top:6px;} .row-actions .btn{flex:1;}
   .ns{background:#8a6a3a;} .done{color:#2f5d2a;font-weight:700;} .noshow{color:#8a2a2a;font-weight:700;}
@@ -96,7 +98,7 @@
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{} };
+  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{} };
 
   function sel(id,list,ph){ return '<select id="'+id+'"><option value="" disabled selected>'+ph+'…</option>'+list.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>'; }
   function val(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
@@ -407,7 +409,7 @@
     return zxingLoading;
   }
   function setScanMsg(id,m){ var el=document.getElementById('scanmsg_'+id); if(el) el.textContent=m; }
-  function onVin(id,vin){ var i=document.getElementById('vin_'+id); if(i) i.value=vin; stopScan(id); }
+  function onVin(id,vin){ var i=document.getElementById('vin_'+id); if(i) i.value=vin; stopScan(id); checkVin(id); }
   function stopScan(id){
     if(scanState && scanState.id===id){
       if(scanState.raf) cancelAnimationFrame(scanState.raf);
@@ -474,6 +476,27 @@
     }
   }
 
+  var vinTimers = {};
+  function scheduleVinCheck(id){ clearTimeout(vinTimers[id]); vinTimers[id]=setTimeout(function(){ checkVin(id); }, 500); }
+  async function checkVin(id){
+    var b = STATE.bookings.filter(function(x){ return x.id===id; })[0];
+    var box = document.getElementById('vinwarn_'+id);
+    if(!b || !box) return;
+    var vin = val('vin_'+id).toUpperCase().replace(/[^A-Z0-9]/g,'');
+    var clear = function(){ box.className='vinwarn hidden'; box.innerHTML=''; STATE.vinBlocked[id]=false; };
+    if(vin.length!==17){ clear(); return; }
+    try{
+      var res = await fetch('/.netlify/functions/vin-decode',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({vin:vin,vehicle:b.vehicle,modelYear:b.modelYear})});
+      var out = await res.json().catch(function(){ return {ok:true,warnings:[]}; });
+      if(out.ok || !(out.warnings && out.warnings.length)){ clear(); return; }
+      STATE.vinBlocked[id]=true;
+      box.className='vinwarn';
+      box.innerHTML='<div class="vinwarn-h">⚠ Check this VIN</div><ul>'+
+        out.warnings.map(function(w){ return '<li>'+esc(w)+'</li>'; }).join('')+'</ul>'+
+        '<label class="nsconfirm"><input type="checkbox" id="ackvin_'+id+'"> I\'ve verified this VIN is correct</label>';
+    }catch(e){ clear(); }   // never block on our own failure
+  }
+
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
@@ -499,6 +522,7 @@
     c.innerHTML=head+
       '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
       (canScan()?'<button type="button" class="btn scanvin" id="scan_'+b.id+'">📷 Scan VIN</button>':'')+
+      '<div id="vinwarn_'+b.id+'" class="vinwarn hidden"></div>'+
       '<select id="cal_'+b.id+'">'+opts+'</select>'+
       '<div class="otthdr">OTT commission report</div>'+
       sel('tp_'+b.id, TP, 'Tuning Platform')+
@@ -515,6 +539,8 @@
     var cb=c.querySelector('#nsc_'+b.id), nsb=c.querySelector('#ns_'+b.id);
     cb.onchange=function(){ nsb.disabled=!cb.checked; };
     nsb.onclick=function(){ if(cb.checked) closeout(b.id,{action:'noshow',confirmed:true}); };
+    var vinEl = c.querySelector('#vin_'+b.id);
+    if(vinEl) vinEl.oninput = function(){ scheduleVinCheck(b.id); };
     return c;
   }
 
@@ -529,6 +555,7 @@
     var gear=val('gear_'+id); if(!gear){ fail('Enter the gear ratio.'); return; }
     var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!mi){ fail('Enter the mileage.'); return; }
     var cem=val('cem_'+id);
+    if(STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I've verified this VIN is correct'."); return; } }
     closeout(id,{action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem});
   }
 
