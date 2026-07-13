@@ -6,7 +6,8 @@ is correct and the calibration is countable in the monthly OTT report.
 
 Close-out happens on the **Installer Console** at **`/installer.html`** on a phone or tablet.
 This is the single moment where the calibration and VIN are captured; get it right here and the
-certificate and OTT report take care of themselves.
+certificate and OTT report take care of themselves. The same flow applies to **everyday walk-ins /
+call-ins**, not just scheduled events — see the [Installer Dashboard Playbook](installer-dashboard-playbook.md).
 
 ---
 
@@ -23,7 +24,8 @@ certificate and OTT report take care of themselves.
 For each customer, after the calibration is written and road-verified:
 
 1. On the booking card, enter the **VIN** — the full **17 characters** (auto-uppercases;
-   the console will not let you complete until a valid 17-char VIN is entered).
+   the console will not let you complete until a valid 17-char VIN is entered). Tap **📷 Scan VIN**
+   to read the door-jamb/windshield barcode instead of typing.
 2. Choose the **OTT Calibration** that was actually flashed:
    **Light · Mild · Medium · Spicy · SS**, or an adjacent combo
    (**Light and Mild · Mild and Medium · Medium and Spicy · Spicy and SS**).
@@ -40,7 +42,9 @@ What happens automatically (`installer-closeout.js`):
   as `certificate.html`, pre-filled with the customer, vehicle, VIN, calibration, your name/region,
   and a unique serial (`TY-<year>-<id>`). The vehicle line shows the customer's **exact model year**
   (captured at booking), and "Date Calibrated" is the event day.
-- Ownership is re-checked server-side — you can only close out **your own** bookings.
+- Ownership is re-checked server-side — you can only close out **your own** bookings. **Admins**
+  (env `INSTALLER_ADMINS`) may close out any installer's booking; the certificate and any waitlist
+  rebook still route to the **owning** installer, so nothing is misattributed.
 
 > **VIN accuracy matters.** It appears on the customer's certificate and is reported to OTT.
 > Read it off the door jamb or dash plate; don't guess.
@@ -86,4 +90,4 @@ Idempotent: a certificate is never sent twice.
 - [ ] **Marked complete** → certificate received.
 - [ ] Certificate PDF sent to the customer.
 
-**Related:** [SOP 6 Installer Field Guide](sop-installer-field-guide.md) · [SOP 5 Priority Waitlist](sop-priority-waitlist.md) · [SOP 9 Monthly OTT Report](sop-monthly-ott-report.md)
+**Related:** [Installer Dashboard Playbook](installer-dashboard-playbook.md) · [SOP 6 Installer Field Guide](sop-installer-field-guide.md) · [SOP 5 Priority Waitlist](sop-priority-waitlist.md) · [SOP 9 Monthly OTT Report](sop-monthly-ott-report.md)

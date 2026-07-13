@@ -1,10 +1,13 @@
 # SOP 6 — Installer Field Guide
 
-**Owner:** Installer · **Cadence:** Every event day
-**Goal:** Run your event cleanly from the console — roster in, calibration done, VIN + calibration
-recorded, certificate delivered.
+**Owner:** Installer · **Cadence:** Every event day + everyday walk-ins
+**Goal:** Run your work cleanly from the console — roster in, calibration done, VIN + calibration
+recorded, certificate delivered — at events and for any-day walk-ins.
 
-This is the installer's day-of companion to [SOP 4 Close-Out](sop-event-closeout.md).
+This is the installer's quick day-of companion. The **full field manual** — feed, search, admin view,
+VIN scan, and everyday walk-ins — lives in the
+[**Installer Dashboard Playbook**](installer-dashboard-playbook.md). Deeper close-out detail is in
+[SOP 4 Close-Out](sop-event-closeout.md).
 
 ---
 
@@ -17,15 +20,23 @@ This is the installer's day-of companion to [SOP 4 Close-Out](sop-event-closeout
 
 ---
 
-## 2. Reading your roster
+## 2. Reading the feed
 
-- The console lists **your upcoming events**, grouped by **city + date**, sorted by slot time.
-- Each card = one customer: slot, name, vehicle, phone, and modifications.
-- Already-handled cards show **✓ Completed** (with calibration + VIN) or **No-show**.
+The console opens on a **smart feed** with a sticky header and your work in priority order:
+
+- **Header:** a **tally** (this month done/open/no-show · lifetime tunes · next event) and an
+  **all-history search** (name, VIN, vehicle, city, calibration, phone, platform, type).
+- **Feed sections:** **＋ Log a walk-in / call-in** → **Needs close-out** (clear these first) →
+  **Today** → **Upcoming** → **Recent**.
+- Each **event card** is grouped by **city + date** with a status pill (`3 done · 1 open`); inside,
+  bookings run open → no-show → `✓ Done`. Your expand/collapse choices stick.
+- Each **booking card**: slot, name (walk-ins tagged `· walk-in`), vehicle, phone, modifications.
+  Tundras show an amber **flex-fuel** reminder (Policy 0011).
 
 You also receive **roster emails automatically** at 30 / 15 / 10 / 2 / 0 days before each event
-(from `event-reminders.js`), including that city's waitlist — but the **console is the live source**
-on the day.
+(from `event-reminders.js`), including that city's waitlist — but the **console is the live source**.
+
+Full walkthrough: [Installer Dashboard Playbook §2](installer-dashboard-playbook.md).
 
 ---
 
@@ -42,13 +53,17 @@ Full detail + the backstop behavior: [SOP 4](sop-event-closeout.md).
 
 ---
 
-## 4. Walk-ins at the event
+## 4. Walk-ins & call-ins (any day)
 
-Someone shows up without a booking?
+Walk-ins are **everyday business** — logged **on the console itself**, no separate intake page.
 
-1. Open the **+ Add a walk-in (intake form)** link on the console (goes to `/intake.html`).
-2. Enter the intake passcode, choose **Book** (if a slot's open) or **Lead**, pick channel **walk-in**.
-3. Fill their details and submit. If you booked them, they'll appear on your roster to close out.
+- **Any day:** use **＋ Log a walk-in / call-in** at the top of the feed — name, vehicle (with year),
+  phone, date (defaults to today), and market.
+- **At an event:** open the event card and tap **+ Add walk-in**.
+
+The booking appears in the feed immediately and closes out like any other → certificate + OTT report.
+Name and phone are required; the date uses your **local (Central)** time so evening walk-ins bucket
+into the right day/OTT month. Full detail: [Playbook §3](installer-dashboard-playbook.md).
 
 ---
 
@@ -68,6 +83,7 @@ Someone shows up without a booking?
 - [ ] Every attending customer marked **Completed** with VIN + calibration.
 - [ ] Every absent customer marked **No-show**.
 - [ ] All certificates delivered to customers.
-- [ ] Walk-ins recorded via intake.
+- [ ] Walk-ins/call-ins logged on the console.
+- [ ] **Needs close-out** section is empty.
 
-**Related:** [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 3 Booking](sop-event-booking.md)
+**Related:** [Installer Dashboard Playbook](installer-dashboard-playbook.md) · [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 3 Booking](sop-event-booking.md)

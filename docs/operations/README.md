@@ -39,6 +39,10 @@ Installer regions (server source of truth — `netlify/functions/lib/routing.js`
 | 9 | [Monthly OTT Calibration Report](sop-monthly-ott-report.md) | Owner |
 | 10 | [Data Security & Secrets](sop-data-security-secrets.md) | Owner |
 
+**Field manual:** [Installer Dashboard Playbook](installer-dashboard-playbook.md) — the complete
+everyday guide to the Installer Console (`/installer.html`): smart feed, all-history search, everyday
+walk-ins, close-out + OTT fields, VIN scan, admin view, and troubleshooting. Backs SOP 4 + SOP 6.
+
 ## The business at a glance
 
 ```
