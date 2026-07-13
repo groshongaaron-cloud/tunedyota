@@ -39,7 +39,7 @@ Each is a small, independently testable unit. Builders stay pure (no I/O); Netli
   - AMSOIL red measure bar; eyebrow "AMSOIL MAINTENANCE REFERENCE".
   - Hero: *"A tuned truck deserves the best fluids in the world — AMSOIL."* + the owner-approved paragraph.
   - **Official AMSOIL logo**, unaltered, on a white chip with clear space (brand-guide compliant — see §7).
-  - **Fluids table** — columns: **System · AMSOIL Product (description) · Product No. (official AMSOIL stock number) · Capacity · Interval** (tuned interval prominent, factory shown small beneath).
+  - **Fluids table** — columns: **System · AMSOIL Product · Capacity · Interval** (tuned interval prominent, factory shown small beneath). The **official AMSOIL stock number** renders as a "Stock No. `<code>`" line beneath each product description (brand red), not as a separate column — keeps the table uncrowded.
   - **Order block:** QR (from `lib/qr.js`) → pre-filtered garage URL; "Order your exact fluids" + the Preferred-Customer "save up to 25%" pill; the visible URL.
   - Footnote: "confirm capacities against your owner's manual before service · Tuned Yota is an Authorized AMSOIL Dealer."
 - **Graceful degradation:** if `amsoil-fluids` returns `null` (unsupported vehicle), page 2 renders a compact version — hero + logo + QR to the general garage — with **no fabricated fluid rows**.
