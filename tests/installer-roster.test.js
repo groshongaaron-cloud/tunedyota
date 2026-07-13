@@ -99,3 +99,22 @@ test("roster booking exposes modelYear for the VIN guard", async () => {
     loadEvents: async () => [] });
   assert.equal(out.bookings[0].modelYear, "2024");
 });
+
+test("roster resolves OTT commission for a completed booking", async () => {
+  const out = await buildRoster({ key: "aaron",
+    list: async () => ([{ id: "r1", fields: {
+      Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Completed",
+      Vehicle: "2024 Toyota Tacoma 2.4L-T I4", "Model Year": "2024",
+      "Tuning Platform": "VFT", "Calibration Type": "Basic" } }]),
+    loadEvents: async () => [] });
+  assert.equal(typeof out.bookings[0].commission, "number");
+});
+
+test("non-completed booking has null commission", async () => {
+  const out = await buildRoster({ key: "aaron",
+    list: async () => ([{ id: "r2", fields: {
+      Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Booked",
+      Vehicle: "2021 Toyota Tundra" } }]),
+    loadEvents: async () => [] });
+  assert.equal(out.bookings[0].commission, null);
+});

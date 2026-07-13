@@ -8,6 +8,7 @@ const { getAllActiveEvents } = require("./lib/events.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const EVENTS = require("./lib/events-data.js");
+const { deriveVehicle, resolveCommission } = require("./lib/ott-commission.js");
 
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 const bySlot = (a, b) => String(a.slot || "").localeCompare(String(b.slot || ""), undefined, { numeric: true });
@@ -28,6 +29,15 @@ async function buildRoster(deps) {
     const src = String(f.Source || "");
     // Installer arrives as a single-select string OR a multi-select array — normalize.
     const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+    let commission = null;
+    if (f.Status === "Completed") {
+      const dv = deriveVehicle(f.Vehicle || "");
+      commission = resolveCommission({
+        vehicleType: dv.vehicleType, engine: dv.engine,
+        year: f["Model Year"] || dv.year,
+        tuningPlatform: f["Tuning Platform"], calibrationType: f["Calibration Type"],
+      });
+    }
     return {
       id: r.id, city: f.City || "", dateISO: dateOnly(f["Event Date"]), installer: owner || "",
       slot: f.Slot || "", slotLabel: f.Slot ? formatSlot(f.Slot) : "",
@@ -39,6 +49,7 @@ async function buildRoster(deps) {
       tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
       certDelivery: f["Cert Delivery"] || "",
+      commission,
     };
   }).sort((a, b) => a.dateISO.localeCompare(b.dateISO) || bySlot(a, b));
 
