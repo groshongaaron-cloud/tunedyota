@@ -40,6 +40,10 @@
 [functions."certificate-dispatch"]
   schedule = "0 14 * * *"
 
+# Daily AMSOIL follow-up: ~3 days post-tune (netlify/functions/amsoil-followup.js).
+[functions."amsoil-followup"]
+  schedule = "0 15 * * *"
+
 # "Get OTT Now!" share link -> the decision funnel, tagged to the share campaign.
 [[redirects]]
   from = "/get-ott-now"
