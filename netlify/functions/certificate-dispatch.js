@@ -3,6 +3,8 @@ const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const { buildCertificate, certSerial } = require("./lib/certificate.js");
+const { resolveFluids } = require("./lib/amsoil-fluids.js");
+const { qrSvg } = require("./lib/qr.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -29,19 +31,30 @@ async function dispatchCertificates(deps) {
     // than send a blank one. Left unmarked, so a later run sends it once set.
     if (!calibration) { held.push(f.Name || row.id); continue; }
     const inst = keyToInstaller(f.Installer);
+    const customerEmail = String(f.Email || "").trim();
+    const to = customerEmail || inst.email;
+    const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
+    const amsoil = { fluids, qrSvg: qrSvg((fluids && fluids.garageUrl) || "https://tunedyota.com/amsoil-garage") };
     const certNo = certSerial(row.id, f["Calibration Date"], issueDate);
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin: f.VIN, calibration,
       installer: inst.name, installerRegion: inst.region,
-      calibrationDate: f["Calibration Date"], certNo, issueDate,
+      calibrationDate: f["Calibration Date"], certNo, issueDate, amsoil,
     });
     try {
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM,
-        to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: OWNER,
+        to, replyTo: OWNER,
         subject,
-        text: `Attached is the Tuned Yota Certificate of Calibration for ${f.Name || "your customer"}. Open certificate.html in a browser, confirm the OTT Calibration selection, then Print → Save as PDF and send it to the customer.`,
+        text: customerEmail
+          ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.`
+          : `Attached is the Certificate of Calibration for ${f.Name || "your customer"} — no customer email on file; please forward it to them.`,
         attachments: [{ filename: "certificate.html", content: Buffer.from(html).toString("base64") }] });
-      await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: { "Certificate Sent": true } });
+      await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: {
+        "Certificate Sent": true,
+        "Certificate Issued": issueDate,
+        "Certificate Recipient": to,
+        "Cert Delivery": customerEmail ? "customer" : "installer-fallback",
+      } });
       sent++;
     } catch (e) {
       if (log.error) log.error("cert send", e.message);
