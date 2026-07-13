@@ -1,4 +1,4 @@
-const { cfg, listRecords, updateRecord } = require("./lib/airtable.js");
+const { cfg, listRecords, updateRecord, updateTolerant } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { keyToInstaller } = require("./lib/routing.js");
@@ -49,12 +49,12 @@ async function dispatchCertificates(deps) {
           ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.`
           : `Attached is the Certificate of Calibration for ${f.Name || "your customer"} — no customer email on file; please forward it to them.`,
         attachments: [{ filename: "certificate.html", content: Buffer.from(html).toString("base64") }] });
-      await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: {
+      await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: {
         "Certificate Sent": true,
         "Certificate Issued": issueDate,
         "Certificate Recipient": to,
         "Cert Delivery": customerEmail ? "customer" : "installer-fallback",
-      } });
+      } }, ["Certificate Issued", "Certificate Recipient", "Cert Delivery"]);
       sent++;
     } catch (e) {
       if (log.error) log.error("cert send", e.message);

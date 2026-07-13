@@ -59,6 +59,27 @@ test("OTT Calibration field from Airtable appears in the certificate attachment"
   assert.ok(/OTT Calibration/.test(attachmentHtml), "attachment HTML should contain 'OTT Calibration' label");
   assert.ok(/SS/.test(attachmentHtml), "attachment HTML should contain calibration value 'SS'");
 });
+test("idempotency flag persists even when the new metadata columns are missing", async () => {
+  const writes = [];
+  // Simulate Airtable rejecting the optional columns until they're dropped.
+  const update = async (a) => {
+    if (a.fields && "Cert Delivery" in a.fields) {
+      const e = new Error("Unknown field name: \"Cert Delivery\" (UNKNOWN_FIELD_NAME)");
+      throw e;
+    }
+    writes.push(a.fields);
+    return {};
+  };
+  const r = await dispatchCertificates({
+    list: async () => ([{ id: "rec1", fields: {
+      Status: "Completed", "OTT Calibration": "Medium", Name: "C", Installer: "aaron",
+      Vehicle: "2024 Toyota Tacoma 2.4L-T I4", Email: "cust@example.com", "Calibration Date": "2026-07-12" } }]),
+    update, send: async () => {}, notify: async () => {}, env: { RESEND_API_KEY: "x" },
+  });
+  assert.equal(r.sent, 1);
+  const merged = Object.assign({}, ...writes);
+  assert.equal(merged["Certificate Sent"], true, "idempotency flag must still persist");
+});
 test("backstop sends to the customer email when present, no cc", async () => {
   const sent = [];
   const r = await dispatchCertificates({
