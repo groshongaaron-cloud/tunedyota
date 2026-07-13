@@ -241,3 +241,54 @@ test("re-completing an already-certified booking is idempotent (no duplicate cer
   assert.equal(out.alreadySent, true);
   assert.equal(sends, 0); // did NOT re-send the certificate
 });
+
+function baseDeps(overrides = {}) {
+  const sent = [];
+  const updated = [];
+  return {
+    sent, updated,
+    deps: {
+      key: "aaron", admin: false,
+      get: async () => ({ id: "recX", fields: {
+        Installer: "aaron", Name: "Marcus Bell", Vehicle: "2024 Toyota Tacoma 2.4L-T I4",
+        "Model Year": "2024", Email: "marcus@example.com", "Event Date": "2026-07-12", Status: "Booked" } }),
+      update: async (a) => { updated.push(a.fields); return { id: a.id }; },
+      create: async () => ({ id: "wrec" }),
+      send: async (a) => { sent.push(a); },
+      ...overrides,
+    },
+  };
+}
+
+test("delivers the certificate to the customer, not cc'd to the installer", async () => {
+  const { sent, deps } = baseDeps();
+  const out = await processCloseout(
+    { recordId: "recX", action: "complete", calibration: "Medium", vin: "3TMLB5JN1RM123456",
+      customerEmail: "marcus@example.com" }, deps);
+  assert.equal(out.status, "completed");
+  assert.equal(sent[0].to, "marcus@example.com");
+  assert.equal(sent[0].cc, undefined, "no installer/info cc");
+  assert.match(sent[0].attachments[0].content, /./);
+});
+
+test("stores issue metadata and marks delivery = customer", async () => {
+  const { updated, deps } = baseDeps();
+  await processCloseout({ recordId: "recX", action: "complete", calibration: "Medium",
+    vin: "3TMLB5JN1RM123456", customerEmail: "marcus@example.com" }, deps);
+  const all = Object.assign({}, ...updated);
+  assert.ok(all["Certificate Issued"], "issue date stored");
+  assert.equal(all["Certificate Recipient"], "marcus@example.com");
+  assert.equal(all["Cert Delivery"], "customer");
+});
+
+test("falls back to the installer when no customer email exists", async () => {
+  const { sent, updated, deps } = baseDeps({
+    get: async () => ({ id: "recX", fields: {
+      Installer: "aaron", Name: "No Email", Vehicle: "2024 Toyota Tacoma 2.4L-T I4",
+      "Event Date": "2026-07-12", Status: "Booked" } }) });
+  await processCloseout({ recordId: "recX", action: "complete", calibration: "Medium",
+    vin: "3TMLB5JN1RM123456" }, deps);
+  assert.ok(sent[0].to && sent[0].to !== "", "sent to installer fallback");
+  const all = Object.assign({}, ...updated);
+  assert.equal(all["Cert Delivery"], "installer-fallback");
+});
