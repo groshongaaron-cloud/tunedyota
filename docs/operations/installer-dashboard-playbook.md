@@ -19,10 +19,29 @@
    each visit. Keep it private — it scopes the console to **your** bookings only.
 3. If the console ever bounces you back to the passcode screen, your token was rejected — re-enter it.
 
-**On the native app** it also asks for **Face ID / fingerprint** on open and registers for push
-notifications. On the plain website those steps are skipped automatically.
+**On the native app** it also asks for **Face ID / fingerprint** on open. On the plain website that
+step is skipped automatically.
 
 **Log out** (top-right) clears the passcode from the device — use it on a shared or borrowed device.
+
+### Turn on notifications (optional, recommended)
+
+The console can **push notifications straight to your phone's browser** — a new booking in your
+market, your day-of roster, a certificate stuck waiting on you, and (admins) the monthly OTT report
+deadline. You don't need the native app for this.
+
+1. Tap **🔔 Enable notifications** in the top header.
+2. Your browser asks permission — tap **Allow**.
+3. You'll see *"Notifications enabled on this device."* The link becomes **🔔 Notifications on ·
+   Send test** — tap it once to fire a test push and confirm it lands.
+
+**iPhone:** you must **Add the console to your Home Screen first** (Share → Add to Home Screen), then
+open it from that icon and enable — iOS only delivers web push to a home-screen ("installed") app.
+**Android Chrome** works right in the browser.
+
+Enable it **on each device** you want alerts on. Notifications are informational — you still run
+everything from the feed; a missed push never loses a booking. If you don't see the **🔔** link at
+all, notifications aren't switched on for the account yet — ask the Owner.
 
 ---
 
@@ -157,6 +176,8 @@ misattributed. Use the dropdown to filter to one installer. Regular installers n
 | Certificate email didn't arrive | The daily backstop (`certificate-dispatch.js`, ~9 AM Central) resends once the calibration is set; tell the Owner if urgent. |
 | Wrong calibration selected | Tell the Owner immediately — it locks on the certificate. |
 | VIN won't scan | Type it manually — completion only needs a valid 17-char VIN. |
+| No **🔔 Enable notifications** link | Notifications aren't switched on for the account yet — ask the Owner. |
+| Enabled notifications but no test push | iPhone: open the console from its **Home Screen icon** (not Safari) and re-enable. Check the browser didn't block notifications. Re-tap **Send test**. |
 
 ---
 

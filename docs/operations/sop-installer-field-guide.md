@@ -17,6 +17,12 @@ VIN scan, and everyday walk-ins — lives in the
 2. Enter your personal **installer passcode**. It's stored on the device — you won't re-enter it
    each time. Keep the passcode private; it scopes the console to **your** bookings only.
 3. If the console ever returns you to the passcode screen, your token was rejected — re-enter it.
+4. **Turn on notifications (recommended):** tap **🔔 Enable notifications** in the header → **Allow** →
+   **Send test** to confirm. You'll get a push for new bookings, your day-of roster, and any
+   certificate waiting on you. **iPhone:** Add the console to your Home Screen first and open it from
+   that icon (iOS only pushes to a home-screen app); Android Chrome works in-browser. Enable on each
+   device. No **🔔** link? Notifications aren't switched on for the account yet — ask the Owner.
+   Full detail: [Playbook §1](installer-dashboard-playbook.md).
 
 ---
 
