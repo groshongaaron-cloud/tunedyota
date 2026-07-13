@@ -42,6 +42,13 @@ test("resolveVehicle skips unverified generations", () => {
   assert.equal(r, null);
 });
 
+test("resolveVehicle includes unverified generations when opted in", () => {
+  const r = G.resolveVehicle({ make: "Toyota", model: "Tundra", year: 2015 }, CATALOG, 2026, true);
+  assert.ok(r, "should resolve the unverified generation");
+  assert.equal(r.gen.y, "2007-2021");
+  assert.equal(r.gen.verified, false);
+});
+
 test("resolveVehicle returns null for unknown make/model", () => {
   assert.equal(G.resolveVehicle({ make: "Ford", model: "F150", year: 2024 }, CATALOG, 2026), null);
 });

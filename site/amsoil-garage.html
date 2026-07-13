@@ -171,7 +171,7 @@
   function renderGarage(resolved) {
     var g = el("garage");
     if (!resolved) {
-      g.innerHTML = '<p style="color:var(--sage-d)">Pick your vehicle above. Verified fluid specs are rolling out across the lineup — meanwhile, browse the full catalog or lock in Preferred-Customer savings below.</p>';
+      g.innerHTML = '<p style="color:var(--sage-d)">Pick your make, model, and year above to see the exact AMSOIL fluids, capacities, and severe-service intervals for your vehicle.</p>';
       return;
     }
     var gen = resolved.gen, rows = "";
@@ -199,13 +199,14 @@
   function modelsFor(mk) { return mk ? Object.keys(CAT.vehicles[mk]) : []; }
   function yearsFor(mk, md) {
     if (!mk || !md) return [];
-    return CAT.vehicles[mk][md].filter(function (g) { return g.verified; }).map(function (g) { return g.y; });
+    // Show every generation (the cert prints fluids for all; the landing matches).
+    return CAT.vehicles[mk][md].map(function (g) { return g.y; });
   }
   function sync() {
     var mk = el("sel-make").value, md = el("sel-model").value;
     var resolved = null;
     if (mk && md) {
-      var gens = (CAT.vehicles[mk] && CAT.vehicles[mk][md] || []).filter(function (g) { return g.verified && (!el("sel-year").value || g.y === el("sel-year").value); });
+      var gens = (CAT.vehicles[mk] && CAT.vehicles[mk][md] || []).filter(function (g) { return (!el("sel-year").value || g.y === el("sel-year").value); });
       if (gens.length) resolved = { make: mk, model: md, gen: gens[0] };
     }
     renderGarage(resolved);
@@ -236,14 +237,16 @@
       el("sel-model").value = matchedModel;
       fill(el("sel-year"), yearsFor(matchedMake, matchedModel), "Year");
       if (params.year && matchedModel) {
-        var yr = String(params.year);
-        var matchedYear = yearsFor(matchedMake, matchedModel).find(function (y) { return String(y) === yr; }) || "";
+        // Range-aware: the QR sends an exact year (e.g. 2024); options are range
+        // labels ("2024+", "2016-2023"). Reuse the resolver's inRange to match.
+        var yrNum = parseInt(params.year, 10);
+        var matchedYear = yearsFor(matchedMake, matchedModel).find(function (y) { return AmsoilGarage.inRange(y, yrNum, CUR); }) || "";
         el("sel-year").value = matchedYear;
       }
     }
   }
   applyPrefill(pre);
-  renderGarage(AmsoilGarage.resolveVehicle(pre, CAT, CUR));
+  renderGarage(AmsoilGarage.resolveVehicle(pre, CAT, CUR, true));
 
   // --- My Garage (device-local, localStorage) ---
   var GARAGE_KEY = "ty_amsoil_garage";

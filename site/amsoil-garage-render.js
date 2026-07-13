@@ -23,7 +23,10 @@
     return false;
   }
 
-  function resolveVehicle(params, catalog, currentYear) {
+  // includeUnverified: the /amsoil-garage landing shows fluids for EVERY generation
+  // (matching the certificate, which prints them unconditionally). The default stays
+  // gated so any other caller keeps the verified-only contract.
+  function resolveVehicle(params, catalog, currentYear, includeUnverified) {
     if (!params || !params.make || !params.model) return null;
     var mk = Object.keys(catalog.vehicles).find(function (k) {
       return k.toLowerCase() === String(params.make).toLowerCase();
@@ -33,7 +36,7 @@
       return k.toLowerCase().replace(/\s+/g, "") === String(params.model).toLowerCase().replace(/\s+/g, "");
     });
     if (!md) return null;
-    var gens = catalog.vehicles[mk][md].filter(function (g) { return g.verified; });
+    var gens = catalog.vehicles[mk][md].filter(function (g) { return includeUnverified || g.verified; });
     var gen = gens.find(function (g) { return inRange(g.y, params.year, currentYear); });
     if (!gen && params.year == null) gen = gens[0];
     return gen ? { make: mk, model: md, gen: gen } : null;
