@@ -12,6 +12,35 @@ test("refuses a booking that belongs to another installer (403 shape)", async ()
   assert.equal(out.error, "not-yours");
 });
 
+test("an admin may close out another installer's booking; cert routes to the OWNER", async () => {
+  const updates = []; let sent = null;
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
+    { env, key: "aaron", admin: true, now: new Date("2026-07-03T12:00:00Z"),
+      get: async () => recFor("cody"),                 // job belongs to cody
+      update: async (a) => { updates.push(a.fields); return {}; },
+      send: async (m) => { sent = m; return { ok: true }; } });
+  assert.equal(out.status, "completed");               // NOT "not-yours"
+  assert.equal(updates[0].Status, "Completed");
+  assert.equal(sent.to, "cody@tunedyota.com");         // certificate routes to the owning installer
+});
+
+test("a non-admin still cannot close another installer's booking", async () => {
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
+    { env, key: "noah", admin: false, get: async () => recFor("cody"), update: async () => ({}), send: async () => ({}) });
+  assert.equal(out.error, "not-yours");
+});
+
+test("admin no-show waitlists under the OWNING installer, not the admin", async () => {
+  const created = [];
+  const out = await processCloseout({ recordId: "rec1", action: "noshow", confirmed: true },
+    { env, key: "aaron", admin: true,
+      get: async () => ({ id: "rec1", fields: { Installer: "cody", Name: "Jo", Phone: "555", City: "Omaha", "Event Date": "2026-07-03" } }),
+      update: async () => ({}), create: async (a) => { created.push(a); return { id: "pr1" }; },
+      send: async () => ({}), log: { error() {} } });
+  assert.equal(out.status, "noshow");
+  assert.equal(created[0].fields.Installer, "cody");   // waitlist attributed to the owner
+});
+
 test("complete requires a valid calibration", async () => {
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Nope" },
     { env, key: "cody", get: async () => recFor("cody"), update: async () => ({}), send: async () => ({}) });

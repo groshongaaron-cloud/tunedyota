@@ -42,6 +42,23 @@ test("creates a scoped walk-in booking with the right fields + Source", async ()
   assert.equal(out.booking.name, "Jo");
 });
 
+test("an admin may add a walk-in to another installer's market → assigned to that owner", async () => {
+  let created;
+  const create = async (a) => { created = a; return { id: "recADMIN" }; };
+  // Aaron (admin) adds a walk-in in Omaha, which routes to cody.
+  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
+    { env, key: "aaron", admin: true, create, events: { omaha: [{ dateISO: "2026-07-03" }] } });
+  assert.equal(out.status, "booked");
+  assert.equal(created.fields.Installer, "cody");     // owned by the market's installer, NOT the admin
+  assert.equal(out.booking.installer, "cody");
+});
+
+test("a non-admin still cannot add to a market that isn't theirs", async () => {
+  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
+    { env, key: "aaron", admin: false, create: okCreate, events: { omaha: [{ dateISO: "2026-07-03" }] } });
+  assert.equal(out.error, "not-your-market");
+});
+
 test("rejects an event date not on the city's schedule", async () => {
   const out = await processWalkin({ city: "Omaha", dateISO: "2099-01-01", name: "Jo", phone: "555" }, {
     env, key: "cody", create: okCreate, events: { omaha: [{ dateISO: "2026-07-03" }] },

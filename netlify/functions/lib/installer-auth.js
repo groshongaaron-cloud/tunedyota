@@ -13,4 +13,14 @@ function resolveInstaller(headers, env) {
   }
   return null;
 }
-module.exports = { resolveInstaller };
+
+// An admin installer sees + acts across ALL installers (roster, walk-ins, close-out).
+// Membership is env-driven (INSTALLER_ADMINS, comma-separated keys) so onboarding a
+// new admin is a config change, not a code change. Fail-closed when unset.
+function isAdmin(key, env) {
+  if (!key) return false;
+  const raw = (env && env.INSTALLER_ADMINS) || "";
+  const admins = String(raw).split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+  return admins.includes(String(key).toLowerCase());
+}
+module.exports = { resolveInstaller, isAdmin };
