@@ -118,3 +118,16 @@ test("non-completed booking has null commission", async () => {
     loadEvents: async () => [] });
   assert.equal(out.bookings[0].commission, null);
 });
+
+test("roster exposes reviewUrl from env", async () => {
+  const out = await buildRoster({ key: "aaron",
+    env: { GOOGLE_REVIEW_URL: "https://g.page/r/x/review" },
+    list: async () => [], loadEvents: async () => [] });
+  assert.equal(out.reviewUrl, "https://g.page/r/x/review");
+});
+
+test("roster reviewUrl is empty when unset", async () => {
+  const out = await buildRoster({ key: "aaron",
+    env: {}, list: async () => [], loadEvents: async () => [] });
+  assert.equal(out.reviewUrl, "");
+});

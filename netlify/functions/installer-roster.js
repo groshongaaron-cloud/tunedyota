@@ -73,7 +73,8 @@ async function buildRoster(deps) {
     events.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
   } catch (e) { if (log && log.warn) log.warn("roster events", e.message); events = []; }
 
-  return { installer: key, admin: !!admin, today, bookings, events };
+  return { installer: key, admin: !!admin, today, bookings, events,
+    reviewUrl: String((env.GOOGLE_REVIEW_URL || "")).trim() };
 }
 
 async function handler(event) {
