@@ -1,4 +1,4 @@
-const { test } = require("node:test");
+﻿const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { buildRoster } = require("../netlify/functions/installer-roster.js");
 
@@ -78,4 +78,16 @@ test("a roster events fetch failure degrades to an empty events list (never thro
   const out = await buildRoster({ env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
     list: async () => [], loadEvents: async () => { throw new Error("sheet down"); }, log: { warn() {} } });
   assert.deepEqual(out.events, []);
+});
+
+test("mapped booking includes certDelivery from the Cert Delivery field", async () => {
+  const list = async () => [
+    { id: "r1", fields: { City: "Omaha", "Event Date": "2026-07-03", Name: "A", Installer: "cody", Status: "Completed", "Cert Delivery": "installer-fallback" } },
+    { id: "r2", fields: { City: "Lincoln", "Event Date": "2026-07-04", Name: "B", Installer: "cody", Status: "Booked" } },
+  ];
+  const out = await buildRoster({ env, key: "cody", now: new Date("2026-07-03T12:00:00Z"), list });
+  const a = out.bookings.find((b) => b.name === "A");
+  const b = out.bookings.find((b) => b.name === "B");
+  assert.equal(a.certDelivery, "installer-fallback");
+  assert.equal(b.certDelivery, "");
 });

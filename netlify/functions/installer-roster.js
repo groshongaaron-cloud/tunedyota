@@ -1,4 +1,4 @@
-// netlify/functions/installer-roster.js
+﻿// netlify/functions/installer-roster.js
 // Live, per-installer event roster. Scoped to the authenticated installer's key.
 const { cfg, listRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
@@ -38,6 +38,7 @@ async function buildRoster(deps) {
       calibration: f["OTT Calibration"] || "", vin: f.VIN || "",
       tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
+      certDelivery: f["Cert Delivery"] || "",
     };
   }).sort((a, b) => a.dateISO.localeCompare(b.dateISO) || bySlot(a, b));
 
