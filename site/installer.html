@@ -94,6 +94,7 @@
     <a class="link" href="/calibration.html">Calibration reference (cal ID · TSB)</a>
     <a class="link" href="#" id="logout" style="margin-left:14px;color:#8a2a2a">Log out</a>
     <a class="link" href="#" id="reviewlink" style="display:none;margin-left:14px">★ Ask for a review</a>
+    <a class="link" href="#" id="pushlink" style="display:none;margin-left:14px">🔔 Enable notifications</a>
     <div id="header" class="hdr"></div>
     <div id="feed"></div>
     <div id="msg" class="msg"></div>
@@ -104,7 +105,7 @@
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'' };
+  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:'' };
 
   function sel(id,list,ph){ return '<select id="'+id+'"><option value="" disabled selected>'+ph+'…</option>'+list.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>'; }
   function val(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
@@ -155,6 +156,33 @@
   }
   function closeReviewOverlay(){ var ov = document.getElementById('reviewov'); if(ov) ov.style.display = 'none'; }
 
+  function urlB64ToUint8Array(base64String){
+    var padding = '='.repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    var raw = atob(base64), arr = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+    return arr;
+  }
+  async function enablePush(){
+    clearMsg();
+    if(!('serviceWorker' in navigator) || !('PushManager' in window)){ fail('Notifications aren’t supported on this browser.'); return; }
+    try{
+      var reg = await navigator.serviceWorker.register('/sw.js');
+      var perm = await Notification.requestPermission();
+      if(perm !== 'granted'){ fail('Notifications not enabled — allow them in your browser settings.'); return; }
+      var sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(STATE.vapidPublicKey) });
+      var res = await fetch('/.netlify/functions/push-subscribe', { method:'POST', headers:{ 'Content-Type':'application/json', 'x-installer-token':tok() }, body: JSON.stringify({ subscription: sub }) });
+      if(!res.ok){ fail('Could not save your subscription.'); return; }
+      var pl = document.getElementById('pushlink'); if(pl){ pl.textContent = '🔔 Notifications on · Send test'; pl.onclick = function(e){ e.preventDefault(); testPush(); }; }
+      succeed('Notifications enabled on this device.');
+    }catch(e){ fail('Couldn’t enable notifications: ' + (e && e.message ? e.message : 'error')); }
+  }
+  async function testPush(){
+    clearMsg();
+    try{ var res = await fetch('/.netlify/functions/push-test', { method:'POST', headers:{ 'x-installer-token':tok() } }); var out = await res.json().catch(function(){return{};}); succeed(out.sent ? 'Test sent — check your notifications.' : 'No device is subscribed yet.'); }
+    catch(e){ fail('Test failed: ' + (e && e.message ? e.message : 'error')); }
+  }
+
   // --- Native (Capacitor) helpers — no-ops on the plain website ---
   function isNative(){ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
   async function nativeLock(){
@@ -190,6 +218,13 @@
     if(rl){
       if(STATE.reviewUrl){ rl.style.display = ''; rl.onclick = function(e){ e.preventDefault(); openReviewOverlay(); }; }
       else { rl.style.display = 'none'; }
+    }
+    STATE.vapidPublicKey = data.vapidPublicKey || '';
+    var pl = document.getElementById('pushlink');
+    if(pl){
+      var supported = ('serviceWorker' in navigator) && ('PushManager' in window);
+      if(STATE.vapidPublicKey && supported){ pl.style.display = ''; pl.onclick = function(e){ e.preventDefault(); enablePush(); }; }
+      else { pl.style.display = 'none'; }
     }
     buildHeaderOnce();
     renderAll();
