@@ -3,6 +3,7 @@
   "products": {
     "SS-0W20-QT": {
       "sku": "SS-0W20-QT",
+      "stockNo": "ASMQT",
       "name": "Signature Series 0W-20 100% Synthetic Motor Oil",
       "productPath": "/p/amsoil-signature-series-0w-20-100-synthetic-motor-oil-asm/",
       "image": "/images/amsoil/ss-0w20.png",
@@ -12,6 +13,7 @@
     },
     "SS-5W30-QT": {
       "sku": "SS-5W30-QT",
+      "stockNo": "ASLQT",
       "name": "Signature Series 5W-30 100% Synthetic Motor Oil",
       "productPath": "/p/amsoil-signature-series-5w-30-100-synthetic-motor-oil-asl/",
       "image": "/images/amsoil/ss-5w30.png",
@@ -21,6 +23,7 @@
     },
     "SS-5W20-QT": {
       "sku": "SS-5W20-QT",
+      "stockNo": "ALMQT",
       "name": "Signature Series 5W-20 100% Synthetic Motor Oil",
       "productPath": "/p/amsoil-signature-series-5w-20-100-synthetic-motor-oil-alm/",
       "image": "/images/amsoil/ss-5w20.png",
@@ -30,6 +33,7 @@
     },
     "EA15K09": {
       "sku": "EA15K09",
+      "stockNo": "EA15K09",
       "name": "Ea Oil Filter EA15K09",
       "productPath": "/p/amsoil-oil-filter-eaoilfilt/?code=EA15K09-EA",
       "image": "/images/amsoil/ea15k09.png",
@@ -39,6 +43,7 @@
     },
     "EA15K51": {
       "sku": "EA15K51",
+      "stockNo": "EA15K51",
       "name": "Ea Oil Filter EA15K51",
       "productPath": "/p/amsoil-oil-filter-eaoilfilt/?code=EA15K51-EA",
       "image": "/images/amsoil/ea15k51.png",
@@ -48,6 +53,7 @@
     },
     "EA15K02": {
       "sku": "EA15K02",
+      "stockNo": "EA15K02",
       "name": "Ea Oil Filter EA15K02",
       "productPath": "/p/amsoil-oil-filter-eaoilfilt/?code=EA15K02-EA",
       "image": "/images/amsoil/ea15k02.png",
@@ -57,6 +63,7 @@
     },
     "EA15K49": {
       "sku": "EA15K49",
+      "stockNo": "EA15K49",
       "name": "Ea Oil Filter EA15K49",
       "productPath": "/p/amsoil-oil-filter-eaoilfilt/?code=EA15K49-EA",
       "image": "/images/amsoil/ea15k49.png",
@@ -66,6 +73,7 @@
     },
     "EA15K04": {
       "sku": "EA15K04",
+      "stockNo": "EA15K04",
       "name": "Ea Oil Filter EA15K04",
       "productPath": "/p/amsoil-oil-filter-eaoilfilt/?code=EA15K04-EA",
       "image": "/images/amsoil/ea15k04.png",
@@ -75,6 +83,7 @@
     },
     "SVL-QT": {
       "sku": "SVL-QT",
+      "stockNo": "SVLQT",
       "name": "SEVERE GEAR 75W-85 100% Synthetic Gear Lube",
       "productPath": "/p/amsoil-severe-gear-75w-85-100-synthetic-gear-lube-svl/",
       "image": "/images/amsoil/svl-75w85.png",
@@ -84,6 +93,7 @@
     },
     "AGLPK-QT": {
       "sku": "AGLPK-QT",
+      "stockNo": "AGLQT",
       "name": "SEVERE GEAR 80W-90 100% Synthetic Gear Lube",
       "productPath": "/p/amsoil-severe-gear-80w-90-100-synthetic-gear-lube-agl/",
       "image": "/images/amsoil/aglpk-80w90.png",
@@ -93,6 +103,7 @@
     },
     "SVG-75W90-QT": {
       "sku": "SVG-75W90-QT",
+      "stockNo": "SVGQT",
       "name": "SEVERE GEAR 75W-90 100% Synthetic Gear Lube",
       "productPath": "/p/amsoil-severe-gear-75w-90-100-synthetic-gear-lube-svg/",
       "image": "/images/amsoil/svg-75w90.png",
@@ -102,6 +113,7 @@
     },
     "SVG-75W140-QT": {
       "sku": "SVG-75W140-QT",
+      "stockNo": "SVOQT",
       "name": "SEVERE GEAR 75W-140 100% Synthetic Gear Lube",
       "productPath": "/p/amsoil-severe-gear-75w-140-100-synthetic-gear-lube-svo/",
       "image": "/images/amsoil/svg-75w140.png",
@@ -111,6 +123,7 @@
     },
     "ATL-QT": {
       "sku": "ATL-QT",
+      "stockNo": "ATLQT",
       "name": "Signature Series Multi-Vehicle 100% Synthetic ATF",
       "productPath": "/p/amsoil-signature-series-multi-vehicle-100-synthetic-automatic-transmission-fluid-atf/",
       "image": "/images/amsoil/atl.png",

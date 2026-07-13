@@ -38,6 +38,7 @@ async function buildRoster(deps) {
       calibration: f["OTT Calibration"] || "", vin: f.VIN || "",
       tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
+      certDelivery: f["Cert Delivery"] || "",
     };
   }).sort((a, b) => a.dateISO.localeCompare(b.dateISO) || bySlot(a, b));
 

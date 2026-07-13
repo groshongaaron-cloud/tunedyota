@@ -17,15 +17,16 @@ function deps(overrides = {}) {
   };
 }
 
-test("emails installer (CC owner) with cert attachment and marks sent", async () => {
+test("no customer email — sends to installer (no cc) with cert attachment and marks sent", async () => {
   const d = deps();
   await dispatchCertificates(d);
   assert.equal(d._sends.length, 1);
   assert.equal(d._sends[0].to, "cody@tunedyota.com");
-  assert.equal(d._sends[0].cc, "info@tunedyota.com");
+  assert.equal(d._sends[0].cc, undefined);
   assert.equal(d._sends[0].attachments[0].filename, "certificate.html");
   assert.equal(d._updates.length, 1);
   assert.equal(d._updates[0].fields["Certificate Sent"], true);
+  assert.equal(d._updates[0].fields["Cert Delivery"], "installer-fallback");
   assert.equal(d._notifies.length, 0);
 });
 test("email failure -> Slack alert AND row left unmarked", async () => {
@@ -57,4 +58,38 @@ test("OTT Calibration field from Airtable appears in the certificate attachment"
   const attachmentHtml = Buffer.from(d._sends[0].attachments[0].content, "base64").toString("utf8");
   assert.ok(/OTT Calibration/.test(attachmentHtml), "attachment HTML should contain 'OTT Calibration' label");
   assert.ok(/SS/.test(attachmentHtml), "attachment HTML should contain calibration value 'SS'");
+});
+test("idempotency flag persists even when the new metadata columns are missing", async () => {
+  const writes = [];
+  // Simulate Airtable rejecting the optional columns until they're dropped.
+  const update = async (a) => {
+    if (a.fields && "Cert Delivery" in a.fields) {
+      const e = new Error("Unknown field name: \"Cert Delivery\" (UNKNOWN_FIELD_NAME)");
+      throw e;
+    }
+    writes.push(a.fields);
+    return {};
+  };
+  const r = await dispatchCertificates({
+    list: async () => ([{ id: "rec1", fields: {
+      Status: "Completed", "OTT Calibration": "Medium", Name: "C", Installer: "aaron",
+      Vehicle: "2024 Toyota Tacoma 2.4L-T I4", Email: "cust@example.com", "Calibration Date": "2026-07-12" } }]),
+    update, send: async () => {}, notify: async () => {}, env: { RESEND_API_KEY: "x" },
+  });
+  assert.equal(r.sent, 1);
+  const merged = Object.assign({}, ...writes);
+  assert.equal(merged["Certificate Sent"], true, "idempotency flag must still persist");
+});
+test("backstop sends to the customer email when present, no cc", async () => {
+  const sent = [];
+  const r = await dispatchCertificates({
+    list: async () => ([{ id: "rec1", fields: {
+      Status: "Completed", "OTT Calibration": "Medium", Name: "C", Installer: "aaron",
+      Vehicle: "2024 Toyota Tacoma 2.4L-T I4", Email: "cust@example.com", "Calibration Date": "2026-07-12" } }]),
+    update: async () => ({}), send: async (a) => { sent.push(a); }, notify: async () => {},
+    env: { RESEND_API_KEY: "x" },
+  });
+  assert.equal(r.sent, 1);
+  assert.equal(sent[0].to, "cust@example.com");
+  assert.equal(sent[0].cc, undefined);
 });

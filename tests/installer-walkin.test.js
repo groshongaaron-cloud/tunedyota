@@ -74,3 +74,12 @@ test("defaults the walk-in date to today when none is supplied", async () => {
     { env, key: "cody", now: new Date("2026-07-12T15:00:00Z"), create: async (a) => { created = a; return { id: "r" }; } });
   assert.equal(created.fields["Event Date"], "2026-07-12");
 });
+
+test("persists a customer email when provided", async () => {
+  const created = [];
+  const out = await processWalkin(
+    { city: "Sioux Falls", name: "Pat R", phone: "6055551212", email: "pat@example.com", vehicle: "2021 Tundra" },
+    { key: "cody", create: async (a) => { created.push(a.fields); return { id: "rec1" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(created[0].Email, "pat@example.com");
+});

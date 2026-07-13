@@ -33,15 +33,16 @@ async function processWalkin(body, deps) {
 
   const c = cfg(env);
   const vehicle = String(d.vehicle || "").trim();
+  const email = String(d.email || "").trim();
   const fields = { City: market.city, "Event Date": dateISO, Name: name, Vehicle: vehicle,
-    Phone: phone, Status: "Booked", Source: "installer:walk-in", Installer: ownerKey };
+    Phone: phone, Email: email, Status: "Booked", Source: "installer:walk-in", Installer: ownerKey };
   let rec;
-  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source"]); }
+  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Email"]); }
   catch (e) { return { status: "error", error: "store-unavailable" }; }
 
   const id = rec && rec.id;
   return { status: "booked", recordId: id, booking: {
-    id, city: market.city, dateISO, installer: ownerKey, slot: "", slotLabel: "", name, vehicle, phone, email: "",
+    id, city: market.city, dateISO, installer: ownerKey, slot: "", slotLabel: "", name, vehicle, phone, email,
     mods: "", status: "Booked", isWalkin: true, calibration: "", vin: "", tuningPlatform: "",
     calibrationType: "", ecuId: "", gearSize: "", mileage: "" } };
 }

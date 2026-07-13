@@ -1,23 +1,28 @@
 <!--
-  TUNED YOTA — CERTIFICATE OF CALIBRATION
+  TUNED YOTA — CERTIFICATE OF CALIBRATION (v2 — two-page canonical master)
   Customer-facing tune-completion certificate.
+
+  PAGE 1 — Certificate of Calibration
+  PAGE 2 — AMSOIL Maintenance Reference (added v2, 2026-07-13)
 
   MERGE FIELDS (replace with values from Airtable Bookings):
     {{customer_name}}   -> Name
-    {{vehicle}}         -> Vehicle  (e.g. "2016–2023 Toyota Tacoma 3.5L")
-    {{calibration}}     -> calibration tier label (e.g. "Turbo Performance Calibration")
+    {{vehicle}}         -> Vehicle  (e.g. "2024 Toyota Tacoma 2.4L-T I4")
+    {{calibration}}     -> calibration tier label (e.g. "Medium")
     {{installer}}       -> Installer (Aaron / Noah Kreis / Cody Star)
     {{installer_region}}-> installer's territory (e.g. "Minnesota / Twin Cities")
     {{date}}            -> Calibration Date
     {{cert_no}}         -> certificate serial (suggest: TY-{YYYY}-{record id})
+    {{vin}}             -> VIN
+    {{amsoil_vehicle}}  -> short vehicle label for page-2 header (e.g. "2024 Toyota Tacoma · 2.4L-T I4")
+    {{amsoil_garage_url}}-> pre-filtered garage URL for QR / link
+    <!-- page-2 fluids table rows are generated per-vehicle from amsoil-garage.json -->
 
-  This file renders example data so you can preview it. Swap the
-  data-merge spans (or do a string replace on the {{tokens}} in the
-  commented reference block) when generating per-booking.
+  This file renders example data (2024 Tacoma / Marcus Bell) so you can preview it.
+  Swap the data-merge spans when generating per-booking.
 
-  BRAND COLORS: the :root variables below are placeholders tuned to be
-  safe and on-feel. Drop your exact Tuned Yota hex values in to match
-  the logo/color guide precisely.
+  BRAND COLORS: the :root variables below are the official Tuned Yota + AMSOIL values.
+  AMSOIL colors: Red PMS 485 #ed1c24, Blue PMS 286 #005baa, Cool Gray 6 #bcbec0.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -44,6 +49,12 @@
     --fox-blue-deep:#7FA6B2;
     --sage:#99A08E;
     --sand:#DFC4B5;
+    /* Official AMSOIL brand colors (Style Guide): Red PMS 485 #ed1c24, Blue PMS 286 #005baa, Cool Gray 6 #bcbec0 */
+    --amsoil:#ed1c24;
+    --amsoil-deep:#b3141b;
+    --amsoil-brand:#ed1c24;
+    --amsoil-blue:#005baa;
+    --amsoil-gray:#bcbec0;
     --mono: "SFMono-Regular", ui-monospace, "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
     --sans: "Lato", "Helvetica Neue", Arial, sans-serif;
   }
@@ -64,7 +75,7 @@
     position:relative;
     width:100%;
     max-width:760px;
-    margin:0 auto;
+    margin:0 auto 26px;
     background:var(--paper);
     border:1px solid var(--hair);
     box-shadow:0 18px 50px rgba(25,28,30,.16);
@@ -271,26 +282,177 @@
   }
   .fine a{ color:var(--steel); text-decoration:none; }
 
+  /* ================================================================
+     PAGE 2 — AMSOIL Maintenance Reference
+     ================================================================ */
+  .ref .pad{ padding:40px 52px 30px; }
+  .ref .measure{
+    background:repeating-linear-gradient(90deg,
+      var(--amsoil) 0, var(--amsoil) 1px,
+      transparent 1px, transparent 12px);
+    opacity:.85;
+  }
+  .ref-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    border-bottom:1.5px solid var(--ink);
+    padding-bottom:18px;
+  }
+  .ref-eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.36em;
+    text-transform:uppercase;
+    color:var(--amsoil);
+    margin-bottom:8px;
+  }
+  .ref-head h2{
+    margin:0;
+    font-size:27px;
+    font-weight:800;
+    letter-spacing:-.01em;
+    line-height:1.08;
+  }
+  .ref-head h2 .thin{ font-weight:300; color:var(--steel); }
+  .ref-veh{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--steel);
+    margin-top:8px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .amsoil-red{ color:var(--amsoil-brand); }
+  /* Official approved AMSOIL logo — used UNALTERED on a solid white chip with clear
+     space, per the AMSOIL Brand Style Guide (no recreation, recolor, or textured bg). */
+  .amsoil-lockup{ flex:0 0 auto; text-align:right; }
+  .amsoil-chip{
+    display:inline-block;
+    background:#fff;
+    border:1px solid var(--hair);
+    border-radius:10px;
+    padding:13px 17px;
+  }
+  .amsoil-chip img{ display:block; width:178px; height:auto; }
+  .amsoil-dealer{
+    margin-top:8px;
+    font-family:var(--mono);
+    font-size:9px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--faint);
+  }
+  .lede{ margin:18px 0 20px; font-size:14px; color:var(--steel); }
+  .lede strong{ color:var(--ink); }
+  table.fluids{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.fluids thead th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--faint);
+    padding:0 12px 8px;
+    border-bottom:1.5px solid var(--ink);
+  }
+  table.fluids thead th.num{ text-align:right; }
+  table.fluids tbody td{
+    padding:11px 12px;
+    border-bottom:1px solid var(--hair2);
+    vertical-align:top;
+  }
+  table.fluids tbody tr:last-child td{ border-bottom:0; }
+  .sys{ font-weight:800; color:var(--ink); }
+  .prod{ color:var(--steel); font-size:12px; }
+  .stockno{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--faint);
+    letter-spacing:.02em;
+    margin-top:3px;
+  }
+  .stockno b{ color:var(--amsoil-brand); font-weight:700; letter-spacing:.03em; }
+  .num{ text-align:right; font-family:var(--mono); white-space:nowrap; }
+  .num .cap{ font-weight:700; color:var(--ink); }
+  .intv .t{ font-weight:700; color:var(--amsoil-deep); }
+  .intv .f{ display:block; font-size:11px; color:var(--faint); }
+  .order{
+    display:flex;
+    gap:22px;
+    align-items:center;
+    margin:24px 0 6px;
+    background:#FBFAF7;
+    border:1px solid var(--hair);
+    border-radius:14px;
+    padding:20px 22px;
+  }
+  .qr{
+    flex:0 0 132px;
+    width:132px; height:132px;
+    border:1px solid var(--hair);
+    border-radius:10px;
+    background:#fff;
+    padding:8px;
+    display:block;
+  }
+  .order .pitch{ flex:1; }
+  .order .pitch h3{ margin:0 0 6px; font-size:17px; font-weight:800; }
+  .order .pitch p{ margin:0 0 10px; font-size:13px; color:var(--steel); }
+  .order .save{
+    display:inline-block;
+    background:var(--ember-tint);
+    color:var(--amsoil-deep);
+    font-weight:800;
+    font-size:12px;
+    padding:4px 10px;
+    border-radius:20px;
+    letter-spacing:.02em;
+  }
+  .order .url{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--faint);
+    margin-top:10px;
+    word-break:break-all;
+  }
+  .ref-fine{
+    padding:16px 52px 30px;
+    border-top:1px solid var(--hair2);
+    font-family:var(--mono);
+    font-size:9.5px;
+    line-height:1.7;
+    color:var(--faint);
+    text-align:center;
+  }
+
   @media (max-width:560px){
-    .pad{ padding:30px 24px; }
+    .pad, .ref .pad{ padding:30px 24px; }
     h1{ font-size:30px; }
-    .head{ flex-direction:column; }
+    .head, .ref-head{ flex-direction:column; }
     .doc-id{ text-align:left; }
     .row{ grid-template-columns:120px 1fr; }
     .foot{ flex-direction:column; align-items:stretch; }
     .seal{ align-self:flex-end; }
-    .fine{ padding:18px 24px 26px; }
+    .order{ flex-direction:column; text-align:center; }
+    .qr{ margin:0 auto; }
+    .fine, .ref-fine{ padding:18px 24px 26px; }
   }
 
   @media print{
     body{ background:#fff; padding:0; }
-    .cert{ box-shadow:none; border:none; max-width:none; }
+    .cert{ box-shadow:none; border:none; max-width:none; margin:0; }
     /* print just the chosen calibration — no input chrome */
     .cal-select{ border-bottom:none; background-image:none; padding-right:2px; }
+    /* page-2 always starts on a new print page */
+    .ref{ page-break-before:always; }
   }
 </style>
 </head>
 <body>
+
+  <!-- ================= PAGE 1 — CERTIFICATE OF CALIBRATION ================= -->
   <div class="cert">
     <div class="measure"></div>
 
@@ -309,7 +471,7 @@
         </div>
         <div class="doc-id">
           <div><span class="k">CERT&nbsp;NO&nbsp;</span><span class="v">TY-2026-00042</span></div>
-          <div><span class="k">ISSUED&nbsp;&nbsp;&nbsp;</span><span class="v">2026-06-27</span></div>
+          <div><span class="k">ISSUED&nbsp;&nbsp;&nbsp;</span><span class="v">2026-07-13</span></div>
           <div><span class="k">STATUS&nbsp;&nbsp;</span><span class="v" style="color:var(--ember);">VERIFIED</span></div>
         </div>
       </div>
@@ -324,7 +486,7 @@
         installer. The calibration was written, road-verified,
         and confirmed for daily operation. Retain this record with the
         vehicle&rsquo;s documentation — it confirms the work performed for
-        <strong>Owen Wagner</strong>.
+        <strong>Marcus Bell</strong>.
       </p>
 
       <!-- Readout (signature element) -->
@@ -335,15 +497,15 @@
         </div>
         <div class="row">
           <div class="label">Owner</div>
-          <div class="value">Owen Wagner</div>
+          <div class="value">Marcus Bell</div>
         </div>
         <div class="row">
           <div class="label">Vehicle</div>
-          <div class="value">2007–2021 Toyota Tundra 5.7L (2019)</div>
+          <div class="value">2024 Toyota Tacoma 2.4L-T I4</div>
         </div>
         <div class="row">
           <div class="label">VIN</div>
-          <div class="value">5TFDW5F17MX000000</div>
+          <div class="value">3TMLB5JN1RM123456</div>
         </div>
         <div class="row">
           <div class="label">OTT Calibration</div>
@@ -352,7 +514,7 @@
               <option value="" disabled selected>Choose calibration…</option>
               <option>Light</option>
               <option>Mild</option>
-              <option>Medium</option>
+              <option selected>Medium</option>
               <option>Spicy</option>
               <option>SS</option>
               <option>Light and Mild</option>
@@ -368,7 +530,7 @@
         </div>
         <div class="row">
           <div class="label">Date Calibrated</div>
-          <div class="value">June 27, 2026</div>
+          <div class="value">July 13, 2026</div>
         </div>
       </div>
 
@@ -409,5 +571,104 @@
       <span>tunedyota.com &middot; Toyota &amp; Lexus performance calibration</span>
     </div>
   </div>
+
+  <!-- ================= PAGE 2 — AMSOIL MAINTENANCE REFERENCE ================= -->
+  <div class="cert ref">
+    <div class="measure"></div>
+    <div class="pad">
+      <div class="ref-head">
+        <div>
+          <div class="ref-eyebrow">AMSOIL Maintenance Reference</div>
+          <h2>A tuned truck deserves the best fluids in the world — <span class="amsoil-red">AMSOIL</span>.</h2>
+          <div class="ref-veh">2024 Toyota Tacoma &middot; 2.4L-T I4</div>
+        </div>
+        <div class="amsoil-lockup">
+          <!-- Official AMSOIL logo — used UNALTERED on a solid white chip with clear space,
+               per AMSOIL Brand Style Guide (no recreation, recolor, or textured bg). -->
+          <span class="amsoil-chip"><img src="/images/amsoil/amsoil-logo.png" alt="AMSOIL"></span>
+          <div class="amsoil-dealer">Authorized AMSOIL Dealer</div>
+        </div>
+      </div>
+
+      <p class="lede">Tuned Yota has organized your vehicle&rsquo;s necessary fluids, fluid capacities, and service intervals! We hope you enjoy this quick reference list of AMSOIL products for your vehicle.</p>
+
+      <table class="fluids">
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>AMSOIL product</th>
+            <th class="num">Capacity</th>
+            <th class="num">Interval</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="sys">Engine Oil</span></td>
+            <td><div class="prod">Signature Series 0W-20 Synthetic</div><div class="stockno">Stock No. <b>ASMQT</b></div></td>
+            <td class="num"><span class="cap">4.8</span> qt</td>
+            <td class="num intv"><span class="t">7,500 mi</span><span class="f">factory 10,000</span></td>
+          </tr>
+          <tr>
+            <td><span class="sys">Engine Oil Filter</span></td>
+            <td><div class="prod">Ea Oil Filter</div><div class="stockno">Stock No. <b>EA15K09</b></div></td>
+            <td class="num"><span class="cap">1</span> ea</td>
+            <td class="num intv"><span class="t">7,500 mi</span><span class="f">factory 10,000</span></td>
+          </tr>
+          <tr>
+            <td><span class="sys">Front Differential</span></td>
+            <td><div class="prod">SEVERE GEAR 75W-85 Synthetic</div><div class="stockno">Stock No. <b>SVLQT</b></div></td>
+            <td class="num"><span class="cap">1.5</span> qt</td>
+            <td class="num intv"><span class="t">30,000 mi</span><span class="f">severe: inspect</span></td>
+          </tr>
+          <tr>
+            <td><span class="sys">Rear Differential</span></td>
+            <td><div class="prod">SEVERE GEAR 75W-85 Synthetic</div><div class="stockno">Stock No. <b>SVLQT</b></div></td>
+            <td class="num"><span class="cap">2</span> qt</td>
+            <td class="num intv"><span class="t">30,000 mi</span><span class="f">severe: inspect</span></td>
+          </tr>
+          <tr>
+            <td><span class="sys">Transfer Case</span></td>
+            <td><div class="prod">SEVERE GEAR 75W-85 Synthetic</div><div class="stockno">Stock No. <b>SVLQT</b></div></td>
+            <td class="num"><span class="cap">1.5</span> qt</td>
+            <td class="num intv"><span class="t">30,000 mi</span><span class="f">severe: inspect</span></td>
+          </tr>
+          <tr>
+            <td><span class="sys">Transmission</span></td>
+            <td><div class="prod">Signature Series Multi-Vehicle ATF</div><div class="stockno">Stock No. <b>ATLQT</b></div></td>
+            <td class="num"><span class="cap">8</span> qt</td>
+            <td class="num intv"><span class="t">60,000 mi</span><span class="f">severe service</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="order">
+        <!-- PLACEHOLDER QR — shipped version encodes the pre-filtered garage URL via lib/qr.js -->
+        <svg class="qr" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR code to your AMSOIL Garage">
+          <rect width="100" height="100" fill="#fff"/>
+          <g fill="#191C1E">
+            <rect x="6" y="6" width="22" height="22"/><rect x="10" y="10" width="14" height="14" fill="#fff"/><rect x="13" y="13" width="8" height="8"/>
+            <rect x="72" y="6" width="22" height="22"/><rect x="76" y="10" width="14" height="14" fill="#fff"/><rect x="79" y="13" width="8" height="8"/>
+            <rect x="6" y="72" width="22" height="22"/><rect x="10" y="76" width="14" height="14" fill="#fff"/><rect x="13" y="79" width="8" height="8"/>
+            <rect x="34" y="8" width="4" height="4"/><rect x="42" y="8" width="4" height="4"/><rect x="50" y="12" width="4" height="4"/><rect x="58" y="8" width="4" height="4"/>
+            <rect x="8" y="34" width="4" height="4"/><rect x="16" y="42" width="4" height="4"/><rect x="8" y="50" width="4" height="4"/><rect x="12" y="58" width="4" height="4"/>
+            <rect x="34" y="34" width="4" height="4"/><rect x="42" y="38" width="4" height="4"/><rect x="50" y="34" width="4" height="4"/><rect x="58" y="42" width="4" height="4"/><rect x="38" y="50" width="4" height="4"/><rect x="46" y="46" width="4" height="4"/><rect x="54" y="54" width="4" height="4"/><rect x="34" y="58" width="4" height="4"/><rect x="62" y="34" width="4" height="4"/><rect x="66" y="50" width="4" height="4"/><rect x="58" y="58" width="4" height="4"/>
+            <rect x="72" y="34" width="4" height="4"/><rect x="80" y="42" width="4" height="4"/><rect x="88" y="34" width="4" height="4"/><rect x="76" y="50" width="4" height="4"/><rect x="84" y="58" width="4" height="4"/><rect x="90" y="50" width="4" height="4"/>
+            <rect x="34" y="72" width="4" height="4"/><rect x="42" y="80" width="4" height="4"/><rect x="50" y="72" width="4" height="4"/><rect x="58" y="80" width="4" height="4"/><rect x="38" y="88" width="4" height="4"/><rect x="50" y="88" width="4" height="4"/>
+            <rect x="72" y="72" width="4" height="4"/><rect x="80" y="72" width="4" height="4"/><rect x="88" y="72" width="4" height="4"/><rect x="76" y="80" width="4" height="4"/><rect x="84" y="84" width="4" height="4"/><rect x="72" y="88" width="4" height="4"/><rect x="90" y="88" width="4" height="4"/>
+          </g>
+        </svg>
+        <div class="pitch">
+          <h3>Order your exact fluids</h3>
+          <p>Scan to open <strong>your AMSOIL Garage</strong> — pre-loaded with these products for your Tacoma. Add other vehicles, or search the full AMSOIL catalog.</p>
+          <span class="save">Enroll free as a Preferred Customer — save up to 25%</span>
+          <div class="url">tunedyota.com/amsoil-garage?make=Toyota&amp;model=Tacoma&amp;year=2024</div>
+        </div>
+      </div>
+    </div>
+    <div class="ref-fine">
+      Fluids &amp; capacities are a maintenance reference for your vehicle — confirm capacities against your owner&rsquo;s manual before service. &nbsp;&middot;&nbsp; Tuned Yota is an Authorized AMSOIL Dealer. &nbsp;&middot;&nbsp; tunedyota.com/amsoil-garage
+    </div>
+  </div>
+
 </body>
 </html>

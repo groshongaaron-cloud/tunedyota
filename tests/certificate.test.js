@@ -1,6 +1,8 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { buildCertificate, certSerial } = require("../netlify/functions/lib/certificate.js");
+const { resolveFluids } = require("../netlify/functions/lib/amsoil-fluids.js");
+const { qrSvg } = require("../netlify/functions/lib/qr.js");
 
 test("renders the Master Certificate with merged booking data", () => {
   const { subject, html } = buildCertificate({
@@ -94,4 +96,34 @@ test("escapes HTML and tolerates blank/missing fields (no 'undefined')", () => {
 test("certSerial is deterministic: TY-{year}-{id suffix}", () => {
   assert.equal(certSerial("recABCDE12345", "2026-09-12", "2026-09-13"), "TY-2026-12345");
   assert.equal(certSerial("", "", "2027-01-02"), "TY-2027-00000");
+});
+
+test("page 1 is unchanged when no amsoil context is passed", () => {
+  const { html } = buildCertificate({ name: "A", vehicle: "V", calibration: "Medium" });
+  assert.ok(!/AMSOIL Maintenance Reference/.test(html), "no page 2 without amsoil context");
+});
+
+test("renders the AMSOIL reference page with fluids + stock numbers", () => {
+  const fluids = resolveFluids("2024 Toyota Tacoma 2.4L-T I4", "2024");
+  const { html } = buildCertificate({
+    name: "Marcus Bell", vehicle: "2024 Toyota Tacoma 2.4L-T I4", modelYear: "2024",
+    calibration: "Medium", installer: "Aaron Groshong", calibrationDate: "2026-07-12",
+    amsoil: { fluids, qrSvg: qrSvg(fluids.garageUrl) },
+  });
+  assert.match(html, /AMSOIL Maintenance Reference/);
+  assert.ok(html.includes("Signature Series 0W-20"), "product description present");
+  assert.ok(html.includes("ASMQT"), "stock number present");
+  assert.ok(html.includes("7,500 mi"), "tuned interval present");
+  assert.match(html, /amsoil-logo\.png/, "official logo referenced");
+  assert.match(html, /<svg[^>]*aria-label="QR code/, "QR svg embedded");
+  assert.ok(html.includes("Authorized AMSOIL Dealer"));
+});
+
+test("compact reference page when the vehicle has no fluid data", () => {
+  const { html } = buildCertificate({
+    name: "A", vehicle: "2020 Ford F-150", calibration: "Medium",
+    amsoil: { fluids: null, qrSvg: qrSvg("https://tunedyota.com/amsoil-garage") },
+  });
+  assert.match(html, /AMSOIL Maintenance Reference/);
+  assert.ok(!/<table class="fluids"/.test(html), "no fabricated fluids table");
 });

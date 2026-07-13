@@ -314,10 +314,11 @@
     sum.innerHTML='<span style="font-weight:700;color:var(--accent)">+ Add walk-in</span>'; det.appendChild(sum);
     var box=document.createElement('div'); box.className='walkmini';
     var n=mkInput('Customer name'), v=mkInput('Vehicle (e.g. 2021 Tundra)'), p=mkInput('Phone'); p.inputMode='tel';
+    var em=mkInput('Customer email (for their certificate)'); em.type='email';
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Add walk-in to '+e.city;
-    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(btn);
+    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(em); box.appendChild(btn);
     det.appendChild(box);
-    btn.onclick=function(){ addWalkin(e,{name:n.value,vehicle:v.value,phone:p.value}); };
+    btn.onclick=function(){ addWalkin(e,{name:n.value,vehicle:v.value,phone:p.value,email:em.value}); };
     return det;
   }
 
@@ -350,14 +351,15 @@
     if(cities.length){ city=document.createElement('select'); city.innerHTML=cities.map(function(x){return '<option>'+esc(x)+'</option>';}).join(''); }
     else { city=mkInput('City / market'); }
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Log walk-in';
-    [n,v,p,ld,dt,lc,city,btn].forEach(function(el){ box.appendChild(el); });
+    var em=mkInput('Customer email (for their certificate)'); em.type='email';
+    [n,v,p,ld,dt,lc,city,em,btn].forEach(function(el){ box.appendChild(el); });
     det.appendChild(box);
     btn.onclick=function(){
       var c=(city.value||'').trim(), d=(dt.value||'').trim();
       if(!c){ fail('Enter a city / market.'); return; }
       if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ fail('Pick the date of the tune.'); return; }
       STATE.walkOpen[K]=true;                       // keep this form open for the next entry
-      addWalkin({city:c,dateISO:d,key:c+'|'+d},{name:n.value,vehicle:v.value,phone:p.value});
+      addWalkin({city:c,dateISO:d,key:c+'|'+d},{name:n.value,vehicle:v.value,phone:p.value,email:em.value});
     };
     return det;
   }
@@ -365,9 +367,10 @@
   async function addWalkin(evt, vals){
     clearMsg();
     var name=(vals.name||'').trim(), vehicle=(vals.vehicle||'').trim(), phone=(vals.phone||'').trim();
+    var email=(vals.email||'').trim();
     if(!name){ fail('Enter the customer name.'); return; }
     if(!phone){ fail('Enter a phone number.'); return; }
-    var res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({city:evt.city,dateISO:evt.dateISO,name:name,vehicle:vehicle,phone:phone})});
+    var res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({city:evt.city,dateISO:evt.dateISO,name:name,vehicle:vehicle,phone:phone,email:email})});
     if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
     var out=await res.json().catch(function(){return{};});
     if(out.status==='booked' && out.booking){
@@ -476,7 +479,21 @@
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
       (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'');
-    if(b.status==='Completed'){ c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'; return c; }
+    if(b.status==='Completed'){
+      c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'+
+        (b.certDelivery==='installer-fallback' ? '<div class="ffnote">No customer email on file — this certificate went to you. Re-open and add the email to send it to the customer.</div>' : '')+
+        '<a href="#" class="link" id="cert_'+b.id+'">View / download certificate</a>';
+      var certEl=c.querySelector('#cert_'+b.id);
+      if(certEl) certEl.onclick=async function(e){
+        e.preventDefault();
+        var res=await fetch('/.netlify/functions/installer-certificate?recordId='+encodeURIComponent(b.id),{headers:{'x-installer-token':tok()}});
+        if(!res.ok){ fail('Could not load certificate.'); return; }
+        var html=await res.text();
+        var url=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+        window.open(url,'_blank');
+      };
+      return c;
+    }
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
@@ -489,6 +506,7 @@
       '<input id="ecu_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="ECU ID" style="text-transform:uppercase;margin:5px 0">'+
       '<input id="gear_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="Gear ratio (e.g. 4.30)" style="margin:5px 0">'+
       '<input id="mi_'+b.id+'" inputmode="numeric" autocomplete="off" placeholder="Mileage" style="margin:5px 0">'+
+      '<input id="cem_'+b.id+'" type="email" autocomplete="off" placeholder="Customer email (for their certificate)" value="'+esc(b.email||'')+'" style="margin:5px 0">'+ 
       '<div class="row-actions"><button class="btn" id="ok_'+b.id+'">Mark complete</button></div>'+
       '<label class="nsconfirm"><input type="checkbox" id="nsc_'+b.id+'"> Customer didn\'t show — add to waitlist</label>'+
       '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
@@ -510,7 +528,8 @@
     var ecu=val('ecu_'+id).toUpperCase(); if(!ecu){ fail('Enter the ECU ID.'); return; }
     var gear=val('gear_'+id); if(!gear){ fail('Enter the gear ratio.'); return; }
     var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!mi){ fail('Enter the mileage.'); return; }
-    closeout(id,{action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi});
+    var cem=val('cem_'+id);
+    closeout(id,{action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem});
   }
 
   async function closeout(id,extra){

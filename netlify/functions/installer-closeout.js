@@ -7,6 +7,8 @@ const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { keyToInstaller } = require("./lib/routing.js");
 const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate.js");
 const { sendEmail } = require("./lib/resend.js");
+const { resolveFluids } = require("./lib/amsoil-fluids.js");
+const { qrSvg } = require("./lib/qr.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -74,6 +76,7 @@ async function processCloseout(body, deps) {
   // must still report under June. Falls back to today only when there's no event
   // date (e.g. a walk-in with no scheduled event).
   const calibrationDate = String(f["Event Date"] || "").slice(0, 10) || issueDate;
+  const customerEmail = String(d.customerEmail || f.Email || "").trim();
   const completeFields = { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": calibrationDate };
   if (vin) completeFields.VIN = vin;
   if (tuningPlatform) completeFields["Tuning Platform"] = tuningPlatform;
@@ -81,23 +84,35 @@ async function processCloseout(body, deps) {
   if (ecuId) completeFields["ECU ID"] = ecuId;
   if (gearSize) completeFields["Gear Size"] = gearSize;
   if (mileage) completeFields["Mileage"] = Number(mileage);
+  // Resolve recipient before updateTolerant so delivery metadata is persisted together
+  // with Status/Calibration in the first write (tolerant retry drops only missing cols).
+  const inst = keyToInstaller(owner);
+  const toCustomer = !!customerEmail;
+  const to = toCustomer ? customerEmail : inst.email;
+  if (customerEmail) completeFields.Email = customerEmail;
+  completeFields["Certificate Issued"] = issueDate;
+  completeFields["Certificate Recipient"] = to;
+  completeFields["Cert Delivery"] = toCustomer ? "customer" : "installer-fallback";
   try {
     // updateTolerant: if the base hasn't added a column yet, drop only the missing
     // optional field(s) and retry, so the completion (Status/Calibration) still persists.
     await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields },
-      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage"]);
+      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery"]);
   } catch (e) { if (log.error) log.error("closeout complete", e.message); return { status: "error", error: "store-unavailable" }; }
 
   let certSent = false;
   try {
-    const inst = keyToInstaller(owner);
     const certNo = certSerial(d.recordId, calibrationDate, issueDate);
+    const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
+    const amsoil = { fluids, qrSvg: qrSvg((fluids && fluids.garageUrl) || "https://tunedyota.com/amsoil-garage") };
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin, calibration, installer: inst.name,
-      installerRegion: inst.region, calibrationDate, certNo, issueDate });
-    await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email,
-      cc: inst.email === OWNER ? undefined : OWNER, replyTo: OWNER, subject,
-      text: `Attached is the Tuned Yota Certificate of Calibration for ${f.Name || "your customer"}. Open certificate.html, confirm the OTT Calibration, then Print -> Save as PDF and send it to the customer.`,
+      installerRegion: inst.region, calibrationDate, certNo, issueDate, amsoil });
+    await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to,
+      replyTo: OWNER, subject,
+      text: toCustomer
+        ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.`
+        : `Attached is the Certificate of Calibration for ${f.Name || "your customer"} — no customer email on file; please forward it to them.`,
       attachments: [{ filename: "certificate.html", content: Buffer.from(html).toString("base64") }] });
     await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: { "Certificate Sent": true } });
     certSent = true;
