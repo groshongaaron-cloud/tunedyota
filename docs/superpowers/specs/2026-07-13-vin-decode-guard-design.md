@@ -33,7 +33,7 @@ NHTSA `DecodeVinValues/<VIN>?format=json` → `Results[0]` gives `ModelYear`, `M
 ### 4.2 `netlify/functions/vin-decode.js` (new, auth-gated proxy)
 - **Auth:** `resolveInstaller(headers, env)`; 401 if unresolved (same model as the other console endpoints). Gating keeps it from being an open proxy.
 - **Input:** `{ vin, vehicle, modelYear }` (query or JSON body). Normalize `vin` → uppercase, strip non-`[A-Z0-9]`; must be 17 chars else `{ ok: true, unavailable: true, warnings: [] }` (nothing to check).
-- **Decode:** `GET https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/<vin>?format=json` via injectable `fetchImpl`, with a ~4s `AbortController` timeout. Map `Results[0]` → `decoded = { modelYear, make, model, fuel, errorCode }`.
+- **Decode:** `GET https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/<vin>?format=json` via injectable `fetchImpl`, with an **8s** `AbortController` timeout. (NHTSA latency measured bimodal — sub-second or 20s+ spikes; 8s catches the fast common case and stays under Netlify's ~10s sync-function limit so a slow call returns a clean `unavailable` rather than a 502. The guard is **best-effort** — it fails open when NHTSA is slow.) Map `Results[0]` → `decoded = { modelYear, make, model, fuel, errorCode }`.
 - **Compare:** `compareVin(decoded, { vehicle, modelYear })`.
 - **Return:** `{ ok, warnings, decoded, unavailable: false }`.
 - **Graceful degradation (never block a close-out on our/NHTSA's outage):** any fetch error, non-2xx, timeout, or unparseable body → `{ ok: true, unavailable: true, warnings: [] }`.

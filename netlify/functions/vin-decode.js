@@ -16,7 +16,10 @@ async function processVinDecode(body, deps) {
   let decoded;
   try {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 4000);
+    // NHTSA latency is bimodal (sub-second, or 20s+ spikes). 8s catches the fast
+    // common case and stays under Netlify's ~10s sync-function limit so a slow call
+    // returns a clean `unavailable` (fails open) instead of a 502. Best-effort guard.
+    const timer = setTimeout(() => ctrl.abort(), 8000);
     let res;
     try { res = await fetchImpl(`${NHTSA}${vin}?format=json`, { signal: ctrl.signal }); }
     finally { clearTimeout(timer); }
