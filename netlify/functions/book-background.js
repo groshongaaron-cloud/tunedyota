@@ -10,6 +10,7 @@ const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { pingN8n } = require("./lib/n8n.js");
 const { sendPush } = require("./lib/push.js");
+const { sendWebPush } = require("./lib/webpush.js");
 const { buildIcs } = require("./lib/ics.js");
 const tpl = require("./lib/templates.js");
 
@@ -39,7 +40,8 @@ async function reportEmailFailure({ fetchImpl, env, notify, update, c, table, id
 //   { kind:"priority", d, inst, market, reason, recordId }
 async function processNotifications(job, deps) {
   const { fetchImpl = fetch, env = process.env, send = sendEmail, log = console,
-          notify = notifyOwner, update = updateRecord, ping = pingN8n, push = sendPush } = deps;
+          notify = notifyOwner, update = updateRecord, ping = pingN8n, push = sendPush,
+          webPush = sendWebPush } = deps;
   const c = cfg(env);
   const d = (job && job.d) || {};
   const inst = job && job.inst;
@@ -62,6 +64,9 @@ async function processNotifications(job, deps) {
   try {
     if (inst && inst.key) await push(inst.key, { title: "New booking", body: `${d.name || "A customer"} — ${market.city}`, data: { recordId: job.recordId || "" } });
   } catch (e) { if (log.error) log.error("booking push", e.message); }
+  try {
+    if (inst && inst.key) await webPush(inst.key, { title: "New booking", body: `${d.name || "A customer"} — ${market.city}`, url: "/installer.html" });
+  } catch (e) { if (log.error) log.error("booking webpush", e.message); }
   if (d.email) {
     try {
       const ics = buildIcs({ uid: `${event.dateISO}-${d.slot}-${job.stamp}@tunedyota.com`, dateISO: event.dateISO, slot: d.slot, summary: `Tuned Yota — ${market.city} OTT Tune`, location: `${market.city}, ${market.state}`, description: `Your ${d.vehicle || "vehicle"} tune with ${inst.name}. Questions: ${inst.phone}`, stamp: job.stamp });
