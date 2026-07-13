@@ -74,7 +74,8 @@ async function buildRoster(deps) {
   } catch (e) { if (log && log.warn) log.warn("roster events", e.message); events = []; }
 
   return { installer: key, admin: !!admin, today, bookings, events,
-    reviewUrl: String((env.GOOGLE_REVIEW_URL || "")).trim() };
+    reviewUrl: String((env.GOOGLE_REVIEW_URL || "")).trim(),
+    vapidPublicKey: String((env.VAPID_PUBLIC_KEY || "")).trim() };
 }
 
 async function handler(event) {

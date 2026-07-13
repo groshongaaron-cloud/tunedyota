@@ -66,6 +66,19 @@ test("baked events (no embedded city) route correctly — no unknown-city failur
   assert.ok(d._sends.some((s) => s.to === "a@x.com"), "customer notified");
 });
 
+test("day-of roster fires a web push to the installer", async () => {
+  let wp;
+  const out = await runReminders({
+    now: new Date("2026-09-10T12:00:00Z"), // 07:00 America/Chicago (same as other tests)
+    env: {},
+    loadEvents: async () => ({}), listAll: async () => [],
+    plan: () => ([{ type: "installer-roster", daysUntil: 0, event: { city: "fargo" }, bookings: [{}, {}], waitlist: [] }]),
+    send: async () => {}, create: async () => ({}), notify: async () => {},
+    push: async (k, m) => { wp = { k, m }; return { sent: 1, failed: 0 }; }, log: { error() {}, warn() {} } });
+  assert.ok(wp, "push should fire");
+  assert.match(wp.m.title, /Today/i);
+});
+
 test("a city with two dates flattens to two events", () => {
   const { flattenEvents } = require("../netlify/functions/lib/events.js");
   const eventMap = { "twin cities": [

@@ -51,6 +51,15 @@ test("holds the certificate when OTT Calibration is empty (no send, retries next
   assert.equal(d._notifies.length, 1);     // owner nudged once
   assert.match(d._notifies[0].text, /held/i);
 });
+test("a held certificate (blank calibration) web-pushes the installer", async () => {
+  let wp;
+  await dispatchCertificates({
+    list: async () => ([{ id: "h1", fields: { Status: "Completed", "OTT Calibration": "", Name: "Dana", Installer: "aaron" } }]),
+    update: async () => ({}), send: async () => {}, notify: async () => {},
+    push: async (k, m) => { wp = { k, m }; return { sent: 1, failed: 0 }; }, env: {} });
+  assert.equal(wp.k, "aaron");
+  assert.match(wp.m.title, /hold/i);
+});
 test("OTT Calibration field from Airtable appears in the certificate attachment", async () => {
   const d = deps({ list: async () => [{ id: "b3", fields: { Name: "Jane", Vehicle: "Tacoma", Installer: "cody", "Calibration Date": "2026-06-28", Status: "Completed", "OTT Calibration": "SS" } }] });
   await dispatchCertificates(d);

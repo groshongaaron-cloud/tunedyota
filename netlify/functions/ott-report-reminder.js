@@ -8,6 +8,7 @@ const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { flattenRecords } = require("./lib/report-sources.js");
 const { priorMonth, buildSubmissionRows, totalCommission, unresolved } = require("./lib/ott-report.js");
+const { sendWebPush } = require("./lib/webpush.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -34,7 +35,7 @@ function reminderHtml(subRows, month, url) {
 async function runOttReminder(deps) {
   const { env = process.env, now = new Date(), fetchImpl = fetch,
           listAll = (a) => listAllRecords({ fetchImpl, ...a }),
-          notify = notifyOwner, send = sendEmail, log = console } = deps;
+          notify = notifyOwner, send = sendEmail, push = sendWebPush, log = console } = deps;
   const c = cfg(env);
   const month = priorMonth(now);
 
@@ -56,6 +57,12 @@ async function runOttReminder(deps) {
   if (emailFailed) slack += ` — REMINDER EMAIL FAILED, check logs`;
   try { await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL, text: slack, log }); }
   catch (e) { if (log.error) log.error("ott reminder slack", e.message); }
+
+  const admins = String(env.INSTALLER_ADMINS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+  for (const a of admins) {
+    try { await push(a, { title: `OTT report due by the ${DUE_DAY}th`, body: `Submit ${month.label}'s commission report · $${total}`, url: "/installer.html" }); }
+    catch (e) { if (log.error) log.error("ott reminder webpush", e.message); }
+  }
 
   return { ok: true, count: subRows.length, reminded: !emailFailed, unresolved: u, total };
 }

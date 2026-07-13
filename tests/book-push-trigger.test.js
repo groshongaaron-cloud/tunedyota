@@ -25,6 +25,18 @@ test("a new booking pushes the assigned installer", async () => {
   assert.match(pushes[0].msg.body, /Jo/);
 });
 
+test("booking also sends a web push to the installer", async () => {
+  let wp;
+  await processNotifications(bookingJob(), {
+    env: {}, send: async () => ({}), notify: async () => ({}), update: async () => ({}),
+    ping: async () => ({}), log: { error() {}, log() {} },
+    push: async () => ({ sent: 1, failed: 0 }),
+    webPush: async (k, m) => { wp = { k, m }; return { sent: 1, failed: 0 }; },
+  });
+  assert.equal(wp.k, "aaron");
+  assert.match(wp.m.title, /New booking/i);
+});
+
 test("a push failure never breaks the notification flow", async () => {
   const out = await processNotifications(bookingJob(), {
     env: {}, send: async () => ({}), notify: async () => ({}), update: async () => ({}),

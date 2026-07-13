@@ -131,3 +131,13 @@ test("roster reviewUrl is empty when unset", async () => {
     env: {}, list: async () => [], loadEvents: async () => [] });
   assert.equal(out.reviewUrl, "");
 });
+
+test("roster exposes vapidPublicKey from env", async () => {
+  const out = await buildRoster({ key: "aaron", env: { VAPID_PUBLIC_KEY: "BPUBKEY" }, list: async () => [], loadEvents: async () => [] });
+  assert.equal(out.vapidPublicKey, "BPUBKEY");
+});
+
+test("roster vapidPublicKey empty when unset", async () => {
+  const out = await buildRoster({ key: "aaron", env: {}, list: async () => [], loadEvents: async () => [] });
+  assert.equal(out.vapidPublicKey, "");
+});

@@ -41,6 +41,20 @@ test("stays silent when there is nothing to submit", async () => {
   assert.equal(slack, false, "no Slack when nothing to submit");
 });
 
+test("report-due reminder web-pushes the admin(s)", async () => {
+  const pushed = [];
+  await runOttReminder({
+    env: { ...env, INSTALLER_ADMINS: "aaron" },
+    now: new Date("2026-07-05T13:00:00Z"),
+    listAll: async () => recs([completed()]),
+    send: async () => {}, notify: async () => {},
+    push: async (k, m) => { pushed.push({ k, m }); return { sent: 1, failed: 0 }; },
+    log: { error() {} },
+  });
+  assert.ok(pushed.some((p) => p.k === "aaron"));
+  assert.match(pushed[0].m.title, /due/i);
+});
+
 test("a reminder email failure still fires Slack and never throws", async () => {
   let slack = null;
   const out = await runOttReminder({
