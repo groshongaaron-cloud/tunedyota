@@ -1,0 +1,14 @@
+{
+  "name": "Tuned Yota Installer",
+  "short_name": "TY Installer",
+  "description": "Tuned Yota installer console — roster, close-out, and certificates.",
+  "start_url": "/installer.html",
+  "scope": "/installer.html",
+  "display": "standalone",
+  "background_color": "#EDECEB",
+  "theme_color": "#3A2E26",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}
