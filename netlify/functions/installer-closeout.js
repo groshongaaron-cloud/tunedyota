@@ -93,11 +93,18 @@ async function processCloseout(body, deps) {
   completeFields["Certificate Issued"] = issueDate;
   completeFields["Certificate Recipient"] = to;
   completeFields["Cert Delivery"] = toCustomer ? "customer" : "installer-fallback";
+  // Customer sign-off signature (satisfaction/acceptance proof). Optional, additive,
+  // record-only — never printed on the certificate. Accept only a PNG data URL under a
+  // sane cap; anything else is ignored so a bad signature never blocks completion.
+  const signature = String(d.signature || "");
+  if (/^data:image\/png;base64,/.test(signature) && signature.length <= 200000) {
+    completeFields["Customer Signature"] = signature;
+  }
   try {
     // updateTolerant: if the base hasn't added a column yet, drop only the missing
     // optional field(s) and retry, so the completion (Status/Calibration) still persists.
     await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields },
-      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery"]);
+      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery", "Customer Signature"]);
   } catch (e) { if (log.error) log.error("closeout complete", e.message); return { status: "error", error: "store-unavailable" }; }
 
   let certSent = false;
