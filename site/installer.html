@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#3A2E26">
+<script src="/commission-tally.js"></script>
 <style>
   :root{--ink:#3A2E26;--accent:#5B4B42;--line:#d8d2ca;--muted:#7c8472;}
   *{box-sizing:border-box;} body{font-family:-apple-system,Arial,sans-serif;color:var(--ink);margin:0;background:#faf8f5;}
@@ -107,6 +108,7 @@
   function ym(iso){ return (iso||'').slice(0,7); }
   function isOpen(b){ return b.status!=='Completed' && b.status!=='No-show' && b.status!=='Cancelled'; }
   function cap(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):''; }
+  function money(n){ return '$' + Math.round(n || 0).toLocaleString('en-US'); }
   // The installer's LOCAL date (Central), not server UTC — UTC rolls to tomorrow in
   // the evening, which would mis-date an evening walk-in + push it into the wrong OTT month.
   function localToday(){ var d=new Date(),p=function(n){return String(n).padStart(2,'0');}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
@@ -206,9 +208,20 @@
     });
     var next=null;
     buildEvents().forEach(function(e){ if(e.dateISO>=STATE.today && (!next||e.dateISO<next.dateISO)) next=e; });
+    var ct = (window.commissionTally
+      ? window.commissionTally(visibleBookings(), mo)
+      : { month:{total:0,tunes:0,pending:0}, lastMonth:{total:0}, lifetime:{total:0}, byInstaller:{} });
+    var adminLines = '';
+    if(STATE.admin && !STATE.installerFilter){
+      var keys = Object.keys(ct.byInstaller).sort();
+      if(keys.length) adminLines += '<span>'+keys.map(function(k){ return esc(cap(k))+' '+money(ct.byInstaller[k]); }).join(' · ')+'</span>';
+      adminLines += '<span>Last month · est. <b>'+money(ct.lastMonth.total)+'</b> — report due by the 7th</span>';
+    }
     host.innerHTML=
       '<span>This month <b class="g">'+mDone+'</b> done · <b class="o">'+mOpen+'</b> open'+(mNo?' · <b class="r">'+mNo+'</b> no-show':'')+'</span>'+
-      '<span>Lifetime <b>'+life+'</b> tunes ✓</span>'+
+      '<span>This month · est. <b>'+money(ct.month.total)+'</b> · '+ct.month.tunes+' tunes'+(ct.month.pending?' · '+ct.month.pending+' pending':'')+'</span>'+
+      '<span>Lifetime <b>'+life+'</b> tunes ✓ · <b>'+money(ct.lifetime.total)+'</b> commission</span>'+
+      adminLines+
       (next?'<span class="next">Next: '+esc(next.city)+' · '+esc(relDate(next.dateISO))+'</span>':'');
   }
 
