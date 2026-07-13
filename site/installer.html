@@ -156,6 +156,64 @@
   }
   function closeReviewOverlay(){ var ov = document.getElementById('reviewov'); if(ov) ov.style.display = 'none'; }
 
+  var SIGPAD = null;
+  function openSignOverlay(id, extra){
+    var b = STATE.bookings.filter(function(x){return x.id===id;})[0] || {};
+    var summary = esc(((b.modelYear?b.modelYear+' ':'')+(b.vehicle||'')).trim()+(extra.calibration?' · '+extra.calibration:''));
+    var ov = document.createElement('div');
+    ov.className = 'reviewov'; ov.id = 'signov';
+    ov.innerHTML =
+      '<div class="reviewbox">'+
+        '<button class="btn ns" id="signx" aria-label="Cancel" style="float:right;padding:4px 10px;width:auto;margin:-8px -8px 0 0">✕</button>'+
+        '<div class="reviewh">Confirm the tune</div>'+
+        '<p class="meta">'+summary+'</p>'+
+        '<p class="meta">Ask the customer to sign below confirming the work is complete.</p>'+
+        '<canvas id="sigpad" width="600" height="180" style="width:100%;height:180px;border:2px dashed #b9c0ad;border-radius:10px;background:#fff;touch-action:none"></canvas>'+
+        '<div class="row-actions" style="margin-top:10px">'+
+          '<button class="btn ns" id="sigclear">Clear</button>'+
+          '<button class="btn" id="sigdone">✓ Done &amp; complete</button>'+
+        '</div>'+
+        '<a href="#" class="link" id="sigskip" style="margin-top:10px">Customer unavailable — skip →</a>'+
+      '</div>';
+    document.body.appendChild(ov);
+    ov.style.display = 'flex';
+    var canvas = ov.querySelector('#sigpad'), ctx = canvas.getContext('2d');
+    ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1c1c1c';
+    SIGPAD = { canvas: canvas, ctx: ctx, dirty: false };
+    var drawing = false;
+    function pos(e){ var r = canvas.getBoundingClientRect(); var t = (e.touches && e.touches[0]) || e; return { x: (t.clientX - r.left) * (canvas.width / r.width), y: (t.clientY - r.top) * (canvas.height / r.height) }; }
+    function down(e){ e.preventDefault(); drawing = true; var p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+    function move(e){ if(!drawing) return; e.preventDefault(); var p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); SIGPAD.dirty = true; }
+    function up(){ drawing = false; }
+    canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    ov.querySelector('#sigclear').onclick = function(){ ctx.clearRect(0,0,canvas.width,canvas.height); SIGPAD.dirty = false; };
+    ov.querySelector('#sigdone').onclick = function(){ if(SIGPAD.dirty){ extra.signature = canvas.toDataURL('image/png'); } closeSignOverlay(); closeout(id, extra); };
+    ov.querySelector('#sigskip').onclick = function(e){ e.preventDefault(); closeSignOverlay(); closeout(id, extra); };
+    ov.querySelector('#signx').onclick = function(){ closeSignOverlay(); };
+  }
+  function closeSignOverlay(){ var ov = document.getElementById('signov'); if(ov) ov.remove(); SIGPAD = null; }
+
+  async function viewSignature(id){
+    clearMsg();
+    try{
+      var res = await fetch('/.netlify/functions/installer-signature?id='+encodeURIComponent(id), { headers:{ 'x-installer-token':tok() } });
+      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      var out = await res.json().catch(function(){return{};});
+      if(out.status!=='ok' || !out.signature){ succeed('No signature on file for this tune.'); return; }
+      var ov = document.createElement('div'); ov.className='reviewov'; ov.id='sigviewov';
+      ov.innerHTML = '<div class="reviewbox">'+
+        '<button class="btn ns" id="sigviewx" aria-label="Close" style="float:right;padding:4px 10px;width:auto;margin:-8px -8px 0 0">✕</button>'+
+        '<div class="reviewh">Customer sign-off</div>'+
+        '<img alt="Customer signature" src="'+out.signature+'" style="width:100%;background:#fff;border:1px solid #d8dcc9;border-radius:10px">'+
+        '</div>';
+      document.body.appendChild(ov);
+      ov.style.display = 'flex';
+      ov.addEventListener('click', function(e){ if(e.target === ov) ov.remove(); });
+      ov.querySelector('#sigviewx').onclick=function(){ ov.remove(); };
+    }catch(e){ fail('Could not load the signature.'); }
+  }
+
   function urlB64ToUint8Array(base64String){
     var padding = '='.repeat((4 - base64String.length % 4) % 4);
     var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -582,7 +640,8 @@
     if(b.status==='Completed'){
       c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'+
         (b.certDelivery==='installer-fallback' ? '<div class="ffnote">No customer email on file — this certificate went to you. Re-open and add the email to send it to the customer.</div>' : '')+
-        '<a href="#" class="link" id="cert_'+b.id+'">View / download certificate</a>';
+        '<a href="#" class="link" id="cert_'+b.id+'">View / download certificate</a>'+
+        (b.signed ? '<a href="#" class="link" id="sig_'+b.id+'" style="margin-left:14px">✍ Signed — view</a>' : '');
       var certEl=c.querySelector('#cert_'+b.id);
       if(certEl) certEl.onclick=async function(e){
         e.preventDefault();
@@ -592,6 +651,8 @@
         var url=URL.createObjectURL(new Blob([html],{type:'text/html'}));
         window.open(url,'_blank');
       };
+      var sv=c.querySelector('#sig_'+b.id);
+      if(sv) sv.onclick=function(e){ e.preventDefault(); viewSignature(b.id); };
       return c;
     }
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
@@ -633,7 +694,8 @@
     var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!mi){ fail('Enter the mileage.'); return; }
     var cem=val('cem_'+id);
     if(STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I've verified this VIN is correct'."); return; } }
-    closeout(id,{action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem});
+    var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem};
+    openSignOverlay(id, extra);
   }
 
   async function closeout(id,extra){
@@ -643,7 +705,7 @@
     if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
     var out=await res.json().catch(function(){return{};});
     var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
-    if(out.status==='completed'){ if(b){ b.status='Completed'; if(extra.calibration)b.calibration=extra.calibration; if(extra.vin)b.vin=extra.vin; if(extra.tuningPlatform)b.tuningPlatform=extra.tuningPlatform; if(extra.calibrationType)b.calibrationType=extra.calibrationType; } renderAll(); }
+    if(out.status==='completed'){ if(b){ b.status='Completed'; if(extra.calibration)b.calibration=extra.calibration; if(extra.vin)b.vin=extra.vin; if(extra.tuningPlatform)b.tuningPlatform=extra.tuningPlatform; if(extra.calibrationType)b.calibrationType=extra.calibrationType; if(extra.signature) b.signed=true; } renderAll(); }
     else if(out.status==='noshow'){ if(b){ b.status='No-show'; } renderAll(); }
     else { fail('Could not save: '+(out.error||'error '+res.status)); }
   }
