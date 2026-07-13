@@ -5,6 +5,7 @@ const { keyToInstaller } = require("./lib/routing.js");
 const { buildCertificate, certSerial } = require("./lib/certificate.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
+const { sendWebPush } = require("./lib/webpush.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -14,7 +15,7 @@ async function dispatchCertificates(deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(),
           list = (a) => listRecords({ fetchImpl, ...a }),
           update = (a) => updateRecord({ fetchImpl, ...a }),
-          send = sendEmail, notify = notifyOwner, log = console } = deps;
+          send = sendEmail, notify = notifyOwner, push = sendWebPush, log = console } = deps;
   const issueDate = now.toISOString().slice(0, 10);
   const c = cfg(env);
   let rows = [];
@@ -29,7 +30,12 @@ async function dispatchCertificates(deps) {
     const calibration = String(f["OTT Calibration"] || "").trim();
     // Hold the certificate until the installer records the calibration, rather
     // than send a blank one. Left unmarked, so a later run sends it once set.
-    if (!calibration) { held.push(f.Name || row.id); continue; }
+    if (!calibration) {
+      held.push(f.Name || row.id);
+      const heldOwner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+      if (heldOwner) { try { await push(heldOwner, { title: "Certificate on hold", body: `Set the OTT calibration for ${f.Name || "a customer"}`, url: "/installer.html" }); } catch (e) { if (log.error) log.error("held webpush", e.message); } }
+      continue;
+    }
     const inst = keyToInstaller(f.Installer);
     const customerEmail = String(f.Email || "").trim();
     const to = customerEmail || inst.email;
