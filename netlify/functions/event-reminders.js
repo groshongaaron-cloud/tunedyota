@@ -11,6 +11,7 @@ const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { centralParts } = require("./lib/central-time.js");
 const { planDispatch, SWEEP_REASON } = require("./lib/event-plan.js");
+const { sendWebPush } = require("./lib/webpush.js");
 const { renderRosterEmail } = require("./lib/roster-render.js");
 const { renderRebookReport } = require("./lib/rebook-render.js");
 const tpl = require("./lib/templates.js");
@@ -25,7 +26,8 @@ async function runReminders(deps) {
           loadEvents = (a) => fetchEvents(a),
           listAll = (a) => listAllRecords({ fetchImpl, ...a }),
           create = (a) => createRecord({ fetchImpl, ...a }),
-          send = sendEmail, notify = notifyOwner, log = console } = deps;
+          send = sendEmail, notify = notifyOwner, log = console,
+          plan = (a) => planDispatch(a), push = sendWebPush } = deps;
   // At-most-once relies on the once-daily 07:00 gate: every reminder offset is an
   // exact integer-day match, so it fires on a single calendar day, and per-action
   // try/catch below means this function always resolves (no error → no Netlify
@@ -44,7 +46,7 @@ async function runReminders(deps) {
   const bookings = flatten(bRecs);
   const priority = flatten(pRecs);
 
-  const actions = planDispatch({ events, bookings, priority, nowCentral });
+  const actions = plan({ events, bookings, priority, nowCentral });
   const failures = [];
 
   for (const act of actions) {
@@ -65,6 +67,10 @@ async function runReminders(deps) {
         const m = renderRosterEmail(evRender, act.bookings, act.waitlist);
         await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, replyTo: OWNER,
           subject: `${m.subject} (${act.daysUntil === 0 ? "morning-of" : act.daysUntil + "-day"})`, html: m.html, text: m.text });
+        if (act.daysUntil === 0) {
+          try { await push(inst.key, { title: `Today: ${market.city}`, body: `${(act.bookings || []).length} booking(s)`, url: "/installer.html" }); }
+          catch (e) { if (log.error) log.error("roster webpush", e.message); }
+        }
       } else if (act.type === "customer-notify") {
         const m = tpl.buildEventReminderCustomerEmail(act.booking, act.event, inst, act.daysUntil);
         await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: act.booking.Email, replyTo: OWNER,
