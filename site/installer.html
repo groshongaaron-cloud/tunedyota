@@ -409,6 +409,8 @@
     var host=document.getElementById('feed'); host.innerHTML='';
     var events=buildEvents();
 
+    host.appendChild(anydayWalkForm());   // everyday walk-in / call-in — always available, even while searching
+
     // Search mode: flat, all-history, event-grouped results (newest first).
     if(STATE.q.trim()){
       var hits=events.map(function(e){ return { e:e, bs:e.bookings.filter(matchesQ) }; })
@@ -420,8 +422,6 @@
       hits.forEach(function(x){ host.appendChild(eventCard(x.e, x.bs, true, false)); });
       return;
     }
-
-    host.appendChild(anydayWalkForm());   // everyday walk-in / call-in — always available, any day
 
     var t=STATE.today;
     var needs=events.filter(function(e){ return e.dateISO<t && e.hasOpen; }).sort(function(a,b){ return b.dateISO.localeCompare(a.dateISO); });
@@ -437,7 +437,7 @@
     if(upcoming.length){ host.appendChild(secHead('Upcoming','')); upcoming.forEach(function(e,i){ host.appendChild(eventCard(e,e.bookings,i===0,true)); }); }
     if(recent.length){
       host.appendChild(secHead('Recent',''));
-      (STATE.showAllPast?recent:recent.slice(0,5)).forEach(function(e){ host.appendChild(eventCard(e,e.bookings,false,false)); });
+      (STATE.showAllPast?recent:recent.slice(0,5)).forEach(function(e){ host.appendChild(eventCard(e,e.bookings,false,true)); });
       if(recent.length>5 && !STATE.showAllPast){
         var btn=document.createElement('button'); btn.className='showmore'; btn.textContent='Show older events ('+(recent.length-5)+') ▾';
         btn.onclick=function(){ STATE.showAllPast=true; renderFeed(); }; host.appendChild(btn);
