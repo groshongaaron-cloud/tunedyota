@@ -3,20 +3,59 @@
   "capturedAt": "2026-07-13",
   "thumborSize": "800x800",
   "products": {
-    "SS-0W20-QT":   { "file": "ss-0w20.jpg",     "cdn2Path": "digitalLibrary/9aff53bd-3553-454c-850a-f810fb80a862/Signature_Series_0W-20_Synthetic_Motor_Oil_Quart-ASMQT.jpg" },
-    "SS-5W30-QT":   { "file": "ss-5w30.jpg",     "cdn2Path": "digitalLibrary/cb685e9f-ff36-4935-8f6b-5036f5665b04/Signature_Series_5W-30_Synthetic_Motor_Oil_Quart-ASLQT.jpg" },
-    "SS-5W20-QT":   { "file": "ss-5w20.jpg",     "cdn2Path": "digitalLibrary/ca7d18a6-495a-4bf1-bce9-6de5d0177fb0/Signature_Series_5W-20_Synthetic_Motor_Oil_Quart-ALMQT.jpg" },
-    "EA15K09":      { "file": "ea15k09.jpg",     "cdn2Path": "digitalLibrary/d6c34eb5-7c2b-407f-9879-677303a8f0bd/AMSOIL_Oil_Filter-EA15K09.JPG" },
-    "EA15K51":      { "file": "ea15k51.jpg",     "cdn2Path": "digitalLibrary/c4b9a995-0cab-4525-8d23-d887cf331ec7/AMSOIL_Oil_Filter-EA15K51.jpg" },
-    "EA15K04":      { "file": "ea15k04.jpg",     "cdn2Path": "digitalLibrary/7a04763e-529f-469f-9d9e-cc64cce2c683/AMSOIL_Oil_Filter-Ea15K04.jpg" },
-    "SVL-QT":       { "file": "svl-75w85.jpg",   "cdn2Path": "digitalLibrary/5028dcf1-fc8a-45c3-92de-48fb6f511702/SVLPK_1.jpg" },
-    "AGLPK-QT":     { "file": "aglpk-80w90.jpg", "cdn2Path": "digitalLibrary/94c5a44e-7ea4-4d7e-ab46-664e40e65fa8/SEVERE_GEAR%C2%AE_80W-90_Quart_Easy_Pack-AGLPK.jpg" },
-    "SVG-75W90-QT": { "file": "svg-75w90.jpg",   "cdn2Path": "digitalLibrary/f3b026a6-b585-4b3f-b9f2-628165e17c28/SEVERE_GEAR%C2%AE_75W-90_Quart-SVGQT.jpg" },
-    "SVG-75W140-QT":{ "file": "svg-75w140.jpg",  "cdn2Path": "digitalLibrary/c68a4bad-67c6-4948-8c6f-9b5f0a387ce3/SEVERE_GEAR%C2%AE_75W-140_Quart_Easy-Pack-SVOPK.jpg" },
-    "ATL-QT":       { "file": "atf.jpg",         "cdn2Path": "digitalLibrary/21b3418c-3437-4cdd-951c-4083eae501ee/Signature_Series_Multi-Vehicle_Synthetic_Automatic_Transmission_Fluid_Quart-ATFQT.jpg" }
+    "SS-0W20-QT": {
+      "file": "ss-0w20.jpg",
+      "cdn2Path": "digitalLibrary/9aff53bd-3553-454c-850a-f810fb80a862/Signature_Series_0W-20_Synthetic_Motor_Oil_Quart-ASMQT.jpg"
+    },
+    "SS-5W30-QT": {
+      "file": "ss-5w30.jpg",
+      "cdn2Path": "digitalLibrary/cb685e9f-ff36-4935-8f6b-5036f5665b04/Signature_Series_5W-30_Synthetic_Motor_Oil_Quart-ASLQT.jpg"
+    },
+    "SS-5W20-QT": {
+      "file": "ss-5w20.jpg",
+      "cdn2Path": "digitalLibrary/ca7d18a6-495a-4bf1-bce9-6de5d0177fb0/Signature_Series_5W-20_Synthetic_Motor_Oil_Quart-ALMQT.jpg"
+    },
+    "EA15K09": {
+      "file": "ea15k09.jpg",
+      "cdn2Path": "digitalLibrary/d6c34eb5-7c2b-407f-9879-677303a8f0bd/AMSOIL_Oil_Filter-EA15K09.JPG"
+    },
+    "EA15K51": {
+      "file": "ea15k51.jpg",
+      "cdn2Path": "digitalLibrary/c4b9a995-0cab-4525-8d23-d887cf331ec7/AMSOIL_Oil_Filter-EA15K51.jpg"
+    },
+    "EA15K04": {
+      "file": "ea15k04.jpg",
+      "cdn2Path": "digitalLibrary/7a04763e-529f-469f-9d9e-cc64cce2c683/AMSOIL_Oil_Filter-Ea15K04.jpg"
+    },
+    "SVL-QT": {
+      "file": "svl-75w85.jpg",
+      "cdn2Path": "digitalLibrary/5028dcf1-fc8a-45c3-92de-48fb6f511702/SVLPK_1.jpg"
+    },
+    "AGLPK-QT": {
+      "file": "aglpk-80w90.jpg",
+      "cdn2Path": "digitalLibrary/94c5a44e-7ea4-4d7e-ab46-664e40e65fa8/SEVERE_GEAR%C2%AE_80W-90_Quart_Easy_Pack-AGLPK.jpg"
+    },
+    "SVG-75W90-QT": {
+      "file": "svg-75w90.jpg",
+      "cdn2Path": "digitalLibrary/f3b026a6-b585-4b3f-b9f2-628165e17c28/SEVERE_GEAR%C2%AE_75W-90_Quart-SVGQT.jpg"
+    },
+    "SVG-75W140-QT": {
+      "file": "svg-75w140.jpg",
+      "cdn2Path": "digitalLibrary/c68a4bad-67c6-4948-8c6f-9b5f0a387ce3/SEVERE_GEAR%C2%AE_75W-140_Quart_Easy-Pack-SVOPK.jpg"
+    },
+    "ATL-QT": {
+      "file": "atf.jpg",
+      "cdn2Path": "digitalLibrary/21b3418c-3437-4cdd-951c-4083eae501ee/Signature_Series_Multi-Vehicle_Synthetic_Automatic_Transmission_Fluid_Quart-ATFQT.jpg"
+    }
   },
-  "unavailable": {
-    "EA15K02": "not in AMSOIL Oil Filters library (available: K04,K09,K12,K32,K43,K50,K51) — verify catalog part number",
-    "EA15K49": "not in AMSOIL Oil Filters library — verify catalog part number"
+  "ownerProvided": {
+    "EA15K02": {
+      "file": "ea15k02.jpg",
+      "source": "assets-source/Amsoil/ea15k02-ea.jpg (owner-provided 2026-07-13; NOT in the dealer library — image-sync must skip)"
+    },
+    "EA15K49": {
+      "file": "ea15k49.jpg",
+      "source": "assets-source/Amsoil/ea15k49-ea.jpg (owner-provided 2026-07-13)"
+    }
   }
 }
