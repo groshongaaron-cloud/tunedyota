@@ -78,19 +78,26 @@ function buildCustomerEmail(d, inst) {
 
 function buildBookingCustomerEmail(d, inst, market, event) {
   const first = (d.name || "there").split(" ")[0];
+  // Show the venue street address on the confirmation when it's set; when the venue
+  // is still "To Be Released" (or missing), promise it by email before the event.
+  const addr = event && event.address && !/to be released/i.test(event.address) ? event.address : "";
   const subject = `You're booked — Tuned Yota ${market.city} (${d.slot})`;
   const text =
     `Hi ${first},\n\nYou're booked for your ${d.vehicle || "vehicle"} tune.\n\n` +
-    `City: ${market.city}, ${market.state}\nDate: ${event.label || event.dateISO}\nTime: ${d.slot}\nInstaller: ${inst.name} (${inst.phone})\n\n` +
+    `City: ${market.city}, ${market.state}\n` +
+    (addr ? `Address: ${addr}\n` : "") +
+    `Date: ${event.label || event.dateISO}\nTime: ${d.slot}\nInstaller: ${inst.name} (${inst.phone})\n\n` +
+    (addr ? "" : `We'll email you the exact address before your event.\n\n`) +
     `A calendar invite is attached. Need to change it? Call or text ${inst.phone}.\n\n— Tuned Yota · Undeniable Performance\n`;
   const html =
     `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px">` +
     `<h2 style="color:#5B4B42">You're booked, ${esc(first)}.</h2>` +
     `<p>Your <strong>${esc(d.vehicle || "vehicle")}</strong> tune is confirmed.</p>` +
     `<table style="border-collapse:collapse;font-size:14px">` +
-    row("City", `${market.city}, ${market.state}`).html + row("Date", event.label || event.dateISO).html +
+    row("City", `${market.city}, ${market.state}`).html + row("Address", addr).html + row("Date", event.label || event.dateISO).html +
     row("Time", d.slot).html + row("Model year", d.modelYear).html + row("Installer", `${inst.name} (${inst.phone})`).html +
     `</table>` +
+    (addr ? "" : `<p style="margin-top:10px;color:#7c8472">We'll email you the exact address before your event.</p>`) +
     `<p style="margin-top:14px">A calendar invite is attached. Need to change it? Call or text <strong>${esc(inst.phone)}</strong>.</p>` +
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
   return { subject, html, text };

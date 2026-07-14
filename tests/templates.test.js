@@ -54,6 +54,20 @@ test("booking customer email names slot + date", () => {
   assert.ok(m.text.includes("9:20"));
   assert.ok(m.text.includes("Sioux Falls"));
 });
+test("booking confirmation includes the venue street address when it's set", () => {
+  const ev = { dateISO: "2026-07-25", label: "July 25, 2026", address: "4165 Loberg Avenue, Hermantown, MN 55811" };
+  const m = tB.buildBookingCustomerEmail({ ...dB, slot: "9:20" }, instB, marketB, ev);
+  assert.ok(m.text.includes("4165 Loberg Avenue, Hermantown, MN 55811"), "confirmation text missing address");
+  assert.ok(m.html.includes("4165 Loberg Avenue"), "confirmation html missing address");
+  assert.ok(!/exact address before your event/i.test(m.text), "should not promise a later address when it's known");
+});
+test("booking confirmation promises a later address when the venue is TBD", () => {
+  const tbd = { dateISO: "2026-09-12", label: "September 12, 2026", address: "To Be Released" };
+  const m = tB.buildBookingCustomerEmail({ ...dB, slot: "9:20" }, instB, marketB, tbd);
+  assert.ok(!/to be released/i.test(m.text), "must never print the raw 'To Be Released' placeholder");
+  assert.ok(/exact address before your event/i.test(m.text), "should promise the address by email when TBD");
+  assert.ok(/exact address before your event/i.test(m.html), "html should promise the address when TBD");
+});
 test("booking installer email lists details", () => {
   const m = tB.buildBookingInstallerEmail({ ...dB, slot: "9:20" }, instB, marketB, eventB);
   assert.ok(m.subject.includes("Sioux Falls"));

@@ -69,7 +69,8 @@ async function processNotifications(job, deps) {
   } catch (e) { if (log.error) log.error("booking webpush", e.message); }
   if (d.email) {
     try {
-      const ics = buildIcs({ uid: `${event.dateISO}-${d.slot}-${job.stamp}@tunedyota.com`, dateISO: event.dateISO, slot: d.slot, summary: `Tuned Yota — ${market.city} OTT Tune`, location: `${market.city}, ${market.state}`, description: `Your ${d.vehicle || "vehicle"} tune with ${inst.name}. Questions: ${inst.phone}`, stamp: job.stamp });
+      const icsLoc = (event.address && !/to be released/i.test(event.address)) ? event.address : `${market.city}, ${market.state}`;
+      const ics = buildIcs({ uid: `${event.dateISO}-${d.slot}-${job.stamp}@tunedyota.com`, dateISO: event.dateISO, slot: d.slot, summary: `Tuned Yota — ${market.city} OTT Tune`, location: icsLoc, description: `Your ${d.vehicle || "vehicle"} tune with ${inst.name}. Questions: ${inst.phone}`, stamp: job.stamp });
       const m = tpl.buildBookingCustomerEmail(d, inst, market, event);
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: d.email, replyTo: OWNER, subject: m.subject, html: m.html, text: m.text, attachments: [{ filename: "tuned-yota-booking.ics", content: Buffer.from(ics).toString("base64") }] });
     } catch (e) { custOk = false; why = why || e.message; if (log.error) log.error("cust email", e.message); }
