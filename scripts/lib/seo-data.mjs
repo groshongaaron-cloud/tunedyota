@@ -31,6 +31,8 @@ export const HEAD_PAGES = [
   "amsoil-lexus-gx.html","amsoil-lexus-lx570.html","amsoil-lexus-rx350.html","amsoil-lexus-ls460.html",
   "amsoil-synthetic-motor-oil-guide.html","amsoil-synthetic-atf-guide.html","amsoil-severe-gear-guide.html",
   "amsoil-ea-oil-filter-guide.html","is-amsoil-worth-it.html","amsoil-vs-oem-toyota-lexus-fluids.html",
+  "amsoil-minnesota.html","amsoil-iowa.html","amsoil-wisconsin.html","amsoil-north-dakota.html","amsoil-south-dakota.html","amsoil-nebraska.html",
+  "amsoil-texas.html","amsoil-florida.html","amsoil-colorado.html","amsoil-arizona.html","amsoil-michigan.html","amsoil-california.html",
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 

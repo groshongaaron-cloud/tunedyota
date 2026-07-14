@@ -562,12 +562,129 @@ ${FQA11Y}
 `;
 }
 
+// ---- Front B: national "Buy AMSOIL in [State]" geo pages ----------------------
+// Substantive (NOT thin doorway) — each state gets real cities + a climate/driving
+// angle, the AMSOIL value case, product cards + schema, and a national-shipping FAQ.
+// `served: true` states also surface our in-person tuning events. Start curated;
+// expand by adding STATES entries.
+const STATES = [
+  { name: "Minnesota", slug: "minnesota", cities: ["Minneapolis", "St. Paul", "Rochester"], served: true, angle: "In Minnesota's brutal winters, AMSOIL synthetic oils protect at start-up in sub-zero cold and resist the moisture and fuel dilution of short, cold-weather trips." },
+  { name: "Iowa", slug: "iowa", cities: ["Des Moines", "Cedar Rapids", "Davenport"], served: true, angle: "From Iowa's farm-country hauling to daily commutes, AMSOIL's extended-drain synthetics protect through hot summers and cold winters alike." },
+  { name: "Wisconsin", slug: "wisconsin", cities: ["Milwaukee", "Madison", "Green Bay"], served: true, angle: "Wisconsin drivers face everything from Northwoods cold to lake-country towing — AMSOIL's full-synthetic protection handles both." },
+  { name: "North Dakota", slug: "north-dakota", cities: ["Fargo", "Bismarck", "Grand Forks"], served: true, angle: "North Dakota's extreme cold and oilfield-grade duty demand more than OEM fluids — AMSOIL delivers cold-start protection and reserve durability." },
+  { name: "South Dakota", slug: "south-dakota", cities: ["Sioux Falls", "Rapid City", "Aberdeen"], served: true, angle: "Across South Dakota's big temperature swings and long highway miles, AMSOIL's extended drain intervals mean fewer oil changes and more protection." },
+  { name: "Nebraska", slug: "nebraska", cities: ["Omaha", "Lincoln", "Grand Island"], served: true, angle: "Nebraska's mix of interstate miles, farm work and hot summers is exactly where AMSOIL's heat and wear protection earns its keep." },
+  { name: "Texas", slug: "texas", cities: ["Houston", "Dallas", "San Antonio"], served: false, angle: "Texas heat and heavy towing punish ordinary oil — AMSOIL synthetics resist thermal breakdown and protect under load." },
+  { name: "Florida", slug: "florida", cities: ["Miami", "Orlando", "Tampa"], served: false, angle: "Florida's heat, humidity and stop-and-go traffic are hard on fluids — AMSOIL full-synthetic protection stands up to it." },
+  { name: "Colorado", slug: "colorado", cities: ["Denver", "Colorado Springs", "Fort Collins"], served: false, angle: "Colorado's high altitude, mountain towing and cold winters demand a fluid with reserve protection — AMSOIL delivers." },
+  { name: "Arizona", slug: "arizona", cities: ["Phoenix", "Tucson", "Mesa"], served: false, angle: "In Arizona's extreme desert heat, AMSOIL's thermal-breakdown resistance keeps engines and transmissions protected." },
+  { name: "Michigan", slug: "michigan", cities: ["Detroit", "Grand Rapids", "Lansing"], served: false, angle: "Michigan's harsh winters and daily miles are ideal for AMSOIL's cold-start protection and extended drains." },
+  { name: "California", slug: "california", cities: ["Los Angeles", "San Diego", "Sacramento"], served: false, angle: "From California commutes to canyon runs and desert heat, AMSOIL's synthetic protection outperforms conventional oil." },
+];
+
+function geoPage(st, vehModels) {
+  const url = `https://tunedyota.com/amsoil-${st.slug}`;
+  const skus = ["SS-0W20-QT", "SS-5W30-QT", "EA15K09"];
+  const products = skus.map(prod).filter(Boolean);
+  const offers = products.map((p) => {
+    const price = priceOfP(p);
+    if (price == null) return null;
+    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."}}`;
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
+  }).filter(Boolean).join(",");
+  const cityList = st.cities.join(", ");
+  const faqs = [
+    [`Where can I buy AMSOIL in ${st.name}?`, `From Tuned Yota, an Authorized AMSOIL Dealer. Order online and it ships direct from AMSOIL to anywhere in ${st.name}, including ${cityList} — no local store trip required.`],
+    [`Does AMSOIL ship to ${st.name}?`, `Yes. AMSOIL ships direct to your door anywhere in ${st.name}. Order through Tuned Yota and your dealer referral is applied automatically, or enroll as a Preferred Customer to save up to 25%.`],
+    [`Is AMSOIL a good choice for ${st.name} driving?`, `${st.angle} It also carries a guaranteed drain interval up to 25,000 miles, so you change oil less often.`],
+  ];
+  const faqSchema = faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
+  const faqVisible = faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
+  const servedBlock = st.served
+    ? `  <h2>Toyota &amp; Lexus tuning in ${ESC(st.name)}</h2>\n  <p>Beyond AMSOIL, Tuned Yota runs in-person OTT tuning events across ${ESC(st.name)}, including ${ESC(cityList)}. <a href="toyota-lexus-tuning-${st.slug}.html">See ${ESC(st.name)} tuning &amp; dates →</a></p>`
+    : "";
+  const title = `Buy AMSOIL in ${ESC(st.name)} — Synthetic Oil Shipped to Your Door | Tuned Yota`;
+  const desc = `Buy genuine AMSOIL synthetic oil, filters, gear lube and ATF in ${ESC(st.name)} — shipped direct to your door from Tuned Yota, an Authorized AMSOIL Dealer. Real prices, and save up to 25% as a Preferred Customer.`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title}</title>
+<meta name="description" content="${desc}">
+<link rel="canonical" href="${url}">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Store","@id":"${url}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${url}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"State","name":${JSON.stringify(st.name)}},"description":${JSON.stringify(desc)}${offers ? `,"hasOfferCatalog":{"@type":"OfferCatalog","name":${JSON.stringify(`AMSOIL synthetic fluids in ${st.name}`)},"itemListElement":[${offers}]}` : ""}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[${faqSchema}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tunedyota.com/"},{"@type":"ListItem","position":2,"name":"AMSOIL Garage","item":"https://tunedyota.com/amsoil-garage"},{"@type":"ListItem","position":3,"name":${JSON.stringify(`AMSOIL in ${st.name}`)},"item":"${url}"}]}
+</script>
+${FONTS}
+${SITECSS}
+${FAVICON}
+${STYLE}
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+${NAV}
+<a id="main" tabindex="-1"></a>
+<div class="lp">
+  <div class="lp-eyebrow">Tuned Yota · Authorized AMSOIL Dealer</div>
+  <h1>Buy AMSOIL in ${ESC(st.name)}</h1>
+  <div class="lp-answer">Get genuine AMSOIL synthetic oil, filters, gear lube and ATF delivered anywhere in ${ESC(st.name)} — from Tuned Yota, an Authorized AMSOIL Dealer. ${ESC(st.angle)} Order online and it ships direct from AMSOIL to your door.</div>
+  <div class="lp-cta">
+    <a class="btn primary" target="_blank" rel="noopener" href="${amsoilUrl("/shop/")}">Shop AMSOIL →</a>
+    <a class="btn outline" target="_blank" rel="noopener" href="${amsoilUrl("/offers/pc/")}">Save 25% as a Preferred Customer</a>
+  </div>
+
+  <h2>Popular AMSOIL products — shipped to ${ESC(st.name)}</h2>
+  <p>Real prices, delivered direct from AMSOIL with Tuned Yota's dealer referral attached.</p>
+  ${guideCards(skus)}
+
+  <h2>Why AMSOIL in ${ESC(st.name)}</h2>
+  <ul class="lp-bul">
+    <li>${ESC(st.angle)}</li>
+    <li><strong>75% more wear protection</strong> and <strong>100% LSPI protection</strong> — built for modern turbo and direct-injection engines.</li>
+    <li><strong>Up to 25,000-mile / 1-year</strong> guaranteed drain intervals — fewer oil changes over the life of your vehicle.</li>
+    <li>Factory-direct and shipped to your door in ${ESC(st.name)} — no store trip, no markup.</li>
+  </ul>
+
+${servedBlock}
+
+  <div class="lp-book">
+    <h2>Save up to 25% for life</h2>
+    <p>Become a Preferred Customer under Tuned Yota — wholesale pricing (up to 25% off retail), points, promotions and free gear. The membership pays for itself in about two oil changes.</p>
+    <a class="btn primary" target="_blank" rel="noopener" href="${amsoilUrl("/offers/pc/")}">Become a Preferred Customer →</a>
+  </div>
+
+  <h2>AMSOIL in ${ESC(st.name)} — FAQ</h2>
+${faqVisible}
+
+  <div class="lp-links">
+    <strong>More:</strong><br>
+    <a href="amsoil-garage.html">AMSOIL Garage</a><a href="amsoil-synthetic-motor-oil-guide.html">AMSOIL oil guide</a><a href="amsoil-vs-oem-toyota-lexus-fluids.html">AMSOIL vs. OEM</a>
+  </div>
+  <p class="lp-disc">Product recommendations are from AMSOIL's official materials; checkout completes on amsoil.com. Tuned Yota is an Authorized AMSOIL Dealer shipping nationwide.</p>
+</div>
+${FQSCRIPT}
+${FOOTER}
+${FQA11Y}
+</body>
+</html>
+`;
+}
+
 export const AMSOIL_GUIDE_FILES = GUIDES.map((g) => `${g.slug}.html`);
+export const AMSOIL_GEO_FILES = STATES.map((s) => `amsoil-${s.slug}.html`);
 
 export function buildAmsoilPages() {
   const list = models();
   for (const m of list) fs.writeFileSync(path.join(SITE, `amsoil-${m.slug}.html`), page(m, list));
   for (const g of GUIDES) fs.writeFileSync(path.join(SITE, `${g.slug}.html`), guidePage(g, list));
+  for (const st of STATES) fs.writeFileSync(path.join(SITE, `amsoil-${st.slug}.html`), geoPage(st, list));
   buildAmsoilGarageStore();
   return list.length;
 }
