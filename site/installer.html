@@ -12,6 +12,7 @@
 <link rel="manifest" href="/installer.webmanifest">
 <meta name="theme-color" content="#3A2E26">
 <script src="/commission-tally.js"></script>
+  <script src="/offline-queue.js"></script>
 <style>
   :root{--ink:#3A2E26;--accent:#5B4B42;--line:#d8d2ca;--muted:#7c8472;}
   *{box-sizing:border-box;} body{font-family:-apple-system,Arial,sans-serif;color:var(--ink);margin:0;background:#faf8f5;}
@@ -106,6 +107,14 @@
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:'' };
+  function Q(){ return window.OfflineQueue; }
+  function store(){ return window.localStorage; }
+
+  function registerServiceWorker(){
+    if(!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+    navigator.serviceWorker.addEventListener('message', function(e){ if(e.data && e.data.type==='ty-flush') flushQueue(); });
+  }
 
   function sel(id,list,ph){ return '<select id="'+id+'"><option value="" disabled selected>'+ph+'…</option>'+list.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>'; }
   function val(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
@@ -132,8 +141,10 @@
 
   document.getElementById('unlock').onclick=function(){ var v=document.getElementById('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
   if(tok()) showApp();
-  document.getElementById('logout').onclick=function(e){ e.preventDefault(); localStorage.removeItem('ty_installer_token'); location.reload(); };
-  async function showApp(){ if(!(await nativeLock())) return; document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
+  document.getElementById('logout').onclick=function(e){ e.preventDefault();
+    if(Q().loadQueue(store()).length && !confirm('You have unsynced close-outs/walk-ins. Log out anyway and lose them?')) return;
+    localStorage.removeItem('ty_installer_token'); location.reload(); };
+  async function showApp(){ registerServiceWorker(); renderPendingBadge(); if(!(await nativeLock())) return; document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
   function fail(m){ var el=document.getElementById('msg'); el.className='msg err'; el.textContent=m; el.scrollIntoView({block:'nearest'}); }
   function succeed(m){ var el=document.getElementById('msg'); el.className='msg ok'; el.textContent=m; el.scrollIntoView({block:'nearest'}); }
   function clearMsg(){ var el=document.getElementById('msg'); el.className='msg'; el.textContent=''; }
@@ -265,10 +276,19 @@
 
   async function load(){
     document.getElementById('feed').innerHTML='<div class="empty">Loading…</div>';
-    var res = await fetch('/.netlify/functions/installer-roster', { headers:{ 'x-installer-token':tok() } });
+    var res;
+    try { res = await fetch('/.netlify/functions/installer-roster', { headers:{ 'x-installer-token':tok() } }); }
+    catch(netErr){ return renderFromCache('Offline — showing your last synced roster'); }
     if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
     if(!res.ok){ document.getElementById('feed').innerHTML='<div class="empty">Could not load roster.</div>'; return; }
     var data = await res.json();
+    try { localStorage.setItem('ty_roster_cache', JSON.stringify({ savedAt: Date.now(), data: data })); } catch(e){}
+    clearOfflineBanner();
+    applyRoster(data);
+    flushQueue();
+  }
+
+  function applyRoster(data){
     STATE.today = localToday(); STATE.bookings = data.bookings||[]; STATE.events = data.events||[];
     STATE.admin = !!data.admin;
     STATE.reviewUrl = data.reviewUrl || '';
@@ -288,6 +308,18 @@
     renderAll();
     registerPush();
   }
+
+  function renderFromCache(msg){
+    var raw; try { raw = localStorage.getItem('ty_roster_cache'); } catch(e){ raw = null; }
+    if(!raw){ document.getElementById('feed').innerHTML='<div class="empty">Offline — no saved roster yet. Reconnect once to load it.</div>'; return; }
+    var cached; try { cached = JSON.parse(raw); } catch(e){ cached = null; }
+    if(!cached || !cached.data){ document.getElementById('feed').innerHTML='<div class="empty">Offline — no saved roster yet.</div>'; return; }
+    showOfflineBanner(msg + (cached.savedAt ? ' (saved '+relTime(cached.savedAt)+')' : ''));
+    applyRoster(cached.data);
+  }
+  function relTime(ms){ var s=Math.round((Date.now()-ms)/1000); if(s<60) return 'just now'; var m=Math.round(s/60); if(m<60) return m+'m ago'; var h=Math.round(m/60); if(h<24) return h+'h ago'; return Math.round(h/24)+'d ago'; }
+  function showOfflineBanner(text){ var el=document.getElementById('offlinebanner'); if(!el){ el=document.createElement('div'); el.id='offlinebanner'; el.style.cssText='background:#8a6d3b;color:#fff;padding:8px 12px;border-radius:8px;margin:8px 0;font-size:14px'; var app=document.getElementById('app'); app.insertBefore(el, app.firstChild); } el.textContent='⚠ '+text; el.style.display=''; }
+  function clearOfflineBanner(){ var el=document.getElementById('offlinebanner'); if(el) el.style.display='none'; }
 
   // Admins see every installer's data; an optional filter narrows to one installer.
   function visibleBookings(){
@@ -507,8 +539,21 @@
     var email=(vals.email||'').trim();
     if(!name){ fail('Enter the customer name.'); return; }
     if(!phone){ fail('Enter a phone number.'); return; }
-    var res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({city:evt.city,dateISO:evt.dateISO,name:name,vehicle:vehicle,phone:phone,email:email})});
-    if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    var op = Q().makeOp('walkin', { city:evt.city, dateISO:evt.dateISO, name:name, vehicle:vehicle, phone:phone, email:email, clientKey:null });
+    op.body.clientKey = op.clientKey;
+    var res, netErr=null;
+    try { res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(op.body)}); }
+    catch(e){ netErr=e; }
+    if(!netErr && res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    if(netErr || (res && Q().shouldQueue(null, res.status))){
+      queuePush(op);
+      STATE.walkOpen[evt.key]=true; STATE.eventOpen[evt.key]=true;
+      STATE.bookings.push(optimisticWalkin(evt, op));
+      renderAll();
+      succeed('Saved '+name+' — will sync when you’re back online.');
+      registerBgSync();
+      return;
+    }
     var out=await res.json().catch(function(){return{};});
     if(out.status==='booked' && out.booking){
       STATE.walkOpen[evt.key]=true;        // keep this event's adder open for the next walk-in
@@ -517,13 +562,18 @@
       renderAll();                         // #msg lives outside the feed, so this message survives
       succeed('✓ Added '+name+' — walk-in saved for '+evt.city+'.');
     } else {
-      var er=out.error||('error '+res.status);
+      var er=out.error||('error '+(res?res.status:'network'));
       fail( er==='unknown-event'   ? 'That event isn’t recognized — reload and try again.'
           : er==='not-your-market' ? 'That market isn’t assigned to you.'
           : er==='unknown-city'    ? 'That city isn’t a recognized market.'
           : er==='missing-contact' ? 'Enter both a customer name and a phone number.'
           : 'Could not add walk-in: '+er );
     }
+  }
+  function optimisticWalkin(evt, op){
+    return { id:'pending:'+op.clientKey, city:evt.city, dateISO:evt.dateISO, installer:'', slot:'', slotLabel:'',
+      name:op.body.name, vehicle:op.body.vehicle, phone:op.body.phone, email:op.body.email, mods:'', status:'Booked',
+      isWalkin:true, pendingSync:true, calibration:'', vin:'', tuningPlatform:'', calibrationType:'', ecuId:'', gearSize:'', mileage:'' };
   }
 
   // --- VIN scan (mirror of netlify/functions/lib/vin.js — keep in sync) ---
@@ -634,7 +684,7 @@
 
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
-    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
+    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
       (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'');
     if(b.status==='Completed'){
@@ -701,14 +751,66 @@
   async function closeout(id,extra){
     clearMsg();
     var body=Object.assign({recordId:id},extra);
-    var res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(body)});
-    if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    var res, netErr=null;
+    try { res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(body)}); }
+    catch(e){ netErr=e; }
+    if(!netErr && res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    if(netErr || (res && Q().shouldQueue(null, res.status))){ enqueueOp('closeout', body, id, extra); return; }
     var out=await res.json().catch(function(){return{};});
     var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
     if(out.status==='completed'){ if(b){ b.status='Completed'; if(extra.calibration)b.calibration=extra.calibration; if(extra.vin)b.vin=extra.vin; if(extra.tuningPlatform)b.tuningPlatform=extra.tuningPlatform; if(extra.calibrationType)b.calibrationType=extra.calibrationType; if(extra.signature) b.signed=true; } renderAll(); }
     else if(out.status==='noshow'){ if(b){ b.status='No-show'; } renderAll(); }
     else { fail('Could not save: '+(out.error||'error '+res.status)); }
   }
+
+  function queuePush(op){ var q=Q().loadQueue(store()); q.push(op); Q().saveQueue(store(), q); renderPendingBadge(); }
+  function enqueueOp(type, body, id, extra){
+    var op=Q().makeOp(type, body); queuePush(op);
+    if(type==='closeout'){
+      var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
+      if(b){ if(extra.action==='noshow'){ b.status='No-show'; } else { b.status='Completed'; if(extra.calibration)b.calibration=extra.calibration; if(extra.vin)b.vin=extra.vin; if(extra.signature)b.signed=true; b.pendingSync=true; } }
+      renderAll();
+      succeed('Saved — will sync when you’re back online.' + (extra.signature||extra.calibration ? ' The certificate sends once synced.' : ''));
+    }
+    registerBgSync();
+  }
+
+  var FLUSHING=false;
+  async function flushQueue(){
+    if(FLUSHING) return; FLUSHING=true;
+    try{
+      var q=Q().loadQueue(store());
+      while(q.length){
+        var op=q[0], url=op.type==='closeout'?'/.netlify/functions/installer-closeout':'/.netlify/functions/installer-walkin';
+        var res, netErr=null;
+        try{ res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(op.body)}); }
+        catch(e){ netErr=e; }
+        var verdict = netErr ? 'retry-later' : Q().nextFlushResult(res.status);
+        if(verdict==='remove' || verdict==='drop'){
+          if(verdict==='drop') fail('A queued '+op.type+' could not be saved and was dropped.');
+          q.shift(); Q().saveQueue(store(), q); renderPendingBadge();
+        } else if(verdict==='stop-auth'){
+          Q().saveQueue(store(), q); localStorage.removeItem('ty_installer_token'); location.reload(); return;
+        } else { break; }
+      }
+      if(!Q().loadQueue(store()).length && navigator.onLine){ load(); }
+    } finally { FLUSHING=false; renderPendingBadge(); }
+  }
+
+  function renderPendingBadge(){
+    var n=Q().loadQueue(store()).length, el=document.getElementById('pendingbadge');
+    if(!el){ el=document.createElement('a'); el.id='pendingbadge'; el.href='#'; el.className='link'; el.style.cssText='margin-left:14px';
+      el.onclick=function(e){ e.preventDefault(); flushQueue(); };
+      var host=document.getElementById('logout') ? document.getElementById('logout').parentNode : document.getElementById('app'); if(host) host.appendChild(el); }
+    if(n>0){ el.style.display=''; el.textContent='⏳ '+n+' pending sync'; } else { el.style.display='none'; }
+  }
+  function registerBgSync(){
+    if('serviceWorker' in navigator && 'SyncManager' in window){
+      navigator.serviceWorker.ready.then(function(reg){ if(reg.sync) reg.sync.register('ty-flush').catch(function(){}); }).catch(function(){});
+    }
+  }
+  window.addEventListener('online', flushQueue);
+  window.addEventListener('beforeunload', function(e){ if(Q().loadQueue(store()).length){ e.preventDefault(); e.returnValue=''; return ''; } });
 </script>
 </body>
 </html>
