@@ -122,6 +122,10 @@ ul.lp-bul li::before{content:"";position:absolute;left:0;top:5px;width:11px;heig
 </style>`;
 
 const FQA11Y = `<script>document.querySelectorAll('.lp-fq').forEach(function(it,i){var q=it.querySelector('.lp-fqq'),a=it.querySelector('.lp-fqa');if(!q||!a)return;a.id='amfqa-'+i;q.setAttribute('aria-controls','amfqa-'+i);});</script>`;
+// Progressive-enhancement click attribution: rewrites amsoil.com links to route
+// through the /amsoil-go tracker (source = page slug). No-JS visitors keep the
+// direct links. See site/amsoil-track.js.
+const TRACK = `<script src="/amsoil-track.js" defer></script>`;
 
 // Cross-link hub: all AMSOIL platform pages (built after the model list is known).
 function vehHub(models, currentSlug) {
@@ -265,6 +269,7 @@ ${vehHub(models, slug)}
 ${FQSCRIPT}
 ${FOOTER}
 ${FQA11Y}
+${TRACK}
 </body>
 </html>
 `;
@@ -623,6 +628,7 @@ ${faqVisible}
 ${FQSCRIPT}
 ${FOOTER}
 ${FQA11Y}
+${TRACK}
 </body>
 </html>
 `;
@@ -750,6 +756,7 @@ ${faqVisible}
 ${FQSCRIPT}
 ${FOOTER}
 ${FQA11Y}
+${TRACK}
 </body>
 </html>
 `;
