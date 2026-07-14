@@ -184,6 +184,7 @@ function page(model, models) {
 
   const faqs = [
     [`Where can I buy AMSOIL for my ${name}?`, `From Tuned Yota, an Authorized AMSOIL Dealer. Use the AMSOIL Garage to see the exact oil, filter, and gear lube for your ${name} and order online — products ship direct from AMSOIL anywhere in the U.S.`],
+    [`Is AMSOIL safe for my ${name}, or should I stick with ${make} OEM fluid?`, `AMSOIL is a safe choice for your ${name}. It's formulated to meet and exceed the performance standards ${make} requires, and using it does not void your factory warranty — under the federal Magnuson-Moss Warranty Act a manufacturer can't void your warranty just for using a different brand of oil, and AMSOIL backs every product with the AMSOIL Limited Warranty. Where OEM fluids are built to meet the minimum standard, AMSOIL Signature Series exceeds it: 75% more wear protection and drain intervals up to 25,000 miles — so you get more protection and fewer oil changes, not less.`],
     [`What AMSOIL oil does a ${name} take?`, `AMSOIL recommends ${oilPhrase} for the ${name}; the exact grade depends on your engine and model year. Pick your vehicle in the AMSOIL Garage to confirm the right oil, filter, and capacity for your build.`],
     [`How often should I change the oil on a tuned ${name}?`, `AMSOIL's full-synthetic motor oils are built for extended and severe-service drain intervals. For a tuned or towing ${name} we recommend a severe-service schedule; your AMSOIL Garage shows the interval for your exact configuration.`],
     [`Is AMSOIL worth it for a tuned or towing ${name}?`, `Full-synthetic AMSOIL fluids are formulated for the added heat and load a tuned, supercharged, or towing ${name} puts on its oil, gears, and transmission — which is why our own installers run them.`],
@@ -448,6 +449,31 @@ const GUIDES = [
       ["Will AMSOIL void my warranty?", "No. Using AMSOIL synthetic lubricants does not void your vehicle or equipment manufacturer's warranty, and all AMSOIL lubricants and filters are covered by the AMSOIL Limited Warranty."],
     ],
     footnotes: "<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.",
+  },
+  {
+    slug: "amsoil-vs-oem-toyota-lexus-fluids",
+    h1: "AMSOIL vs. OEM Toyota &amp; Lexus Fluids",
+    title: "AMSOIL vs. OEM Toyota &amp; Lexus Fluids — Is It Safe? Is It Better? | Tuned Yota",
+    desc: "Can you use AMSOIL instead of Toyota or Lexus OEM fluids? Yes — it's safe, it won't void your warranty, and AMSOIL Signature Series exceeds the OEM standard with 75% more wear protection and 25,000-mile drains. The honest comparison from Tuned Yota, a Toyota/Lexus specialist and Authorized AMSOIL Dealer.",
+    answer: "You can absolutely run AMSOIL in your Toyota or Lexus instead of OEM fluid — and for most owners it's the better choice. AMSOIL is formulated to <strong>meet and exceed the performance standards Toyota and Lexus require</strong>, it <strong>won't void your factory warranty</strong>, and its Signature Series delivers <strong>75% more wear protection</strong> with drain intervals up to <strong>25,000 miles</strong>. As a Toyota/Lexus specialist and Authorized AMSOIL Dealer, here's the straight comparison.",
+    skus: ["SS-0W20-QT", "EA15K09"],
+    sections: [
+      { h: "Is it safe to use AMSOIL instead of OEM?", html: "<p>Yes. AMSOIL synthetic motor oils and fluids are formulated to meet and exceed the performance standards your Toyota or Lexus calls for — the correct viscosity grade plus API, ILSAC and dexos performance where recommended. The <a href=\"amsoil-garage.html\">AMSOIL Garage</a> shows the exact oil, filter and capacity for your specific model and year, so you always install the right fluid.</p>" },
+      { h: "Will AMSOIL void my Toyota or Lexus warranty?", html: "<p><strong>No.</strong> Under the federal Magnuson-Moss Warranty Act, a manufacturer can't void your warranty simply because you used a different brand of oil — they would have to prove that oil caused a failure. Toyota and Lexus dealers recommend their own branded fluids because they sell them, not because a premium synthetic like AMSOIL is unsafe. On top of that, AMSOIL backs every lubricant and filter with the AMSOIL Limited Warranty.</p>" },
+      { h: "OEM meets the minimum. AMSOIL goes further.", bullets: [
+        "OEM fluids are built to meet the <em>minimum</em> standard; AMSOIL Signature Series is engineered to <strong>exceed</strong> it — <strong>75% more wear protection</strong>.<sup>1</sup>",
+        "<strong>100% protection against LSPI</strong> — important for Toyota's modern turbocharged and direct-injection engines (i-FORCE, turbo Tacoma and more).<sup>2</sup>",
+        "<strong>Up to a 25,000-mile / 1-year drain</strong> vs. the shorter OEM interval — fewer oil changes over the life of the vehicle.",
+        "Built for the heat and load of a <strong>tuned, supercharged or towing</strong> Toyota/Lexus — the exact fluids our own installers run.",
+      ] },
+      { h: "The value case", html: "<p>AMSOIL costs more per quart, but its extended drain interval means you buy oil less often — often eliminating an oil change per year — which helps offset the price while adding protection. Enroll as a Preferred Customer under Tuned Yota and you save up to 25%, closing the gap even further.</p>" },
+    ],
+    faqs: [
+      ["Can I use AMSOIL instead of Toyota or Lexus OEM oil?", "Yes. AMSOIL is formulated to meet and exceed the performance standards Toyota and Lexus require, and it's a safe, higher-performance alternative to OEM fluid. Use the AMSOIL Garage to confirm the exact oil, filter and capacity for your model and year."],
+      ["Does using AMSOIL void my Toyota or Lexus warranty?", "No. The federal Magnuson-Moss Warranty Act prevents a manufacturer from voiding your warranty just for using a different brand of oil, and AMSOIL backs its products with the AMSOIL Limited Warranty."],
+      ["Is AMSOIL actually better than Toyota OEM oil?", "OEM fluids are formulated to meet the minimum standard; AMSOIL Signature Series is engineered to exceed it — 75% more wear protection, 100% LSPI protection, and up to 25,000-mile drains — which especially benefits tuned, turbocharged and towing vehicles."],
+    ],
+    footnotes: "<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30. Magnuson-Moss Warranty Act information is general and not legal advice.",
   },
 ];
 
