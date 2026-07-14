@@ -1,5 +1,5 @@
 // site/sw.js — Tuned Yota installer console: web push + offline shell cache.
-var CACHE_VERSION = "ty-console-v1"; // bump when the SHELL list changes
+var CACHE_VERSION = "ty-console-v2"; // bump when the SHELL list or fetch strategy changes
 var SHELL = ["/installer.html", "/commission-tally.js", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"];
 
 self.addEventListener("install", function (event) {
@@ -16,17 +16,36 @@ self.addEventListener("fetch", function (event) {
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   var isNav = req.mode === "navigate" && url.pathname === "/installer.html";
-  var isShell = isNav || SHELL.indexOf(url.pathname) >= 0;
-  if (!isShell) return; // pass through the public site + all /.netlify/functions/* (never cached)
-  var key = isNav ? "/installer.html" : req;
+  var isAsset = !isNav && SHELL.indexOf(url.pathname) >= 0;
+  if (!isNav && !isAsset) return; // pass through the public site + all /.netlify/functions/* (never cached)
+
+  // The HTML shell changes often and correctness matters most: NETWORK-FIRST so an
+  // online installer always loads the latest console on their next visit (no more
+  // second-reload lag after a fix), with the cached copy as an offline fallback.
+  if (isNav) {
+    event.respondWith(
+      caches.open(CACHE_VERSION).then(function (cache) {
+        return fetch(req).then(function (res) {
+          if (res && res.status === 200) cache.put("/installer.html", res.clone());
+          return res;
+        }).catch(function () {
+          return cache.match("/installer.html").then(function (c) { return c || Response.error(); });
+        });
+      })
+    );
+    return;
+  }
+
+  // Static assets (icons, commission-tally.js): stale-while-revalidate — instant
+  // from cache, refreshed in the background.
   event.respondWith(
     caches.open(CACHE_VERSION).then(function (cache) {
-      return cache.match(key).then(function (cached) {
+      return cache.match(req).then(function (cached) {
         var network = fetch(req).then(function (res) {
-          if (res && res.status === 200) cache.put(key, res.clone());
+          if (res && res.status === 200) cache.put(req, res.clone());
           return res;
         }).catch(function () { return cached; });
-        return cached || network; // stale-while-revalidate
+        return cached || network;
       });
     })
   );
