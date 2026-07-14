@@ -72,6 +72,9 @@ function amsoilPage(amsoil, vehicleDisplay) {
   const fluids = amsoil.fluids;
   const qr = amsoil.qrSvg || "";
   const url = (fluids && fluids.orderUrl) || "https://www.amsoil.com/shop/?zo=30713116";
+  // Preferred-Customer enrollment link (dealer-attributed + click-tracked when the
+  // caller passes a tracked amsoil-go URL; falls back to the direct PC page).
+  const pcUrl = amsoil.pcUrl || "https://www.amsoil.com/p/preferred-customer-registration-preg/?zo=30713116";
   const veh = esc(vehicleDisplay || "");
   return `
   <div class="cert ref">
@@ -95,7 +98,8 @@ function amsoilPage(amsoil, vehicleDisplay) {
         <div class="pitch">
           <h3>Order your exact fluids</h3>
           <p>Scan to order at <strong>AMSOIL.com</strong> through Tuned&nbsp;Yota, your Authorized AMSOIL Dealer${fluids ? " — use the products listed above for your " + esc(fluids.model) : ""}, or browse the full catalog.</p>
-          <span class="save">Enroll free as a Preferred Customer — save up to 25%</span>
+          <a href="${pcUrl}" style="display:inline-block;background:#1F3A2E;color:#fff;text-decoration:none;font-weight:800;font-size:12.5px;padding:9px 15px;border-radius:8px;margin:2px 0 5px">Save up to 25% for life &mdash; become a Preferred Customer &#9658;</a>
+          <p style="font-size:11px;color:#5B6066;margin:0 0 5px;line-height:1.45">Set up once under Tuned&nbsp;Yota &mdash; you keep Preferred-Customer pricing on every future AMSOIL order for as long as you&rsquo;re enrolled.</p>
           <div class="url">${esc(url.replace(/^https?:\/\//, ""))}</div>
         </div>
       </div>

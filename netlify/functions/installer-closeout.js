@@ -111,7 +111,8 @@ async function processCloseout(body, deps) {
   try {
     const certNo = certSerial(d.recordId, calibrationDate, issueDate);
     const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
-    const amsoil = { fluids, qrSvg: qrSvg((fluids && fluids.orderUrl) || "https://www.amsoil.com/shop/?zo=30713116") };
+    const track = (to) => `https://tunedyota.com/.netlify/functions/amsoil-go?c=${encodeURIComponent(d.recordId)}&to=${to}`;
+    const amsoil = { fluids, qrSvg: qrSvg(track("shop")), pcUrl: track("pc") };
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin, calibration, installer: inst.name,
       installerRegion: inst.region, calibrationDate, certNo, issueDate, amsoil });
