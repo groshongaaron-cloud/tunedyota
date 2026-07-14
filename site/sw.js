@@ -1,4 +1,45 @@
-// site/sw.js — Tuned Yota console service worker: receive web push + open on tap.
+// site/sw.js — Tuned Yota installer console: web push + offline shell cache.
+var CACHE_VERSION = "ty-console-v1"; // bump when the SHELL list changes
+var SHELL = ["/installer.html", "/commission-tally.js", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"];
+
+self.addEventListener("install", function (event) {
+  event.waitUntil(caches.open(CACHE_VERSION).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
+});
+self.addEventListener("activate", function (event) {
+  event.waitUntil(caches.keys().then(function (keys) {
+    return Promise.all(keys.map(function (k) { return k === CACHE_VERSION ? null : caches.delete(k); }));
+  }).then(function () { return self.clients.claim(); }));
+});
+self.addEventListener("fetch", function (event) {
+  var req = event.request;
+  if (req.method !== "GET") return;
+  var url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  var isNav = req.mode === "navigate" && url.pathname === "/installer.html";
+  var isShell = isNav || SHELL.indexOf(url.pathname) >= 0;
+  if (!isShell) return; // pass through the public site + all /.netlify/functions/* (never cached)
+  var key = isNav ? "/installer.html" : req;
+  event.respondWith(
+    caches.open(CACHE_VERSION).then(function (cache) {
+      return cache.match(key).then(function (cached) {
+        var network = fetch(req).then(function (res) {
+          if (res && res.status === 200) cache.put(key, res.clone());
+          return res;
+        }).catch(function () { return cached; });
+        return cached || network; // stale-while-revalidate
+      });
+    })
+  );
+});
+// Background Sync (where supported): tell open clients to flush their offline queue.
+self.addEventListener("sync", function (event) {
+  if (event.tag === "ty-flush") {
+    event.waitUntil(self.clients.matchAll({ includeUncontrolled: true }).then(function (list) {
+      list.forEach(function (c) { c.postMessage({ type: "ty-flush" }); });
+    }));
+  }
+});
+
 self.addEventListener("push", function (event) {
   var d = {};
   try { d = event.data ? event.data.json() : {}; } catch (e) { d = {}; }

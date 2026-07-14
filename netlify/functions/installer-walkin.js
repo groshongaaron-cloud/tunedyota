@@ -5,17 +5,19 @@
 // date (defaults to today), which then flows through the normal close-out → cert +
 // OTT commission report exactly like an at-event walk-in. Ownership is enforced by
 // market routing. See memory: "walk-ins are EVERYDAY, not event-only".
-const { cfg, createRecord, createTolerant } = require("./lib/airtable.js");
+const { cfg, createRecord, createTolerant, listRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
 
 async function processWalkin(body, deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false,
-          create = (a) => createRecord({ fetchImpl, ...a }) } = deps;
+          create = (a) => createRecord({ fetchImpl, ...a }),
+          list = (a) => listRecords({ fetchImpl, ...a }) } = deps;
   const d = body || {};
   const name = String(d.name || "").trim();
   const phone = String(d.phone || "").trim();
+  const clientKey = String(d.clientKey || "").trim();
   if (!name || !phone) return { status: "error", error: "missing-contact" };
   const city = String(d.city || "").trim();
   const market = getMarket(city);
@@ -34,10 +36,28 @@ async function processWalkin(body, deps) {
   const c = cfg(env);
   const vehicle = String(d.vehicle || "").trim();
   const email = String(d.email || "").trim();
+  // Best-effort dedupe: an offline walk-in replay carries a client-generated clientKey.
+  // If a booking already exists with that Client Key, return it instead of creating a
+  // duplicate. An absent Client Key column simply yields no match — swallow errors and
+  // fall through to create.
+  if (clientKey) {
+    try {
+      const dupes = await list({ token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula: `{Client Key}="${clientKey}"` });
+      if (dupes && dupes.length) {
+        const g = dupes[0], gf = g.fields || {};
+        return { status: "booked", recordId: g.id, booking: {
+          id: g.id, city: gf.City || market.city, dateISO: String(gf["Event Date"] || dateISO).slice(0, 10),
+          installer: ownerKey, slot: "", slotLabel: "", name: gf.Name || name, vehicle: gf.Vehicle || vehicle,
+          phone: gf.Phone || phone, email: gf.Email || email, mods: gf.Modifications || "", status: gf.Status || "Booked",
+          isWalkin: true, calibration: "", vin: "", tuningPlatform: "", calibrationType: "", ecuId: "", gearSize: "", mileage: "" } };
+      }
+    } catch (e) { /* column may not exist yet — fall through to create */ }
+  }
   const fields = { City: market.city, "Event Date": dateISO, Name: name, Vehicle: vehicle,
     Phone: phone, Email: email, Status: "Booked", Source: "installer:walk-in", Installer: ownerKey };
+  if (clientKey) fields["Client Key"] = clientKey;
   let rec;
-  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Email"]); }
+  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Email", "Client Key"]); }
   catch (e) { return { status: "error", error: "store-unavailable" }; }
 
   const id = rec && rec.id;

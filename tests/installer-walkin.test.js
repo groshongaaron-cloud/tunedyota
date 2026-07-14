@@ -83,3 +83,28 @@ test("persists a customer email when provided", async () => {
   assert.equal(out.status, "booked");
   assert.equal(created[0].Email, "pat@example.com");
 });
+
+test("a clientKey matching an existing booking returns it without creating", async () => {
+  let created = false;
+  const existing = { id: "recX", fields: { City: "Fargo", "Event Date": "2026-08-01", Name: "Dana", Vehicle: "Tundra", Phone: "1", Email: "", Installer: "aaron", "Client Key": "ck-1" } };
+  const out = await processWalkin({ city: "fargo", name: "Dana", phone: "1", clientKey: "ck-1" },
+    { key: "aaron", admin: false, list: async () => [existing], create: async () => { created = true; return {}; } });
+  assert.equal(out.status, "booked");
+  assert.equal(out.recordId, "recX");
+  assert.equal(created, false);
+});
+
+test("a new clientKey creates and writes Client Key", async () => {
+  let fields;
+  const out = await processWalkin({ city: "fargo", name: "Dana", phone: "1", clientKey: "ck-2" },
+    { key: "aaron", admin: false, list: async () => [], create: async (a) => { fields = a.fields; return { id: "recNew" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(out.recordId, "recNew");
+  assert.equal(fields["Client Key"], "ck-2");
+});
+
+test("no clientKey still creates as before (no lookup required)", async () => {
+  const out = await processWalkin({ city: "fargo", name: "Dana", phone: "1" },
+    { key: "aaron", admin: false, list: async () => [], create: async () => ({ id: "rec3" }) });
+  assert.equal(out.status, "booked");
+});
