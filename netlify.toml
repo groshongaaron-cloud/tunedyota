@@ -41,6 +41,7 @@
   schedule = "0 14 * * *"
 
 # Daily AMSOIL follow-up: ~3 days post-tune (netlify/functions/amsoil-followup.js).
+# Active 2026-07-14 (AMSOIL_FOLLOWUP_START=2020-01-01 → all completed tunes on record).
 [functions."amsoil-followup"]
   schedule = "0 15 * * *"
 
