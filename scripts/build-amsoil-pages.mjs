@@ -37,6 +37,12 @@ function categoryOf(name) {
 }
 const prod = (sku) => CAT.products[sku];
 
+// Shared with the guide generator (Front B): live retail price + product-image tag.
+const priceOfP = (p) => (p && typeof p.salePrice === "number" && p.salePrice > 0 ? p.salePrice
+  : p && typeof p.retailPrice === "number" && p.retailPrice > 0 ? p.retailPrice : null);
+const imgTagP = (p, size) => (p && p.image && /\.jpg$/i.test(p.image))
+  ? `<img class="pimg" src="${p.image}" alt="${ESC(p.name)}" loading="lazy" width="${size}" height="${size}">` : "";
+
 // ---- shared chrome (mirrors build-state-pages.mjs; AMSOIL link included) ----
 const FONTS = `<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">`;
 const SITECSS = `<link rel="stylesheet" href="site.css">`;
@@ -324,9 +330,129 @@ export function buildAmsoilGarageStore() {
   fs.writeFileSync(file, html.replace(re, () => block));
 }
 
+// ---- Front B: national AMSOIL product-guide pages ------------------------------
+// Data-driven informational guides targeting high-volume "AMSOIL <product>" search +
+// AI intent, written from AMSOIL's approved Dealer Sales Briefs, with real product
+// cards (image + live price + ?zo= order) and the same chrome/schema as the vehicle
+// pages. National (no per-vehicle capacity gate). More guides = more GUIDES entries.
+const GUIDES = [
+  {
+    slug: "amsoil-synthetic-motor-oil-guide",
+    h1: "AMSOIL Synthetic Motor Oil",
+    title: "AMSOIL Synthetic Motor Oil — Signature Series Guide, Prices &amp; Where to Buy | Tuned Yota",
+    desc: "AMSOIL Signature Series 100% synthetic motor oil: 75% more wear protection, 100% LSPI protection, and a guaranteed 25,000-mile drain. Compare Signature Series, XL and OE, see prices, and order from Tuned Yota — an Authorized AMSOIL Dealer.",
+    answer: "AMSOIL Signature Series 100% Synthetic Motor Oil delivers <strong>75% more wear protection</strong> and <strong>100% protection against LSPI</strong>, with a guaranteed <strong>25,000-mile / 1-year</strong> drain interval — built for turbocharged and direct-injection engines. Order it from Tuned Yota, an Authorized AMSOIL Dealer, shipped direct anywhere in the U.S.",
+    skus: ["SS-0W20-QT", "SS-5W30-QT", "SS-5W20-QT"],
+    sections: [
+      { h: "Why AMSOIL Signature Series", bullets: [
+        "<strong>75% more wear protection</strong> for longer engine life.<sup>1</sup>",
+        "<strong>100% protection against LSPI</strong> — safeguards modern turbo &amp; direct-injection engines.<sup>2</sup>",
+        "<strong>Guaranteed up to 25,000 miles or 1 year</strong> between oil changes.",
+        "Purpose-built for turbocharged and direct-injection engines — and turbo vehicles use the normal-service interval, not severe.",
+      ] },
+      { h: "Signature Series vs. XL vs. OE — which AMSOIL oil?", html: "<p>AMSOIL offers three synthetic tiers. <strong>Signature Series</strong> is the top tier — 75% more wear protection and up to a 25,000-mile drain — and it's what we run in tuned Toyota and Lexus builds. <strong>XL / Extended-Life</strong> adds 37% more cleaning power with a 20,000-mile guarantee. <strong>OE</strong> is the OEM-interval, API- and dexos-licensed choice with 47% more wear protection than conventional oil. For a tuned, towing, or high-performance vehicle, choose Signature Series.</p>" },
+    ],
+    faqs: [
+      ["What is the drain interval for AMSOIL Signature Series?", "Up to 25,000 miles or one year, whichever comes first — guaranteed. Turbocharged vehicles fall under the normal-service category. Always change the oil filter when you change the oil."],
+      ["Does using AMSOIL void my vehicle's warranty?", "No. Using AMSOIL synthetic lubricants does not void your vehicle or equipment manufacturer's warranty, and all AMSOIL lubricants and filters are covered by the AMSOIL Limited Warranty."],
+      ["Why isn't Signature Series API-licensed?", "AMSOIL formulates Signature Series to exceed minimum industry standards rather than to a one-size-fits-all license, which lets it adopt new protection technology faster. AMSOIL's OE line is API- and dexos-licensed for those who prefer it."],
+      ["Where can I buy AMSOIL synthetic oil?", "From Tuned Yota, an Authorized AMSOIL Dealer. Order online and it ships direct from AMSOIL anywhere in the U.S. — or enroll as a Preferred Customer to save up to 25%."],
+    ],
+    footnotes: "<sup>1</sup> 75% more wear protection based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> 100% LSPI protection based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.",
+  },
+];
+
+function guideCards(skus) {
+  return skus.map(prod).filter(Boolean).map((p) => {
+    const price = priceOfP(p);
+    return `<div class="fl">${imgTagP(p, 50)}<div class="pinfo"><span class="sys">${ESC(categoryOf(p.name))}</span><span class="prd">${ESC(p.name)}</span></div><div class="pbuy">${price != null ? `<span class="price">$${price.toFixed(2)}</span>` : ""}<a class="ord" target="_blank" rel="noopener" href="${amsoilUrl(p.productPath)}">Order &#9658;</a></div></div>`;
+  }).join("");
+}
+
+function guidePage(g, vehModels) {
+  const url = `https://tunedyota.com/${g.slug}`;
+  const products = g.skus.map(prod).filter(Boolean);
+  const offers = products.map((p) => {
+    const price = priceOfP(p);
+    if (price == null) return null;
+    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."}}`;
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
+  }).filter(Boolean).join(",");
+  const faqSchema = g.faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
+  const faqVisible = g.faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
+  const sections = g.sections.map((s) => s.bullets
+    ? `  <h2>${ESC(s.h)}</h2>\n  <ul class="lp-bul">${s.bullets.map((b) => `<li>${b}</li>`).join("")}</ul>`
+    : `  <h2>${ESC(s.h)}</h2>\n  ${s.html}`).join("\n");
+  const vehLinks = vehModels.slice(0, 8).map((m) => `<a href="amsoil-${m.slug}.html">${ESC(m.make)} ${ESC(m.model)}</a>`).join("") + `<a href="amsoil-garage.html">All vehicles →</a>`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${g.title}</title>
+<meta name="description" content="${g.desc}">
+<link rel="canonical" href="${url}">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Store","@id":"${url}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${url}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"Country","name":"United States"},"description":${JSON.stringify(g.desc)}${offers ? `,"hasOfferCatalog":{"@type":"OfferCatalog","name":${JSON.stringify(g.h1)},"itemListElement":[${offers}]}` : ""}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[${faqSchema}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tunedyota.com/"},{"@type":"ListItem","position":2,"name":"AMSOIL Garage","item":"https://tunedyota.com/amsoil-garage"},{"@type":"ListItem","position":3,"name":${JSON.stringify(g.h1)},"item":"${url}"}]}
+</script>
+${FONTS}
+${SITECSS}
+${FAVICON}
+${STYLE}
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+${NAV}
+<a id="main" tabindex="-1"></a>
+<div class="lp">
+  <div class="lp-eyebrow">Tuned Yota · Authorized AMSOIL Dealer</div>
+  <h1>${ESC(g.h1)}</h1>
+  <div class="lp-answer">${g.answer}</div>
+  <div class="lp-cta">
+    <a class="btn primary" target="_blank" rel="noopener" href="${amsoilUrl("/shop/")}">Shop AMSOIL →</a>
+    <a class="btn outline" target="_blank" rel="noopener" href="${amsoilUrl("/offers/pc/")}">Save 25% as a Preferred Customer</a>
+  </div>
+
+  <h2>Order online — real prices, shipped direct</h2>
+  <p>Ships direct from AMSOIL with Tuned Yota's dealer referral attached.</p>
+  ${guideCards(g.skus)}
+
+${sections}
+
+  <div class="lp-book">
+    <h2>Save up to 25% for life</h2>
+    <p>Become a Preferred Customer under Tuned Yota — wholesale pricing (up to 25% off retail), points, exclusive promotions and free gear. The membership pays for itself in about two oil changes.</p>
+    <a class="btn primary" target="_blank" rel="noopener" href="${amsoilUrl("/offers/pc/")}">Become a Preferred Customer →</a>
+  </div>
+
+  <h2>AMSOIL synthetic oil — FAQ</h2>
+${faqVisible}
+
+  <h2>AMSOIL for your Toyota or Lexus</h2>
+  <div class="lp-veh">${vehLinks}</div>
+
+  <p class="lp-disc">${g.footnotes || ""} Product recommendations are from AMSOIL's official materials; checkout completes on amsoil.com. Tuned Yota is an Authorized AMSOIL Dealer.</p>
+</div>
+${FQSCRIPT}
+${FOOTER}
+${FQA11Y}
+</body>
+</html>
+`;
+}
+
+export const AMSOIL_GUIDE_FILES = GUIDES.map((g) => `${g.slug}.html`);
+
 export function buildAmsoilPages() {
   const list = models();
   for (const m of list) fs.writeFileSync(path.join(SITE, `amsoil-${m.slug}.html`), page(m, list));
+  for (const g of GUIDES) fs.writeFileSync(path.join(SITE, `${g.slug}.html`), guidePage(g, list));
   buildAmsoilGarageStore();
   return list.length;
 }
