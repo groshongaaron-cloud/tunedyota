@@ -77,13 +77,26 @@ h2{font-family:'Spectral',serif;font-weight:600;font-size:24px;color:var(--ink);
 .gen{background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);padding:16px 18px;margin:0 0 12px}
 .gen h3{font-family:'Spectral',serif;font-weight:600;font-size:17px;color:var(--ink);margin:0 0 4px}
 .gen .eng{font-size:12.5px;color:var(--sage-d);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-.fl{display:flex;gap:10px;align-items:center;border-top:1px solid var(--line);padding:10px 0}
+.fl{display:flex;gap:11px;align-items:center;border-top:1px solid var(--line);padding:11px 0}
 .fl:first-of-type{border-top:none;margin-top:8px}
-.fl .sys{flex:0 0 40%;font-weight:800;color:#222;font-size:13.5px}
-.fl .prd{flex:1;font-size:13px;color:#555}
-.fl .cap{font-size:12px;color:var(--sage-d);font-weight:700;white-space:nowrap}
+.fl .pimg{flex:0 0 50px;width:50px;height:50px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px}
+.fl .pinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.fl .sys{font-weight:700;color:var(--sage-d);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.fl .prd{font-size:13px;color:#333;font-weight:600;line-height:1.25}
+.fl .cap{font-size:11.5px;color:var(--sage-d);font-weight:700}
+.fl .pbuy{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.fl .price{font-weight:900;color:var(--ink);font-size:14px;white-space:nowrap}
 .fl .ord{background:var(--ink);color:#fff;border-radius:99px;padding:7px 13px;font-weight:900;text-decoration:none;font-size:12px;white-space:nowrap}
 .fl .ord:hover{background:var(--brown)}
+.hero-prod{display:flex;gap:16px;align-items:center;background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);padding:16px 18px;margin:16px 0 4px}
+.hero-prod .pimg{flex:0 0 104px;width:104px;height:104px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px}
+.hero-prod .hp-info{flex:1;min-width:0}
+.hero-prod .hp-name{font-family:'Spectral',serif;font-weight:600;font-size:18px;color:var(--ink);margin:3px 0 2px;line-height:1.2}
+.hero-prod .hp-price{font-size:16px;font-weight:900;color:var(--ink);margin-bottom:11px}
+.hero-prod .hp-pc{font-size:12.5px;font-weight:600;color:var(--sage-d)}
+.hero-prod .hp-cta{display:flex;flex-wrap:wrap;gap:9px}
+.hero-prod .hp-cta .btn{padding:11px 18px;font-size:13px}
+@media(max-width:520px){.hero-prod{flex-direction:column;text-align:center}.hero-prod .hp-cta{justify-content:center}}
 ul.lp-bul{list-style:none;display:grid;gap:9px;margin-top:6px}
 ul.lp-bul li{position:relative;padding-left:24px;font-size:14.5px;line-height:1.5}
 ul.lp-bul li::before{content:"";position:absolute;left:0;top:5px;width:11px;height:11px;border-radius:3px;background:var(--sage)}
@@ -125,6 +138,14 @@ function page(model, models) {
   const primaryOil = products.find((p) => categoryOf(p.name) === "Synthetic Motor Oil");
   const oilPhrase = primaryOil ? primaryOil.name.replace(/ 100% Synthetic Motor Oil/i, "").replace(/Signature Series /i, "AMSOIL Signature Series ") : "AMSOIL synthetic motor oil";
 
+  // Live retail price (salePrice wins) + a product-image tag. Prices come from the
+  // auto-synced catalog; a product without a synced price simply shows no price.
+  // Only self-hosted .jpg product shots render (all 13 catalog products now have one).
+  const priceOf = (p) => (typeof p.salePrice === "number" && p.salePrice > 0 ? p.salePrice
+    : typeof p.retailPrice === "number" && p.retailPrice > 0 ? p.retailPrice : null);
+  const imgTag = (p, size) => (p && p.image && /\.jpg$/i.test(p.image))
+    ? `<img class="pimg" src="${p.image}" alt="${ESC(p.name)}" loading="lazy" width="${size}" height="${size}">` : "";
+
   // Per-generation fluid cards. Capacity/interval only when verified.
   const genCards = gens.map((g) => {
     const rows = (g.bundle || []).map((sku) => {
@@ -134,7 +155,9 @@ function page(model, models) {
             ? `<span class="cap">${g.systems.find((s) => s.sku === sku).capacity} ${g.systems.find((s) => s.sku === sku).unit}</span>` : "")
         : "";
       const sys = (g.systems.find((s) => s.sku === sku) || {}).system || categoryOf(p.name);
-      return `<div class="fl"><span class="sys">${ESC(sys)}</span><span class="prd">${ESC(p.name)}</span>${detail}<a class="ord" target="_blank" rel="noopener" href="${amsoilUrl(p.productPath)}">Order &#9658;</a></div>`;
+      const price = priceOf(p);
+      const priceHtml = price != null ? `<span class="price">$${price.toFixed(2)}</span>` : "";
+      return `<div class="fl">${imgTag(p, 50)}<div class="pinfo"><span class="sys">${ESC(sys)}</span><span class="prd">${ESC(p.name)}</span>${detail}</div><div class="pbuy">${priceHtml}<a class="ord" target="_blank" rel="noopener" href="${amsoilUrl(p.productPath)}">Order &#9658;</a></div></div>`;
     }).join("");
     const capNote = g.verified ? "" : `<p style="margin:8px 0 0;font-size:12px;color:var(--sage-d)">Exact fill capacities &amp; severe-service intervals for this configuration are in your <a href="amsoil-garage.html?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}" style="color:var(--sage-d);font-weight:700">AMSOIL Garage</a>.</p>`;
     return `<div class="gen"><div class="eng">${ESC(g.y)}</div><h3>${ESC(name)} <span style="color:var(--sage-d);font-weight:600">${ESC(g.e)}</span></h3>${rows}${capNote}</div>`;
@@ -146,8 +169,6 @@ function page(model, models) {
   // catalog (salePrice wins); the weekly price-sync regenerates these pages so it
   // never drifts. A product without a synced price is left out of the schema (it
   // still appears in the visible fluid cards) rather than emitting a bare Product.
-  const priceOf = (p) => (typeof p.salePrice === "number" && p.salePrice > 0 ? p.salePrice
-    : typeof p.retailPrice === "number" && p.retailPrice > 0 ? p.retailPrice : null);
   const offers = products.map((p) => {
     const price = priceOf(p);
     if (price == null) return null;
@@ -201,6 +222,8 @@ ${NAV}
     <a class="btn primary" href="amsoil-garage.html?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}">Open your AMSOIL Garage →</a>
     <a class="btn outline" target="_blank" rel="noopener" href="${amsoilUrl("/shop/")}">Shop the full catalog</a>
   </div>
+${primaryOil ? `
+  <div class="hero-prod">${imgTag(primaryOil, 104)}<div class="hp-info"><div class="lp-eyebrow">Recommended engine oil</div><div class="hp-name">${ESC(primaryOil.name)}</div>${priceOf(primaryOil) != null ? `<div class="hp-price">$${priceOf(primaryOil).toFixed(2)}<span class="hp-pc"> retail · Preferred Customers save up to 25%</span></div>` : ""}<div class="hp-cta"><a class="btn primary" target="_blank" rel="noopener" href="${amsoilUrl(primaryOil.productPath)}">Order &#9658;</a><a class="btn outline" target="_blank" rel="noopener" href="${amsoilUrl("/offers/pc/")}">Save 25% as a Preferred Customer</a></div></div></div>` : ""}
 
   <h2>AMSOIL fluids for the ${ESC(name)}</h2>
   <p>AMSOIL's recommended product, viscosity, and filter for each ${ESC(name)} engine and model year (from AMSOIL's official vehicle guide). Tap <strong>Order</strong> to add any item to your AMSOIL cart with Tuned Yota's dealer referral attached.</p>
