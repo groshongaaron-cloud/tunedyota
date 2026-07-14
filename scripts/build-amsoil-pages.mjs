@@ -475,6 +475,72 @@ const GUIDES = [
     ],
     footnotes: "<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30. Magnuson-Moss Warranty Act information is general and not legal advice.",
   },
+  {
+    slug: "amsoil-0w20-guide",
+    h1: "AMSOIL 0W-20 Synthetic Oil",
+    title: "AMSOIL 0W-20 Synthetic Oil — Signature Series Guide &amp; Price | Tuned Yota",
+    desc: "AMSOIL Signature Series 0W-20 100% synthetic motor oil: 75% more wear protection, 100% LSPI protection and a 25,000-mile guarantee — the grade most modern Toyota and Lexus engines specify. See the price and order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    answer: "AMSOIL Signature Series <strong>0W-20</strong> is the grade most modern Toyota and Lexus engines call for — and it delivers <strong>75% more wear protection</strong>, <strong>100% LSPI protection</strong> and a guaranteed <strong>25,000-mile</strong> drain. Order it from Tuned Yota, an Authorized AMSOIL Dealer.",
+    skus: ["SS-0W20-QT"],
+    sections: [
+      { h: "Which vehicles use 0W-20?", html: "<p>0W-20 is the factory grade for a large share of modern Toyota and Lexus engines — including the Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, Camry, Highlander and many Lexus models. Always confirm your exact grade in the <a href=\"amsoil-garage.html\">AMSOIL Garage</a> or your owner's manual.</p>" },
+      { h: "Why AMSOIL Signature Series 0W-20", bullets: [
+        "<strong>75% more wear protection</strong> for longer engine life.<sup>1</sup>",
+        "<strong>100% protection against LSPI</strong> — critical for direct-injection and turbo engines.<sup>2</sup>",
+        "<strong>Guaranteed up to 25,000 miles or 1 year</strong> between changes.",
+      ] },
+    ],
+    faqs: [
+      ["Is AMSOIL 0W-20 good for my Toyota?", "Yes — 0W-20 is the factory grade for most modern Toyota and Lexus engines, and AMSOIL Signature Series 0W-20 meets and exceeds those requirements while adding 75% more wear protection and a 25,000-mile drain guarantee."],
+      ["Can I use AMSOIL 0W-20 instead of the dealer's oil?", "Yes. AMSOIL 0W-20 is a safe, higher-performance alternative to OEM oil and does not void your warranty — see our AMSOIL vs. OEM comparison for details."],
+      ["Where can I buy AMSOIL 0W-20?", "From Tuned Yota, an Authorized AMSOIL Dealer — shipped anywhere in the U.S., or save up to 25% as a Preferred Customer."],
+    ],
+    footnotes: "<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.",
+  },
+  {
+    slug: "amsoil-5w30-guide",
+    h1: "AMSOIL 5W-30 Synthetic Oil",
+    title: "AMSOIL 5W-30 Synthetic Oil — Signature Series Guide &amp; Price | Tuned Yota",
+    desc: "AMSOIL Signature Series 5W-30 100% synthetic motor oil: 75% more wear protection, 100% LSPI protection and a 25,000-mile guarantee. See the price and order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    answer: "AMSOIL Signature Series <strong>5W-30</strong> is a top-tier full synthetic delivering <strong>75% more wear protection</strong>, <strong>100% LSPI protection</strong> and a guaranteed <strong>25,000-mile</strong> drain — for the engines that specify 5W-30 and for added protection under load and heat. Order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    skus: ["SS-5W30-QT"],
+    sections: [
+      { h: "Which vehicles use 5W-30?", html: "<p>5W-30 is specified for many Toyota, Lexus and other vehicles, and it's a common choice for towing, high-mileage and performance builds that call for a slightly heavier film. Confirm your exact grade in the <a href=\"amsoil-garage.html\">AMSOIL Garage</a> or your owner's manual.</p>" },
+      { h: "Why AMSOIL Signature Series 5W-30", bullets: [
+        "<strong>75% more wear protection</strong> for longer engine life.<sup>1</sup>",
+        "<strong>100% protection against LSPI</strong> — protects modern turbo and direct-injection engines.<sup>2</sup>",
+        "<strong>Guaranteed up to 25,000 miles or 1 year</strong> between changes.",
+      ] },
+    ],
+    faqs: [
+      ["Is AMSOIL 5W-30 a full synthetic?", "Yes — AMSOIL Signature Series 5W-30 is a 100% synthetic motor oil engineered to exceed industry standards, with 75% more wear protection and a 25,000-mile drain guarantee."],
+      ["Can I use AMSOIL 5W-30 instead of OEM oil?", "Yes. It's a safe, higher-performance alternative to OEM oil and does not void your warranty — see our AMSOIL vs. OEM comparison."],
+      ["Where can I buy AMSOIL 5W-30?", "From Tuned Yota, an Authorized AMSOIL Dealer — shipped anywhere in the U.S., or save up to 25% as a Preferred Customer."],
+    ],
+    footnotes: "<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.",
+  },
+  {
+    slug: "amsoil-5w20-guide",
+    h1: "AMSOIL 5W-20 Synthetic Oil",
+    title: "AMSOIL 5W-20 Synthetic Oil — Signature Series Guide &amp; Price | Tuned Yota",
+    desc: "AMSOIL Signature Series 5W-20 100% synthetic motor oil: 75% more wear protection, 100% LSPI protection and a 25,000-mile guarantee — the grade many Toyota and Lexus engines specify. See the price and order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    answer: "AMSOIL Signature Series <strong>5W-20</strong> is a top-tier full synthetic delivering <strong>75% more wear protection</strong>, <strong>100% LSPI protection</strong> and a guaranteed <strong>25,000-mile</strong> drain — the grade many Toyota and Lexus engines specify. Order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    skus: ["SS-5W20-QT"],
+    sections: [
+      { h: "Which vehicles use 5W-20?", html: "<p>5W-20 is the factory grade for many Toyota and Lexus engines. Confirm your exact grade in the <a href=\"amsoil-garage.html\">AMSOIL Garage</a> or your owner's manual.</p>" },
+      { h: "Why AMSOIL Signature Series 5W-20", bullets: [
+        "<strong>75% more wear protection</strong> for longer engine life.<sup>1</sup>",
+        "<strong>100% protection against LSPI</strong> — protects modern turbo and direct-injection engines.<sup>2</sup>",
+        "<strong>Guaranteed up to 25,000 miles or 1 year</strong> between changes.",
+      ] },
+    ],
+    faqs: [
+      ["Is AMSOIL 5W-20 good for my Toyota?", "Yes — 5W-20 is the factory grade for many Toyota and Lexus engines, and AMSOIL Signature Series 5W-20 meets and exceeds those requirements with 75% more wear protection and a 25,000-mile drain guarantee."],
+      ["Can I use AMSOIL 5W-20 instead of OEM oil?", "Yes. It's a safe, higher-performance alternative to OEM oil and does not void your warranty — see our AMSOIL vs. OEM comparison."],
+      ["Where can I buy AMSOIL 5W-20?", "From Tuned Yota, an Authorized AMSOIL Dealer — shipped anywhere in the U.S., or save up to 25% as a Preferred Customer."],
+    ],
+    footnotes: "<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.",
+  },
 ];
 
 function guideCards(skus) {
@@ -580,6 +646,18 @@ const STATES = [
   { name: "Arizona", slug: "arizona", cities: ["Phoenix", "Tucson", "Mesa"], served: false, angle: "In Arizona's extreme desert heat, AMSOIL's thermal-breakdown resistance keeps engines and transmissions protected." },
   { name: "Michigan", slug: "michigan", cities: ["Detroit", "Grand Rapids", "Lansing"], served: false, angle: "Michigan's harsh winters and daily miles are ideal for AMSOIL's cold-start protection and extended drains." },
   { name: "California", slug: "california", cities: ["Los Angeles", "San Diego", "Sacramento"], served: false, angle: "From California commutes to canyon runs and desert heat, AMSOIL's synthetic protection outperforms conventional oil." },
+  { name: "Georgia", slug: "georgia", cities: ["Atlanta", "Augusta", "Savannah"], served: false, angle: "Georgia's heat, humidity and Atlanta stop-and-go traffic are hard on fluids — AMSOIL's full-synthetic protection resists thermal breakdown where conventional oil thins out." },
+  { name: "Ohio", slug: "ohio", cities: ["Columbus", "Cleveland", "Cincinnati"], served: false, angle: "From Ohio's snowy winters to daily highway miles, AMSOIL's cold-start protection and extended drains keep engines protected all year." },
+  { name: "Pennsylvania", slug: "pennsylvania", cities: ["Philadelphia", "Pittsburgh", "Allentown"], served: false, angle: "Pennsylvania's cold winters, hilly terrain and towing demand a fluid with reserve protection — AMSOIL delivers where OEM oil is stretched thin." },
+  { name: "Illinois", slug: "illinois", cities: ["Chicago", "Aurora", "Springfield"], served: false, angle: "Illinois' brutal winters and Chicago stop-and-go traffic are exactly where AMSOIL's cold-start flow and extended drains earn their keep." },
+  { name: "Washington", slug: "washington", cities: ["Seattle", "Spokane", "Tacoma"], served: false, angle: "From Washington's wet commutes to Cascade mountain towing, AMSOIL's synthetic protection handles both the daily grind and the grades." },
+  { name: "Tennessee", slug: "tennessee", cities: ["Nashville", "Memphis", "Knoxville"], served: false, angle: "Tennessee's summer heat and towing across the hills punish ordinary oil — AMSOIL resists thermal breakdown under sustained load." },
+  { name: "North Carolina", slug: "north-carolina", cities: ["Charlotte", "Raleigh", "Greensboro"], served: false, angle: "North Carolina's heat, humidity and mountain-to-coast terrain are a workout for fluids — AMSOIL's protection keeps up in every condition." },
+  { name: "Missouri", slug: "missouri", cities: ["Kansas City", "St. Louis", "Springfield"], served: false, angle: "Missouri's big temperature swings and long highway miles favor AMSOIL's all-season protection and 25,000-mile drain intervals." },
+  { name: "Montana", slug: "montana", cities: ["Billings", "Missoula", "Bozeman"], served: false, angle: "Montana's extreme cold, big country and heavy towing demand more than OEM fluids — AMSOIL delivers cold-start protection and reserve durability." },
+  { name: "Idaho", slug: "idaho", cities: ["Boise", "Meridian", "Nampa"], served: false, angle: "Idaho's cold winters and mountain towing call for a fluid with reserve protection — AMSOIL delivers cold-flow and wear protection where it counts." },
+  { name: "Oklahoma", slug: "oklahoma", cities: ["Oklahoma City", "Tulsa", "Norman"], served: false, angle: "Oklahoma's heat and heavy towing are exactly where AMSOIL's thermal-breakdown resistance protects engines, transmissions and axles." },
+  { name: "Indiana", slug: "indiana", cities: ["Indianapolis", "Fort Wayne", "Evansville"], served: false, angle: "From Indiana's cold winters to daily highway miles, AMSOIL's cold-start protection and extended drains keep engines protected." },
 ];
 
 function geoPage(st, vehModels) {

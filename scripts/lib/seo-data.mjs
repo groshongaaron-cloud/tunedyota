@@ -31,8 +31,11 @@ export const HEAD_PAGES = [
   "amsoil-lexus-gx.html","amsoil-lexus-lx570.html","amsoil-lexus-rx350.html","amsoil-lexus-ls460.html",
   "amsoil-synthetic-motor-oil-guide.html","amsoil-synthetic-atf-guide.html","amsoil-severe-gear-guide.html",
   "amsoil-ea-oil-filter-guide.html","is-amsoil-worth-it.html","amsoil-vs-oem-toyota-lexus-fluids.html",
+  "amsoil-0w20-guide.html","amsoil-5w30-guide.html","amsoil-5w20-guide.html",
   "amsoil-minnesota.html","amsoil-iowa.html","amsoil-wisconsin.html","amsoil-north-dakota.html","amsoil-south-dakota.html","amsoil-nebraska.html",
   "amsoil-texas.html","amsoil-florida.html","amsoil-colorado.html","amsoil-arizona.html","amsoil-michigan.html","amsoil-california.html",
+  "amsoil-georgia.html","amsoil-ohio.html","amsoil-pennsylvania.html","amsoil-illinois.html","amsoil-washington.html","amsoil-tennessee.html",
+  "amsoil-north-carolina.html","amsoil-missouri.html","amsoil-montana.html","amsoil-idaho.html","amsoil-oklahoma.html","amsoil-indiana.html",
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 
@@ -45,6 +48,7 @@ export const PRIORITY = {
   "amsoil-synthetic-motor-oil-guide.html": "0.8", "amsoil-synthetic-atf-guide.html": "0.8",
   "amsoil-severe-gear-guide.html": "0.8", "amsoil-ea-oil-filter-guide.html": "0.8", "is-amsoil-worth-it.html": "0.8",
   "amsoil-vs-oem-toyota-lexus-fluids.html": "0.9",
+  "amsoil-0w20-guide.html": "0.8", "amsoil-5w30-guide.html": "0.8", "amsoil-5w20-guide.html": "0.8",
 };
 // loc path for a filename (index -> "/", others -> "/name" without .html).
 export function locFor(file) {
