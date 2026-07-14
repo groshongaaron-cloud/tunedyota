@@ -111,6 +111,14 @@ test("event reminder names date, time, city, and address", () => {
   assert.ok(m.html.includes("9:00 AM") && m.html.includes("Sep 12, 2026"));
   assert.ok(m.text.includes("Jane"));
 });
+test("event reminder never prints a 'To Be Released' venue as a literal address", () => {
+  const event = { city: "Rapid City", state: "SD", label: "July 16, 2026", dateISO: "2026-07-16", address: "To Be Released" };
+  const inst = { name: "Cody Star", phone: "(605) 214-1335" };
+  const m = require("../netlify/functions/lib/templates.js").buildEventReminderCustomerEmail({ Name: "Ben", Email: "b@x.com", Slot: "10:00" }, event, inst, 2);
+  assert.ok(!/to be released/i.test(m.text), "reminder text must not print the placeholder");
+  assert.ok(!/to be released/i.test(m.html), "reminder html must not print the placeholder");
+  assert.ok(/exact address before your event/i.test(m.text), "should promise the address instead");
+});
 test("event reminder uses the customer's booked slot time, not a hardcoded 9 AM", () => {
   const event = { city: "Green Bay", state: "WI", label: "Sep 12, 2026", dateISO: "2026-09-12", address: "X" };
   const inst = { name: "Noah Kreis", phone: "(920) 860-7050" };

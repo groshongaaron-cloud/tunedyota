@@ -144,14 +144,19 @@ function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
   const when = `${event.label || event.dateISO} at ${booking.Slot ? formatSlot(booking.Slot) : "9:00 AM"}`;
   const where = `${event.city}, ${event.state || ""}`.trim().replace(/,\s*$/, "");
   const subject = `Tuned Yota — your ${event.city} tune ${subjWhen}`;
-  const addr = event.address ? `\nAddress: ${event.address}` : "";
+  // A still-"To Be Released" venue must never print as a literal address.
+  const realAddr = event.address && !/to be released/i.test(event.address) ? event.address : "";
+  const addr = realAddr ? `\nAddress: ${realAddr}` : "";
+  const closer = realAddr
+    ? `Please save the address above so you know exactly where to go. `
+    : `We'll email you the exact address before your event. `;
   const text =
     `Hi ${first},\n\nYour Tuned Yota tuning event is ${phrase}.\n\n` +
     `When: ${when}\nWhere: ${where}${addr}\n\n` +
-    `Please save the address above so you know exactly where to go. ` +
+    closer +
     `Questions? Call or text ${inst.name} at ${inst.phone}.\n\n— Tuned Yota · Undeniable Performance\n`;
-  const addrHtml = event.address
-    ? `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Address</td><td style="padding:4px 0;color:#3A2E26"><strong>${esc(event.address)}</strong></td></tr>`
+  const addrHtml = realAddr
+    ? `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Address</td><td style="padding:4px 0;color:#3A2E26"><strong>${esc(realAddr)}</strong></td></tr>`
     : "";
   const html =
     `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px">` +
@@ -161,7 +166,7 @@ function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
     `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">When</td><td style="padding:4px 0;color:#3A2E26">${esc(when)}</td></tr>` +
     `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Where</td><td style="padding:4px 0;color:#3A2E26">${esc(where)}</td></tr>` +
     addrHtml + `</table>` +
-    `<p style="margin-top:12px">Please save the address so you know exactly where to go. Questions? Call or text <strong>${esc(inst.phone)}</strong>.</p>` +
+    `<p style="margin-top:12px">${realAddr ? "Please save the address so you know exactly where to go." : "We'll email you the exact address before your event."} Questions? Call or text <strong>${esc(inst.phone)}</strong>.</p>` +
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
   return { subject, html, text };
 }
