@@ -24,7 +24,35 @@ node scripts/amsoil/verify-platform.mjs confirm "Toyota Tundra" --build   # go l
 regenerate the pages immediately. After confirming: `npm test`, then commit `site/amsoil-garage.json`
 + the regenerated `site/amsoil-*.html` and push master. Revert with `unverify`. Until a platform is
 confirmed, its product/viscosity/filter recommendations still show — only the capacities/intervals
-are withheld. Logic lives in `scripts/amsoil/lib/verify.mjs` (tested by `tests/amsoil-verify.test.js`).
+are withheld **on the SEO pages + garage**. NOTE: the **follow-up email + certificate render capacity
+UNGATED** (they read `resolveFluids` directly), so a wrong capacity reaches customers even before a
+platform is verified — keep the numbers right regardless of the verified flag.
+Logic lives in `scripts/amsoil/lib/verify.mjs` (tested by `tests/amsoil-verify.test.js`).
+
+---
+
+## Correction log
+
+### 2026-07-14 — V8 engine-oil capacities (liters mis-entered as quarts) — CORRECTED (master @ ff465d0)
+A factory-spec cross-check found several V8 oil capacities holding the **liter** figure in the quart
+field. Corrected to with-filter US quarts (owner-approved; still `verified:false` pending installer nod):
+- **5.7L V8 (3UR-FE): 7.4 → 7.9 qt** — Tundra 2007-2021, Sequoia 2008-2022, Land Cruiser 2016-2021 +
+  2008-2015, Lexus LX570 2008-2021.
+- **4.7L V8 (2UZ-FE): 6.1 → 6.4 qt** — Tundra 2000-2009, Sequoia 2001-2009, Land Cruiser 2006-2007,
+  Lexus GX 2005-2009.
+
+### Engine-oil rows still needing installer confirmation (🟡 — "yes, that's what we pour")
+Cross-check flagged these as plausible-but-unconfirmed; confirm the actual fill, then `confirm` the platform:
+- **3.5L V6 2GR-FKS** (2016-2023 Tacoma) — draft 6.4, spec ≈ 6.2 qt.
+- **3.5L V6 2GR-FE** (Camry/RX350/Highlander/RAV4) — draft 6.4 qt.
+- **4.6L V8 1UR** — draft is inconsistent across the SAME engine: Tundra/Sequoia 4.6 = 6.4 qt vs Lexus GX 4.6 = 6.9 qt. Pick one.
+- **2.4L turbo T24A-FTS** (2024+ Tacoma / 2025+ 4Runner / Land Cruiser) — draft 4.8, spec ≈ 5.0 qt.
+- **4.6L 1UR-FSE** (LS460) — draft 8.5 qt (verify).
+- **2.7L I4 2TR-FE** (Tacoma 2.7) — draft 6.0 / 5.5 qt.
+- **4Runner 2005-2009** dual-engine row shows only the 4.0L figure (5.5) — the 4.7L variant needs its own capacity.
+
+Beyond engine oil, diff / transfer-case / ATF capacities across all platforms remain drafts too — the
+`review "<Make Model>"` command lists every system per generation for a full walk-through.
 
 ---
 
