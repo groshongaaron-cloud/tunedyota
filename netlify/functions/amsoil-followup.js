@@ -38,7 +38,7 @@ async function runAmsoilFollowup(deps) {
     const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
     if (!fluids) { skipped++; continue; }   // non-catalog vehicle; leave unmarked (self-heals if catalog grows)
     try {
-      const { subject, html, text } = buildAmsoilEmail({ name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], fluids });
+      const { subject, html, text } = buildAmsoilEmail({ name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], fluids, bookingId: row.id });
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: f.Email, replyTo: OWNER, subject, html, text });
       await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: { "AMSOIL Email Sent": today } });
       sent++;

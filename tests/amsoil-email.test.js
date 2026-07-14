@@ -6,16 +6,26 @@ const { resolveFluids } = require("../netlify/functions/lib/amsoil-fluids.js");
 test("builds a tailored AMSOIL follow-up email with fluids + opt-out", () => {
   const fluids = resolveFluids("2024 Toyota Tacoma 2.4L-T I4", "2024");
   const { subject, html, text } = buildAmsoilEmail({
-    name: "Marcus Bell", vehicle: "2024 Toyota Tacoma 2.4L-T I4", modelYear: "2024", fluids });
+    name: "Marcus Bell", vehicle: "2024 Toyota Tacoma 2.4L-T I4", modelYear: "2024", fluids, bookingId: "recABC" });
   assert.match(subject, /AMSOIL|running strong/i);
   assert.ok(html.includes("Signature Series 0W-20"), "product listed");
   assert.ok(html.includes("ASMQT"), "stock number listed");
-  assert.ok(html.includes(fluids.orderUrl), "CTA links to the dealer-attributed AMSOIL shop");
-  assert.match(html, /zo=30713116/, "referral ZO on the CTA so the order is credited");
+  // Links now route through the tracker (source=email, per-customer c=<id>); the ZO
+  // referral is applied by the redirect target, not printed in the email.
+  assert.match(html, /amsoil-go\?to=shop&s=email&c=recABC/, "shop CTA is tracked per-customer");
+  assert.match(html, /amsoil-go\?to=pc&s=email&c=recABC/, "PC CTA is tracked per-customer");
+  assert.ok(!/Enroll free/i.test(html), "dropped the inaccurate 'Enroll free' claim");
+  assert.match(text, /amsoil-go\?to=shop&s=email&c=recABC/, "text CTA is tracked too");
   assert.match(html, /amsoil-logo\.png/);
   assert.match(html, /UNSUBSCRIBE/);
   assert.match(html, /Marcus/);
   assert.match(text, /UNSUBSCRIBE/);
+});
+test("tracked links omit the customer id when no booking id is supplied", () => {
+  const fluids = resolveFluids("2024 Toyota Tacoma 2.4L-T I4", "2024");
+  const { html } = buildAmsoilEmail({ name: "A", fluids });
+  assert.match(html, /amsoil-go\?to=shop&s=email"/, "shop link still tracked, no c= when id absent");
+  assert.ok(!/&c=/.test(html), "no dangling customer id");
 });
 
 test("degrades safely with no fluids", () => {

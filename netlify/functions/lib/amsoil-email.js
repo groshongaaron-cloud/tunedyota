@@ -8,19 +8,24 @@ function esc(s) {
 }
 const LOGO = "https://tunedyota.com/images/amsoil/amsoil-logo.png";
 const GARAGE = "https://tunedyota.com/amsoil-garage";
-// Dealer-attributed AMSOIL shop link — landing here sets AMSOIL's 30-day ?zo= referral
-// cookie so the order is credited to Tuned Yota (mirrors lib/amsoil-fluids.js ORDER_URL).
-const ORDER = "https://www.amsoil.com/shop/?zo=30713116";
+// Links route through the /amsoil-go tracker (source=email, per-customer via c=<id>),
+// which logs the click then 302s to amsoil.com with the dealer ?zo= so the 30-day
+// referral cookie still sets on landing. Absolute URL — email clients need it.
+const TRACK = "https://tunedyota.com/.netlify/functions/amsoil-go";
+function trackUrl(to, bookingId) {
+  return TRACK + "?to=" + to + "&s=email" + (bookingId ? "&c=" + encodeURIComponent(bookingId) : "");
+}
 
 function firstName(name) { return name ? esc(String(name).trim().split(/\s+/)[0]) : "there"; }
 
-function buildAmsoilEmail({ name, vehicle, modelYear, fluids } = {}) {
+function buildAmsoilEmail({ name, vehicle, modelYear, fluids, bookingId } = {}) {
   const hasFluids = !!(fluids && fluids.systems && fluids.systems.length);
   const veh = esc(fluids && fluids.model
     ? (fluids.make + " " + fluids.model + (fluids.engine ? " " + fluids.engine : ""))
     : (vehicle || "your vehicle"));
-  // Primary CTA → dealer-attributed AMSOIL shop (sets the ?zo= cookie on landing).
-  const url = (fluids && fluids.orderUrl) || ORDER;
+  // Primary CTA → tracked dealer-attributed AMSOIL shop; PC CTA → tracked registration.
+  const url = trackUrl("shop", bookingId);
+  const pcUrl = trackUrl("pc", bookingId);
   const subject = `Keep your ${fluids && fluids.model ? esc(fluids.model) : "tuned Toyota"} running strong - your AMSOIL fluids`;
   const th = 'padding:6px 10px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8f94;';
   const td = 'padding:8px 10px;border-bottom:1px solid #e7e3da;';
@@ -47,7 +52,7 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids } = {}) {
       <div style="text-align:center;margin:24px 0 8px;">
         <a href="${url}" style="display:inline-block;background:#191c1e;color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 26px;border-radius:8px;">Shop your fluids &amp; save up to 25% &#9658;</a>
       </div>
-      <p style="font-size:13px;color:#8a8f94;text-align:center;margin:8px 0 0;">Enroll free as a Preferred Customer under Tuned Yota and save up to 25% on every future order.</p>
+      <p style="font-size:13px;color:#8a8f94;text-align:center;margin:8px 0 0;"><a href="${pcUrl}" style="color:#8a8f94;text-decoration:underline;">Become a Preferred Customer under Tuned Yota</a> and save up to 25% for life on every future order.</p>
     </div>
     <div style="padding:16px 28px;border-top:1px solid #e7e3da;font-size:11px;color:#8a8f94;line-height:1.5;">
       You&rsquo;re receiving this because Tuned Yota tuned your ${veh}. Reply <strong>UNSUBSCRIBE</strong> to stop AMSOIL emails.<br>
