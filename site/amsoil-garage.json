@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-10",
+  "updated": "2026-07-13",
   "products": {
     "SS-0W20-QT": {
       "sku": "SS-0W20-QT",
@@ -37,7 +37,7 @@
       "name": "Ea Oil Filter EA15K09",
       "productPath": "/p/amsoil-oil-filter-eaoilfilt/?code=EA15K09-EA",
       "image": "/images/amsoil/ea15k09.png",
-      "retailPrice": 17.20,
+      "retailPrice": 17.2,
       "salePrice": null,
       "priceVerifiedAt": "DRAFT"
     },
@@ -67,7 +67,7 @@
       "name": "Ea Oil Filter EA15K49",
       "productPath": "/p/amsoil-oil-filter-eaoilfilt/?code=EA15K49-EA",
       "image": "/images/amsoil/ea15k49.png",
-      "retailPrice": 35.80,
+      "retailPrice": 35.8,
       "salePrice": null,
       "priceVerifiedAt": "DRAFT"
     },
@@ -83,13 +83,13 @@
     },
     "SVL-QT": {
       "sku": "SVL-QT",
-      "stockNo": "SVLQT",
+      "stockNo": "SVLPK-EA",
       "name": "SEVERE GEAR 75W-85 100% Synthetic Gear Lube",
       "productPath": "/p/amsoil-severe-gear-75w-85-100-synthetic-gear-lube-svl/",
       "image": "/images/amsoil/svl-75w85.png",
       "retailPrice": 24.59,
       "salePrice": null,
-      "priceVerifiedAt": "DRAFT"
+      "priceVerifiedAt": "2026-07-13"
     },
     "AGLPK-QT": {
       "sku": "AGLPK-QT",
@@ -97,9 +97,9 @@
       "name": "SEVERE GEAR 80W-90 100% Synthetic Gear Lube",
       "productPath": "/p/amsoil-severe-gear-80w-90-100-synthetic-gear-lube-agl/",
       "image": "/images/amsoil/aglpk-80w90.png",
-      "retailPrice": 21.39,
+      "retailPrice": 19.49,
       "salePrice": null,
-      "priceVerifiedAt": "DRAFT"
+      "priceVerifiedAt": "2026-07-13"
     },
     "SVG-75W90-QT": {
       "sku": "SVG-75W90-QT",
@@ -123,13 +123,13 @@
     },
     "ATL-QT": {
       "sku": "ATL-QT",
-      "stockNo": "ATLQT",
+      "stockNo": "ATFQT",
       "name": "Signature Series Multi-Vehicle 100% Synthetic ATF",
       "productPath": "/p/amsoil-signature-series-multi-vehicle-100-synthetic-automatic-transmission-fluid-atf/",
       "image": "/images/amsoil/atl.png",
-      "retailPrice": 24.19,
+      "retailPrice": 21.19,
       "salePrice": null,
-      "priceVerifiedAt": "2026-07-10"
+      "priceVerifiedAt": "2026-07-13"
     }
   },
   "vehicles": {
