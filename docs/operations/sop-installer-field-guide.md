@@ -48,12 +48,19 @@ Full walkthrough: [Installer Dashboard Playbook §2](installer-dashboard-playboo
 
 ## 3. The close-out flow (per vehicle)
 
-> Enter **VIN (17 chars)** → pick **OTT Calibration** → **Mark complete** → certificate emails to you.
+> Enter **VIN (17 chars)** → pick **OTT Calibration** → fill the **OTT fields** → **Mark complete** →
+> **customer signs (optional)** → certificate goes **straight to the customer**.
 
-- VIN is **required and validated** — you can't complete without a full 17-character VIN.
-- Pick the calibration you **actually flashed** (single tier or adjacent combo).
-- The certificate arrives in your inbox; open it, confirm, **Print → Save as PDF**, send to the customer.
+- VIN is **required and validated** — you can't complete without a full 17-character VIN. The console
+  **warns on a VIN/year/make mismatch**; verify, then **acknowledge to override** if it's correct.
+- Pick the calibration you **actually flashed** (single tier or adjacent combo); fill the five OTT
+  commission fields (platform, type, ECU ID, gear, mileage).
+- After **Mark complete**, a **signature pad** appears for the customer — optional, skippable, never
+  blocks completion.
+- The certificate is **sent directly to the customer** when their email is on file (a 2-page cert with
+  an AMSOIL fluids reference). No email on file → it comes to **you** to forward.
 - Missed customer → **No-show** (it becomes a rebook automatically).
+- **Offline:** the close-out queues and syncs on reconnect; the certificate sends once it syncs.
 
 Full detail + the backstop behavior: [SOP 4](sop-event-closeout.md).
 
@@ -77,9 +84,12 @@ into the right day/OTT month. Full detail: [Playbook §3](installer-dashboard-pl
 
 | Problem | Do this |
 |---------|---------|
-| Console won't load the roster | Re-enter passcode; check signal. Escalate to Owner if it persists. |
+| Roster slow / stuck on "Loading…" | The console times out and shows **Retry** — tap it. Offline, it shows your last synced roster with a banner. |
+| Console won't load the roster at all | Re-enter passcode; check signal. Escalate to Owner if it persists. |
+| **⏳ pending sync** won't clear | Reconnect and tap the badge to flush. Persists online → tell the Owner. Don't log out with items pending. |
+| VIN mismatch warning | Re-check the VIN against the vehicle; if right, **acknowledge to override**. |
 | A booking isn't yours but should be | Contact the Owner — routing may need updating (`update-routing`). |
-| Certificate email didn't arrive | The daily backstop will resend once calibration is set; tell the Owner if urgent. |
+| Certificate didn't reach the customer | Goes to the customer's email when on file, else to you to forward. The daily backstop resends once calibration is set; tell the Owner if urgent. |
 | Wrong calibration selected | Tell the Owner immediately — the value locks on the certificate. |
 
 ---
@@ -88,8 +98,8 @@ into the right day/OTT month. Full detail: [Playbook §3](installer-dashboard-pl
 
 - [ ] Every attending customer marked **Completed** with VIN + calibration.
 - [ ] Every absent customer marked **No-show**.
-- [ ] All certificates delivered to customers.
+- [ ] All certificates delivered to customers (direct, or forwarded where no email was on file).
 - [ ] Walk-ins/call-ins logged on the console.
-- [ ] **Needs close-out** section is empty.
+- [ ] **Needs close-out** section is empty and **⏳ pending sync** shows nothing (all uploaded).
 
 **Related:** [Installer Dashboard Playbook](installer-dashboard-playbook.md) · [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 3 Booking](sop-event-booking.md)
