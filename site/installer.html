@@ -801,7 +801,10 @@
     var n=Q().loadQueue(store()).length, el=document.getElementById('pendingbadge');
     if(!el){ el=document.createElement('a'); el.id='pendingbadge'; el.href='#'; el.className='link'; el.style.cssText='margin-left:14px';
       el.onclick=function(e){ e.preventDefault(); flushQueue(); };
-      var host=document.getElementById('logout') ? document.getElementById('logout').parentNode : document.getElementById('app'); if(host) host.appendChild(el); }
+      // Insert in the header links row (before #header), not at the bottom of #app.
+      var anchor=document.getElementById('pushlink')||document.getElementById('reviewlink')||document.getElementById('logout');
+      if(anchor && anchor.parentNode){ anchor.parentNode.insertBefore(el, anchor.nextSibling); }
+      else { var app=document.getElementById('app'); if(app) app.insertBefore(el, app.firstChild); } }
     if(n>0){ el.style.display=''; el.textContent='⏳ '+n+' pending sync'; } else { el.style.display='none'; }
   }
   function registerBgSync(){
