@@ -360,6 +360,95 @@ const GUIDES = [
     ],
     footnotes: "<sup>1</sup> 75% more wear protection based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> 100% LSPI protection based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.",
   },
+  {
+    slug: "amsoil-synthetic-atf-guide",
+    h1: "AMSOIL Synthetic Automatic Transmission Fluid",
+    title: "AMSOIL Synthetic ATF — Signature Series Multi-Vehicle Guide &amp; Prices | Tuned Yota",
+    desc: "AMSOIL Signature Series Multi-Vehicle Synthetic ATF: guaranteed for twice the OEM severe-service drain interval and proven in a 100,000-mile severe-service fleet trial. See the price and order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    answer: "AMSOIL Signature Series Multi-Vehicle Synthetic ATF is built for heavy towing, high heat and hard use — <strong>guaranteed for twice the OEM severe-service drain interval</strong> and proven in a <strong>100,000-mile severe-service taxi-fleet field trial</strong>. Order it from Tuned Yota, an Authorized AMSOIL Dealer, shipped anywhere in the U.S.",
+    skus: ["ATL-QT"],
+    sections: [
+      { h: "Why AMSOIL Signature Series ATF", bullets: [
+        "<strong>Guaranteed for twice the OEM severe-service drain interval.</strong>",
+        "Proven in a <strong>100,000-mile severe-service taxi-fleet trial</strong> — the valve body and clutch plates came back virtually free of sludge, deposits and wear.",
+        "High antioxidant content resists <strong>thermal breakdown</strong>, sludge and varnish that clog narrow passages and glaze clutches.",
+        "Stays fluid in sub-zero cold and holds reserve protection under heavy towing, hauling and challenging terrain.",
+      ] },
+    ],
+    faqs: [
+      ["Is AMSOIL ATF good for towing and heavy hauling?", "Yes — it's formulated specifically for severe service: heavy towing, elevated temperatures and challenging terrain, with reserve protection against heat. It's a strong choice for trucks, SUVs and vans that work hard."],
+      ["How long does AMSOIL Signature Series ATF last?", "It's guaranteed for twice the original equipment manufacturer's severe-service drain interval. After 100,000 miles in a severe-service fleet trial it still retained 41% of its original oxidation inhibitors."],
+      ["Where can I buy AMSOIL transmission fluid?", "From Tuned Yota, an Authorized AMSOIL Dealer. Order online and it ships direct anywhere in the U.S. — or enroll as a Preferred Customer to save up to 25%."],
+    ],
+    footnotes: "Severe-service and 100,000-mile results are from AMSOIL's Las Vegas Taxi Cab Field Study.",
+  },
+  {
+    slug: "amsoil-severe-gear-guide",
+    h1: "AMSOIL SEVERE GEAR Synthetic Gear Lube",
+    title: "AMSOIL SEVERE GEAR Synthetic Gear Lube — Guide, Grades &amp; Prices | Tuned Yota",
+    desc: "AMSOIL SEVERE GEAR 100% synthetic extreme-pressure gear lube: high film strength, ultimate wear protection and extreme-temperature performance for towing, hauling and racing. See grades and prices from Tuned Yota, an Authorized AMSOIL Dealer.",
+    answer: "AMSOIL SEVERE GEAR 100% Synthetic Extreme-Pressure Gear Lube is engineered with <strong>high film strength</strong> for heavy loads, <strong>reduces friction and wear</strong>, and <strong>excels in extreme temperatures</strong> — ideal for towing, hauling, racing and severe duty. Order it from Tuned Yota, an Authorized AMSOIL Dealer.",
+    skus: ["SVL-QT", "SVG-75W90-QT", "SVG-75W140-QT", "AGLPK-QT"],
+    sections: [
+      { h: "Why AMSOIL SEVERE GEAR", bullets: [
+        "<strong>High film strength</strong> stands up to high-load demands and shock loading.",
+        "<strong>Reduces friction and delivers the ultimate protection against wear.</strong>",
+        "<strong>Excels in extreme temperatures</strong> and outperforms conventional gear oils.",
+        "Excellent for all cars and trucks — and especially well-suited to towing, hauling, racing and severe duty.",
+      ] },
+    ],
+    faqs: [
+      ["What gear lube does AMSOIL recommend for towing?", "AMSOIL SEVERE GEAR — its high film strength and extreme-temperature performance are built for the heat and load of towing, hauling and severe duty. The right viscosity depends on your axle; the AMSOIL Garage shows it for your vehicle."],
+      ["Does SEVERE GEAR come in the Easy-Pack?", "Yes — SEVERE GEAR is sold in the SEVERE GEAR Easy-Pack, a flexible pouch that makes differential fluid changes faster, cleaner and less messy than a rigid quart bottle."],
+      ["Where can I buy AMSOIL gear lube?", "From Tuned Yota, an Authorized AMSOIL Dealer. Order online, shipped anywhere in the U.S. — or save up to 25% as a Preferred Customer."],
+    ],
+    footnotes: "",
+  },
+  {
+    slug: "amsoil-ea-oil-filter-guide",
+    h1: "AMSOIL Ea Synthetic Oil Filters",
+    title: "AMSOIL Ea Oil Filters — 99% Efficiency, Extended-Life Guide &amp; Prices | Tuned Yota",
+    desc: "AMSOIL Ea Oil Filters: up to 99% efficiency at 20 microns and warranty-supported 15,000-25,000-mile change intervals. Find the right filter and price from Tuned Yota, an Authorized AMSOIL Dealer.",
+    answer: "AMSOIL Ea Oil Filters deliver <strong>up to 99% efficiency at 20 microns</strong> and warranty-supported <strong>15,000-mile (EA15K) to 25,000-mile (EAO)</strong> change intervals — the premium filter to match AMSOIL synthetic oil's extended drains. Order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    skus: ["EA15K09", "EA15K51", "EA15K04", "EA15K02", "EA15K49"],
+    sections: [
+      { h: "Why AMSOIL Ea Oil Filters", bullets: [
+        "<strong>Up to 99% efficiency at 20 microns</strong> — traps the wear-causing contaminants many filters miss.",
+        "<strong>High capacity</strong> — warranty-supported 15,000-mile (EA15K) and 25,000-mile (EAO) change intervals.",
+        "Canister-style construction withstands up to <strong>9X</strong> normal system operating pressure.",
+        "Silicone anti-drainback valves give up to <strong>3X the hot-oil resistance</strong> of nitrile valves for faster starts and longer life.",
+      ] },
+    ],
+    faqs: [
+      ["How long does an AMSOIL Ea oil filter last?", "AMSOIL Ea filters are warranty-supported for 15,000-mile (EA15K) or 25,000-mile (EAO) change intervals when used with AMSOIL synthetic motor oil, designed to match AMSOIL oil's extended drains. Always change the filter when you change the oil."],
+      ["Why use an AMSOIL filter instead of FRAM or WIX?", "AMSOIL Ea filters are built for enthusiasts who want more protection — up to 99% efficiency at 20 microns and high capacity for extended intervals — going beyond what many competing filters offer."],
+      ["Which AMSOIL filter fits my vehicle?", "Pick your vehicle in the AMSOIL Garage or look it up on amsoil.com. The AMSOIL Ea line covers more than 95% of North American cars and light trucks."],
+    ],
+    footnotes: "",
+  },
+  {
+    slug: "is-amsoil-worth-it",
+    h1: "Is AMSOIL Worth It?",
+    title: "Is AMSOIL Worth It? AMSOIL vs. Conventional &amp; Mobil 1 | Tuned Yota",
+    desc: "Is AMSOIL worth the money? AMSOIL Signature Series delivers 75% more wear protection and up to 25,000-mile drains, going further between oil changes. Here's how it compares, and where to buy from Tuned Yota, an Authorized AMSOIL Dealer.",
+    answer: "For most drivers — especially tuned, towing or high-performance vehicles — <strong>yes</strong>. AMSOIL Signature Series delivers <strong>75% more wear protection</strong> and up to a <strong>25,000-mile / 1-year</strong> drain, so you go further between changes and give your engine top-tier protection. Order from Tuned Yota, an Authorized AMSOIL Dealer.",
+    skus: ["SS-0W20-QT", "SS-5W30-QT"],
+    sections: [
+      { h: "Is AMSOIL worth the extra cost?", html: "<p>AMSOIL costs more up front, but it's built to go further between oil changes — often eliminating an oil change per year — so you buy it less often, which helps offset the price while adding protection. For a tuned, supercharged or towing build, the added wear and heat protection is exactly where a premium synthetic earns its keep.</p>" },
+      { h: "AMSOIL vs. conventional and Mobil 1", bullets: [
+        "<strong>75% more wear protection</strong> for longer engine life (Signature Series 0W-20, ASTM D6891).<sup>1</sup>",
+        "<strong>100% protection against LSPI</strong> — critical for modern turbo and direct-injection engines.<sup>2</sup>",
+        "Trusted by professional engine builders; surpasses leading standards for protection against horsepower loss, wear and sludge.",
+        "Using AMSOIL does <strong>not void</strong> your vehicle manufacturer's warranty, and it's backed by the AMSOIL Limited Warranty.",
+      ] },
+    ],
+    faqs: [
+      ["Is AMSOIL better than Mobil 1?", "AMSOIL Signature Series is engineered to exceed minimum industry standards, is trusted by professional engine builders, and surpasses leading standards for protection against horsepower loss, engine wear and sludge."],
+      ["Does AMSOIL really last 25,000 miles?", "AMSOIL Signature Series is guaranteed for up to 25,000 miles or one year in normal service (turbocharged vehicles use the normal-service interval). Always change the oil filter when you change the oil."],
+      ["Will AMSOIL void my warranty?", "No. Using AMSOIL synthetic lubricants does not void your vehicle or equipment manufacturer's warranty, and all AMSOIL lubricants and filters are covered by the AMSOIL Limited Warranty."],
+    ],
+    footnotes: "<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.",
+  },
 ];
 
 function guideCards(skus) {

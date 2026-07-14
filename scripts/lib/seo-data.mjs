@@ -29,7 +29,8 @@ export const HEAD_PAGES = [
   "amsoil-toyota-tundra.html","amsoil-toyota-tacoma.html","amsoil-toyota-4runner.html","amsoil-toyota-sequoia.html",
   "amsoil-toyota-land-cruiser.html","amsoil-toyota-fj-cruiser.html","amsoil-toyota-rav4.html","amsoil-toyota-highlander.html","amsoil-toyota-camry.html",
   "amsoil-lexus-gx.html","amsoil-lexus-lx570.html","amsoil-lexus-rx350.html","amsoil-lexus-ls460.html",
-  "amsoil-synthetic-motor-oil-guide.html",
+  "amsoil-synthetic-motor-oil-guide.html","amsoil-synthetic-atf-guide.html","amsoil-severe-gear-guide.html",
+  "amsoil-ea-oil-filter-guide.html","is-amsoil-worth-it.html",
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 
@@ -39,7 +40,8 @@ export const PRIORITY = {
   "magnuson-supercharger-pricing.html": "0.9",
   "faq.html": "0.7", "ott-tune.html": "0.7", "team.html": "0.7",
   "amsoil-garage.html": "0.9",
-  "amsoil-synthetic-motor-oil-guide.html": "0.8",
+  "amsoil-synthetic-motor-oil-guide.html": "0.8", "amsoil-synthetic-atf-guide.html": "0.8",
+  "amsoil-severe-gear-guide.html": "0.8", "amsoil-ea-oil-filter-guide.html": "0.8", "is-amsoil-worth-it.html": "0.8",
 };
 // loc path for a filename (index -> "/", others -> "/name" without .html).
 export function locFor(file) {
