@@ -71,7 +71,7 @@ function fluidsRows(fluids) {
 function amsoilPage(amsoil, vehicleDisplay) {
   const fluids = amsoil.fluids;
   const qr = amsoil.qrSvg || "";
-  const url = (fluids && fluids.garageUrl) || "https://tunedyota.com/amsoil-garage";
+  const url = (fluids && fluids.orderUrl) || "https://www.amsoil.com/shop/?zo=30713116";
   const veh = esc(vehicleDisplay || "");
   return `
   <div class="cert ref">
@@ -94,7 +94,7 @@ function amsoilPage(amsoil, vehicleDisplay) {
         <span class="qr">${qr}</span>
         <div class="pitch">
           <h3>Order your exact fluids</h3>
-          <p>Scan to open <strong>your AMSOIL Garage</strong>${fluids ? " — pre-loaded with these products for your " + esc(fluids.model) : ""}. Add other vehicles, or search the full AMSOIL catalog.</p>
+          <p>Scan to order at <strong>AMSOIL.com</strong> through Tuned&nbsp;Yota, your Authorized AMSOIL Dealer${fluids ? " — use the products listed above for your " + esc(fluids.model) : ""}, or browse the full catalog.</p>
           <span class="save">Enroll free as a Preferred Customer — save up to 25%</span>
           <div class="url">${esc(url.replace(/^https?:\/\//, ""))}</div>
         </div>

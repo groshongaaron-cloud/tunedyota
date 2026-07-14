@@ -8,6 +8,9 @@ function esc(s) {
 }
 const LOGO = "https://tunedyota.com/images/amsoil/amsoil-logo.png";
 const GARAGE = "https://tunedyota.com/amsoil-garage";
+// Dealer-attributed AMSOIL shop link — landing here sets AMSOIL's 30-day ?zo= referral
+// cookie so the order is credited to Tuned Yota (mirrors lib/amsoil-fluids.js ORDER_URL).
+const ORDER = "https://www.amsoil.com/shop/?zo=30713116";
 
 function firstName(name) { return name ? esc(String(name).trim().split(/\s+/)[0]) : "there"; }
 
@@ -16,7 +19,8 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids } = {}) {
   const veh = esc(fluids && fluids.model
     ? (fluids.make + " " + fluids.model + (fluids.engine ? " " + fluids.engine : ""))
     : (vehicle || "your vehicle"));
-  const url = (fluids && fluids.garageUrl) || GARAGE;
+  // Primary CTA → dealer-attributed AMSOIL shop (sets the ?zo= cookie on landing).
+  const url = (fluids && fluids.orderUrl) || ORDER;
   const subject = `Keep your ${fluids && fluids.model ? esc(fluids.model) : "tuned Toyota"} running strong - your AMSOIL fluids`;
   const th = 'padding:6px 10px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8f94;';
   const td = 'padding:8px 10px;border-bottom:1px solid #e7e3da;';

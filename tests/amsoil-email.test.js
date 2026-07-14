@@ -10,7 +10,8 @@ test("builds a tailored AMSOIL follow-up email with fluids + opt-out", () => {
   assert.match(subject, /AMSOIL|running strong/i);
   assert.ok(html.includes("Signature Series 0W-20"), "product listed");
   assert.ok(html.includes("ASMQT"), "stock number listed");
-  assert.ok(html.includes(fluids.garageUrl), "CTA links to the pre-filtered garage");
+  assert.ok(html.includes(fluids.orderUrl), "CTA links to the dealer-attributed AMSOIL shop");
+  assert.match(html, /zo=30713116/, "referral ZO on the CTA so the order is credited");
   assert.match(html, /amsoil-logo\.png/);
   assert.match(html, /UNSUBSCRIBE/);
   assert.match(html, /Marcus/);

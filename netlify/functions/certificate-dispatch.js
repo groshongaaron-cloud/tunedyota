@@ -40,7 +40,7 @@ async function dispatchCertificates(deps) {
     const customerEmail = String(f.Email || "").trim();
     const to = customerEmail || inst.email;
     const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
-    const amsoil = { fluids, qrSvg: qrSvg((fluids && fluids.garageUrl) || "https://tunedyota.com/amsoil-garage") };
+    const amsoil = { fluids, qrSvg: qrSvg((fluids && fluids.orderUrl) || "https://www.amsoil.com/shop/?zo=30713116") };
     const certNo = certSerial(row.id, f["Calibration Date"], issueDate);
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin: f.VIN, calibration,

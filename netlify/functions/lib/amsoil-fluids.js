@@ -25,6 +25,13 @@ function pickRow(rows, vlow, year) {
   return (byYear[0] || pool[0]);
 }
 
+// Tuned Yota AMSOIL dealer/ZO referral number — mirrors site/amsoil-referral.js
+// (public; appears in URLs). Landing on amsoil.com with ?zo= sets a 30-day referral
+// cookie on the customer's device so the order is credited to the dealer. Used by the
+// certificate QR + the follow-up email so attribution is set the moment they land.
+const AMSOIL_ZO = "30713116";
+const ORDER_URL = "https://www.amsoil.com/shop/?zo=" + AMSOIL_ZO;
+
 function garageUrl(make, model, year) {
   const q = "make=" + encodeURIComponent(make) + "&model=" + encodeURIComponent(model) +
     (year ? "&year=" + encodeURIComponent(year) : "");
@@ -53,7 +60,7 @@ function resolveFluids(vehicle, modelYear) {
         };
       });
       const yr = !isNaN(year) ? year : (/(\d{4})/.exec(row.y) || [])[1] || "";
-      return { make, model, engine: row.e || "", systems, garageUrl: garageUrl(make, model, yr) };
+      return { make, model, engine: row.e || "", systems, garageUrl: garageUrl(make, model, yr), orderUrl: ORDER_URL };
     }
   }
   return null;
