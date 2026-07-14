@@ -274,18 +274,44 @@
     }catch(e){}
   }
 
+  // The roster fetch is bounded by a hard timeout so a slow/stalled server (cold
+  // function, network blip, Airtable latency, or the events sheet hanging) can never
+  // leave the console wedged on "Loading…". On any failure we fall back to the last
+  // synced roster if we have one, else show an explicit error with a Retry button.
+  var ROSTER_TIMEOUT_MS = 15000;
   async function load(){
     document.getElementById('feed').innerHTML='<div class="empty">Loading…</div>';
-    var res;
-    try { res = await fetch('/.netlify/functions/installer-roster', { headers:{ 'x-installer-token':tok() } }); }
-    catch(netErr){ return renderFromCache('Offline — showing your last synced roster'); }
-    if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
-    if(!res.ok){ document.getElementById('feed').innerHTML='<div class="empty">Could not load roster.</div>'; return; }
-    var data = await res.json();
-    try { localStorage.setItem('ty_roster_cache', JSON.stringify({ savedAt: Date.now(), data: data })); } catch(e){}
-    clearOfflineBanner();
-    applyRoster(data);
-    flushQueue();
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, ROSTER_TIMEOUT_MS);
+    try {
+      var res = await fetch('/.netlify/functions/installer-roster', { headers:{ 'x-installer-token':tok() }, signal: ctrl.signal });
+      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(!res.ok){ rosterUnavailable('Could not reach the server — showing your last synced roster.'); return; }
+      var data = await res.json();
+      try { localStorage.setItem('ty_roster_cache', JSON.stringify({ savedAt: Date.now(), data: data })); } catch(e){}
+      clearOfflineBanner();
+      applyRoster(data);
+      flushQueue();
+    } catch(err){
+      // AbortError = our timeout fired; anything else = network/parse failure.
+      var msg = (err && err.name==='AbortError')
+        ? 'The roster took too long to load — showing your last synced roster.'
+        : 'Offline — showing your last synced roster.';
+      rosterUnavailable(msg);
+    } finally { clearTimeout(timer); }
+  }
+  // Cache-or-retry fallback for a failed roster load: prefer the last synced roster
+  // (with a banner), else render an actionable Retry rather than a dead-end message.
+  function rosterUnavailable(bannerMsg){
+    var hasCache=false; try { hasCache=!!localStorage.getItem('ty_roster_cache'); } catch(e){}
+    if(hasCache){ renderFromCache(bannerMsg); return; }
+    retryFeed('Couldn’t load your roster.');
+  }
+  function retryFeed(msg){
+    var feed=document.getElementById('feed'); feed.innerHTML='';
+    var m=document.createElement('div'); m.className='empty'; m.textContent=msg; feed.appendChild(m);
+    var b=document.createElement('button'); b.className='btn'; b.textContent='Retry'; b.style.marginTop='10px';
+    b.onclick=function(){ load(); }; feed.appendChild(b);
   }
 
   function applyRoster(data){
@@ -311,9 +337,9 @@
 
   function renderFromCache(msg){
     var raw; try { raw = localStorage.getItem('ty_roster_cache'); } catch(e){ raw = null; }
-    if(!raw){ document.getElementById('feed').innerHTML='<div class="empty">Offline — no saved roster yet. Reconnect once to load it.</div>'; return; }
+    if(!raw){ retryFeed('No saved roster yet — reconnect once to load it.'); return; }
     var cached; try { cached = JSON.parse(raw); } catch(e){ cached = null; }
-    if(!cached || !cached.data){ document.getElementById('feed').innerHTML='<div class="empty">Offline — no saved roster yet.</div>'; return; }
+    if(!cached || !cached.data){ retryFeed('No saved roster yet — reconnect once to load it.'); return; }
     showOfflineBanner(msg + (cached.savedAt ? ' (saved '+relTime(cached.savedAt)+')' : ''));
     applyRoster(cached.data);
   }

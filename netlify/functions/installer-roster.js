@@ -13,8 +13,17 @@ const { deriveVehicle, resolveCommission } = require("./lib/ott-commission.js");
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 const bySlot = (a, b) => String(a.slot || "").localeCompare(String(b.slot || ""), undefined, { numeric: true });
 
+// Bound a promise so a stalled upstream can't hang the whole roster. Rejects with
+// `msg` after `ms`; always clears its timer so it never keeps the process alive.
+function withTimeout(promise, ms, msg) {
+  let t;
+  const timeout = new Promise((_, reject) => { t = setTimeout(() => reject(new Error(msg || "timeout")), ms); });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(t));
+}
+
 async function buildRoster(deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false, log = console,
+          eventsTimeoutMs = 6000,
           list = (a) => listRecords({ fetchImpl, ...a }),
           loadEvents = () => getAllActiveEvents({ fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
   const c = cfg(env);
@@ -60,7 +69,7 @@ async function buildRoster(deps) {
   let events = [];
   try {
     const seen = {};
-    for (const e of await loadEvents()) {
+    for (const e of await withTimeout(loadEvents(), eventsTimeoutMs, "events load timeout")) {
       if (!e || !e.dateISO || e.dateISO < today) continue;
       const market = getMarket(e.city);
       if (!market) continue;

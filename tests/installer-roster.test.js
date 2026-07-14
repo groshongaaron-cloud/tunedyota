@@ -80,6 +80,16 @@ test("a roster events fetch failure degrades to an empty events list (never thro
   assert.deepEqual(out.events, []);
 });
 
+test("a STALLED events load can't hang the roster — it times out and still returns bookings", async () => {
+  const bookings = [{ id: "r1", fields: { City: "Omaha", "Event Date": "2026-07-03", Name: "B", Installer: "cody", Status: "Booked" } }];
+  const out = await buildRoster({ env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    list: async () => bookings,
+    loadEvents: () => new Promise(() => {}),   // never resolves
+    eventsTimeoutMs: 40, log: { warn() {} } });
+  assert.equal(out.bookings.length, 1);        // primary data still returns
+  assert.deepEqual(out.events, []);            // events degrade to empty on timeout
+});
+
 test("mapped booking includes certDelivery from the Cert Delivery field", async () => {
   const list = async () => [
     { id: "r1", fields: { City: "Omaha", "Event Date": "2026-07-03", Name: "A", Installer: "cody", Status: "Completed", "Cert Delivery": "installer-fallback" } },
