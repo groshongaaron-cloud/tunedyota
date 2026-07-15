@@ -1,0 +1,18 @@
+# PLACEHOLDER — replace with a real OTT lead email; parser regexes may need adjustment.
+From: Overland Tailor <info@overlandtailor.com>
+To: info@tunedyota.com
+CC: Aaron Groshong <info@tunedyota.com>
+Subject: A New Lead From Facebook Ads
+Date: Tue, 15 Jul 2026 09:00:00 -0500
+Message-ID: <lead-abc@mail.overlandtailor.com>
+
+Full Name: Jane Customer
+Phone: 6125550147
+Email: jane@example.com
+Vehicle: 2022 Tundra
+
+Thank you for contacting Overland Tailor Tuning. We have forwarded this lead to our
+nearest authorized retailer. They will be in touch with you soon.
+
+Best,
+John @ OTT
