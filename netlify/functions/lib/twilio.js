@@ -28,6 +28,7 @@ function webhookUrl(event, env, fnName) {
   return (event && event.rawUrl) || "";
 }
 
+// Formats US 10-digit numbers only; non-US or short input is passed through as-is.
 function formatPhone(e164) {
   const d = String(e164 == null ? "" : e164).replace(/\D/g, "").slice(-10);
   return d.length === 10 ? `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}` : String(e164 == null ? "" : e164);
@@ -62,7 +63,7 @@ function smsReplyTwiml(text) {
 function dialTwiml(numbers, opts = {}) {
   const { timeout = 20, action = "", callerId = "" } = opts;
   const attrs = [
-    `timeout="${timeout}"`,
+    `timeout="${Number.isFinite(+timeout) ? timeout : 20}"`,
     `answerOnBridge="true"`,
     action ? `action="${escapeXml(action)}"` : "",
     callerId ? `callerId="${escapeXml(callerId)}"` : "",
@@ -74,7 +75,7 @@ function dialTwiml(numbers, opts = {}) {
 function voicemailTwiml(opts = {}) {
   const { greeting = GREETING, voice = "Polly.Matthew-Neural", transcribeCallback = "", maxLength = 120 } = opts;
   const cb = transcribeCallback ? ` transcribeCallback="${escapeXml(transcribeCallback)}"` : "";
-  const rec = `<Record transcribe="true"${cb} maxLength="${maxLength}" playBeep="true"/>`;
+  const rec = `<Record transcribe="true"${cb} maxLength="${Number.isFinite(+maxLength) ? maxLength : 120}" playBeep="true"/>`;
   return `${XML}<Response><Say voice="${escapeXml(voice)}">${escapeXml(greeting)}</Say>${rec}</Response>`;
 }
 

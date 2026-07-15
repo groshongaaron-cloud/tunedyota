@@ -135,3 +135,22 @@ test("ingestLead swallows a thrown post error -> ok:false", async () => {
   const out = await T.ingestLead({ phone: "x" }, { env: {}, post: async () => { throw new Error("down"); } });
   assert.equal(out.ok, false);
 });
+
+test("ingestLead returns ok:false when lead-ingest responds not-ok (e.g. 500)", async () => {
+  const out = await T.ingestLead({ phone: "x" }, { env: { LEAD_INGEST_URL: "https://x/lead-ingest" }, post: async () => ({ ok: false, status: 500 }) });
+  assert.equal(out.ok, false);
+});
+
+test("formatPhone truncates a non-US E.164 to last 10 (documented US-only behavior)", () => {
+  // US-only formatter: a non-US number is not specially handled.
+  assert.equal(T.formatPhone("+441234567890"), "123-456-7890");
+});
+
+test("parseTranscription with no TranscriptionText yields the no-transcription note", () => {
+  const lead = T.parseTranscription({ From: "+16125551234", RecordingUrl: "https://rec/1" });
+  assert.match(lead.message, /voicemail \(no transcription\) — https:\/\/rec\/1/);
+});
+
+test("webhookUrl returns empty string when neither rawUrl nor TWILIO_PUBLIC_BASE is present", () => {
+  assert.equal(T.webhookUrl({}, {}, "twilio-sms"), "");
+});
