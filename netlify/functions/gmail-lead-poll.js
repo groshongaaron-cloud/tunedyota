@@ -20,6 +20,7 @@ async function runPoll(deps = {}) {
       const full = await gmail.getMessage(id, { env });
       const lead = parseOttLeadEmail(full);
       const body = { name: lead.name, phone: lead.phone, email: lead.email, vehicle: lead.vehicle,
+        goals: lead.goals, city: lead.city, message: lead.message,
         channel: lead.channel, source: lead.source, emailThread: lead.threadId, emailMessageId: lead.messageIdHeader, replyTo: lead.replyTo };
       const res = await post(base, { method: "POST",
         headers: { "Content-Type": "application/json", "x-ty-task": env.INTERNAL_TASK_SECRET || "" }, body: JSON.stringify(body) });

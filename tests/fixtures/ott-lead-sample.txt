@@ -1,18 +1,36 @@
-# PLACEHOLDER — replace with a real OTT lead email; parser regexes may need adjustment.
-From: Overland Tailor <info@overlandtailor.com>
-To: info@tunedyota.com
-CC: Aaron Groshong <info@tunedyota.com>
+# SANITIZED sample of a real OTT "A New Lead From Facebook Ads" email. The customer's
+# name/email/phone are replaced with fake values; the layout + field labels are IDENTICAL
+# to production (captured from a real message 2026-07-15). Used by tests/ott-email.test.js.
+# Lines starting with '#' are stripped by the test before parsing.
+
+
+________________________________
+From: advertising@marketingteam.live <advertising@marketingteam.live>
+Sent: Saturday, April 11, 2026 9:19 PM
+To: Overland Tailor <info@overlandtailor.com>
 Subject: A New Lead From Facebook Ads
-Date: Tue, 15 Jul 2026 09:00:00 -0500
-Message-ID: <lead-abc@mail.overlandtailor.com>
 
-Full Name: Jane Customer
-Phone: 6125550147
-Email: jane@example.com
-Vehicle: 2022 Tundra
+Hey!
 
-Thank you for contacting Overland Tailor Tuning. We have forwarded this lead to our
-nearest authorized retailer. They will be in touch with you soon.
+We generated a new lead from Facebook!
 
-Best,
-John @ OTT
+Name: Jane Sample
+Email: jane.sample@example.com
+Phone: +13205550147 | (320) 555-0147
+Lead: Overland Tuning
+City: Kerkhoven
+State: MN
+Country: US
+Transmission Type: automatic_
+Vehicle Year: 2026
+Vehicle Make: Toyota
+Vehicle Model: Tacoma
+Engine Size: 2.4
+Engine modifications: Non
+Campaign name:
+Adset name:
+GHL Link: https://app.gohighlevel.com/v2/location/EXAMPLE/opportunities/list
+
+Sincerely,
+
+- Marketing Team
