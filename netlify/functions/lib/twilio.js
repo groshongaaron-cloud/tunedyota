@@ -80,5 +80,42 @@ function voicemailTwiml(opts = {}) {
 
 function hangupTwiml() { return `${XML}<Response><Hangup/></Response>`; }
 
+function parseInboundSms(params) {
+  const from = params.From || "";
+  const body = String(params.Body || "").trim();
+  return { name: displayName("Text", from), phone: from, channel: "sms", source: "twilio:sms",
+    goals: body, message: body || "inbound text" };
+}
+
+function parseInboundCall(params, note) {
+  const from = params.From || "";
+  return { name: displayName("Caller", from), phone: from, channel: "phone", source: "twilio:call",
+    message: note || "inbound call" };
+}
+
+function parseTranscription(params) {
+  const from = params.From || "";
+  const text = String(params.TranscriptionText || "").trim();
+  const rec = params.RecordingUrl || "";
+  const base = text ? `voicemail: ${text}` : "voicemail (no transcription)";
+  return { name: displayName("Caller", from), phone: from, channel: "phone", source: "twilio:call",
+    goals: text, message: rec ? `${base} — ${rec}` : base };
+}
+
+// POST a normalized lead to the Core ingest endpoint (mirrors gmail-lead-poll.js).
+async function ingestLead(body, deps = {}) {
+  const env = deps.env || process.env;
+  const post = deps.post || fetch;
+  const base = env.LEAD_INGEST_URL
+    || (env.URL ? `${env.URL}/.netlify/functions/lead-ingest` : "https://tunedyota.com/.netlify/functions/lead-ingest");
+  try {
+    const res = await post(base, { method: "POST",
+      headers: { "Content-Type": "application/json", "x-ty-task": env.INTERNAL_TASK_SECRET || "" },
+      body: JSON.stringify(body) });
+    return { ok: !!(res && res.ok) };
+  } catch (e) { return { ok: false, error: e.message }; }
+}
+
 module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers,
-  escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, GREETING };
+  escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, GREETING,
+  parseInboundSms, parseInboundCall, parseTranscription, ingestLead };

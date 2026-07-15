@@ -90,3 +90,48 @@ test("GREETING includes the leave-a-message cue and the text-in alternative", ()
   assert.match(T.GREETING, /after the tone/i);
   assert.match(T.GREETING, /612-406-7117/);
 });
+
+test("parseInboundSms maps From/Body to an sms lead", () => {
+  const lead = T.parseInboundSms({ From: "+16125551234", Body: "  Want an OTT tune  " });
+  assert.deepEqual(lead, { name: "Text 612-555-1234", phone: "+16125551234", channel: "sms",
+    source: "twilio:sms", goals: "Want an OTT tune", message: "Want an OTT tune" });
+});
+
+test("parseInboundSms falls back to a message note when Body is empty", () => {
+  const lead = T.parseInboundSms({ From: "+16125551234", Body: "" });
+  assert.equal(lead.message, "inbound text");
+});
+
+test("parseInboundCall maps From to a phone lead with the given note", () => {
+  const lead = T.parseInboundCall({ From: "+16125551234" }, "call answered by installer");
+  assert.deepEqual(lead, { name: "Caller 612-555-1234", phone: "+16125551234", channel: "phone",
+    source: "twilio:call", message: "call answered by installer" });
+});
+
+test("parseInboundCall defaults the note to 'inbound call'", () => {
+  assert.equal(T.parseInboundCall({ From: "+16125551234" }).message, "inbound call");
+});
+
+test("parseTranscription folds transcript + recording url into the message", () => {
+  const lead = T.parseTranscription({ From: "+16125551234", TranscriptionText: "hi it's Sam about my Tundra", RecordingUrl: "https://rec/1" });
+  assert.equal(lead.channel, "phone");
+  assert.equal(lead.phone, "+16125551234");
+  assert.equal(lead.goals, "hi it's Sam about my Tundra");
+  assert.match(lead.message, /^voicemail: hi it's Sam about my Tundra — https:\/\/rec\/1$/);
+});
+
+test("ingestLead posts to lead-ingest with the task secret and returns ok", async () => {
+  const calls = [];
+  const post = async (url, opts) => { calls.push({ url, opts }); return { ok: true }; };
+  const out = await T.ingestLead({ name: "Text 612-555-1234", phone: "+16125551234", channel: "sms" },
+    { env: { INTERNAL_TASK_SECRET: "sekret", LEAD_INGEST_URL: "https://x/lead-ingest" }, post });
+  assert.deepEqual(out, { ok: true });
+  assert.equal(calls[0].url, "https://x/lead-ingest");
+  assert.equal(calls[0].opts.headers["x-ty-task"], "sekret");
+  assert.equal(JSON.parse(calls[0].opts.body).phone, "+16125551234");
+});
+
+test("ingestLead swallows a thrown post error -> ok:false", async () => {
+  const out = await T.ingestLead({ phone: "x" }, { env: {}, post: async () => { throw new Error("down"); } });
+  assert.equal(out.ok, false);
+});
