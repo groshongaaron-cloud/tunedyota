@@ -73,6 +73,9 @@
   .ebody{padding:4px 12px 10px;}
   .donehdr{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin:12px 0 2px;border-top:1px dashed var(--line);padding-top:8px;}
   .addwalk{width:100%;margin:8px 0 2px;background:#5B4B42;} .walkmini input{margin:5px 0;} .walkmini select{margin:5px 0;}
+  .tabbtn{background:#1a1a1a;border:1px solid #333;color:var(--muted);padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer}
+  .tabbtn.on{background:var(--accent);color:#111;border-color:var(--accent)}
+  .tabbadge{background:#8a6d3b;color:#fff;border-radius:10px;padding:1px 7px;font-size:12px;margin-left:4px}
   .walkmini .fld{font-size:12px;color:var(--muted);font-weight:700;margin:6px 0 0;display:block;}
   .empty{color:var(--muted);font-size:13px;padding:8px 0;}
   .showmore{width:100%;background:#fff;color:var(--accent);border:1px dashed var(--line);border-radius:9px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;margin:6px 0;}
@@ -107,7 +110,8 @@
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:'' };
+  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:''
+    , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:'' };
   function Q(){ return window.OfflineQueue; }
   function store(){ return window.localStorage; }
 
@@ -464,7 +468,16 @@
       (next?'<span class="next">Next: '+esc(next.city)+' · '+esc(relDate(next.dateISO))+'</span>':'');
   }
 
-  function renderAll(){ renderTally(); renderFeed(); }
+  function renderAll(){ renderTally(); renderTabs(); if(STATE.tab==='leads'){ renderLeads(); } else { renderFeed(); } }
+  function renderTabs(){
+    var host=document.getElementById('tabs');
+    if(!host){ host=document.createElement('div'); host.id='tabs'; host.style.cssText='display:flex;gap:8px;margin:6px 0 10px';
+      var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
+    function tab(id,label,badge){ return '<button class="tabbtn'+(STATE.tab===id?' on':'')+'" data-tab="'+id+'">'+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
+    var due=STATE.leads.filter(function(l){ return ['New','Contacted','Following up'].indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today; }).length;
+    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'');
+    Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){ STATE.tab=b.getAttribute('data-tab'); if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); } renderAll(); }; });
+  }
 
   function bySlot(a,b){ return String(a.slot||'').localeCompare(String(b.slot||''),undefined,{numeric:true}); }
 
@@ -667,6 +680,110 @@
     return { id:'pending:'+op.clientKey, city:evt.city, dateISO:evt.dateISO, installer:'', slot:'', slotLabel:'',
       name:op.body.name, vehicle:op.body.vehicle, phone:op.body.phone, email:op.body.email, mods:'', status:'Booked',
       isWalkin:true, pendingSync:true, calibration:'', vin:'', tuningPlatform:'', calibrationType:'', ecuId:'', gearSize:'', mileage:'' };
+  }
+
+  // ---- Leads pipeline ----
+  var LEAD_STAGES=['New','Contacted','Following up','Booked','Not now'];
+  var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶',other:'•'};
+  async function loadLeads(){
+    try{
+      var res=await fetch('/.netlify/functions/leads-list',{headers:{'x-installer-token':tok()}});
+      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      var data=await res.json(); STATE.leads=data.leads||[]; STATE.leadsLoaded=true;
+    }catch(e){ /* keep whatever we have */ }
+    renderAll();
+  }
+  function leadMatchesQ(l){ var q=STATE.leadQ.trim().toLowerCase(); if(!q) return true;
+    return [l.name,l.vehicle,l.phone,l.city,l.channel].some(function(v){ return String(v||'').toLowerCase().indexOf(q)>=0; }); }
+  function renderLeads(){
+    var host=document.getElementById('feed'); host.innerHTML='';
+    host.appendChild(logLeadForm());
+    var box=document.createElement('div'); box.className='search';
+    box.innerHTML='<input id="leadq" type="search" placeholder="Search leads — name, vehicle, phone…">';
+    host.appendChild(box);
+    var qi=document.getElementById('leadq'); qi.value=STATE.leadQ; qi.oninput=function(){ STATE.leadQ=this.value; renderLeads(); };
+    var visible=STATE.leads.filter(leadMatchesQ);
+    LEAD_STAGES.forEach(function(stage){
+      var inStage=visible.filter(function(l){ return (l.stage||'New')===stage; });
+      if(!inStage.length) return;
+      inStage.sort(function(a,b){
+        var ao=(['New','Contacted','Following up'].indexOf(a.stage)>=0 && a.nextFollowup && a.nextFollowup<=STATE.today)?0:1;
+        var bo=(['New','Contacted','Following up'].indexOf(b.stage)>=0 && b.nextFollowup && b.nextFollowup<=STATE.today)?0:1;
+        if(ao!==bo) return ao-bo; return (b.lastContact||'').localeCompare(a.lastContact||'');
+      });
+      host.appendChild(secHead(stage+' ('+inStage.length+')',''));
+      inStage.forEach(function(l){ host.appendChild(leadCard(l)); });
+    });
+    if(!visible.length){ var em=document.createElement('div'); em.className='empty'; em.textContent='No leads yet. Use "＋ Log a lead" above.'; host.appendChild(em); }
+  }
+  function leadCard(l){
+    var overdue=(['New','Contacted','Following up'].indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
+    var det=document.createElement('details'); det.className='evt';
+    var sum=document.createElement('summary');
+    sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' '+esc(l.name)+'</span>'+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
+      '<br><span class="edate">'+esc(l.vehicle||'—')+' · '+esc(l.city||'—')+'</span></span>'+
+      '<span class="pill'+(overdue?' hasopen':'')+'">'+(overdue?'⏰ due':(l.nextFollowup?('→ '+esc(l.nextFollowup)):esc(l.stage)))+'</span>';
+    det.appendChild(sum);
+    var body=document.createElement('div'); body.className='ebody';
+    var row=document.createElement('div'); row.className='walkmini';
+    function act(label,fn){ var b=document.createElement('button'); b.className='btn'; b.textContent=label; b.onclick=fn; return b; }
+    if(l.phone){ row.appendChild(linkBtn('Call','tel:'+l.phone)); row.appendChild(linkBtn('Text','sms:'+l.phone)); }
+    if(l.email){ row.appendChild(linkBtn('Email','mailto:'+l.email)); }
+    body.appendChild(row);
+    var stagesRow=document.createElement('div'); stagesRow.className='walkmini';
+    LEAD_STAGES.forEach(function(s){ if(s!==l.stage){ stagesRow.appendChild(act('→ '+s,function(){ leadUpdate(l.id,{action:'setStage',stage:s}); })); } });
+    body.appendChild(stagesRow);
+    var fu=document.createElement('div'); fu.className='walkmini';
+    [['Today',0],['Tomorrow',1],['+3d',3],['+1wk',7]].forEach(function(p){ fu.appendChild(act('Follow-up '+p[0],function(){ leadUpdate(l.id,{action:'setFollowup',date:addDays(STATE.today,p[1])}); })); });
+    body.appendChild(fu);
+    var note=mkInput('Log a contact note'); var logb=act('Log contact',function(){ leadUpdate(l.id,{action:'logContact',note:note.value}); });
+    var mini=document.createElement('div'); mini.className='walkmini'; mini.appendChild(note); mini.appendChild(logb); body.appendChild(mini);
+    var conv=document.createElement('div'); conv.className='walkmini';
+    var cd=document.createElement('input'); cd.type='date'; cd.value=STATE.today;
+    conv.appendChild(cd); conv.appendChild(act('Convert to booking',function(){ leadUpdate(l.id,{action:'convert',dateISO:cd.value}); }));
+    body.appendChild(conv);
+    if(l.activity){ var log=document.createElement('div'); log.className='edate'; log.style.whiteSpace='pre-wrap'; log.style.marginTop='6px'; log.textContent=l.activity; body.appendChild(log); }
+    det.appendChild(body); return det;
+  }
+  function linkBtn(label,href){ var a=document.createElement('a'); a.className='btn'; a.textContent=label; a.href=href; a.style.textAlign='center'; return a; }
+  function addDays(iso,n){ var d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); var p=function(x){return String(x).padStart(2,'0');}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+  async function leadUpdate(id,payload){
+    clearMsg();
+    try{
+      var res=await fetch('/.netlify/functions/lead-update',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(Object.assign({id:id},payload))});
+      var out=await res.json().catch(function(){return{};});
+      if(res.ok && out.status==='ok'){ succeed(payload.action==='convert'?'✓ Converted to a booking.':'✓ Updated.'); loadLeads(); }
+      else { fail('Could not update: '+(out.error||res.status)); }
+    }catch(e){ fail('Network error — try again.'); }
+  }
+  function logLeadForm(){
+    var K='__lead__'; var det=document.createElement('details'); det.className='evt'; det.open=!!STATE.leadStageOpen[K];
+    det.addEventListener('toggle',function(){ STATE.leadStageOpen[K]=det.open; });
+    var sum=document.createElement('summary'); sum.innerHTML='<span class="etitle">＋ Log a lead</span><span class="pill">any channel</span>'; det.appendChild(sum);
+    var box=document.createElement('div'); box.className='ebody walkmini';
+    var n=mkInput('Customer name'), v=mkInput('Vehicle (e.g. 2021 Tundra)'), p=mkInput('Phone'); p.inputMode='tel';
+    var em=mkInput('Email'); em.type='email';
+    var ch=document.createElement('select'); ch.innerHTML=['phone','sms','email','facebook','instagram','walk-in','other'].map(function(x){return '<option>'+x+'</option>';}).join('');
+    var city=mkInput('City / market'); var note=mkInput('Note (what they want)');
+    var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Save lead';
+    [n,v,p,em,ch,city,note,btn].forEach(function(el){ box.appendChild(el); });
+    det.appendChild(box);
+    btn.onclick=function(){
+      var name=(n.value||'').trim(); if(!name){ fail('Enter a name.'); return; }
+      if(!(p.value||'').trim() && !(em.value||'').trim()){ fail('Enter a phone or email.'); return; }
+      STATE.leadStageOpen[K]=true;
+      ingestLead({name:name,vehicle:v.value,phone:p.value,email:em.value,channel:ch.value,city:city.value,message:note.value});
+    };
+    return det;
+  }
+  async function ingestLead(vals){
+    clearMsg();
+    try{
+      var res=await fetch('/.netlify/functions/lead-ingest',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(vals)});
+      var out=await res.json().catch(function(){return{};});
+      if(res.ok && out.status==='lead'){ succeed(out.deduped?'✓ Added to an existing lead.':'✓ Lead saved.'); loadLeads(); }
+      else { fail('Could not save lead: '+(out.error||res.status)); }
+    }catch(e){ fail('Network error — try again.'); }
   }
 
   // --- VIN scan (mirror of netlify/functions/lib/vin.js — keep in sync) ---
