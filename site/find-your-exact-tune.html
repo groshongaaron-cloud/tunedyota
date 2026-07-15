@@ -521,7 +521,7 @@ const INSTALLERS = {
 const MARKETS = [
   {city:"Duluth",       state:"MN", lat:46.7867, lng:-92.1005,  inst:"aaron", date:"July 25, 2026", event:"Duluth, Minnesota Summer 2026 OTT Event"},
   {city:"Twin Cities",  state:"MN", lat:44.9778, lng:-93.2650,  inst:"aaron", date:"August 29, 2026", event:"Twin Cities, Minnesota Summer 2026 OTT Event"},
-  {city:"Coon Rapids",  state:"MN", lat:45.1889, lng:-93.3402,  inst:"aaron", date:"July 18, 2026", event:"Carlson Toyota Tacos & Tacomas — Coon Rapids, MN OTT Event"},
+  {city:"Coon Rapids",  state:"MN", lat:45.2057, lng:-93.3594,  inst:"aaron", date:"July 18, 2026", event:"Carlson Toyota Tacos & Tacomas — Coon Rapids, MN OTT Event"},
   {city:"Mankato",      state:"MN", lat:44.1636, lng:-93.9994,  inst:"aaron", date:"August 8, 2027", event:"Mankato, Minnesota Summer 2027 OTT Event"},
   {city:"Rochester",    state:"MN", lat:44.0121, lng:-92.4802,  inst:"aaron", date:"September 26, 2026", event:"Rochester, Minnesota Fall 2026 OTT Event"},
   {city:"Brainerd",     state:"MN", lat:46.3580, lng:-94.2008,  inst:"aaron"},
@@ -641,6 +641,10 @@ const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 /* Existing-customer free re-flash entry: ?intent=update reframes step 0 and
    tags the lead/booking Source so installers can spot a re-flash. */
 S.intent=new URLSearchParams(location.search).get("intent")||"";
+/* Deep-link: ?city=<name> (e.g. an event-flyer QR) preselects that market at the
+   book step so a scan lands straight on that event's booking. Hyphens/underscores
+   in the param are treated as spaces ("coon-rapids" -> "coon rapids"). */
+S.presetCity=(new URLSearchParams(location.search).get("city")||"").trim().toLowerCase().replace(/[-_+]+/g," ");
 if(S.intent==="update"){
   const eb=$('[data-step="0"] .tf-eyebrow'), h=$('[data-step="0"] .tf-h'), sub=$('[data-step="0"] .tf-sub');
   if(eb) eb.textContent="Free OTT Update";
@@ -824,6 +828,10 @@ function selectMarket(i){
 }
 function prepBooking(){
   initMap(); renderBar(); renderList();
+  if(S.presetCity && S.marketIndex===null){
+    const pi=MARKETS.findIndex(m=>m.city.toLowerCase()===S.presetCity);
+    if(pi>=0) selectMarket(pi);
+  }
   $("#fVeh").value=vehStr()+(S.goals.size?`  \u00b7  ${[...S.goals].map(id=>GOALS.find(g=>g.id===id).l).join(", ")}`:"");
   populateModelYear();
   $("#proofBook").innerHTML=proofCard(pickReview(S.make,[proofResultName]));
