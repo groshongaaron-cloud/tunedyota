@@ -476,7 +476,8 @@ Expected: FAIL — cannot find module.
 const gmailLib = require("./lib/gmail.js");
 const { parseOttLeadEmail } = require("./lib/ott-email.js");
 
-const QUERY = 'subject:"A New Lead From Facebook Ads" -label:ty-ingested -label:ty-ingest-failed newer_than:30d';
+// 60-day lookback ("60 days in arrears") so first activation backfills recent leads.
+const QUERY = 'subject:"A New Lead From Facebook Ads" -label:ty-ingested -label:ty-ingest-failed newer_than:60d';
 
 async function runPoll(deps = {}) {
   const env = deps.env || process.env;

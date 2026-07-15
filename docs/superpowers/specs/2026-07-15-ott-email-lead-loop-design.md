@@ -51,7 +51,7 @@ Added the same schema-token way as the Core's six (see [[airtable-metadata-api]]
 - **Concrete extraction rules are derived TDD-style from real captured samples in implementation Task 1** — the *contract* (inputs/outputs above) is fixed here; the field-locating patterns come from fixtures, because a parser must be built against real data. If a field isn't present in the email, it's returned empty and the lead still tracks on its email refs.
 
 ### 6.2 `gmail-lead-poll` — scheduled ingest (every 10 min)
-1. `listMessages('subject:"A New Lead From Facebook Ads" -label:ty-ingested newer_than:30d')`.
+1. `listMessages('subject:"A New Lead From Facebook Ads" -label:ty-ingested newer_than:60d')` — a **60-day lookback** ("60 days in arrears") so first activation backfills recent leads, not just brand-new ones; processed messages are excluded by the `ty-ingested`/`ty-ingest-failed` labels.
 2. For each: `getMessage` → normalize → `parseOttLeadEmail`.
 3. POST to `/.netlify/functions/lead-ingest` with header `x-ty-task: $INTERNAL_TASK_SECRET` and body `{ name, phone, email, vehicle, goals, channel, source, emailThread, emailMessageId, replyTo }`.
 4. On a 2xx, `addLabel(id, 'ty-ingested')` so it never reprocesses. On parse failure, label `ty-ingest-failed` (visible, not silently dropped) and continue the batch.
