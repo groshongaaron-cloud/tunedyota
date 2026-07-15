@@ -50,6 +50,12 @@
 [functions."lead-followups"]
   schedule = "0 13 * * *"
 
+[functions."gmail-lead-poll"]
+  schedule = "*/10 * * * *"
+
+[functions."ott-reply-sweep"]
+  schedule = "*/15 * * * *"
+
 # "Get OTT Now!" share link -> the decision funnel, tagged to the share campaign.
 [[redirects]]
   from = "/get-ott-now"
