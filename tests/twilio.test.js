@@ -56,3 +56,37 @@ test("webhookUrl uses rawUrl, or TWILIO_PUBLIC_BASE override", () => {
   assert.equal(T.webhookUrl({ rawUrl: "ignored" }, { TWILIO_PUBLIC_BASE: "https://p/" }, "twilio-voice"),
     "https://p/.netlify/functions/twilio-voice");
 });
+
+test("escapeXml escapes the five XML entities", () => {
+  assert.equal(T.escapeXml(`a&b<c>"d'`), "a&amp;b&lt;c&gt;&quot;d&apos;");
+});
+
+test("smsReplyTwiml wraps an escaped Message", () => {
+  const x = T.smsReplyTwiml("Thanks & welcome");
+  assert.match(x, /^<\?xml/);
+  assert.match(x, /<Response><Message>Thanks &amp; welcome<\/Message><\/Response>/);
+});
+
+test("dialTwiml rings every number with timeout + action + callerId", () => {
+  const x = T.dialTwiml(["+1612", "+1651"], { timeout: 20, action: "https://a/x", callerId: "+1999" });
+  assert.match(x, /timeout="20"/);
+  assert.match(x, /action="https:\/\/a\/x"/);
+  assert.match(x, /callerId="\+1999"/);
+  assert.match(x, /<Number>\+1612<\/Number><Number>\+1651<\/Number>/);
+});
+
+test("voicemailTwiml says the greeting in a Polly voice then records with transcription", () => {
+  const x = T.voicemailTwiml({ greeting: T.GREETING, transcribeCallback: "https://a/t" });
+  assert.match(x, /<Say voice="Polly\.Matthew-Neural">/);
+  assert.match(x, /Tuned Yota/);
+  assert.match(x, /<Record transcribe="true" transcribeCallback="https:\/\/a\/t" maxLength="120" playBeep="true"\/>/);
+});
+
+test("hangupTwiml returns a bare Hangup", () => {
+  assert.match(T.hangupTwiml(), /<Response><Hangup\/><\/Response>/);
+});
+
+test("GREETING includes the leave-a-message cue and the text-in alternative", () => {
+  assert.match(T.GREETING, /after the tone/i);
+  assert.match(T.GREETING, /612-406-7117/);
+});

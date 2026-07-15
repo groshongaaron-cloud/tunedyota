@@ -39,4 +39,46 @@ function parseForwardNumbers(env) {
   return String((env && env.TWILIO_FORWARD_NUMBERS) || "").split(",").map((s) => s.trim()).filter(Boolean);
 }
 
-module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers };
+const XML = '<?xml version="1.0" encoding="UTF-8"?>';
+
+// Owner-authored no-answer greeting (spec). Edit here to change what callers hear.
+const GREETING = "Hi this is Tuned Yota — I saw we missed your call, sorry about that! " +
+  "I wanted to make sure I got back to you personally. Whether you're looking for the OTT tune, " +
+  "a Magnuson Supercharger, a build for your vehicle, or a maintenance issue needing a fix, or just " +
+  "have a few questions, I'd love to help you get it dialed in. You can also shoot a quick text to the " +
+  "same line, 612-406-7117, and a team member can begin a live chat with you. So we can call you right " +
+  "back, please leave your name and a short message after the tone. Thanks, and talk soon!";
+
+function escapeXml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+
+function smsReplyTwiml(text) {
+  return `${XML}<Response><Message>${escapeXml(text)}</Message></Response>`;
+}
+
+function dialTwiml(numbers, opts = {}) {
+  const { timeout = 20, action = "", callerId = "" } = opts;
+  const attrs = [
+    `timeout="${timeout}"`,
+    `answerOnBridge="true"`,
+    action ? `action="${escapeXml(action)}"` : "",
+    callerId ? `callerId="${escapeXml(callerId)}"` : "",
+  ].filter(Boolean).join(" ");
+  const nums = (numbers || []).map((n) => `<Number>${escapeXml(n)}</Number>`).join("");
+  return `${XML}<Response><Dial ${attrs}>${nums}</Dial></Response>`;
+}
+
+function voicemailTwiml(opts = {}) {
+  const { greeting = GREETING, voice = "Polly.Matthew-Neural", transcribeCallback = "", maxLength = 120 } = opts;
+  const cb = transcribeCallback ? ` transcribeCallback="${escapeXml(transcribeCallback)}"` : "";
+  const rec = `<Record transcribe="true"${cb} maxLength="${maxLength}" playBeep="true"/>`;
+  return `${XML}<Response><Say voice="${escapeXml(voice)}">${escapeXml(greeting)}</Say>${rec}</Response>`;
+}
+
+function hangupTwiml() { return `${XML}<Response><Hangup/></Response>`; }
+
+module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers,
+  escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, GREETING };
