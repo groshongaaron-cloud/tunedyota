@@ -107,3 +107,40 @@ test("processLeadIngest treats a match in a TERMINAL stage as a new lead", async
   assert.equal(created, true);
   assert.equal(out.recordId, "recNew2");
 });
+
+test("applyLeadUpdate builds the field patch + activity line per action", () => {
+  const lead = { activity: "start" };
+  const now = new Date("2026-07-14T12:00:00Z");
+  const s = L.applyLeadUpdate(lead, "setStage", { stage: "Contacted" }, now);
+  assert.equal(s.fields.Stage, "Contacted");
+  assert.match(s.fields["Activity Log"], /stage → Contacted/);
+
+  const c = L.applyLeadUpdate(lead, "logContact", { note: "left VM" }, now);
+  assert.equal(c.fields["Last Contact"], "2026-07-14");
+  assert.match(c.fields["Activity Log"], /left VM/);
+
+  const fu = L.applyLeadUpdate(lead, "setFollowup", { date: "2026-07-20" }, now);
+  assert.equal(fu.fields["Next Follow-up"], "2026-07-20");
+
+  const ra = L.applyLeadUpdate(lead, "reassign", { city: "Omaha", installer: "cody" }, now);
+  assert.equal(ra.fields.City, "Omaha");
+  assert.equal(ra.fields.Installer, "cody");
+});
+
+test("applyLeadUpdate rejects an invalid stage", () => {
+  const out = L.applyLeadUpdate({ activity: "" }, "setStage", { stage: "Nope" }, new Date());
+  assert.equal(out.error, "bad-stage");
+});
+
+test("dueLeads picks active leads due today/overdue, grouped by installer", () => {
+  const leads = [
+    { id: "1", installer: "aaron", stage: "Contacted", nextFollowup: "2026-07-10" }, // overdue
+    { id: "2", installer: "aaron", stage: "New", nextFollowup: "2026-07-14" },        // today
+    { id: "3", installer: "cody", stage: "Booked", nextFollowup: "2026-07-10" },      // terminal → excluded
+    { id: "4", installer: "aaron", stage: "New", nextFollowup: "2026-07-20" },        // future → excluded
+    { id: "5", installer: "cody", stage: "Following up", nextFollowup: "2026-07-14" },
+  ];
+  const g = L.dueLeads(leads, "2026-07-14");
+  assert.deepEqual(g.aaron.map((l) => l.id), ["1", "2"]);
+  assert.deepEqual(g.cody.map((l) => l.id), ["5"]);
+});
