@@ -99,6 +99,32 @@ guesswork).
 impossible; ringing all three cells is the correct default for a three-installer
 shop and needs no routing logic. Admin triages the Unassigned lead afterward.
 
+### Voicemail greeting
+
+Played on no-answer, immediately before `<Record>` (owner-authored, verbatim):
+
+> "Hi this is Tuned Yota — I saw we missed your call, sorry about that! I wanted to
+> make sure I got back to you personally. Whether you're looking for the OTT tune, a
+> Magnuson Supercharger, a build for your vehicle, or a maintenance issue needing a
+> fix, or just have a few questions, I'd love to help you get it dialed in. You can
+> also shoot a quick text to the same line, 612‑406‑7117, and a team member can begin
+> a live chat with you. So we can call you right back, please leave your name and a
+> short message after the tone. Thanks, and talk soon!"
+
+- **Rendering:** ships with Twilio TTS using an Amazon **Polly neural** voice
+  (`voice="Polly.Matthew-Neural"` or similar) for a natural read — far better than the
+  default robotic voice, and instantly maintainable. The greeting text lives as a
+  single constant in `lib/twilio.js` so it's trivially editable. The phone number is
+  written so TTS reads the digits cleanly. **Future upgrade path:** swap `<Say>` for
+  `<Play>` of a recorded MP3 of the owner's own voice (warmer, matches the first-person
+  script) — a one-line change once an audio file is hosted; not in this build's scope.
+- **Voicemail-coherence tweak (folded in):** the owner's original script steered
+  callers to *text* and signed off without inviting a message, which conflicts with
+  recording a voicemail. A single sentence — "So we can call you right back, please
+  leave your name and a short message after the tone." — was added before the sign-off
+  so the `playBeep` + `<Record>` that follows is coherent. Both the text alternative and
+  the voicemail path remain open; either way a lead is created.
+
 ## Configuration (owner-provided at activation; never git/memory)
 
 - `TWILIO_AUTH_TOKEN` — signature validation (secret; via clipboard).
