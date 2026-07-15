@@ -17,6 +17,14 @@
     return !!(status && status >= 500);
   }
 
+  // After a flush pass, reload the roster ONLY when we actually synced at least one op
+  // AND the queue is now empty AND we're online. Reloading on an already-empty queue
+  // would recurse forever (load → flushQueue → load → …), because load() kicks off
+  // flushQueue on every load. This guard is the fix for that infinite roster-fetch loop.
+  function shouldReloadAfterFlush(syncedCount, remainingQueueLen, online) {
+    return !!(syncedCount > 0 && remainingQueueLen === 0 && online);
+  }
+
   // Classify a replay response during flush.
   function nextFlushResult(status) {
     if (!status) return "retry-later";          // network error / unknown → keep, retry
@@ -32,7 +40,7 @@
   }
   function saveQueue(storage, ops) { try { storage.setItem(KEY, JSON.stringify(ops || [])); } catch (e) {} }
 
-  var api = { KEY: KEY, makeOp: makeOp, shouldQueue: shouldQueue, nextFlushResult: nextFlushResult, loadQueue: loadQueue, saveQueue: saveQueue };
+  var api = { KEY: KEY, makeOp: makeOp, shouldQueue: shouldQueue, shouldReloadAfterFlush: shouldReloadAfterFlush, nextFlushResult: nextFlushResult, loadQueue: loadQueue, saveQueue: saveQueue };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof root !== "undefined") root.OfflineQueue = api;
 })(typeof window !== "undefined" ? window : this);

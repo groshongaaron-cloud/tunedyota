@@ -1,5 +1,5 @@
 // site/sw.js — Tuned Yota installer console: web push + offline shell cache.
-var CACHE_VERSION = "ty-console-v2"; // bump when the SHELL list or fetch strategy changes
+var CACHE_VERSION = "ty-console-v3"; // bump when the SHELL list or fetch strategy changes
 var SHELL = ["/installer.html", "/commission-tally.js", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"];
 
 self.addEventListener("install", function (event) {

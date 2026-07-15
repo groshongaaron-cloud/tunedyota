@@ -601,12 +601,20 @@
     var ld=document.createElement('label'); ld.className='fld'; ld.textContent='Date of tune';
     var dt=document.createElement('input'); dt.type='date'; dt.value=STATE.today;
     var lc=document.createElement('label'); lc.className='fld'; lc.textContent='Location / market';
-    var cities=knownCities(), city;
-    if(cities.length){ city=document.createElement('select'); city.innerHTML=cities.map(function(x){return '<option>'+esc(x)+'</option>';}).join(''); }
-    else { city=mkInput('City / market'); }
+    // Always a free-text field so ANY of the installer's markets can be logged — even a
+    // city not yet on the roster (everyday call-in). Known cities become datalist
+    // suggestions for one-tap entry. A restricted <select> silently mis-filed a walk-in
+    // under the wrong city when the intended market wasn't in the (roster-derived) list.
+    var cities=knownCities(), city=mkInput('City / market'), dl=null;
+    if(cities.length){
+      dl=document.createElement('datalist'); dl.id='ty_walk_cities';
+      dl.innerHTML=cities.map(function(x){return '<option value="'+esc(x)+'"></option>';}).join('');
+      city.setAttribute('list','ty_walk_cities');
+    }
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Log walk-in';
     var em=mkInput('Customer email (for their certificate)'); em.type='email';
     [n,v,p,ld,dt,lc,city,em,btn].forEach(function(el){ box.appendChild(el); });
+    if(dl) box.appendChild(dl);
     det.appendChild(box);
     btn.onclick=function(){
       var c=(city.value||'').trim(), d=(dt.value||'').trim();
@@ -863,6 +871,7 @@
   var FLUSHING=false;
   async function flushQueue(){
     if(FLUSHING) return; FLUSHING=true;
+    var synced=0;
     try{
       var q=Q().loadQueue(store());
       while(q.length){
@@ -873,12 +882,16 @@
         var verdict = netErr ? 'retry-later' : Q().nextFlushResult(res.status);
         if(verdict==='remove' || verdict==='drop'){
           if(verdict==='drop') fail('A queued '+op.type+' could not be saved and was dropped.');
+          else synced++;
           q.shift(); Q().saveQueue(store(), q); renderPendingBadge();
         } else if(verdict==='stop-auth'){
           Q().saveQueue(store(), q); localStorage.removeItem('ty_installer_token'); location.reload(); return;
         } else { break; }
       }
-      if(!Q().loadQueue(store()).length && navigator.onLine){ load(); }
+      // Refresh the roster ONLY when we actually synced a queued op, so the newly
+      // saved records appear. Reloading on an already-empty queue would recurse
+      // load()→flushQueue()→load()… forever (load() calls flushQueue on every load).
+      if(Q().shouldReloadAfterFlush(synced, Q().loadQueue(store()).length, navigator.onLine)){ load(); }
     } finally { FLUSHING=false; renderPendingBadge(); }
   }
 

@@ -31,6 +31,16 @@ test("nextFlushResult classifies a replay response", () => {
   assert.equal(Q.nextFlushResult(404), "drop");
 });
 
+test("shouldReloadAfterFlush: reload once after a real sync, NEVER on an empty flush", () => {
+  // Regression guard for the infinite roster-fetch loop: an already-empty queue
+  // (synced=0) must NOT trigger a reload, or load()→flushQueue()→load() recurses forever.
+  assert.equal(Q.shouldReloadAfterFlush(0, 0, true), false);   // the loop case — nothing synced
+  assert.equal(Q.shouldReloadAfterFlush(2, 0, true), true);    // synced 2, queue drained, online → refresh
+  assert.equal(Q.shouldReloadAfterFlush(1, 3, true), false);   // still ops left → don't reload yet
+  assert.equal(Q.shouldReloadAfterFlush(2, 0, false), false);  // offline → don't reload
+  assert.equal(Q.shouldReloadAfterFlush(0, 5, true), false);   // nothing synced, ops remain
+});
+
 test("loadQueue/saveQueue round-trip through storage", () => {
   const s = fakeStorage();
   assert.deepEqual(Q.loadQueue(s), []);
