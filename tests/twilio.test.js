@@ -154,3 +154,10 @@ test("parseTranscription with no TranscriptionText yields the no-transcription n
 test("webhookUrl returns empty string when neither rawUrl nor TWILIO_PUBLIC_BASE is present", () => {
   assert.equal(T.webhookUrl({}, {}, "twilio-sms"), "");
 });
+
+test("webhookUrl rewrites last path segment to fnName", () => {
+  assert.equal(
+    T.webhookUrl({ rawUrl: "https://x/.netlify/functions/twilio-voice" }, {}, "twilio-voice-transcription"),
+    "https://x/.netlify/functions/twilio-voice-transcription"
+  );
+});

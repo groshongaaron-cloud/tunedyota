@@ -50,3 +50,10 @@ test("dial action busy -> voicemail (any non-completed status)", async () => {
     { env: {}, verify: () => true, ingest: async () => ({ ok: true }) });
   assert.match(res.body, /<Record transcribe="true"/);
 });
+
+test("ingest failure on the inbound leg still returns 200 Dial TwiML", async () => {
+  const res = await handler(evt("From=%2B16125551234&To=%2B16124067117"),
+    { env: { TWILIO_FORWARD_NUMBERS: "+1611" }, verify: () => true, ingest: async () => { throw new Error("down"); } });
+  assert.equal(res.statusCode, 200);
+  assert.match(res.body, /<Dial /);
+});
