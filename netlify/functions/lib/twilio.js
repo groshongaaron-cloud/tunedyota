@@ -13,4 +13,30 @@ function validateTwilioSignature(authToken, url, params, signature) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
-module.exports = { validateTwilioSignature };
+function decodeBody(event) {
+  const raw = event && event.isBase64Encoded
+    ? Buffer.from(event.body || "", "base64").toString("utf-8")
+    : (event && event.body) || "";
+  const params = {};
+  for (const [k, v] of new URLSearchParams(raw)) params[k] = v;
+  return params;
+}
+
+function webhookUrl(event, env, fnName) {
+  const base = env && env.TWILIO_PUBLIC_BASE;
+  if (base) return `${String(base).replace(/\/$/, "")}/.netlify/functions/${fnName}`;
+  return (event && event.rawUrl) || "";
+}
+
+function formatPhone(e164) {
+  const d = String(e164 == null ? "" : e164).replace(/\D/g, "").slice(-10);
+  return d.length === 10 ? `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}` : String(e164 == null ? "" : e164);
+}
+
+function displayName(prefix, e164) { return `${prefix} ${formatPhone(e164)}`.trim(); }
+
+function parseForwardNumbers(env) {
+  return String((env && env.TWILIO_FORWARD_NUMBERS) || "").split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers };
