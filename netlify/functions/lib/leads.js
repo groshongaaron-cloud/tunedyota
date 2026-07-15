@@ -5,7 +5,7 @@ const { getMarket } = require("./markets.js");
 const { keyToInstaller } = require("./routing.js");
 const { cfg, createRecord, updateRecord, createTolerant, updateTolerant, listAllRecords } = require("./airtable.js");
 
-const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "other"];
+const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "other", "ott-national"];
 const STAGES = ["New", "Contacted", "Following up", "Booked", "Not now"];
 const ACTIVE_STAGES = ["New", "Contacted", "Following up"];
 
@@ -73,6 +73,10 @@ async function processLeadIngest(body, deps) {
   const email = String(d.email || "").trim();
   if (!name || (!phone && !email)) return { status: "error", error: "missing-contact" };
 
+  const emailThread = String(d.emailThread || "").trim();
+  const emailMessageId = String(d.emailMessageId || "").trim();
+  const replyTo = String(d.replyTo || "").trim();
+
   const channel = validChannel(d.channel) ? d.channel : normalizeChannel(d.source || d.channel);
   const source = String(d.source || `lead:${channel}`);
   const city = String(d.city || "").trim();
@@ -99,9 +103,12 @@ async function processLeadIngest(body, deps) {
   if (match) {
     const fields = { "Last Contact": new Date(now).toISOString().slice(0, 10),
       "Activity Log": appendActivity(match.fields["Activity Log"], touch) };
+    if (emailThread) fields["Email Thread"] = emailThread;
+    if (emailMessageId) fields["Email Message-Id"] = emailMessageId;
+    if (replyTo) fields["Reply-To"] = replyTo;
     try {
       await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.priority, id: match.id, fields },
-        ["Last Contact", "Activity Log"]);
+        ["Last Contact", "Activity Log", "Email Thread", "Email Message-Id", "Reply-To"]);
     } catch (e) { return { status: "error", error: "store-unavailable" }; }
     return { status: "lead", recordId: match.id, deduped: true };
   }
@@ -111,12 +118,15 @@ async function processLeadIngest(body, deps) {
     Vehicle: String(d.vehicle || ""), Goals: String(d.goals || ""),
     Source: source, Channel: channel, Stage: "New",
     "Last Contact": new Date(now).toISOString().slice(0, 10), "Activity Log": touch,
+    ...(emailThread ? { "Email Thread": emailThread } : {}),
+    ...(emailMessageId ? { "Email Message-Id": emailMessageId } : {}),
+    ...(replyTo ? { "Reply-To": replyTo } : {}),
   };
   if (ownerKey) fields.Installer = ownerKey;
   let rec;
   try {
     rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields },
-      ["Channel", "Stage", "Last Contact", "Activity Log", "Source"]);
+      ["Channel", "Stage", "Last Contact", "Activity Log", "Source", "Email Thread", "Email Message-Id", "Reply-To"]);
   } catch (e) { return { status: "error", error: "store-unavailable" }; }
   return { status: "lead", recordId: rec && rec.id, deduped: false };
 }

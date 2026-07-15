@@ -165,3 +165,29 @@ test("dueLeads groups an unassigned due lead under 'unassigned'", () => {
   const g = L.dueLeads([{ id: "9", installer: "", stage: "New", nextFollowup: "2026-07-01" }], "2026-07-14");
   assert.deepEqual(g.unassigned.map((l) => l.id), ["9"]);
 });
+
+test("ott-national is a valid channel", () => {
+  assert.equal(L.validChannel("ott-national"), true);
+});
+
+test("processLeadIngest persists email refs when provided (create path)", async () => {
+  let created;
+  await L.processLeadIngest(
+    { name: "Dana", email: "d@x.com", channel: "ott-national", source: "ott-national:fb-ads",
+      emailThread: "thr123", emailMessageId: "<msg-1@mail>", replyTo: "info@overlandtailor.com" },
+    { list: async () => [], create: async (a) => { created = a.fields; return { id: "recN" }; } });
+  assert.equal(created.Channel, "ott-national");
+  assert.equal(created["Email Thread"], "thr123");
+  assert.equal(created["Email Message-Id"], "<msg-1@mail>");
+  assert.equal(created["Reply-To"], "info@overlandtailor.com");
+});
+
+test("processLeadIngest keeps email refs on a dedupe-append", async () => {
+  let updated;
+  const existing = { id: "recX", fields: { Email: "d@x.com", Stage: "New", "Activity Log": "old" } };
+  await L.processLeadIngest(
+    { name: "Dana", email: "d@x.com", channel: "ott-national", emailThread: "thr9", emailMessageId: "<m9@x>", replyTo: "r@x.com", message: "again" },
+    { list: async () => [existing], update: async (a) => { updated = a.fields; return { id: a.id }; }, create: async () => ({}) });
+  assert.equal(updated["Email Thread"], "thr9");
+  assert.match(updated["Activity Log"], /old/);
+});
