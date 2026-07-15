@@ -9,7 +9,7 @@
 -->
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@500;600;700&family=Spectral+SC:wght@500;600&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--paper:#F3EFEA}
+  :root{--bg:#EDECEB;--ink:#3A2E26;--brown:#5B4B42;--sage:#99A08E;--sage-d:#7c8472;--blue:#B3D0D9;--sand:#DFC4B5;--paper:#F3EFEA;--hot:#E85D2A}
   *{margin:0;box-sizing:border-box}
   body{background:#cfcdca;display:grid;place-items:center;min-height:100vh;padding:24px;font-family:'Lato',sans-serif}
   .canvas{width:1080px;height:1920px;position:relative;overflow:hidden;color:var(--paper);
@@ -21,15 +21,15 @@
   .brand svg{width:88px;height:88px}
   .wordmark{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-size:30px;color:#fff}
   .tagrow{font-family:'Spectral SC',serif;letter-spacing:.26em;text-transform:uppercase;font-size:17px;color:var(--blue);margin-top:8px}
-  .eyebrow{font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.28em;text-transform:uppercase;font-size:26px;color:var(--sand);margin-top:70px}
+  .eyebrow{align-self:flex-start;font-family:'Spectral SC',serif;font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-size:24px;color:#fff;background:var(--hot);padding:13px 30px;border-radius:999px;margin-top:70px;box-shadow:0 14px 40px -12px rgba(232,93,42,.7)}
   .count{display:flex;align-items:baseline;gap:32px;margin-top:4px}
-  .days{font-family:'Spectral',serif;font-weight:700;font-size:520px;line-height:.78;letter-spacing:-.04em;color:#fff}
-  .dlab{font-family:'Spectral',serif;font-weight:700;font-size:110px;line-height:.92;color:var(--blue)}
+  .days{font-family:'Spectral',serif;font-weight:700;font-size:540px;line-height:.78;letter-spacing:-.04em;color:#fff;text-shadow:0 10px 90px rgba(232,93,42,.55)}
+  .dlab{font-family:'Spectral',serif;font-weight:700;font-size:114px;line-height:.92;color:var(--hot)}
   .city{font-family:'Spectral',serif;font-weight:700;font-size:108px;line-height:.98;color:#fff;margin-top:40px}
   .date{font-family:'Spectral',serif;font-weight:600;font-size:56px;color:var(--blue);margin-top:14px}
   .spacer{flex:1}
-  .slots{font-family:'Lato';font-weight:900;font-size:36px;color:#fff;margin-top:24px}
-  .slots b{color:var(--sand)}
+  .slots{align-self:flex-start;font-family:'Lato';font-weight:900;font-size:36px;color:#fff;margin-top:24px;background:var(--hot);padding:18px 32px;border-radius:16px;box-shadow:0 16px 40px -14px rgba(232,93,42,.7)}
+  .slots b{color:#fff;text-decoration:underline;text-underline-offset:4px}
   .booking{display:flex;align-items:center;gap:30px;margin-top:26px;background:rgba(243,239,234,.06);border:1.5px solid rgba(179,208,217,.35);border-radius:22px;padding:32px 36px}
   .qr{width:188px;height:188px;flex:0 0 auto;background:#fff;border-radius:14px;padding:12px}
   .qr img{width:100%;height:100%;display:block}

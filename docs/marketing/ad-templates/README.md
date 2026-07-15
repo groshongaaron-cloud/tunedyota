@@ -8,20 +8,20 @@ No AI imagery — real charts/photos + the brand's topographic motif.
 ## Template families
 | File(s) | Purpose |
 |---|---|
-| `dyno-card*` | Dyno proof card — the live dyno results as a shareable graphic |
+| `dyno-card*` | Dyno proof card — the live dyno results as a shareable graphic (specialty / future use) |
 | `event-flyer*` | Event promo — city, date, slots, live QR to the booking URL |
-| `vehicle-spotlight*` | Vehicle feature — real rig photo + "from $X" + proof |
-| `testimonial*` | Customer review card — quote + stars + name/vehicle/city (real reviews, with permission) |
+| `vehicle-spotlight*` | Vehicle feature — real vehicle photo + "from $X" + proof |
 | `before-after*` | Drivability before→after — gear hunting / throttle lag / busy shifts → fixed (no numbers, claims only) |
-| `supercharger*` | Magnuson supercharger feature — real WHP number + "authorized dealer" + sold·installed·calibrated |
-| `emissions-intact*` | Trust card — emissions equipment in place · 5-gas verified · flashes back to stock |
-| `where-we-tune*` | 6-state footprint (MN·IA·WI·ND·SD·NE) + editable "next up" event cities |
-| `find-your-tune*` | Easy-CTA funnel — pick your rig → see your price → book, with live QR (no fabricated prices) |
-| `countdown*` | Event-urgency card — editable "X days out" + city + date + roster-filling line |
-| `youtube-thumbnail.html` | 1280×720 YouTube thumbnail |
+| `where-we-tune*` | 6-state footprint (MN·IA·WI·ND·SD·NE) + editable "next up" event cities (owner-favorite style) |
+| `find-your-tune*` | Easy-CTA funnel — pick your vehicle → see your price → book, with live QR (no fabricated prices) |
+| `countdown*` | Event-urgency card — bold orange urgency accent + "X days out" + city + date + roster-filling badge |
+| `carlson-event-*` | One-off event graphic (Carlson Toyota · Coon Rapids · Jul 18) — partner co-brand + booking QR |
 
-All 10 template families from `master-advertising-plan.md` §3 are now built (the data-driven HTML half;
-the Canva brand kit remains the owner-editable companion). Each family ships in three sizes below.
+Owner curation (2026-07-15) removed the `testimonial`, `supercharger`, `emissions-intact`, and
+`youtube-thumbnail` families (rebuild later, or never for youtube-thumbnail — per owner). Copy rules:
+never "rig" → use "vehicle"; the "Emissions intact" chip is retired as a lead callout in favor of
+benefit-forward lines (emissions-intact stays as brand positioning). Each remaining family ships in
+three sizes below; the Canva brand kit remains the owner-editable companion.
 
 ## Sizes (suffix → dimensions)
 - *(none)* / `-square` → **1080×1080** (IG/FB feed)
