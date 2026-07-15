@@ -24,7 +24,6 @@ module.exports = {
   ],
   "omaha": [
     { dateISO: "2026-06-28", label: "June 28, 2026", active: false, event: "Omaha, Nebraska Summer 2026 OTT Event", details: "", address: "7337 L St., Omaha, NE 68127" },
-    { dateISO: "2026-09-19", label: "September 19, 2026", active: true, event: "Omaha, Nebraska Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2026-10-31", label: "October 31, 2026", active: true, event: "Omaha, Nebraska Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-03-27", label: "March 27, 2027", active: true, event: "Omaha, Nebraska Spring 2027 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-06-26", label: "June 26, 2027", active: true, event: "Omaha, Nebraska Summer 2027 OTT Event", details: "", address: "To Be Released" },
@@ -40,6 +39,7 @@ module.exports = {
   ],
   "rapid city": [
     { dateISO: "2026-07-16", label: "July 16, 2026", active: true, event: "Rapid City, South Dakota Summer 2026 OTT Event", details: "", address: "To Be Released" },
+    { dateISO: "2026-09-19", label: "September 19, 2026", active: true, event: "Rapid City, South Dakota Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-07-17", label: "July 17, 2027", active: true, event: "Rapid City, South Dakota Summer 2027 OTT Event", details: "", address: "To Be Released" },
   ],
   "fargo": [
@@ -78,6 +78,7 @@ module.exports = {
     { dateISO: "2026-09-26", label: "September 26, 2026", active: true, event: "Rochester, Minnesota Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-08-07", label: "August 7, 2027", active: true, event: "Rochester, Minnesota Summer 2027 OTT Event", details: "", address: "To Be Released" },
   ],
+  "coon rapids": { dateISO: "2026-07-18", label: "July 18, 2026", active: true, event: "Carlson Toyota Tacos & Tacomas — Coon Rapids, MN OTT Event", details: "10:30 AM – 1:00 PM", address: "Carlson Toyota, 12880 Riverdale Dr NW, Coon Rapids, MN 55448" },
   "mankato":     { dateISO: "2027-08-08", label: "August 8, 2027", active: true, event: "Mankato, Minnesota Summer 2027 OTT Event", details: "", address: "To Be Released" },
   "davenport":   { dateISO: "2027-06-06", label: "June 6, 2027", active: true, event: "Davenport, Iowa Summer 2027 OTT Event", details: "", address: "To Be Released" },
   "sioux city":  { dateISO: "2027-06-27", label: "June 27, 2027", active: true, event: "Sioux City, Iowa Summer 2027 OTT Event", details: "", address: "To Be Released" },

@@ -4,6 +4,7 @@
 const MARKETS = [
   { city: "Duluth", state: "MN", inst: "aaron" },
   { city: "Twin Cities", state: "MN", inst: "aaron" },
+  { city: "Coon Rapids", state: "MN", inst: "aaron" },
   { city: "Mankato", state: "MN", inst: "aaron" },
   { city: "Rochester", state: "MN", inst: "aaron" },
   // Waitlist-only pending a NEW installer (TBD). Interim routing → aaron, whose
