@@ -45,6 +45,11 @@
 [functions."amsoil-followup"]
   schedule = "0 15 * * *"
 
+# Morning lead follow-up sweep: web-push each installer their due/overdue leads
+# (netlify/functions/lead-followups.js). 13:00 UTC ≈ 8:00am Central.
+[functions."lead-followups"]
+  schedule = "0 13 * * *"
+
 # "Get OTT Now!" share link -> the decision funnel, tagged to the share campaign.
 [[redirects]]
   from = "/get-ott-now"

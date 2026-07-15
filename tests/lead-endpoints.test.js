@@ -91,3 +91,20 @@ test("lead-update convert creates a booking, links it, sets Booked", async () =>
   assert.equal(patched["Converted Booking"], "recBk");
   assert.equal(patched.Stage, "Booked");
 });
+
+const sweep = require("../netlify/functions/lead-followups.js");
+
+test("runFollowups pushes one message per installer with due leads", async () => {
+  const sent = [];
+  const recs2 = [
+    { id: "1", fields: { Installer: "cody", Stage: "New", "Next Follow-up": "2026-07-10" } },
+    { id: "2", fields: { Installer: "cody", Stage: "Contacted", "Next Follow-up": "2026-07-14" } },
+    { id: "3", fields: { Installer: "aaron", Stage: "Booked", "Next Follow-up": "2026-07-01" } }, // terminal
+  ];
+  const out = await sweep.runFollowups({ today: "2026-07-14", listImpl: async () => recs2,
+    pushImpl: async (key, msg) => { sent.push([key, msg.body]); return { sent: 1 }; }, env: {} });
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0][0], "cody");
+  assert.match(sent[0][1], /2 lead/);
+  assert.equal(out.installersNotified, 1);
+});
