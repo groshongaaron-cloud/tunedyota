@@ -684,7 +684,7 @@
 
   // ---- Leads pipeline ----
   var LEAD_STAGES=['New','Contacted','Following up','Booked','Not now'];
-  var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶',other:'•'};
+  var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶','ott-national':'🇺🇸',other:'•'};
   async function loadLeads(){
     try{
       var res=await fetch('/.netlify/functions/leads-list',{headers:{'x-installer-token':tok()}});
@@ -763,7 +763,7 @@
     var box=document.createElement('div'); box.className='ebody walkmini';
     var n=mkInput('Customer name'), v=mkInput('Vehicle (e.g. 2021 Tundra)'), p=mkInput('Phone'); p.inputMode='tel';
     var em=mkInput('Email'); em.type='email';
-    var ch=document.createElement('select'); ch.innerHTML=['phone','sms','email','facebook','instagram','walk-in','other'].map(function(x){return '<option>'+x+'</option>';}).join('');
+    var ch=document.createElement('select'); ch.innerHTML=['phone','sms','email','facebook','instagram','walk-in','other','ott-national'].map(function(x){return '<option>'+x+'</option>';}).join('');
     var city=mkInput('City / market'); var note=mkInput('Note (what they want)');
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Save lead';
     [n,v,p,em,ch,city,note,btn].forEach(function(el){ box.appendChild(el); });
