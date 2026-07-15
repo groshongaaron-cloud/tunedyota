@@ -56,3 +56,54 @@ test("scopeLeads: installer sees own; admin sees all or filtered or unassigned",
   assert.deepEqual(L.scopeLeads(leads, { key: "aaron", admin: true, filter: "cody" }).map((l) => l.id), ["2"]);
   assert.deepEqual(L.scopeLeads(leads, { key: "aaron", admin: true, filter: "unassigned" }).map((l) => l.id), ["3"]);
 });
+
+test("processLeadIngest requires a name and at least one contact", async () => {
+  const out = await L.processLeadIngest({ name: "", phone: "" }, { list: async () => [] });
+  assert.equal(out.error, "missing-contact");
+});
+
+test("processLeadIngest creates a New lead assigned by market", async () => {
+  let created;
+  const out = await L.processLeadIngest(
+    { name: "Dana", phone: "6055551212", channel: "sms", city: "Sioux Falls", vehicle: "Tundra" },
+    { now: new Date("2026-07-14T12:00:00Z"), list: async () => [],
+      create: async (a) => { created = a.fields; return { id: "recNew" }; } });
+  assert.equal(out.status, "lead");
+  assert.equal(out.recordId, "recNew");
+  assert.equal(out.deduped, false);
+  assert.equal(created.Stage, "New");
+  assert.equal(created.Channel, "sms");
+  assert.equal(created.Installer, "cody");            // Sioux Falls routes to cody
+  assert.match(created["Activity Log"], /sms/);
+});
+
+test("processLeadIngest sends an unknown city to the Unassigned bucket", async () => {
+  let created;
+  await L.processLeadIngest({ name: "X", phone: "1", channel: "phone", city: "Nowhere" },
+    { list: async () => [], create: async (a) => { created = a.fields; return { id: "r" }; } });
+  assert.equal(created.City, "Unassigned");
+  assert.equal("Installer" in created, false);        // blank installer, not written
+});
+
+test("processLeadIngest dedupes onto an ACTIVE lead by phone (appends, no create)", async () => {
+  let created = false, updated;
+  const existing = { id: "recX", fields: { Name: "Dana", Phone: "16055551212", Stage: "Contacted", "Activity Log": "old" } };
+  const out = await L.processLeadIngest({ name: "Dana", phone: "605-555-1212", channel: "email", message: "emailed back" },
+    { list: async () => [existing], create: async () => { created = true; return {}; },
+      update: async (a) => { updated = a; return { id: a.id }; } });
+  assert.equal(out.deduped, true);
+  assert.equal(out.recordId, "recX");
+  assert.equal(created, false);
+  assert.match(updated.fields["Activity Log"], /old/);        // preserved
+  assert.match(updated.fields["Activity Log"], /emailed back/); // appended
+});
+
+test("processLeadIngest treats a match in a TERMINAL stage as a new lead", async () => {
+  let created = false;
+  const existing = { id: "recX", fields: { Phone: "16055551212", Stage: "Booked" } };
+  const out = await L.processLeadIngest({ name: "Dana", phone: "6055551212", channel: "sms" },
+    { list: async () => [existing], create: async () => { created = true; return { id: "recNew2" }; } });
+  assert.equal(out.deduped, false);
+  assert.equal(created, true);
+  assert.equal(out.recordId, "recNew2");
+});
