@@ -25,7 +25,7 @@ OTT emails arrive at `info@tunedyota.com` (Google Workspace) with subject **"A N
 
 ## 4. Data model — four new Priority List columns
 
-Added the same schema-token way as the Core's six (see [[airtable-metadata-api]]):
+Added the same schema-token way as the Core's six (see [[airtable-metadata-api]]). Additionally, the existing `Channel` single-select gains an **`ott-national`** option (for the OTT-national tag).
 
 | Column | Type | Purpose |
 |---|---|---|
@@ -46,7 +46,7 @@ Added the same schema-token way as the Core's six (see [[airtable-metadata-api]]
 ### 6.1 `lib/ott-email.js` — pure parser
 `parseOttLeadEmail(message)` → `{ name, phone, email, vehicle, goals, channel, source, replyTo, threadId, messageIdHeader }`.
 - Input: a normalized message object `{ headers: {from,to,cc,replyTo,subject,messageId,date}, textBody, htmlBody, threadId }` produced by `lib/gmail.js`.
-- `channel` = `"facebook"` (the lead's true origin is a Facebook Ad; the email is just OTT's transport). `source` = `"ott-email:fb-ads"` so the pathway is auditable. (Adjustable — one-line change if a different channel label is preferred.)
+- `channel` = **`"ott-national"`** — these are OTT's national Facebook-Ads leads distributed to retailers, tracked as their own category (owner's choice). `source` = `"ott-national:fb-ads"` so the pathway is auditable. **This adds `ott-national` to the Core in three places (small, in-scope):** (a) the `CHANNELS` enum in `netlify/functions/lib/leads.js`; (b) the `Channel` single-select options in Airtable (a `ott-national` choice); (c) the console icon map `CHAN_ICON` in `site/installer.html` (e.g. `ott-national: "🇺🇸"` or a badge). The `+ Log a lead` channel dropdown also gains `ott-national`.
 - Extracts whatever customer detail the email actually contains (name/phone/email/vehicle) plus **always** the email refs (`threadId`, `messageIdHeader`, `replyTo`).
 - **Concrete extraction rules are derived TDD-style from real captured samples in implementation Task 1** — the *contract* (inputs/outputs above) is fixed here; the field-locating patterns come from fixtures, because a parser must be built against real data. If a field isn't present in the email, it's returned empty and the lead still tracks on its email refs.
 
