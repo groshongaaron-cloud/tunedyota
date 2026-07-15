@@ -13,7 +13,7 @@ async function handler(event, ctx = {}) {
   const url = webhookUrl(event, env, "twilio-sms");
   const sig = (event.headers && (event.headers["x-twilio-signature"] || event.headers["X-Twilio-Signature"])) || "";
   if (!verify(env.TWILIO_AUTH_TOKEN, url, params, sig)) return { statusCode: 403, body: "invalid signature" };
-  try { await ingest(parseInboundSms(params)); } catch (e) { /* best-effort; never break the texter */ }
+  try { await ingest(parseInboundSms(params)); } catch (e) { console.error("twilio-sms ingest failed", e && e.message); /* best-effort; never break the texter */ }
   return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body: smsReplyTwiml(REPLY) };
 }
 

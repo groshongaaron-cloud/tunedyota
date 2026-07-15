@@ -20,14 +20,14 @@ async function handler(event, ctx = {}) {
   // Dial-action leg: Twilio re-POSTs the action URL with DialCallStatus once the dial ends.
   if (params.DialCallStatus) {
     if (params.DialCallStatus === "completed") {
-      try { await ingest(parseInboundCall(params, "call answered by installer")); } catch (e) { /* best-effort */ }
+      try { await ingest(parseInboundCall(params, "call answered by installer")); } catch (e) { console.error("twilio-voice ingest failed (answered)", e && e.message); /* best-effort */ }
       return xml(hangupTwiml());
     }
     return voicemail(); // no-answer / busy / failed / canceled
   }
 
   // Initial inbound leg:
-  try { await ingest(parseInboundCall(params, "inbound call")); } catch (e) { /* best-effort */ }
+  try { await ingest(parseInboundCall(params, "inbound call")); } catch (e) { console.error("twilio-voice ingest failed (inbound)", e && e.message); /* best-effort */ }
   const numbers = parseForwardNumbers(env);
   if (!numbers.length) return voicemail();
   return xml(dialTwiml(numbers, { timeout: 20, action: url, callerId: params.To || "" }));

@@ -11,7 +11,7 @@ async function handler(event, ctx = {}) {
   const url = webhookUrl(event, env, "twilio-voice-transcription");
   const sig = (event.headers && (event.headers["x-twilio-signature"] || event.headers["X-Twilio-Signature"])) || "";
   if (!verify(env.TWILIO_AUTH_TOKEN, url, params, sig)) return { statusCode: 403, body: "invalid signature" };
-  try { await ingest(parseTranscription(params)); } catch (e) { /* best-effort */ }
+  try { await ingest(parseTranscription(params)); } catch (e) { console.error("twilio-transcription ingest failed", e && e.message); /* best-effort */ }
   return { statusCode: 200, headers: { "Content-Type": "text/plain" }, body: "ok" };
 }
 
