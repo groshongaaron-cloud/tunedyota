@@ -12,9 +12,10 @@ const ACTIVE_STAGES = ["New", "Contacted", "Following up"];
 function validChannel(c) { return CHANNELS.includes(String(c || "")); }
 function validStage(s) { return STAGES.includes(String(s || "")); }
 
-// Map a free-form Source/channel string to exactly one channel value.
-function normalizeChannel(source) {
-  const s = String(source == null ? "" : source).toLowerCase();
+// Map a free-form Source (and optional Reason, for backfill of rebook rows) to exactly
+// one channel value.
+function normalizeChannel(source, reason) {
+  const s = (String(source == null ? "" : source) + " " + String(reason == null ? "" : reason)).toLowerCase();
   for (const ch of ["email", "facebook", "instagram", "sms", "phone", "walk-in"]) {
     if (s.includes(ch)) return ch;
   }
@@ -35,9 +36,10 @@ function toLeadView(rec) {
     name: f.Name || "", phone: f.Phone || "", email: f.Email || "",
     city: f.City || "", vehicle: f.Vehicle || "", goals: f.Goals || "",
     installer: f.Installer || "",
-    channel: explicit || normalizeChannel(f.Source),
+    channel: explicit || normalizeChannel(f.Source, f.Reason),
     stage: validStage(f.Stage) ? f.Stage : "New",
     source: f.Source || "",
+    modifications: f.Modifications || "", modelYear: f["Model Year"] || "",
     nextFollowup: (f["Next Follow-up"] || "").slice(0, 10),
     lastContact: (f["Last Contact"] || "").slice(0, 10),
     activity: f["Activity Log"] || "",

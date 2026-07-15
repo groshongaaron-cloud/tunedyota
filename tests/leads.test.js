@@ -144,3 +144,24 @@ test("dueLeads picks active leads due today/overdue, grouped by installer", () =
   assert.deepEqual(g.aaron.map((l) => l.id), ["1", "2"]);
   assert.deepEqual(g.cody.map((l) => l.id), ["5"]);
 });
+
+test("normalizeChannel also reads the Reason field (backfill of rebook rows)", () => {
+  assert.equal(L.normalizeChannel("", "installer:walk-in"), "walk-in");
+  assert.equal(L.normalizeChannel(null, "Rebook — not completed"), "other");
+});
+
+test("toLeadView carries Modifications + Model Year (spec §4 reused fields)", () => {
+  const v = L.toLeadView({ id: "r", fields: { Name: "X", Modifications: "lift", "Model Year": "2022" } });
+  assert.equal(v.modifications, "lift");
+  assert.equal(v.modelYear, "2022");
+});
+
+test("applyLeadUpdate rejects a malformed follow-up date and an unknown action", () => {
+  assert.equal(L.applyLeadUpdate({ activity: "" }, "setFollowup", { date: "07/20" }, new Date()).error, "bad-date");
+  assert.equal(L.applyLeadUpdate({ activity: "" }, "frobnicate", {}, new Date()).error, "bad-action");
+});
+
+test("dueLeads groups an unassigned due lead under 'unassigned'", () => {
+  const g = L.dueLeads([{ id: "9", installer: "", stage: "New", nextFollowup: "2026-07-01" }], "2026-07-14");
+  assert.deepEqual(g.unassigned.map((l) => l.id), ["9"]);
+});
