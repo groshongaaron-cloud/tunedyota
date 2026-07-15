@@ -17,7 +17,16 @@ async function handler(event, ctx = {}) {
   const xml = (body) => ({ statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body });
   const voicemail = () => xml(voicemailTwiml({ greeting: GREETING, transcribeCallback: webhookUrl(event, env, "twilio-voice-transcription") }));
 
-  // Dial-action leg is handled in Task 7. Initial inbound leg:
+  // Dial-action leg: Twilio re-POSTs the action URL with DialCallStatus once the dial ends.
+  if (params.DialCallStatus) {
+    if (params.DialCallStatus === "completed") {
+      try { await ingest(parseInboundCall(params, "call answered by installer")); } catch (e) { /* best-effort */ }
+      return xml(hangupTwiml());
+    }
+    return voicemail(); // no-answer / busy / failed / canceled
+  }
+
+  // Initial inbound leg:
   try { await ingest(parseInboundCall(params, "inbound call")); } catch (e) { /* best-effort */ }
   const numbers = parseForwardNumbers(env);
   if (!numbers.length) return voicemail();

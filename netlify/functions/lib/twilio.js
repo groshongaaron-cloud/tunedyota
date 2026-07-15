@@ -25,7 +25,9 @@ function decodeBody(event) {
 function webhookUrl(event, env, fnName) {
   const base = env && env.TWILIO_PUBLIC_BASE;
   if (base) return `${String(base).replace(/\/$/, "")}/.netlify/functions/${fnName}`;
-  return (event && event.rawUrl) || "";
+  const raw = (event && event.rawUrl) || "";
+  if (!raw) return "";
+  return raw.replace(/([^/]+)$/, fnName);
 }
 
 // Formats US 10-digit numbers only; non-US or short input is passed through as-is.

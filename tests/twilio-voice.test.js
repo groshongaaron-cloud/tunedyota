@@ -29,3 +29,24 @@ test("bad signature -> 403", async () => {
   const res = await handler(evt("From=x"), { env: {}, verify: () => false, ingest: async () => {} });
   assert.equal(res.statusCode, 403);
 });
+
+test("dial action completed -> notes 'answered' + hangs up", async () => {
+  const ingested = [];
+  const res = await handler(evt("From=%2B16125551234&DialCallStatus=completed"),
+    { env: {}, verify: () => true, ingest: async (b) => { ingested.push(b); return { ok: true }; } });
+  assert.match(res.body, /<Hangup\/>/);
+  assert.equal(ingested[0].message, "call answered by installer");
+});
+
+test("dial action no-answer -> voicemail with transcription callback", async () => {
+  const res = await handler(evt("From=%2B16125551234&DialCallStatus=no-answer"),
+    { env: {}, verify: () => true, ingest: async () => ({ ok: true }) });
+  assert.match(res.body, /<Say voice="Polly\.Matthew-Neural">/);
+  assert.match(res.body, /<Record transcribe="true" transcribeCallback="[^"]*twilio-voice-transcription"/);
+});
+
+test("dial action busy -> voicemail (any non-completed status)", async () => {
+  const res = await handler(evt("From=%2B16125551234&DialCallStatus=busy"),
+    { env: {}, verify: () => true, ingest: async () => ({ ok: true }) });
+  assert.match(res.body, /<Record transcribe="true"/);
+});
