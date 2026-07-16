@@ -111,7 +111,9 @@
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:''
-    , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:'' };
+    , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:''
+    , jobTab: 'all'      // 'all' | '<city>' | 'done'
+    , doneCity: '' };    // optional city filter applied inside the Done view
   function Q(){ return window.OfflineQueue; }
   function store(){ return window.localStorage; }
 
@@ -468,7 +470,9 @@
       (next?'<span class="next">Next: '+esc(next.city)+' · '+esc(relDate(next.dateISO))+'</span>':'');
   }
 
-  function renderAll(){ renderTally(); renderTabs(); if(STATE.tab==='leads'){ renderLeads(); } else { renderFeed(); } }
+  function renderAll(){ renderTally(); renderTabs();
+    var st=document.getElementById('subtabs'); if(st) st.style.display = STATE.tab==='leads' ? 'none' : 'flex';
+    if(STATE.tab==='leads'){ renderLeads(); } else { renderFeed(); } }
   function renderTabs(){
     var host=document.getElementById('tabs');
     if(!host){ host=document.createElement('div'); host.id='tabs'; host.style.cssText='display:flex;gap:8px;margin:6px 0 10px';
@@ -477,6 +481,28 @@
     var due=STATE.leads.filter(function(l){ return ['New','Contacted','Following up'].indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today; }).length;
     host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'');
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){ STATE.tab=b.getAttribute('data-tab'); if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); } renderAll(); }; });
+  }
+
+  // The Jobs sub-tab strip: All + one tab per city with work + a Done tab.
+  // Horizontally scrollable on mobile; a red dot marks a city needing close-out.
+  function renderSubTabs(events){
+    var host=document.getElementById('subtabs');
+    if(!host){ host=document.createElement('div'); host.id='subtabs';
+      host.style.cssText='display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 10px;padding-bottom:2px';
+      var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
+    var t=STATE.today;
+    var cities={};
+    events.forEach(function(e){
+      var c=(cities[e.city]=cities[e.city]||{city:e.city,open:0,overdue:false});
+      c.open+=e.open; if(e.dateISO<t && e.hasOpen) c.overdue=true;
+    });
+    var list=Object.keys(cities).map(function(k){return cities[k];}).sort(function(a,b){return a.city.localeCompare(b.city);});
+    function tab(id,label,dot,badge){ return '<button class="tabbtn'+(STATE.jobTab===id?' on':'')+'" data-sub="'+esc(id)+'" style="white-space:nowrap">'+(dot?'<span style="color:#c0392b">●</span> ':'')+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
+    var html=tab('all','All','','');
+    list.forEach(function(c){ html+=tab(c.city, c.city, c.overdue, c.open?String(c.open):''); });
+    html+=tab('done','✓ Done','','');
+    host.innerHTML=html;
+    Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){ STATE.jobTab=b.getAttribute('data-sub'); if(STATE.jobTab!=='done') STATE.doneCity=''; renderFeed(); }; });
   }
 
   function bySlot(a,b){ return String(a.slot||'').localeCompare(String(b.slot||''),undefined,{numeric:true}); }
@@ -507,9 +533,14 @@
     var host=document.getElementById('feed'); host.innerHTML='';
     var events=buildEvents();
 
-    host.appendChild(anydayWalkForm());   // everyday walk-in / call-in — always available, even while searching
+    renderSubTabs(events);
 
-    // Search mode: flat, all-history, event-grouped results (newest first).
+    // Done tab: completed jobs only, grouped by event, newest first.
+    if(STATE.jobTab==='done'){ renderDone(events, host); return; }
+
+    host.appendChild(anydayWalkForm());   // everyday walk-in — always available
+
+    // Search mode (unchanged): flat, all-history, event-grouped results.
     if(STATE.q.trim()){
       var hits=events.map(function(e){ return { e:e, bs:e.bookings.filter(matchesQ) }; })
         .filter(function(x){ return x.bs.length; })
@@ -517,36 +548,52 @@
       var n=hits.reduce(function(s,x){ return s+x.bs.length; },0);
       host.appendChild(secHead('Search results ('+n+')',''));
       if(!n){ host.innerHTML+='<div class="empty">No matches.</div>'; return; }
-      hits.forEach(function(x){ host.appendChild(eventCard(x.e, x.bs, true, false)); });
+      hits.forEach(function(x){ host.appendChild(eventCard(x.e, x.bs, true, false, true)); });
       return;
     }
 
     var t=STATE.today;
-    var needs=events.filter(function(e){ return e.dateISO<t && e.hasOpen; }).sort(function(a,b){ return b.dateISO.localeCompare(a.dateISO); });
-    var today=events.filter(function(e){ return e.dateISO===t; }).sort(function(a,b){ return a.city.localeCompare(b.city); });
-    var upcoming=events.filter(function(e){ return e.dateISO>t; }).sort(function(a,b){ return a.dateISO.localeCompare(b.dateISO); });
-    var recent=events.filter(function(e){ return e.dateISO<t && !e.hasOpen && e.total>0; }).sort(function(a,b){ return b.dateISO.localeCompare(a.dateISO); });
+    var scoped = STATE.jobTab==='all' ? events : events.filter(function(e){ return e.city===STATE.jobTab; });
+    var needs=scoped.filter(function(e){ return e.dateISO<t && e.hasOpen; }).sort(function(a,b){ return b.dateISO.localeCompare(a.dateISO); });
+    var today=scoped.filter(function(e){ return e.dateISO===t; }).sort(function(a,b){ return a.city.localeCompare(b.city); });
+    var upcoming=scoped.filter(function(e){ return e.dateISO>t; }).sort(function(a,b){ return a.dateISO.localeCompare(b.dateISO); });
 
-    if(!needs.length && !today.length && !upcoming.length && !recent.length){
-      var em=document.createElement('div'); em.className='empty'; em.textContent='No jobs yet. Use “Log a walk-in / call-in” above for everyday work; scheduled events show here too.'; host.appendChild(em); return;
+    if(!needs.length && !today.length && !upcoming.length){
+      var em=document.createElement('div'); em.className='empty';
+      em.textContent = STATE.jobTab==='all' ? 'No open jobs. Use “Log a walk-in / call-in” above; completed work is under ✓ Done.' : 'No open jobs in '+STATE.jobTab+'. Completed work is under ✓ Done.';
+      host.appendChild(em); return;
     }
-    if(needs.length){ host.appendChild(secHead('Needs close-out','warn')); needs.forEach(function(e){ host.appendChild(eventCard(e,e.bookings,true,true)); }); }
-    if(today.length){ host.appendChild(secHead('Today','')); today.forEach(function(e){ host.appendChild(eventCard(e,e.bookings,true,true)); }); }
-    if(upcoming.length){ host.appendChild(secHead('Upcoming','')); upcoming.forEach(function(e,i){ host.appendChild(eventCard(e,e.bookings,i===0,true)); }); }
-    if(recent.length){
-      host.appendChild(secHead('Recent',''));
-      (STATE.showAllPast?recent:recent.slice(0,5)).forEach(function(e){ host.appendChild(eventCard(e,e.bookings,false,true)); });
-      if(recent.length>5 && !STATE.showAllPast){
-        var btn=document.createElement('button'); btn.className='showmore'; btn.textContent='Show older events ('+(recent.length-5)+') ▾';
-        btn.onclick=function(){ STATE.showAllPast=true; renderFeed(); }; host.appendChild(btn);
-      }
+    // Active views hide completed rows (showDone=false) so they don't crowd the close-out UI.
+    if(needs.length){ host.appendChild(secHead('Needs close-out','warn')); needs.forEach(function(e){ host.appendChild(eventCard(e,e.bookings,true,true,false)); }); }
+    if(today.length){ host.appendChild(secHead('Today','')); today.forEach(function(e){ host.appendChild(eventCard(e,e.bookings,true,true,false)); }); }
+    if(upcoming.length){ host.appendChild(secHead('Upcoming','')); upcoming.forEach(function(e,i){ host.appendChild(eventCard(e,e.bookings,i===0,true,false)); }); }
+  }
+
+  // The ✓ Done view: completed jobs across markets, grouped by event (city|date),
+  // newest first, honoring the search box and an optional city filter (set by the
+  // per-event "done — view ›" deep-link). Completed rows never crowd active work.
+  function renderDone(events, host){
+    if(STATE.doneCity){
+      var chip=document.createElement('div'); chip.className='sec';
+      chip.innerHTML='<span class="lbl">Completed · '+esc(STATE.doneCity)+'</span> <a href="#" class="link" id="doneall">show all markets ›</a>';
+      host.appendChild(chip);
+      chip.querySelector('#doneall').onclick=function(ev){ ev.preventDefault(); STATE.doneCity=''; renderFeed(); };
     }
+    var done=events.map(function(e){
+        var bs=e.bookings.filter(function(b){ return b.status==='Completed' && matchesQ(b) && (!STATE.doneCity || e.city===STATE.doneCity); });
+        return { e:e, bs:bs };
+      }).filter(function(x){ return x.bs.length; })
+      .sort(function(a,b){ return b.e.dateISO.localeCompare(a.e.dateISO); });
+    var n=done.reduce(function(s,x){ return s+x.bs.length; },0);
+    host.appendChild(secHead('Completed ('+n+')',''));
+    if(!n){ host.innerHTML+='<div class="empty">No completed jobs'+(STATE.q.trim()?' match your search':'')+' yet.</div>'; return; }
+    done.forEach(function(x){ host.appendChild(eventCard(x.e, x.bs, false, false, true)); });
   }
 
   // One event = one <details> card. defaultOpen sets the initial state; the user's own
   // toggle is remembered in STATE.eventOpen so a close-out never collapses it. canAdd
   // shows the per-event walk-in adder (actionable events only).
-  function eventCard(e, bookings, defaultOpen, canAdd){
+  function eventCard(e, bookings, defaultOpen, canAdd, showDone){
     var open=(e.key in STATE.eventOpen)?STATE.eventOpen[e.key]:defaultOpen;
     var det=document.createElement('details');
     det.className='evt'+(e.dateISO<STATE.today&&e.hasOpen?' warn':(e.dateISO===STATE.today?' today':''));
@@ -564,7 +611,11 @@
     bookings.filter(isOpen).sort(bySlot).forEach(function(b){ body.appendChild(rowCard(b)); });
     bookings.filter(function(b){return b.status==='No-show';}).sort(bySlot).forEach(function(b){ body.appendChild(rowCard(b)); });
     var doneB=bookings.filter(function(b){return b.status==='Completed';}).sort(bySlot);
-    if(doneB.length){ var h=document.createElement('div'); h.className='donehdr'; h.textContent='✓ Done ('+doneB.length+')'; body.appendChild(h); doneB.forEach(function(b){ body.appendChild(rowCard(b)); }); }
+    if(doneB.length){
+      if(showDone){ var h=document.createElement('div'); h.className='donehdr'; h.textContent='✓ Done ('+doneB.length+')'; body.appendChild(h); doneB.forEach(function(b){ body.appendChild(rowCard(b)); }); }
+      else { var lk=document.createElement('a'); lk.href='#'; lk.className='link'; lk.textContent='✓ '+doneB.length+' done — view ›';
+        lk.onclick=function(ev){ ev.preventDefault(); STATE.jobTab='done'; STATE.doneCity=e.city; renderFeed(); }; body.appendChild(lk); }
+    }
     if(!bookings.length && !canAdd){ var m=document.createElement('div'); m.className='empty'; m.textContent='No bookings.'; body.appendChild(m); }
     det.appendChild(body); return det;
   }
@@ -815,6 +866,29 @@
     var o=document.getElementById('scanov_'+id); if(o) o.remove();
     var b=document.getElementById('scan_'+id); if(b) b.style.display='';
   }
+  // Photograph the current camera frame and OCR the VIN via /vin-ocr. On a
+  // confident read, fill the (always-editable) VIN field and run the NHTSA guard;
+  // on ANY failure, show a plain message and leave the installer to type it.
+  // The camera is a convenience — it never blocks close-out.
+  async function captureVin(id){
+    var video=document.getElementById('scanvid_'+id);
+    var btn=document.getElementById('scancap_'+id);
+    if(!video || !video.videoWidth){ setScanMsg(id,'Hold steady and try again.'); return; }
+    if(btn){ btn.disabled=true; btn.textContent='Reading…'; }
+    setScanMsg(id,'Reading the VIN…');
+    try{
+      var maxEdge=1024, w=video.videoWidth, h=video.videoHeight, scale=Math.min(1, maxEdge/Math.max(w,h));
+      var cv=document.createElement('canvas'); cv.width=Math.round(w*scale); cv.height=Math.round(h*scale);
+      cv.getContext('2d').drawImage(video,0,0,cv.width,cv.height);
+      var dataUrl=cv.toDataURL('image/jpeg',0.7);
+      var res=await fetch('/.netlify/functions/vin-ocr',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({imageBase64:dataUrl,mediaType:'image/jpeg'})});
+      var out=await res.json().catch(function(){ return {ok:false}; });
+      if(out && out.ok && out.vin){ onVin(id,out.vin); return; }  // fills field, stops scan, runs checkVin
+    }catch(e){}
+    // Any failure → keep the camera open, tell them to retry or type it.
+    if(btn){ btn.disabled=false; btn.textContent='● Capture VIN'; }
+    setScanMsg(id,"Couldn't read it — retake, or Cancel and type the VIN.");
+  }
   async function startScan(id){
     if(isNative() && window.Capacitor.Plugins && window.Capacitor.Plugins.BarcodeScanner){
       try{
@@ -830,12 +904,14 @@
     if(document.getElementById('scanov_'+id)) return;
     var ov=document.createElement('div'); ov.id='scanov_'+id; ov.className='scanwrap';
     ov.innerHTML='<video id="scanvid_'+id+'" playsinline autoplay muted></video>'+
-      '<div class="scanhint">Point at the VIN barcode — door jamb or windshield</div>'+
+      '<div class="scanhint">Point at the VIN — barcode auto-scans; or tap Capture to photograph a printed VIN</div>'+
       '<div id="scanmsg_'+id+'" class="scanmsg"></div>'+
+      '<button type="button" class="btn" id="scancap_'+id+'" style="width:100%;margin-bottom:6px">● Capture VIN</button>'+
       '<button type="button" class="btn" id="scancx_'+id+'" style="width:100%;background:#8a2a2a">Cancel</button>';
     card.appendChild(ov);
     var sbtn=document.getElementById('scan_'+id); if(sbtn) sbtn.style.display='none';
     document.getElementById('scancx_'+id).onclick=function(){ stopScan(id); };
+    document.getElementById('scancap_'+id).onclick=function(){ captureVin(id); };
     var video=document.getElementById('scanvid_'+id);
     var stream;
     try{ stream=await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } }); }
@@ -897,6 +973,8 @@
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
       (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'');
+    var overdue = isOpen(b) && b.dateISO < STATE.today;
+    if(overdue){ head += '<div class="ffnote">⚠ Not closed out — this customer has no certificate yet. Close it out (VIN + calibration) to send it.</div>'; }
     if(b.status==='Completed'){
       c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'+
         (b.certDelivery==='installer-fallback' ? '<div class="ffnote">No customer email on file — this certificate went to you. Re-open and add the email to send it to the customer.</div>' : '')+
