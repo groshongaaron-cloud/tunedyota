@@ -71,3 +71,10 @@ test("sanitizes an unexpected media type to image/jpeg", async () => {
   await readVinFromImage({ imageBase64: IMG, mediaType: "image/tiff" }, { apiKey: "k", fetchImpl });
   assert.equal(sentBody.messages[0].content[0].source.media_type, "image/jpeg");
 });
+
+const { handler } = require("../netlify/functions/vin-ocr.js");
+
+test("handler rejects a request with no installer token (401)", async () => {
+  const res = await handler({ headers: {}, body: JSON.stringify({ imageBase64: "AAAA" }) });
+  assert.equal(res.statusCode, 401);
+});
