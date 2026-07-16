@@ -1,20 +1,23 @@
 ---
 name: pending-secret-rotation
-description: Credential-incident log. Airtable PAT + Slack webhook (2026-06-29) + n8n key (2026-06-30) all rotated/CLOSED. OPEN 2026-07-15 — RESEND_API_KEY value printed to a session transcript; needs rotation.
+description: Credential-incident log. Airtable PAT + Slack webhook (2026-06-29) + n8n key (2026-06-30) + Resend key (2026-07-16) ALL rotated/CLOSED. No open items.
 metadata: 
   node_type: memory
   type: project
   originSessionId: e5319100-6ade-4bc9-95a6-c9423d101c2c
 ---
 
-**2026-07-15 — 3rd exposure (RESEND_API_KEY), OPEN.** During installer-dashboard work, a
+**2026-07-15 — 3rd exposure (RESEND_API_KEY), CLOSED 2026-07-16.** During installer-dashboard work, a
 `netlify env:list --plain` filtered on `api_key` printed the **value** of `RESEND_API_KEY`
-(`re_…`) into the session transcript. It's the live Netlify key sending all booking/lead/cert
-email via Resend (from `send.tunedyota.events`; see [[email-sending-infra]]). **TODO:** rotate in
-the Resend dashboard → `netlify env:set RESEND_API_KEY` (via clipboard, not chat) → redeploy →
-send a test cert to confirm delivery. Tracked as Task 6 Step 6 in the installer VIN/IA plan
-([[certificate-v2-dashboard-program]] area). Lesson: never `env:list --plain` / grep on values —
-read one var name-only with `netlify env:get`, and don't pipe secrets through grep.
+(`re_…`) into the session transcript. It was the live Netlify key sending all booking/lead/cert
+email via Resend (from `send.tunedyota.events`; see [[email-sending-infra]]). **ROTATED & VERIFIED
+2026-07-16:** owner minted a new send-only key `tunedyota-prod-2026-07` in the Resend dashboard →
+`netlify env:set RESEND_API_KEY` (via clipboard, cleared after) → prod redeploy → the `email-health`
+canary returned `200 {"ok":true}` BEFORE and AFTER deleting the old `Netlify Production (send-only)`
+key, proving the new key sends and the old one is gone. **Kept `tunedyota-n8n`** (separate key for
+the n8n instance — NOT part of this rotation; deleting it would break n8n email). Lesson: never
+`env:list --plain` / grep on values — read one var name-only with `netlify env:get`, and don't pipe
+secrets through grep.
 
 **CLOSED — COMPLETE 2026-06-29.** Both credentials fully rotated; both OLD secrets REVOKED
 and the plaintext copies in `.claude/settings.local.json` were scrubbed (replaced with

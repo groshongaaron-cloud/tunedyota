@@ -84,5 +84,11 @@ sign-off on DRAFT artifacts 01/02. Owner will supply data later; don't fabricate
 Close-out = fill token → `npm run render:dealer-kit`.
 
 **State 2026-07-07:** 321 tests green (307 prior + 11 pipeline + 3 kit). All committed to master
-(`6425918`..`151de0c`), **not yet pushed**. Both sub-projects passed spec + code/content review clean.
+(`6425918`..`151de0c`). **✅ PUSHED — verified on `origin/master` 2026-07-16** (18 dealer files
+tracked; local master in sync with origin). The old "not yet pushed" state was stale — it landed on
+origin via later activity. Repo-side collateral lives under `docs/` (not `site/`), so it's correctly
+private, not publicly served. Both sub-projects passed spec + code/content review clean. **What's
+actually still open = owner/counsel only** (not Claude-actionable): the 9 `{{OWNER:…}}` economics/
+warranty tokens + counsel sign-off on DRAFT artifacts 01/02 (see `docs/marketing/dealer-kit/OPEN-ITEMS.md`).
+Dealer signals were already filled via research 2026-07-09 (tiers A13·B42·C22) — owner to review/override, not re-fill.
 See [[prefer-automation-over-handoffs]], [[monthly-ott-calibration-report]], [[advertising-graphics-project]].
