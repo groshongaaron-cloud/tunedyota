@@ -10,7 +10,8 @@ test("normalizeVin accepts a clean 17-char VIN and rejects I/O/Q and wrong lengt
   assert.equal(normalizeVin("jtebu5jr4k5601234"), "JTEBU5JR4K5601234");
   assert.equal(normalizeVin("JTEBU5JR4K560123"), "");      // 16 chars
   assert.equal(normalizeVin("JTEBU5JR4K5601234X"), "");    // 18 chars
-  assert.equal(normalizeVin("IOQEBU5JR4K5601234"), "");    // contains I/O/Q
+  assert.equal(normalizeVin("IOQEBU5JR4K5601234"), "");    // 18 chars AND I/O/Q
+  assert.equal(normalizeVin("JTEBU5JR4K560123I"), "");     // exactly 17 chars but ends in I (isolates the I/O/Q rule)
 });
 
 test("returns unconfigured when no apiKey is present (feature degrades to manual)", async () => {
@@ -53,6 +54,13 @@ test("fails open (unavailable) on a non-200 from the API", async () => {
 
 test("fails open (unavailable) when the fetch throws (timeout/network)", async () => {
   const out = await readVinFromImage({ imageBase64: IMG, mediaType: "image/jpeg" }, { apiKey: "k", fetchImpl: async () => { throw new Error("aborted"); } });
+  assert.equal(out.ok, false);
+  assert.equal(out.reason, "unavailable");
+});
+
+test("fails open (unavailable) when the 200 response body is not valid JSON", async () => {
+  const out = await readVinFromImage({ imageBase64: IMG, mediaType: "image/jpeg" },
+    { apiKey: "k", fetchImpl: async () => ({ ok: true, json: async () => { throw new Error("bad json"); } }) });
   assert.equal(out.ok, false);
   assert.equal(out.reason, "unavailable");
 });
