@@ -815,6 +815,29 @@
     var o=document.getElementById('scanov_'+id); if(o) o.remove();
     var b=document.getElementById('scan_'+id); if(b) b.style.display='';
   }
+  // Photograph the current camera frame and OCR the VIN via /vin-ocr. On a
+  // confident read, fill the (always-editable) VIN field and run the NHTSA guard;
+  // on ANY failure, show a plain message and leave the installer to type it.
+  // The camera is a convenience — it never blocks close-out.
+  async function captureVin(id){
+    var video=document.getElementById('scanvid_'+id);
+    var btn=document.getElementById('scancap_'+id);
+    if(!video || !video.videoWidth){ setScanMsg(id,'Hold steady and try again.'); return; }
+    if(btn){ btn.disabled=true; btn.textContent='Reading…'; }
+    setScanMsg(id,'Reading the VIN…');
+    try{
+      var maxEdge=1024, w=video.videoWidth, h=video.videoHeight, scale=Math.min(1, maxEdge/Math.max(w,h));
+      var cv=document.createElement('canvas'); cv.width=Math.round(w*scale); cv.height=Math.round(h*scale);
+      cv.getContext('2d').drawImage(video,0,0,cv.width,cv.height);
+      var dataUrl=cv.toDataURL('image/jpeg',0.7);
+      var res=await fetch('/.netlify/functions/vin-ocr',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({imageBase64:dataUrl,mediaType:'image/jpeg'})});
+      var out=await res.json().catch(function(){ return {ok:false}; });
+      if(out && out.ok && out.vin){ onVin(id,out.vin); return; }  // fills field, stops scan, runs checkVin
+    }catch(e){}
+    // Any failure → keep the camera open, tell them to retry or type it.
+    if(btn){ btn.disabled=false; btn.textContent='● Capture VIN'; }
+    setScanMsg(id,"Couldn't read it — retake, or Cancel and type the VIN.");
+  }
   async function startScan(id){
     if(isNative() && window.Capacitor.Plugins && window.Capacitor.Plugins.BarcodeScanner){
       try{
@@ -830,12 +853,14 @@
     if(document.getElementById('scanov_'+id)) return;
     var ov=document.createElement('div'); ov.id='scanov_'+id; ov.className='scanwrap';
     ov.innerHTML='<video id="scanvid_'+id+'" playsinline autoplay muted></video>'+
-      '<div class="scanhint">Point at the VIN barcode — door jamb or windshield</div>'+
+      '<div class="scanhint">Point at the VIN — barcode auto-scans; or tap Capture to photograph a printed VIN</div>'+
       '<div id="scanmsg_'+id+'" class="scanmsg"></div>'+
+      '<button type="button" class="btn" id="scancap_'+id+'" style="width:100%;margin-bottom:6px">● Capture VIN</button>'+
       '<button type="button" class="btn" id="scancx_'+id+'" style="width:100%;background:#8a2a2a">Cancel</button>';
     card.appendChild(ov);
     var sbtn=document.getElementById('scan_'+id); if(sbtn) sbtn.style.display='none';
     document.getElementById('scancx_'+id).onclick=function(){ stopScan(id); };
+    document.getElementById('scancap_'+id).onclick=function(){ captureVin(id); };
     var video=document.getElementById('scanvid_'+id);
     var stream;
     try{ stream=await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } }); }
