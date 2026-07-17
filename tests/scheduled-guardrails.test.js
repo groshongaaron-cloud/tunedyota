@@ -16,6 +16,7 @@ const UNGATED_SIDE_EFFECTING = [
   "rebook-report",        // emails owner backlog
   "email-health",         // sends canary email
   "inbox-sweep",          // reads Gmail, classifies, ingests OTT leads, creates NEPQ drafts
+  "inbox-digest",         // sends owner digest email of waiting reply drafts
 ];
 
 function scheduledFunctions() {
