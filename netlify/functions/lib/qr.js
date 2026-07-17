@@ -10,6 +10,7 @@ function qrSvg(text, opts = {}) {
   if (!s) throw new Error("qrSvg: empty input");
   const px = opts.moduleSize || 4;
   const quiet = opts.quiet == null ? 4 : opts.quiet;      // quiet-zone modules
+  const ariaLabel = opts.ariaLabel != null ? opts.ariaLabel : "QR code to your AMSOIL Garage";
   const qr = qrcodegen.QrCode.encodeText(s, qrcodegen.QrCode.Ecc.MEDIUM);
   const dim = (qr.size + quiet * 2) * px;
   let rects = "";
@@ -22,7 +23,7 @@ function qrSvg(text, opts = {}) {
     }
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${dim} ${dim}" ` +
-    `role="img" aria-label="QR code to your AMSOIL Garage" shape-rendering="crispEdges">` +
+    `role="img" aria-label="${ariaLabel}" shape-rendering="crispEdges">` +
     `<rect width="${dim}" height="${dim}" fill="#fff"/><g fill="#191C1E">${rects}</g></svg>`;
 }
 

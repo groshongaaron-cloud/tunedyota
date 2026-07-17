@@ -23,6 +23,8 @@ function parseEventSlug(slug) {
   if (!m) return null;
   const [, citySlug, y, mo, d] = m;
   if (Number(mo) < 1 || Number(mo) > 12 || Number(d) < 1 || Number(d) > 31) return null;
+  const dt = new Date(`${y}-${mo}-${d}T00:00:00Z`);
+  if (isNaN(dt) || dt.toISOString().slice(0, 10) !== `${y}-${mo}-${d}`) return null;
   const market = MARKETS.find((mk) => slugifyCity(mk.city) === citySlug);
   if (!market) return null;
   return { city: market.city, dateISO: `${y}-${mo}-${d}` };

@@ -26,3 +26,15 @@ test("parseEventSlug rejects unknown cities, bad dates, junk", () => {
   assert.equal(parseEventSlug(""), null);
   assert.equal(parseEventSlug(null), null);
 });
+
+test("parseEventSlug rejects calendar-impossible dates like Feb 31", () => {
+  assert.equal(parseEventSlug("fargo-2026-02-31"), null);  // Feb never has 31 days
+  assert.equal(parseEventSlug("fargo-2026-02-29"), null);  // 2026 is not a leap year
+  assert.equal(parseEventSlug("fargo-2026-04-31"), null);  // April has 30 days
+});
+
+test("parseEventSlug accepts real Feb 28 on non-leap year", () => {
+  const p = parseEventSlug("fargo-2026-02-28");
+  assert.ok(p !== null, "fargo-2026-02-28 should parse");
+  assert.equal(p.dateISO, "2026-02-28");
+});

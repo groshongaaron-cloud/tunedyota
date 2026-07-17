@@ -101,7 +101,7 @@ function syncVehicles() {
   // (tests/vehicles-parity.test.js pins both copies to the funnel literal).
   fs.writeFileSync(path.join(SITE_DIR, "vehicles.json"),
     JSON.stringify(vehicles, null, 2) + "\n");
-  console.log("vehicles: synced lib/vehicles.json from funnel VEHICLES");
+  console.log("vehicles: synced lib/vehicles.json + site/vehicles.json from funnel VEHICLES");
 }
 
 // Repoint the broken Services breadcrumb to the real OTT Tune hub. Whitespace-

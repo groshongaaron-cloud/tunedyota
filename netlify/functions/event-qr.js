@@ -8,7 +8,14 @@ async function handler(event) {
   const slug = ((event && event.queryStringParameters) || {}).e || "";
   const parsed = parseEventSlug(slug);
   if (!parsed) return { statusCode: 404, headers: { "Content-Type": "text/plain" }, body: "unknown event" };
-  const svg = qrSvg(eventUrl(parsed.city, parsed.dateISO));
+  let svg;
+  try {
+    svg = qrSvg(eventUrl(parsed.city, parsed.dateISO), {
+      ariaLabel: `QR code to book the ${parsed.city} ${parsed.dateISO} event`,
+    });
+  } catch {
+    return { statusCode: 500, headers: { "Content-Type": "text/plain" }, body: "qr error" };
+  }
   return { statusCode: 200, headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "public, max-age=3600" }, body: svg };
 }
 module.exports = { handler };
