@@ -36,13 +36,17 @@ API [Haiku 4.5], **fails open to manual** on any error/missing key), (3) install
 close-out cards), (5) loud "not closed out — no cert yet" flag on past-dated open rows. Tests via
 `node --test`, inject `fetchImpl`. **Task 7 (OPTIONAL end-of-day open-jobs push) DEFERRED** — not built.
 
-**Owner setup STILL OWED (feature degrades gracefully until done):**
-1. `ANTHROPIC_API_KEY` in Netlify → activates live VIN OCR (until set, `/vin-ocr` returns
-   `{ok:false,reason:"unconfigured"}` and the console falls back to manual VIN entry — no dead UI).
-   Capture via clipboard, never chat.
-2. Recover Shannon (record `reciytsQ4mMdJxBWy`, still `Booked`) — needs Aaron's VIN/calibration/ECU/
-   gear/mileage; close her out through the console so her cert emails. Don't fabricate.
-3. Rotate `RESEND_API_KEY` (see [[pending-secret-rotation]]).
+**Owner setup:**
+1. ~~`ANTHROPIC_API_KEY`~~ — DONE 2026-07-16 (set via clipboard→netlify env:set, deployed,
+   verified live: `/vin-ocr` with a 1px test image returned `{ok:false,reason:"no-vin"}`,
+   i.e. a real Claude Haiku vision round-trip — live VIN OCR is ACTIVE).
+2. STILL OWED: recover Shannon (record `reciytsQ4mMdJxBWy`, still `Booked`) — needs Aaron's
+   VIN/calibration/ECU/gear/mileage; close her out through the console so her cert emails.
+   Don't fabricate.
+3. STILL OWED: rotate `AIRTABLE_TOKEN` (see [[pending-secret-rotation]]; Slack webhook half
+   was rotated 2026-07-16, Resend already done).
 
-**Known product follow-up (non-blocking):** global search still ignores the active city sub-tab
-(searches all cities while a city tab is highlighted) — reviewer-flagged as a UX decision to make.
+**Search/city-tab follow-up RESOLVED 2026-07-16 (master @ aeabda2, owner chose scope-to-tab):**
+Jobs search now honors the active city sub-tab with a "search all markets ›" escape hatch that
+jumps to All; Playwright regression tests in `tests/installer-search-scope.test.mjs`.
+Remaining program item: **Task 7 EOD open-jobs push — owner re-confirmed DEFER 2026-07-16.**
