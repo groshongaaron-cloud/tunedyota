@@ -225,6 +225,15 @@ test("site/installer.html Leads tab badge does not use stale 3-stage inline list
     "Stale 3-stage inline array found — Qualified is missing from the Leads tab badge filter");
 });
 
+test("ingest stores GHL Link on the lead (tolerant)", async () => {
+  const { processLeadIngest } = require("../netlify/functions/lib/leads.js");
+  let created;
+  await processLeadIngest({ name: "Q", email: "q@x.com", ghlLink: "https://app.gohighlevel.com/x" },
+    { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, list: async () => [],
+      create: async (a) => { created = a; return { id: "L1" }; }, update: async () => ({}) });
+  assert.equal(created.fields["GHL Link"], "https://app.gohighlevel.com/x");
+});
+
 test("site/installer.html LEAD_STAGES literal includes Qualified between Contacted and Following up", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
   const m = html.match(/var LEAD_STAGES\s*=\s*(\[[\s\S]*?\])/);

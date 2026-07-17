@@ -33,11 +33,12 @@ function parseOttLeadEmail(message) {
   const engine = fieldAfter(body, ["Engine Size"]);
   const trans = fieldAfter(body, ["Transmission Type"]).replace(/_+$/, "");
   const mods = fieldAfter(body, ["Engine modifications", "Engine Modifications"]);
+  const ghlLink = fieldAfter(body, ["GHL Link"]);
   const goals = [[city, state].filter(Boolean).join(", "), engine && ("Engine " + engine), trans && ("Trans " + trans),
     (mods && !/^non$/i.test(mods)) && ("Mods " + mods)].filter(Boolean).join(" · ");
   const rt = (h.replyTo || h.from || "").match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
   return {
-    name, phone, email, vehicle, goals, city,
+    name, phone, email, vehicle, goals, city, ghlLink,
     channel: "ott-national", source: "ott-national:fb-ads",
     message: "OTT national Facebook lead",
     replyTo: rt ? rt[0] : "",

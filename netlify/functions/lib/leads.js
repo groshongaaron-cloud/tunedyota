@@ -76,6 +76,7 @@ async function processLeadIngest(body, deps) {
   const emailThread = String(d.emailThread || "").trim();
   const emailMessageId = String(d.emailMessageId || "").trim();
   const replyTo = String(d.replyTo || "").trim();
+  const ghlLink = String(d.ghlLink || "").trim();
 
   const channel = validChannel(d.channel) ? d.channel : normalizeChannel(d.source || d.channel);
   const source = String(d.source || `lead:${channel}`);
@@ -124,12 +125,13 @@ async function processLeadIngest(body, deps) {
     ...(emailThread ? { "Email Thread": emailThread } : {}),
     ...(emailMessageId ? { "Email Message-Id": emailMessageId } : {}),
     ...(replyTo ? { "Reply-To": replyTo } : {}),
+    ...(ghlLink ? { "GHL Link": ghlLink } : {}),
   };
   if (ownerKey) fields.Installer = ownerKey;
   let rec;
   try {
     rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields },
-      ["Channel", "Stage", "Last Contact", "Activity Log", "Source", "Email Thread", "Email Message-Id", "Reply-To"]);
+      ["Channel", "Stage", "Last Contact", "Activity Log", "Source", "Email Thread", "Email Message-Id", "Reply-To", "GHL Link"]);
   } catch (e) { return { status: "error", error: "store-unavailable" }; }
   return { status: "lead", recordId: rec && rec.id, deduped: false };
 }

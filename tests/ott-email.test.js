@@ -43,3 +43,23 @@ test("parseOttLeadEmail on a boilerplate-only email still yields refs + a fallba
   assert.equal(p.name, "OTT National Lead");
   assert.equal(p.phone, "");
 });
+
+const SAMPLE = [
+  "Name: Quinn Coutley", "Email: qcoutley@gmail.com",
+  "Phone: +19207375148 | (920) 737-5148", "Lead: Overland Tuning",
+  "City: Green Bay", "State: WI", "Country: US",
+  "Transmission Type: automatic_", "Vehicle Year: 2006", "Vehicle Make: Lexus",
+  "Vehicle Model: Gx470", "Engine Size: 4.7", "Engine modifications: None",
+  "Campaign name:", "Adset name:",
+  "GHL Link: https://app.gohighlevel.com/v2/location/xyz/opportunities/list",
+].join("\n");
+
+test("parses the 2026-07 OTT label vocabulary incl. GHL link", () => {
+  const out = parseOttLeadEmail({ headers: { from: "OTT <info@overlandtailor.com>" }, textBody: SAMPLE, threadId: "t1" });
+  assert.equal(out.name, "Quinn Coutley");
+  assert.equal(out.phone, "+19207375148");
+  assert.equal(out.vehicle, "2006 Lexus Gx470");
+  assert.equal(out.city, "Green Bay");
+  assert.equal(out.ghlLink, "https://app.gohighlevel.com/v2/location/xyz/opportunities/list");
+  assert.equal(out.channel, "ott-national");
+});
