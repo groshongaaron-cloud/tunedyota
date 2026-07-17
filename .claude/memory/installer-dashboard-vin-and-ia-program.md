@@ -43,8 +43,11 @@ close-out cards), (5) loud "not closed out — no cert yet" flag on past-dated o
 2. STILL OWED: recover Shannon (record `reciytsQ4mMdJxBWy`, still `Booked`) — needs Aaron's
    VIN/calibration/ECU/gear/mileage; close her out through the console so her cert emails.
    Don't fabricate.
-3. STILL OWED: rotate `AIRTABLE_TOKEN` (see [[pending-secret-rotation]]; Slack webhook half
-   was rotated 2026-07-16, Resend already done).
+3. ~~Rotate secrets~~ — NOTHING PENDING: per [[pending-secret-rotation]] all four incidents are
+   CLOSED (Airtable PAT + Slack webhook 2026-06-29, n8n key 2026-06-30, Resend 2026-07-16; the
+   n8n-embedded Slack webhook was additionally rotated 2026-07-16). A stale "pending Airtable
+   rotation" claim briefly propagated on 2026-07-16 from misreading the memo's for-reference
+   section — corrected same night.
 
 **Search/city-tab follow-up RESOLVED 2026-07-16 (master @ aeabda2, owner chose scope-to-tab):**
 Jobs search now honors the active city sub-tab with a "search all markets ›" escape hatch that
