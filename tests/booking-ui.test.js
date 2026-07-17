@@ -101,3 +101,11 @@ test("funnel event picker offers a per-event share link (event-link virality)", 
   assert.ok(/\/book\/'?\s*\+/.test(HTML) || HTML.includes("'/book/'+"), "event link built from /book/ slug");
   assert.ok(/navigator\.share/.test(HTML), "native share sheet used when available");
 });
+
+test("slugify expression is identical across the four event-link copies (drift guard)", () => {
+  const SLUG = 'replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")';
+  for (const rel of ["site/book.html", "site/installer.html", "site/find-your-exact-tune.html", "netlify/functions/lib/event-links.js"]) {
+    const t = fs.readFileSync(path.join(__dirname, "..", rel), "utf8").replace(/s+/g, "");
+    assert.ok(t.includes(SLUG), `slugify drifted in ${rel}`);
+  }
+});
