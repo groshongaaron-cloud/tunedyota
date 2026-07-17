@@ -97,6 +97,10 @@ function syncVehicles() {
   const vehicles = extractVehicles(html); // brace-matched; throws on missing/malformed → fails the build
   fs.writeFileSync(path.join(ROOT, "netlify", "functions", "lib", "vehicles.json"),
     JSON.stringify(vehicles, null, 2) + "\n");
+  // Public copy for the /book mini flow's vehicle picker — same source, zero drift
+  // (tests/vehicles-parity.test.js pins both copies to the funnel literal).
+  fs.writeFileSync(path.join(SITE_DIR, "vehicles.json"),
+    JSON.stringify(vehicles, null, 2) + "\n");
   console.log("vehicles: synced lib/vehicles.json from funnel VEHICLES");
 }
 

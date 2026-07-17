@@ -16,3 +16,9 @@ test("lib/vehicles.json is byte-equal to the funnel's inline VEHICLES config", (
   assert.deepEqual(JSON_COPY, funnel,
     "lib/vehicles.json is out of sync with the funnel VEHICLES — run `npm run build:seo` (it regenerates the JSON from the funnel), then re-run tests.");
 });
+
+test("site/vehicles.json is byte-equal to lib/vehicles.json (book.html data source)", () => {
+  const site = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "site", "vehicles.json"), "utf8"));
+  assert.deepEqual(site, JSON_COPY,
+    "site/vehicles.json out of sync — run `npm run build:seo` (it writes both copies from the funnel VEHICLES).");
+});
