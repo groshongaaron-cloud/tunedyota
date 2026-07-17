@@ -70,4 +70,16 @@ async function sendReply({ threadId, to, inReplyTo, references, subject, body },
   return authFetch(`/messages/send`, { method: "POST", body: JSON.stringify({ raw: b64url(lines), threadId }) }, deps);
 }
 
-module.exports = { listMessages, getMessage, ensureLabel, addLabel, sendReply, b64url, b64urlDecode };
+// A reply DRAFT in the thread — created, never sent (Aaron reviews in Gmail).
+async function createDraft({ threadId, to, inReplyTo, references, subject, body }, deps) {
+  const lines = [`To: ${to}`, `Subject: ${subject}`,
+    inReplyTo ? `In-Reply-To: ${inReplyTo}` : null, references ? `References: ${references}` : null,
+    "Content-Type: text/plain; charset=UTF-8", "", body].filter((x) => x !== null).join("\r\n");
+  return authFetch(`/drafts`, { method: "POST", body: JSON.stringify({ message: { raw: b64url(lines), threadId } }) }, deps);
+}
+async function listDrafts(deps) {
+  const j = await authFetch(`/drafts`, {}, deps);
+  return (j.drafts || []).map((d) => ({ id: d.id, messageId: d.message && d.message.id, threadId: d.message && d.message.threadId }));
+}
+
+module.exports = { listMessages, getMessage, ensureLabel, addLabel, sendReply, createDraft, listDrafts, b64url, b64urlDecode };
