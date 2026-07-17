@@ -219,6 +219,12 @@ test("ingest leaves stage New when city is unknown or vehicle is missing", async
   assert.equal(b.out.a.fields.Stage, "New");
 });
 
+test("site/installer.html Leads tab badge does not use stale 3-stage inline list missing Qualified", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
+  assert.equal(/\['New','Contacted','Following up'\]/.test(html), false,
+    "Stale 3-stage inline array found — Qualified is missing from the Leads tab badge filter");
+});
+
 test("site/installer.html LEAD_STAGES literal includes Qualified between Contacted and Following up", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
   const m = html.match(/var LEAD_STAGES\s*=\s*(\[.*?\])/);

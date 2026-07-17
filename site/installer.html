@@ -478,7 +478,7 @@
     if(!host){ host=document.createElement('div'); host.id='tabs'; host.style.cssText='display:flex;gap:8px;margin:6px 0 10px';
       var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
     function tab(id,label,badge){ return '<button class="tabbtn'+(STATE.tab===id?' on':'')+'" data-tab="'+id+'">'+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
-    var due=STATE.leads.filter(function(l){ return ['New','Contacted','Following up'].indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today; }).length;
+    var due=STATE.leads.filter(function(l){ return ['New','Contacted','Qualified','Following up'].indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today; }).length;
     host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'');
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){ STATE.tab=b.getAttribute('data-tab'); if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); } renderAll(); }; });
   }
