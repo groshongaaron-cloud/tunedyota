@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>My Account — Tuned Yota</title>
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="/fox.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<style>
+  body{font-family:'Lato',sans-serif;background:#EDECEB;color:#3A2E26;margin:0}
+  .acct{max-width:640px;margin:0 auto;padding:24px 16px 64px}
+  .acct h1{margin:18px 0 6px}
+  .acct .sub{color:#5c6166;margin:0 0 22px}
+  .card{background:#fff;border:1px solid #e4e2dd;border-radius:12px;padding:16px;margin:10px 0}
+  .card .veh{font-weight:800}
+  .card .meta{color:#5c6166;font-size:14px;margin-top:2px}
+  .card a.link{display:inline-block;margin-top:8px;font-weight:700}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .chip{background:#f4f2ee;border:1px solid #e4e2dd;border-radius:999px;padding:8px 14px;font-weight:700;text-decoration:none;color:inherit}
+  .chip .x{margin-left:8px;opacity:.5;cursor:pointer}
+  input,select,button{font:inherit}
+  .field{width:100%;padding:12px;border:1px solid #d9d6cf;border-radius:8px;margin:6px 0}
+  .btn{background:#191c1e;color:#fff;border:0;border-radius:8px;padding:12px 22px;font-weight:800;cursor:pointer}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .row select{flex:1;min-width:120px}
+  #msg{margin:12px 0;font-weight:700}
+  #msg.ok{color:#1d7a3d}#msg.err{color:#b3261e}
+  .signout{float:right;font-size:14px;opacity:.6}
+</style>
+</head>
+<body>
+<div class="acct">
+  <h1>My Tuned Yota <a href="#" id="signout" class="signout" hidden>Sign out</a></h1>
+  <p class="sub">Your certificates and AMSOIL garage.</p>
+  <div id="msg"></div>
+
+  <div id="login" hidden>
+    <p>Enter your email and we&rsquo;ll send you a sign-in link — no password needed.</p>
+    <input id="em" class="field" type="email" autocomplete="email" placeholder="you@example.com">
+    <button class="btn" id="sendlink">Email me a sign-in link</button>
+  </div>
+
+  <div id="portal" hidden>
+    <h2>My certificates</h2>
+    <div id="certs"><p class="meta">Loading…</p></div>
+    <h2 style="margin-top:28px">My Garage</h2>
+    <p class="sub">Your vehicles — each links to its AMSOIL fluids, capacities &amp; intervals.</p>
+    <div class="chips" id="garage"></div>
+    <div class="row">
+      <select id="v-make" class="field"><option value="">Make…</option></select>
+      <select id="v-model" class="field" disabled><option value="">Model…</option></select>
+      <select id="v-year" class="field" disabled><option value="">Year…</option></select>
+    </div>
+    <button class="btn" id="v-add">＋ Add vehicle</button>
+  </div>
+</div>
+<script>
+(function () {
+  var KEY = "ty_client_token", LOCAL_GARAGE = "ty_amsoil_garage";
+  var tok = function () { return localStorage.getItem(KEY) || ""; };
+  var CAT = null, VEHICLES = [];
+  function el(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function msg(t, cls) { var m = el("msg"); m.textContent = t || ""; m.className = cls || ""; }
+  function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ "x-client-token": tok() }, opts.headers || {});
+    return fetch("/.netlify/functions/" + path, opts).then(function (res) {
+      var renewed = res.headers.get("x-renewed-token");
+      if (renewed) localStorage.setItem(KEY, renewed);
+      return res;
+    });
+  }
+  function show(view) {
+    el("login").hidden = view !== "login";
+    el("portal").hidden = view !== "portal";
+    el("signout").hidden = view !== "portal";
+  }
+  function signOut() { localStorage.removeItem(KEY); show("login"); msg(""); }
+
+  // --- login: request a link ---
+  el("sendlink").onclick = function () {
+    var em = el("em").value.trim();
+    if (!em) { msg("Enter your email first.", "err"); return; }
+    msg("Sending…");
+    fetch("/.netlify/functions/client-auth", { method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "request", email: em }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.status === "sent") msg("Check your email — we sent you a sign-in link.", "ok");
+        else if (j.error === "bad-email") msg("That doesn't look like an email address.", "err");
+        else msg("Couldn't send the link — please try again.", "err");
+      })
+      .catch(function () { msg("Couldn't send the link — please try again.", "err"); });
+  };
+
+  // --- magic-link landing: exchange lt= for a session ---
+  function exchange(lt) {
+    msg("Signing you in…");
+    fetch("/.netlify/functions/client-auth", { method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "exchange", token: lt }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.status === "ok") {
+          localStorage.setItem(KEY, j.token);
+          history.replaceState(null, "", "/account");
+          msg("");
+          boot();
+        } else {
+          show("login");
+          msg("That sign-in link expired — enter your email and we'll send a fresh one.", "err");
+        }
+      })
+      .catch(function () { show("login"); msg("Sign-in failed — please try again.", "err"); });
+  }
+
+  // --- certificates ---
+  function loadCerts() {
+    api("client-certs").then(function (res) {
+      if (res.status === 401) { signOut(); return null; }
+      return res.json();
+    }).then(function (j) {
+      if (!j) return;
+      var box = el("certs");
+      if (j.status !== "ok") { box.innerHTML = '<p class="meta">Couldn’t load certificates — refresh to retry.</p>'; return; }
+      if (!j.certs.length) { box.innerHTML = '<p class="meta">No certificates yet — they appear here after your tune.</p>'; return; }
+      box.innerHTML = j.certs.map(function (c) {
+        return '<div class="card"><div class="veh">' + esc(c.vehicle) + '</div>' +
+          '<div class="meta">' + esc(c.calibration) + ' calibration · ' + esc(c.calibrationDate) + '</div>' +
+          '<a href="#" class="link" data-rec="' + esc(c.recordId) + '">View / download certificate</a></div>';
+      }).join("");
+      box.querySelectorAll("a.link").forEach(function (a) {
+        a.onclick = function (e) {
+          e.preventDefault();
+          api("client-certs?recordId=" + encodeURIComponent(a.getAttribute("data-rec")))
+            .then(function (res) {
+              if (!res.ok) { msg("Couldn’t load that certificate — try again.", "err"); return null; }
+              return res.text();
+            })
+            .then(function (html) {
+              if (!html) return;
+              window.open(URL.createObjectURL(new Blob([html], { type: "text/html" })), "_blank");
+            });
+        };
+      });
+    });
+  }
+
+  // --- garage ---
+  function garageUrl(v) {
+    return "/amsoil-garage?make=" + encodeURIComponent(v.make) + "&model=" + encodeURIComponent(v.model) +
+      (v.year ? "&year=" + encodeURIComponent(v.year) : "");
+  }
+  function renderGarage() {
+    var box = el("garage");
+    box.innerHTML = VEHICLES.length
+      ? VEHICLES.map(function (v, i) {
+          return '<a class="chip" href="' + garageUrl(v) + '">' + esc(v.make + " " + v.model + (v.year ? " " + v.year : "")) +
+            '<span class="x" data-i="' + i + '" title="Remove">✕</span></a>';
+        }).join("")
+      : '<p class="meta">No vehicles yet — add one below.</p>';
+    box.querySelectorAll(".x").forEach(function (x) {
+      x.onclick = function (e) {
+        e.preventDefault(); e.stopPropagation();
+        VEHICLES.splice(parseInt(x.getAttribute("data-i"), 10), 1);
+        saveGarage();
+      };
+    });
+  }
+  function saveGarage() {
+    renderGarage();
+    api("client-garage", { method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vehicles: VEHICLES }) })
+      .then(function (res) { return res.json(); })
+      .then(function (j) {
+        if (j.status === "ok") { VEHICLES = j.vehicles; localStorage.setItem(LOCAL_GARAGE, JSON.stringify(VEHICLES)); renderGarage(); }
+        else msg("Couldn’t save your garage — try again.", "err");
+      })
+      .catch(function () { msg("Couldn’t save your garage — try again.", "err"); });
+  }
+  function loadGarage() {
+    var local = [];
+    try { local = JSON.parse(localStorage.getItem(LOCAL_GARAGE) || "[]"); } catch (e) {}
+    var init = local.length
+      ? api("client-garage", { method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ vehicles: local, merge: true }) })
+      : api("client-garage");
+    init.then(function (res) {
+      if (res.status === 401) { signOut(); return null; }
+      return res.json();
+    }).then(function (j) {
+      if (!j) return;
+      if (j.status === "ok") { VEHICLES = j.vehicles; localStorage.setItem(LOCAL_GARAGE, JSON.stringify(VEHICLES)); }
+      renderGarage();
+    });
+  }
+  // vehicle picker fed by the AMSOIL catalog (same data as /amsoil-garage)
+  function initPicker() {
+    fetch("/amsoil-garage.json").then(function (r) { return r.json(); }).then(function (cat) {
+      CAT = cat;
+      var mk = el("v-make");
+      Object.keys(cat.vehicles || {}).forEach(function (m) { mk.add(new Option(m, m)); });
+      mk.onchange = function () {
+        var md = el("v-model"); md.length = 1; md.disabled = !mk.value;
+        el("v-year").length = 1; el("v-year").disabled = true;
+        if (mk.value) Object.keys(cat.vehicles[mk.value]).forEach(function (m) { md.add(new Option(m, m)); });
+      };
+      el("v-model").onchange = function () {
+        var yr = el("v-year"); yr.length = 1;
+        var rows = (CAT.vehicles[mk.value] || {})[el("v-model").value] || [];
+        var seen = {};
+        rows.forEach(function (r) { if (r.y && !seen[r.y]) { seen[r.y] = 1; yr.add(new Option(r.y, r.y)); } });
+        yr.disabled = !el("v-model").value;
+      };
+    });
+  }
+  el("v-add").onclick = function () {
+    var v = { make: el("v-make").value, model: el("v-model").value, year: el("v-year").value };
+    if (!v.make || !v.model) { msg("Pick a make and model first.", "err"); return; }
+    msg("");
+    var key = (v.make + "|" + v.model + "|" + v.year).toLowerCase();
+    var dup = VEHICLES.some(function (s) { return (s.make + "|" + s.model + "|" + (s.year || "")).toLowerCase() === key; });
+    if (!dup) { VEHICLES.push(v); saveGarage(); }
+  };
+
+  el("signout").onclick = function (e) { e.preventDefault(); signOut(); };
+
+  function boot() {
+    show("portal");
+    loadCerts();
+    loadGarage();
+    if (!CAT) initPicker();
+  }
+  var lt = new URLSearchParams(location.search).get("lt");
+  if (lt) exchange(lt);
+  else if (tok()) boot();
+  else show("login");
+})();
+</script>
+</body>
+</html>
