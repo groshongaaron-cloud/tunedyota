@@ -39,6 +39,14 @@ test("funnel measurement: sid + beacon hooks present", () => {
   assert.ok(/track\(6,\s*["']booked["']\)/.test(HTML), "missing terminal booked beacon");
 });
 
+test("funnel measurement: tel: clicks fire a 'call' outcome beacon", () => {
+  // July 2026 finding: 25 of 63 bookings were owner:reconcile (phone/text), and the
+  // funnel pushes "Call now to book faster" — untracked tel: clicks made the
+  // book→outcome drop look like −84% when many of those sessions converted by phone.
+  assert.ok(/track\(6,\s*["']call["']\)/.test(HTML), "missing tel-click call outcome beacon");
+  assert.ok(/closest\(\s*['"]a\[href\^=["\\]*tel:/.test(HTML), "missing delegated tel: click listener");
+});
+
 test("intent=update reframes step 0 and tags source", () => {
   assert.ok(/["']intent["']/.test(HTML), "intent parse missing");
   assert.ok(HTML.includes("Free OTT Update"), "update reframe copy missing");

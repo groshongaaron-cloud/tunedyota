@@ -657,6 +657,12 @@ const prog=$("#prog"); for(let i=0;i<6;i++){let e=document.createElement("i");pr
 const SID=(function(){ let s=""; try{ s=sessionStorage.getItem("ty_sid")||""; }catch(e){} if(!s){ s="s_"+Math.random().toString(36).slice(2)+Date.now().toString(36); try{ sessionStorage.setItem("ty_sid",s); }catch(e){} } return s; })();
 const STEP_NAMES=["make","model","config","goals","result","book"];
 function track(step,name){ try{ const p=JSON.stringify({sid:SID,step,name:name||STEP_NAMES[step]||"",utm_source:ATTR.utm_source||"",utm_medium:ATTR.utm_medium||"",utm_campaign:ATTR.utm_campaign||""}); if(navigator.sendBeacon){ navigator.sendBeacon("/.netlify/functions/track",p); } else { fetch("/.netlify/functions/track",{method:"POST",body:p,keepalive:true}); } }catch(e){} }
+// Phone-intent outcome (2026-07-16): the funnel's own CTAs say "call to book faster",
+// so an untracked tel: tap looked like an abandon (July: book→outcome read −84% while
+// 25/63 real bookings arrived by phone as owner:reconcile). Count a tel: tap as
+// outcome "call" — capture phase so the beacon fires before the dialer takes over;
+// aggregation dedups by session, so repeated taps are harmless.
+document.addEventListener("click",function(e){ try{ const a=e.target.closest&&e.target.closest('a[href^="tel:"]'); if(a) track(6,"call"); }catch(err){} },true);
 
 function go(n){
   $$(".tf-step").forEach(el=>el.classList.toggle("active",+el.dataset.step===n));
