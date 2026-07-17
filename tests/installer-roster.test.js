@@ -164,3 +164,25 @@ test("a booking without a signature is not signed, and the roster never ships th
   assert.ok(!("Customer Signature" in out.bookings[0]));
   assert.ok(!("signature" in out.bookings[0]));
 });
+
+test("roster booking rows expose an ott flag from Source", async () => {
+  const list = async () => [
+    { id: "r1", fields: { Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Booked",
+        Name: "Alice", Source: "lead:ott-national" } },
+    { id: "r2", fields: { Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Booked",
+        Name: "Bob", Source: "ott-national:fb-ads" } },
+    { id: "r3", fields: { Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Booked",
+        Name: "Scott", Source: "" } },
+    { id: "r4", fields: { Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Booked",
+        Name: "Dave", Source: "find-your-exact-tune" } },
+  ];
+  const out = await buildRoster({ key: "aaron", env: {}, list, loadEvents: async () => [] });
+  const alice = out.bookings.find((b) => b.name === "Alice");
+  const bob   = out.bookings.find((b) => b.name === "Bob");
+  const scott = out.bookings.find((b) => b.name === "Scott");
+  const dave  = out.bookings.find((b) => b.name === "Dave");
+  assert.equal(alice.ott, true,  "lead:ott-national should be ott");
+  assert.equal(bob.ott,   true,  "ott-national:fb-ads should be ott");
+  assert.equal(scott.ott, false, "empty Source (Scott) should NOT be ott");
+  assert.equal(dave.ott,  false, "find-your-exact-tune should NOT be ott");
+});

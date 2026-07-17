@@ -54,6 +54,7 @@ async function buildRoster(deps) {
       mods: f.Modifications || "", modelYear: f["Model Year"] || "", status: f.Status || "Booked",
       flexFuelNote: flexFuelNote(f.Vehicle),   // Policy 0011 day-of reminder for Tundras
       isWalkin: /^(intake|installer):walk-in/i.test(src),
+      ott: /(^|[:\s])ott/i.test(src),
       calibration: f["OTT Calibration"] || "", vin: f.VIN || "",
       tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",

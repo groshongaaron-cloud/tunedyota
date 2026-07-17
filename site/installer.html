@@ -783,7 +783,7 @@
     var overdue=(ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
     var det=document.createElement('details'); det.className='evt';
     var sum=document.createElement('summary');
-    sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' '+esc(l.name)+'</span>'+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
+    sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' '+esc(l.name)+'</span>'+(l.channel==='ott-national'?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
       '<br><span class="edate">'+esc(l.vehicle||'—')+' · '+esc(l.city||'—')+'</span></span>'+
       '<span class="pill'+(overdue?' hasopen':'')+'">'+(overdue?'⏰ due':(l.nextFollowup?('→ '+esc(l.nextFollowup)):esc(l.stage)))+'</span>';
     det.appendChild(sum);
@@ -982,7 +982,7 @@
 
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
-    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
+    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
       (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'');
     var overdue = isOpen(b) && b.dateISO < STATE.today;
