@@ -141,6 +141,7 @@
           e.preventDefault();
           api("client-certs?recordId=" + encodeURIComponent(a.getAttribute("data-rec")))
             .then(function (res) {
+              if (res.status === 401) { signOut(); return null; }
               if (!res.ok) { msg("Couldn’t load that certificate — try again.", "err"); return null; }
               return res.text();
             })
@@ -178,8 +179,12 @@
     renderGarage();
     api("client-garage", { method: "PUT", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ vehicles: VEHICLES }) })
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        if (res.status === 401) { signOut(); return null; }
+        return res.json();
+      })
       .then(function (j) {
+        if (!j) return;
         if (j.status === "ok") { VEHICLES = j.vehicles; localStorage.setItem(LOCAL_GARAGE, JSON.stringify(VEHICLES)); renderGarage(); }
         else msg("Couldn’t save your garage — try again.", "err");
       })
