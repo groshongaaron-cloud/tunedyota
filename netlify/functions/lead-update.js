@@ -39,7 +39,7 @@ async function handler(event, ctx = {}) {
     const owner = market ? keyToInstaller(market.inst).key : (lead.installer || key);
     const fields = { City: market ? market.city : lead.city, "Event Date": dateISO, Name: lead.name,
       Vehicle: lead.vehicle, Phone: lead.phone, Email: lead.email, Goals: lead.goals,
-      Status: "Booked", Source: "lead:convert", Installer: owner };
+      Status: "Booked", Source: `lead:${lead.channel || "convert"}`, Installer: owner };
     let bk;
     try { bk = await createTolerant(createBookingImpl, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Goals"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }

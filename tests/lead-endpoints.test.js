@@ -92,6 +92,28 @@ test("lead-update convert creates a booking, links it, sets Booked", async () =>
   assert.equal(patched.Stage, "Booked");
 });
 
+test("convert stamps the booking Source with the lead's channel", async () => {
+  let createdBooking;
+  const ottLead = { id: "recL2", fields: { Name: "Dana", Phone: "1", City: "Sioux Falls", Installer: "cody", Stage: "New", Channel: "ott-national", "Activity Log": "" } };
+  await upd.handler(
+    { headers: { "x-installer-token": "cody-tok" }, body: JSON.stringify({ id: "recL2", action: "convert", dateISO: "2026-08-01" }) },
+    { env: updEnv, getImpl: async () => ottLead,
+      createBookingImpl: async (a) => { createdBooking = a; return { id: "recBk2" }; },
+      updateImpl: async (a) => ({ id: a.id }) });
+  assert.equal(createdBooking.fields.Source, "lead:ott-national");
+});
+
+test("convert falls back to lead:other when the lead has no channel", async () => {
+  let createdBooking;
+  const noChannelLead = { id: "recL3", fields: { Name: "Dana", Phone: "1", City: "Sioux Falls", Installer: "cody", Stage: "New", Source: "", "Activity Log": "" } };
+  await upd.handler(
+    { headers: { "x-installer-token": "cody-tok" }, body: JSON.stringify({ id: "recL3", action: "convert", dateISO: "2026-08-01" }) },
+    { env: updEnv, getImpl: async () => noChannelLead,
+      createBookingImpl: async (a) => { createdBooking = a; return { id: "recBk3" }; },
+      updateImpl: async (a) => ({ id: a.id }) });
+  assert.equal(createdBooking.fields.Source, "lead:other");
+});
+
 test("summarize counts a Qualified lead with nextFollowup <= today as dueOrOverdue", () => {
   const { summarize } = require("../netlify/functions/leads-list.js");
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Chicago" });
