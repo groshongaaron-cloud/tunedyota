@@ -79,24 +79,55 @@ test picks up both new functions.
    received / booked / completed — in both the owner's DRAFT approval email and the final
    report OTT receives.
 
-## Workstream B — drafted replies
+## Workstream B — drafted replies (NEPQ-governed)
 
-**Grounding (live repo data, assembled per email):**
-- `markets.js` — match stated city/state → nearest market + installer name; no match →
-  the draft asks for location (and the lead, if created, lands Unassigned)
-- `netlify/functions/lib/vehicles.json` — starting price for their year/engine
+**The governing sales framework is `docs/sales/nepq-playbook.md`** (owner-provided
+2026-07-16, adapted from "The NEPQ Black Book of Questions"). Every draft is written
+against it. The playbook is the strategy; the voice guide is the tone. Both are
+owner-editable text files — retune without code changes.
+
+**Grounding (assembled per email):**
+- `docs/sales/nepq-playbook.md` — conversation sequence (Connect → Situation → Problem
+  → Solution → Consequence → Qualifying → Transition → Commit), channel rules for email
+  (2–3 questions max, short paragraphs, end with ONE clear question or micro-commitment),
+  money-moment scripts, proposal rules, phrase bank, non-negotiables
+- `docs/email-voice.md` — tone: short, direct, overlander-to-overlander, zero AI-speak,
+  3–4 real Q→A examples
+- `markets.js` — match stated city/state → nearest market + installer name
+- `netlify/functions/lib/vehicles.json` — pricing (used ONLY per proposal rules below)
 - Events data — next event date for their market
-- `docs/email-voice.md` — **owner-editable** voice guide: short, direct,
-  overlander-to-overlander, zero AI-speak; includes 3–4 real Q→A examples. Editing this
-  file retunes the voice without code changes.
 
-**Qualification rule (encoded):** both location + vehicle known → the draft goes straight
-to price + installer + booking link + phone. Either missing → the draft asks for exactly
-the missing item(s), nothing else. Thread replies include prior-thread context so the
-customer is never re-asked something they already said.
+**Stage-aware drafting.** The classifier also estimates the NEPQ stage of the
+conversation from the email/thread. The drafter then behaves per the playbook:
 
-**Hard rule: nothing auto-sends.** Drafts are created in-thread via a new
+- **Cold "how much for a tune?"** → never a bare number. Deflect-with-purpose (§4):
+  acknowledge, then ask what they're running and what it's doing that they want changed.
+- **"Just send me pricing/info"** → qualify first (§4): ask what they're looking for it
+  to do; info goes out only against a committed next step.
+- **Discovery underway** (they've shared setup/frustrations) → advance ONE stage: mirror
+  their exact words, dig with a clarifier ("why does that bother you though?"), end with
+  exactly one question.
+- **Ready to book** (explicit intent — "I want the Fargo event", "sign me up") → Stage 8:
+  calm, assumptive, low-friction — slot options / booking link / phone, zero added
+  friction. NEPQ never blocks a willing booker.
+- **Quotes** follow §5: restate THEIR stated problems/goals in their words before any
+  number; three options (basic / core / premium) built from the platform's real price
+  tiers; actionable close ("reply YES and I'll slot you in" / booking link).
+- **Objections** (warranty, think-about-it, spouse, price-shopper) → the matching §4
+  script pattern, never argument.
+- **Complaints/upset** → §7 pattern (ask, don't defend) AND the sensitive-bucket Slack
+  flag so Aaron sees it immediately.
+
+The **Qualified phase gate** maps to NEPQ Stage 2 (Situation): a lead is Qualified when
+location + vehicle are known. This supersedes the earlier straight-to-price rule —
+price timing now follows the playbook, not field completeness.
+
+**Subject lines** on new threads reference THEIR situation, never our product.
+
+**Hard rules:** nothing auto-sends — drafts are created in-thread via a new
 `createDraft` in `lib/gmail.js` (`drafts.create` with threadId + In-Reply-To/References).
+Every draft ends with exactly one question or one micro-commitment. No pressure
+language (the playbook's banned-phrase list is enforced in the prompt).
 
 ## Safety & cost
 
@@ -121,9 +152,11 @@ customer is never re-asked something they already said.
 
 - `lib/email-classify.js` — pure prompt build + response parse; unknown/garbage responses
   classify as `sensitive`.
-- `lib/email-draft.js` — pure grounding assembly: market match, price lookup,
-  qualification branching (4 cases: both known / location missing / vehicle missing /
-  both missing), thread-context inclusion.
+- `lib/email-draft.js` — pure grounding assembly: market match, price lookup, NEPQ
+  stage branching (cold price-ask deflects · discovery advances one stage · ready-to-book
+  goes straight to scheduling · quote follows §5 three-option shape), thread-context
+  inclusion. Draft-shape checks: ends with exactly one question/micro-commitment; no
+  banned pressure phrases; no bare price on a cold ask.
 - `lib/ott-email.js` — new fields incl. GHL Link; extraction fallback shape parity.
 - `lead-update.js` — Source carries the channel.
 - `ott-report.js` — conversion-section math from injected lead + booking rows.
