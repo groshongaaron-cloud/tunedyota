@@ -79,7 +79,11 @@ New **`Funnel Events`** table:
 - Shape: `{ steps: [{ step, name, sessions, dropPct, overallPct }], totalSessions }`.
 - `STEP_LABELS` map for friendly names (make/model/config/goals/result/book/outcome).
 
-Pure and fully unit-tested. Not yet wired into the report (fast-follow).
+Pure and fully unit-tested. WIRED into the monthly report same day (b5dd4b8:
+submissions-report.js fetches month-to-date Funnel Events → `report.funnel`;
+report-render.js shows the step table in the email + a biggest-drop Slack line).
+Verified live 2026-07-16: Funnel Events table collecting (~5k rows all-time),
+July MTD aggregation ran clean (1,098 sessions).
 
 ## Config / prerequisites
 
