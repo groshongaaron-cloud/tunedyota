@@ -63,3 +63,16 @@ test("parses the 2026-07 OTT label vocabulary incl. GHL link", () => {
   assert.equal(out.ghlLink, "https://app.gohighlevel.com/v2/location/xyz/opportunities/list");
   assert.equal(out.channel, "ott-national");
 });
+
+// Regression: OTT sends "None" (4 letters) which /^non$/i missed → "Mods None" leaked into goals.
+test('suppresses "Mods None" when engine modifications field is "None"', () => {
+  const body = SAMPLE; // already contains "Engine modifications: None"
+  const out = parseOttLeadEmail({ headers: { from: "OTT <info@overlandtailor.com>" }, textBody: body, threadId: "t2" });
+  assert.doesNotMatch(out.goals, /Mods None/i);
+});
+
+test('includes mods in goals when engine modifications field has real content', () => {
+  const bodyWithMods = SAMPLE.replace("Engine modifications: None", "Engine modifications: Intake+exhaust");
+  const out = parseOttLeadEmail({ headers: { from: "OTT <info@overlandtailor.com>" }, textBody: bodyWithMods, threadId: "t3" });
+  assert.match(out.goals, /Mods Intake\+exhaust/);
+});

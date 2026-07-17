@@ -35,7 +35,7 @@ function parseOttLeadEmail(message) {
   const mods = fieldAfter(body, ["Engine modifications", "Engine Modifications"]);
   const ghlLink = fieldAfter(body, ["GHL Link"]);
   const goals = [[city, state].filter(Boolean).join(", "), engine && ("Engine " + engine), trans && ("Trans " + trans),
-    (mods && !/^non$/i.test(mods)) && ("Mods " + mods)].filter(Boolean).join(" · ");
+    (mods && !/^none?$/i.test(mods)) && ("Mods " + mods)].filter(Boolean).join(" · ");
   const rt = (h.replyTo || h.from || "").match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
   return {
     name, phone, email, vehicle, goals, city, ghlLink,
