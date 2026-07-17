@@ -3,19 +3,37 @@
   "nodes": [
     {
       "parameters": {
-        "rule": { "interval": [{ "field": "days", "triggerAtHour": 10 }] }
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 10
+            }
+          ]
+        }
       },
       "id": "wf2-sched",
       "name": "Daily 10:00 CT",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
         "operation": "search",
-        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
-        "table": { "__rl": true, "value": "Bookings", "mode": "name" },
+        "base": {
+          "__rl": true,
+          "value": "appMYG0QlSZTCYxUU",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Bookings",
+          "mode": "name"
+        },
         "filterByFormula": "AND({Status}=\"Completed\", {Email}!=\"\", {Review Requested}!=TRUE(), DATETIME_DIFF(TODAY(), {Event Date}, 'days')>=2, DATETIME_DIFF(TODAY(), {Event Date}, 'days')<=14)",
         "options": {}
       },
@@ -23,7 +41,10 @@
       "name": "Find completed bookings",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
@@ -33,7 +54,10 @@
       "name": "Build review emails",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 300]
+      "position": [
+        700,
+        300
+      ]
     },
     {
       "parameters": {
@@ -50,21 +74,39 @@
       "name": "Send via Resend",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [940, 300],
-      "credentials": { "httpHeaderAuth": { "id": "REPLACE", "name": "Resend API" } }
+      "position": [
+        940,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE",
+          "name": "Resend API"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "update",
-        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
-        "table": { "__rl": true, "value": "Bookings", "mode": "name" },
+        "base": {
+          "__rl": true,
+          "value": "appMYG0QlSZTCYxUU",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Bookings",
+          "mode": "name"
+        },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
             "id": "={{ $('Build review emails').item.json.recordId }}",
             "Review Requested": true
           },
-          "matchingColumns": ["id"]
+          "matchingColumns": [
+            "id"
+          ]
         },
         "options": {}
       },
@@ -72,8 +114,16 @@
       "name": "Mark Review Requested",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [1180, 300],
-      "credentials": { "airtableTokenApi": { "id": "REPLACE", "name": "Airtable PAT" } }
+      "position": [
+        1180,
+        300
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "REPLACE",
+          "name": "Airtable PAT"
+        }
+      }
     },
     {
       "parameters": {
@@ -83,31 +133,102 @@
       "name": "Count sent",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1420, 300]
+      "position": [
+        1420,
+        300
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "url": "https://tunedyota.com/.netlify/functions/notify",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ { \"text\": \":envelope_with_arrow: Sent \" + $json.count + \" post-event review request(s).\" } }}",
-        "options": {}
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "wf2-slack",
       "name": "Slack summary",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1660, 300]
+      "position": [
+        1660,
+        300
+      ]
     }
   ],
   "connections": {
-    "Daily 10:00 CT": { "main": [[{ "node": "Find completed bookings", "type": "main", "index": 0 }]] },
-    "Find completed bookings": { "main": [[{ "node": "Build review emails", "type": "main", "index": 0 }]] },
-    "Build review emails": { "main": [[{ "node": "Send via Resend", "type": "main", "index": 0 }]] },
-    "Send via Resend": { "main": [[{ "node": "Mark Review Requested", "type": "main", "index": 0 }]] },
-    "Mark Review Requested": { "main": [[{ "node": "Count sent", "type": "main", "index": 0 }]] },
-    "Count sent": { "main": [[{ "node": "Slack summary", "type": "main", "index": 0 }]] }
+    "Daily 10:00 CT": {
+      "main": [
+        [
+          {
+            "node": "Find completed bookings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find completed bookings": {
+      "main": [
+        [
+          {
+            "node": "Build review emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build review emails": {
+      "main": [
+        [
+          {
+            "node": "Send via Resend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send via Resend": {
+      "main": [
+        [
+          {
+            "node": "Mark Review Requested",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Review Requested": {
+      "main": [
+        [
+          {
+            "node": "Count sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count sent": {
+      "main": [
+        [
+          {
+            "node": "Slack summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1", "timezone": "America/Chicago" }
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Chicago"
+  }
 }

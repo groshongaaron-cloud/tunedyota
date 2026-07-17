@@ -1,6 +1,6 @@
 ---
 name: booking-model-year-capture
-description: "Exact model-year dropdown on the booking form (LIVE 2026-07-04); code sends modelYear everywhere, but 2 external steps (Airtable column, n8n node) still pending → value not yet stored"
+description: "Exact model-year dropdown on the booking form — FULLY COMPLETE 2026-07-04 (code + Airtable Model Year columns + n8n WF1 Slack (YYYY), re-verified live 2026-07-16); nothing pending"
 metadata: 
   node_type: memory
   type: project

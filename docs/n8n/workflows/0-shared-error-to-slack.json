@@ -7,28 +7,46 @@
       "name": "Error Trigger",
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
-      "position": [260, 300]
+      "position": [
+        260,
+        300
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_ALERTS_WEBHOOK",
+        "url": "https://tunedyota.com/.netlify/functions/notify",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ { \"text\": \":rotating_light: n8n workflow failed — \" + ($json.workflow?.name || \"unknown\") + \"\\nNode: \" + ($json.execution?.lastNodeExecuted || \"?\") + \"\\n\" + ($json.execution?.error?.message || \"no message\") } }}",
-        "options": {}
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "slack-alert",
       "name": "Slack #alerts",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [520, 300]
+      "position": [
+        520,
+        300
+      ]
     }
   ],
   "connections": {
     "Error Trigger": {
-      "main": [[{ "node": "Slack #alerts", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Slack #alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }

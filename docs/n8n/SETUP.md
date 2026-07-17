@@ -23,9 +23,12 @@ In n8n → **Credentials → New**:
 2. **Resend API** (type: *Header Auth*)
    - Name it exactly **`Resend API`**.
    - Header **Name:** `Authorization`  ·  **Value:** `Bearer re_your_resend_key`
-3. **Slack** — no credential needed. These workflows post to a Slack **Incoming Webhook**
-   via plain HTTP Request nodes. You'll paste the webhook URL directly into the Slack nodes
-   (next section). Use your existing `#alerts` webhook, or make a new `#bookings` one.
+3. **TY Notify Relay** (type: *Header Auth*) — Slack posts go through the site's
+   `/notify` relay, NOT a raw Slack webhook (the webhook stays server-side; rotating
+   Slack never touches n8n — see `netlify/functions/notify.js`).
+   - Name it exactly **`TY Notify Relay (x-ty-notify)`**.
+   - Header **Name:** `x-ty-notify`  ·  **Value:** the Netlify `NOTIFY_TOKEN` env value.
+   - Restrict allowed domains to `tunedyota.com`.
 
 ---
 
@@ -47,14 +50,16 @@ n8n → **Workflows → Import from File**, one at a time, in this order:
 
 ## 2. Per-workflow finish steps
 
-### Fill in the Slack webhook URL
-Every Slack node has a placeholder URL `https://hooks.slack.com/services/REPLACE/...`.
-Open each Slack HTTP Request node and paste your real Incoming Webhook URL into the **URL**
-field. (Nodes: WF0 `Slack #alerts`; WF1 `Slack #bookings` + `Slack email-failed note`;
-WF2 `Slack summary`; WF3 `Slack one-liner`.)
+### Map the Slack relay credential
+Every Slack node POSTs to `https://tunedyota.com/.netlify/functions/notify` (2026-07-16:
+replaced the pasted-webhook design — the raw Slack webhook no longer appears in any
+workflow). Open each Slack HTTP Request node → **Authentication → Generic Credential →
+Header Auth** → pick **`TY Notify Relay (x-ty-notify)`**. (Nodes: WF0 `Slack #alerts`;
+WF1 `Slack #bookings` + `Slack email-failed note`; WF2 `Slack summary`; WF3 `Slack one-liner`.)
 
 ### Map credentials
-Open each Airtable node → pick the **`Airtable PAT`** credential. Each Resend HTTP node →
+Open each Airtable node → pick the **`Airtable PAT`** credential. Each Resend HTTP node
+(WF2 `Send via Resend`, WF3 `Email digest to owner`, WF1 `Email owner`) →
 under **Authentication → Generic Credential → Header Auth**, pick **`Resend API`**.
 
 ### Set the shared error workflow
@@ -123,8 +128,9 @@ curl -X POST 'https://<you>.app.n8n.cloud/webhook-test/ty-booking' \
 - **+7-day review nudge** for non-openers — copy + targeting drafted in
   [review-request-email.md](review-request-email.md). Needs `Review Nudged` (and optionally
   `Review Opened`) columns + Resend open-tracking. Say the word and I'll build WF4.
-- **WF1 owner email** — WF1 currently posts to Slack only. A parallel "email me too" branch
-  is a 1-node add if you want it.
+- ~~**WF1 owner email**~~ — DONE 2026-07-16: WF1's `Email owner` node emails `info@` on
+  every booking (Resend, parallel to the Slack post; flags a failed customer-confirmation
+  email in the body). Verified live (execution 66).
 
 ---
 

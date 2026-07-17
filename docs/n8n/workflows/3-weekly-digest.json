@@ -3,19 +3,41 @@
   "nodes": [
     {
       "parameters": {
-        "rule": { "interval": [{ "field": "weeks", "weeksInterval": 1, "triggerAtDay": [1], "triggerAtHour": 7 }] }
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 7
+            }
+          ]
+        }
       },
       "id": "wf3-sched",
       "name": "Mon 07:00 CT",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [220, 300]
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
         "operation": "search",
-        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
-        "table": { "__rl": true, "value": "Bookings", "mode": "name" },
+        "base": {
+          "__rl": true,
+          "value": "appMYG0QlSZTCYxUU",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Bookings",
+          "mode": "name"
+        },
         "filterByFormula": "AND({Status}=\"Booked\", IS_AFTER(CREATED_TIME(), DATEADD(TODAY(), -7, 'days')))",
         "options": {}
       },
@@ -23,15 +45,31 @@
       "name": "Search bookings (7d)",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [460, 300],
+      "position": [
+        460,
+        300
+      ],
       "alwaysOutputData": true,
-      "credentials": { "airtableTokenApi": { "id": "REPLACE", "name": "Airtable PAT" } }
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "REPLACE",
+          "name": "Airtable PAT"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "search",
-        "base": { "__rl": true, "value": "appMYG0QlSZTCYxUU", "mode": "id" },
-        "table": { "__rl": true, "value": "Priority List", "mode": "name" },
+        "base": {
+          "__rl": true,
+          "value": "appMYG0QlSZTCYxUU",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Priority List",
+          "mode": "name"
+        },
         "filterByFormula": "IS_AFTER(CREATED_TIME(), DATEADD(TODAY(), -7, 'days'))",
         "options": {}
       },
@@ -39,10 +77,18 @@
       "name": "Search priority (7d)",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [700, 300],
+      "position": [
+        700,
+        300
+      ],
       "alwaysOutputData": true,
       "executeOnce": true,
-      "credentials": { "airtableTokenApi": { "id": "REPLACE", "name": "Airtable PAT" } }
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "REPLACE",
+          "name": "Airtable PAT"
+        }
+      }
     },
     {
       "parameters": {
@@ -52,7 +98,10 @@
       "name": "Aggregate digest",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [940, 300]
+      "position": [
+        940,
+        300
+      ]
     },
     {
       "parameters": {
@@ -69,31 +118,97 @@
       "name": "Email digest to owner",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1180, 300],
-      "credentials": { "httpHeaderAuth": { "id": "REPLACE", "name": "Resend API" } }
+      "position": [
+        1180,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE",
+          "name": "Resend API"
+        }
+      }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "url": "https://tunedyota.com/.netlify/functions/notify",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ { \"text\": $('Aggregate digest').item.json.slackText } }}",
-        "options": {}
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "wf3-slack",
       "name": "Slack one-liner",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1420, 300]
+      "position": [
+        1420,
+        300
+      ]
     }
   ],
   "connections": {
-    "Mon 07:00 CT": { "main": [[{ "node": "Search bookings (7d)", "type": "main", "index": 0 }]] },
-    "Search bookings (7d)": { "main": [[{ "node": "Search priority (7d)", "type": "main", "index": 0 }]] },
-    "Search priority (7d)": { "main": [[{ "node": "Aggregate digest", "type": "main", "index": 0 }]] },
-    "Aggregate digest": { "main": [[{ "node": "Email digest to owner", "type": "main", "index": 0 }]] },
-    "Email digest to owner": { "main": [[{ "node": "Slack one-liner", "type": "main", "index": 0 }]] }
+    "Mon 07:00 CT": {
+      "main": [
+        [
+          {
+            "node": "Search bookings (7d)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search bookings (7d)": {
+      "main": [
+        [
+          {
+            "node": "Search priority (7d)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search priority (7d)": {
+      "main": [
+        [
+          {
+            "node": "Aggregate digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate digest": {
+      "main": [
+        [
+          {
+            "node": "Email digest to owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email digest to owner": {
+      "main": [
+        [
+          {
+            "node": "Slack one-liner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": { "executionOrder": "v1", "timezone": "America/Chicago" }
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Chicago"
+  }
 }

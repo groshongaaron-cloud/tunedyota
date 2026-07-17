@@ -12,34 +12,50 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "webhookId": "ty-booking"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "url": "https://tunedyota.com/.netlify/functions/notify",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ (() => { const b = $json.body || {}; const contact = b.phone || b.email || 'no contact'; const inst = (b.installer && b.installer.name) || '?'; const utm = (b.utm && (b.utm.source || b.utm.campaign)) ? ((b.utm.source||'') + (b.utm.campaign ? ' / ' + b.utm.campaign : '')) : 'direct'; return { text: ':checkered_flag: New booking — ' + (b.name||'?') + ' · ' + (b.city||'?') + '\\n' + (b.vehicle||'vehicle') + ' · ' + (b.slot||'?') + ' on ' + (b.eventLabel||'?') + '\\nInstaller: ' + inst + ' · ' + contact + '\\nSource: ' + utm }; })() }}",
-        "options": {}
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "wf1-slack",
       "name": "Slack #bookings",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [520, 220]
+      "position": [
+        520,
+        220
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
           "conditions": [
             {
               "id": "cond-emailfailed",
               "leftValue": "={{ $json.body.emailFailed }}",
               "rightValue": "",
-              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
             }
           ],
           "combinator": "and"
@@ -50,37 +66,88 @@
       "name": "IF email failed",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [520, 400]
+      "position": [
+        520,
+        400
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://hooks.slack.com/services/REPLACE/WITH/YOUR_BOOKINGS_WEBHOOK",
+        "url": "https://tunedyota.com/.netlify/functions/notify",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ { \"text\": \":warning: Confirmation email FAILED for \" + ($json.body.name||'?') + \" (\" + ($json.body.email||'no email') + \") — follow up manually.\" } }}",
-        "options": {}
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "wf1-slack-warn",
       "name": "Slack email-failed note",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [780, 400]
+      "position": [
+        780,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (() => { const b = $json.body || {}; const veh = (b.vehicle||'vehicle') + (b.modelYear ? ' (' + b.modelYear + ')' : ''); const inst = (b.installer && b.installer.name) || '?'; const utm = (b.utm && (b.utm.source || b.utm.campaign)) ? ((b.utm.source||'') + (b.utm.campaign ? ' / ' + b.utm.campaign : '')) : 'direct'; return { from: 'Tuned Yota <events@send.tunedyota.events>', to: ['info@tunedyota.com'], subject: 'New booking — ' + (b.name||'?') + ' · ' + (b.city||'?') + ' — ' + (b.slot||'?') + ' on ' + (b.eventLabel||'?'), text: veh + '\nCustomer: ' + (b.name||'?') + ' · ' + (b.phone||b.email||'no contact') + '\nInstaller: ' + inst + '\nSource: ' + utm + (b.emailFailed ? '\n\nNOTE: customer confirmation email FAILED - follow up manually.' : '') }; })() }}",
+        "options": {}
+      },
+      "id": "7e4b1a92-3c5f-4d18-9a6b-2f8c0d51e347",
+      "name": "Email owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        -192
+      ]
     }
   ],
   "connections": {
     "Webhook": {
-      "main": [[
-        { "node": "Slack #bookings", "type": "main", "index": 0 },
-        { "node": "IF email failed", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Slack #bookings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF email failed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "IF email failed": {
       "main": [
-        [{ "node": "Slack email-failed note", "type": "main", "index": 0 }],
+        [
+          {
+            "node": "Slack email-failed note",
+            "type": "main",
+            "index": 0
+          }
+        ],
         []
       ]
     }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }
