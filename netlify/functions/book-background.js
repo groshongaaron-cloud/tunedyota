@@ -96,12 +96,13 @@ async function processNotifications(job, deps) {
 }
 
 async function handler(event) {
-  // Optional shared-secret gate: when INTERNAL_TASK_SECRET is set, only act on
-  // jobs that present it (book.js attaches it). Public endpoint otherwise.
-  if (process.env.INTERNAL_TASK_SECRET) {
-    const h = event.headers || {};
-    const got = h["x-ty-task"] || h["X-Ty-Task"] || h["X-TY-TASK"] || "";
-    if (got !== process.env.INTERNAL_TASK_SECRET) return { statusCode: 401, body: "unauthorized" };
+  // Shared-secret gate, fail closed: jobs must present INTERNAL_TASK_SECRET
+  // (book.js attaches it). An unset secret is a deployment error, not an
+  // open endpoint — same contract as event-roster-run.js.
+  const h = event.headers || {};
+  const got = h["x-ty-task"] || h["X-Ty-Task"] || h["X-TY-TASK"] || "";
+  if (!process.env.INTERNAL_TASK_SECRET || got !== process.env.INTERNAL_TASK_SECRET) {
+    return { statusCode: 401, body: "unauthorized" };
   }
   let job = {};
   try { job = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, body: "bad json" }; }

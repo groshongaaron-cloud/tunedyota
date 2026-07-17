@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { processNotifications } = require("../netlify/functions/book-background.js");
+const { handler, processNotifications } = require("../netlify/functions/book-background.js");
 
 // book-background.js runs the slow follow-up for a job posted by book.js:
 // installer + customer emails (+.ics) and the fire-and-forget n8n ping. Real
@@ -117,3 +117,31 @@ test("a malformed job is handled without throwing", async () => {
   assert.equal(r.ok, false);
   assert.equal(h.emails.length, 0);
 });
+
+// The handler gate must fail CLOSED: a missing INTERNAL_TASK_SECRET is a
+// deployment error, not an invitation to run unauthenticated (same contract
+// as event-roster-run.js).
+function withSecret(value, fn) {
+  const prev = process.env.INTERNAL_TASK_SECRET;
+  if (value === undefined) delete process.env.INTERNAL_TASK_SECRET;
+  else process.env.INTERNAL_TASK_SECRET = value;
+  return fn().finally(() => {
+    if (prev === undefined) delete process.env.INTERNAL_TASK_SECRET;
+    else process.env.INTERNAL_TASK_SECRET = prev;
+  });
+}
+test("handler rejects when INTERNAL_TASK_SECRET is unset (fail closed)", () =>
+  withSecret(undefined, async () => {
+    const r = await handler({ headers: { "x-ty-task": "anything" }, body: "{}" });
+    assert.equal(r.statusCode, 401);
+  }));
+test("handler rejects a wrong x-ty-task secret", () =>
+  withSecret("s3cret", async () => {
+    const r = await handler({ headers: { "x-ty-task": "nope" }, body: "{}" });
+    assert.equal(r.statusCode, 401);
+  }));
+test("handler accepts the correct x-ty-task secret", () =>
+  withSecret("s3cret", async () => {
+    const r = await handler({ headers: { "x-ty-task": "s3cret" }, body: "{}" });
+    assert.equal(r.statusCode, 200);
+  }));
