@@ -56,6 +56,7 @@ async function boot() {
 test("share widget lists upcoming events and generates the link on selection", async (t) => {
   if (!browserOk) return t.skip("no browser available");
   const page = await boot();
+  await page.click("#evshare summary");
   await page.waitForSelector("#evshare select");
   const opts = await page.evaluate(() => [...document.querySelectorAll("#evshare select option")].map((o) => o.textContent));
   assert.ok(opts.some((o) => /Fargo/.test(o)) && opts.some((o) => /Omaha/.test(o)));
@@ -70,6 +71,7 @@ test("share widget lists upcoming events and generates the link on selection", a
 test("QR button reveals the event-qr image for the selected slug", async (t) => {
   if (!browserOk) return t.skip("no browser available");
   const page = await boot();
+  await page.click("#evshare summary");
   await page.waitForSelector("#evshare select");
   await page.selectOption("#evshare select", { index: 1 });
   await page.click("#evshareqr");
