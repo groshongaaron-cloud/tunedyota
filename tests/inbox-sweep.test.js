@@ -22,10 +22,11 @@ function harness(msgs, classifications) {
 const MSG = (id, over = {}) => ({ id, threadId: "t" + id, headers: { from: "jo@x.com", subject: "s", messageId: "<" + id + "@x>", replyTo: "" }, textBody: "Name: Q\nPhone: 555\nCity: Fargo\nVehicle Year: 2019\nVehicle Make: Toyota\nVehicle Model: Tundra", ...over });
 
 test("ott-lead routes to lead-ingest and labels ty-ingested", async () => {
-  const h = harness([MSG("m1")], [{ bucket: "ott-lead", stage: "situation", confidence: 0.95, summary: "" }]);
+  const h = harness([MSG("m1", { textBody: "Name: Q\nPhone: 555\nCity: Fargo\nVehicle Year: 2019\nVehicle Make: Toyota\nVehicle Model: Tundra\nGHL Link: https://app.gohighlevel.com/x" })], [{ bucket: "ott-lead", stage: "situation", confidence: 0.95, summary: "" }]);
   const out = await runSweep(h.deps);
   assert.equal(out.ingested, 1);
   assert.equal(h.posted[0].channel, "ott-national");
+  assert.equal(h.posted[0].ghlLink, "https://app.gohighlevel.com/x");
   assert.deepEqual(h.labeled[0], ["m1", "ty-ingested"]);
 });
 test("inquiry gets a draft (never a send) and labels ty-drafted", async () => {

@@ -97,6 +97,7 @@ async function runSweep(deps = {}) {
           name: lead.name, phone: lead.phone, email: lead.email,
           vehicle: lead.vehicle, goals: lead.goals, city: lead.city,
           message: lead.message, channel: lead.channel, source: lead.source,
+          ghlLink: lead.ghlLink,
           emailThread: lead.threadId || msg.threadId,
           emailMessageId: lead.messageIdHeader || msg.headers.messageId,
           replyTo: lead.replyTo,
