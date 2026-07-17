@@ -127,9 +127,12 @@ export function buildEventsJsonLd(events, states) {
   return JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", name: "Tuned Yota 2026 OTT Tuning Events", itemListElement: items });
 }
 
+// Per-entry lastmod (content-change date) with the build date as fallback —
+// stamping every URL with the build date tells crawlers everything changed
+// every build.
 export function buildSitemap(entries, lastmod) {
   const urls = entries.map((e) =>
-    `  <url>\n    <loc>${e.loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${e.priority || "0.8"}</priority>\n  </url>`
+    `  <url>\n    <loc>${e.loc}</loc>\n    <lastmod>${e.lastmod || lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${e.priority || "0.8"}</priority>\n  </url>`
   ).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }

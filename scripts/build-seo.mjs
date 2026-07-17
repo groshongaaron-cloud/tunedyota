@@ -1,6 +1,7 @@
 // scripts/build-seo.mjs
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import sharp from "sharp";
@@ -114,10 +115,21 @@ function fixBreadcrumbs() {
   }
 }
 
+// lastmod = the page's last git commit date (content change), not the build
+// date. Uncommitted/new pages (no history yet, or dirty in the working tree)
+// fall back to today via buildSitemap's second argument.
+function gitLastmod(file) {
+  try {
+    const dirty = execFileSync("git", ["status", "--porcelain", "--", `site/${file}`], { cwd: ROOT }).toString().trim();
+    if (dirty) return ""; // modified since last commit → today
+    return execFileSync("git", ["log", "-1", "--format=%cs", "--", `site/${file}`], { cwd: ROOT }).toString().trim();
+  } catch { return ""; }
+}
+
 function writeSitemap() {
   const entries = SD.HEAD_PAGES
     .filter((f) => !SD.SITEMAP_EXCLUDE.has(f))
-    .map((f) => ({ loc: SD.locFor(f), priority: SD.PRIORITY[f] || "0.8" }));
+    .map((f) => ({ loc: SD.locFor(f), priority: SD.PRIORITY[f] || "0.8", lastmod: gitLastmod(f) }));
   fs.writeFileSync(path.join(SITE_DIR, "sitemap.xml"), SD.buildSitemap(entries, today()));
 }
 

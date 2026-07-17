@@ -74,7 +74,15 @@ test("sitemap covers exactly the indexable page set", () => {
   const expected = SD.HEAD_PAGES.filter((f) => !SD.SITEMAP_EXCLUDE.has(f)).map(SD.locFor).sort();
   const got = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).sort();
   assert.deepEqual(got, expected);
-  assert.ok(!/<lastmod>2026-06-12<\/lastmod>/.test(xml), "sitemap lastmod refreshed");
+  // lastmod is per-page (git last-commit date, build date for uncommitted pages):
+  // every value must be a valid ISO date and none may be in the future.
+  const dates = [...xml.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);
+  assert.equal(dates.length, got.length, "every url has a lastmod");
+  const todayISO = new Date().toISOString().slice(0, 10);
+  for (const d of dates) {
+    assert.match(d, /^\d{4}-\d{2}-\d{2}$/, `lastmod is ISO date: ${d}`);
+    assert.ok(d <= todayISO, `lastmod not in the future: ${d}`);
+  }
 });
 
 test("generated image assets exist", () => {
