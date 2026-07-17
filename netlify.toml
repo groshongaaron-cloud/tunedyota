@@ -62,6 +62,13 @@
 [functions."inbox-digest"]
   schedule = "0 0,13,17 * * *"
 
+# Per-event booking links: /book/<city-slug>-<date> → the times-first mini flow
+# (200 rewrite keeps the pretty URL; book.html reads the slug from location.pathname).
+[[redirects]]
+  from = "/book/*"
+  to = "/book.html"
+  status = 200
+
 # "Get OTT Now!" share link -> the decision funnel, tagged to the share campaign.
 [[redirects]]
   from = "/get-ott-now"
