@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book your tune | Tuned Yota</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<style>
+/* compact mini-flow styles; reuse tokens from site.css (--ink/--brown/--line etc.) */
+.bk{font-family:'Lato',sans-serif;max-width:560px;margin:0 auto;padding:26px 16px 60px;color:#5D4B40}
+.bk h1{font-family:'Spectral',serif;font-weight:600;color:#3A2E26;font-size:clamp(24px,6vw,34px);margin:6px 0 2px}
+.bk .sub{font-size:15px;margin-bottom:18px}
+#slots{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+#slots button{border:1.5px solid rgba(91,75,66,.25);background:#fff;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:700;cursor:pointer}
+#slots button.sel{background:#3A2E26;color:#F3EFEA;border-color:#3A2E26}
+.bk input,.bk select{width:100%;padding:12px;font-size:16px;border:1px solid rgba(91,75,66,.25);border-radius:9px;margin:6px 0;background:#fff}
+#bkPrice{font-weight:900;color:#3A2E26;margin:8px 0;min-height:22px}
+#bkSubmit{width:100%;border:0;border-radius:99px;padding:15px;font-weight:900;font-size:15px;background:#3A2E26;color:#F3EFEA;cursor:pointer;margin-top:10px}
+#bkSubmit:disabled{opacity:.5;cursor:default}
+#done,#fallback{display:none;background:#FAF9F7;border:1.5px solid rgba(91,75,66,.16);border-radius:14px;padding:20px}
+.bk .err{color:#8a2a2a;font-size:14px;display:none;margin:6px 0}
+.bk .foot{font-size:13px;opacity:.6;margin-top:22px;text-align:center}
+</style>
+</head>
+<body>
+<div class="bk">
+  <div id="hdr"><h1 id="evTitle">Loading event…</h1><div class="sub" id="evSub"></div></div>
+  <div id="flow" style="display:none">
+    <div id="slots"></div>
+    <div id="form" style="display:none">
+      <input id="bkName" placeholder="Your name">
+      <input id="bkPhone" placeholder="Phone" inputmode="tel">
+      <input id="bkEmail" placeholder="Email (for your calendar invite + certificate)" type="email">
+      <select id="bkMake"><option value="">Make…</option></select>
+      <select id="bkModel" disabled><option value="">Model…</option></select>
+      <select id="bkConfig" disabled><option value="">Year / engine…</option></select>
+      <div id="bkPrice"></div>
+      <div class="err" id="bkErr"></div>
+      <button id="bkSubmit" disabled>Confirm booking</button>
+    </div>
+  </div>
+  <div id="done"></div>
+  <div id="fallback"></div>
+  <p class="foot">Questions? Call or text <a href="tel:+16124067117">(612) 406-7117</a></p>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s);};
+// --- slug from the pretty URL (/book/<city-slug>-<date>); querystring fallback ---
+var m=(location.pathname.match(/\/book\/([a-z0-9-]+-\d{4}-\d{2}-\d{2})\/?$/)||[]);
+var slug=m[1]||new URLSearchParams(location.search).get("e")||"";
+var sm=slug.match(/^([a-z0-9-]+)-(\d{4}-\d{2}-\d{2})$/)||[];
+var citySlug=sm[1]||"", dateISO=sm[2]||"";
+var slugify=function(c){return String(c||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");};
+// --- funnel-measurement beacons (same sid key as the funnel) ---
+var SID=(function(){var s="";try{s=sessionStorage.getItem("ty_sid")||"";}catch(e){}if(!s){s="s_"+Math.random().toString(36).slice(2)+Date.now().toString(36);try{sessionStorage.setItem("ty_sid",s);}catch(e){}}return s;})();
+var UTM=new URLSearchParams(location.search);
+function track(step,name){try{var p=JSON.stringify({sid:SID,step:step,name:name||"",utm_source:UTM.get("utm_source")||"",utm_medium:UTM.get("utm_medium")||"",utm_campaign:UTM.get("utm_campaign")||""});if(navigator.sendBeacon){navigator.sendBeacon("/.netlify/functions/track",p);}else{fetch("/.netlify/functions/track",{method:"POST",body:p,keepalive:true});}}catch(e){}}
+document.addEventListener("click",function(e){try{var a=e.target.closest&&e.target.closest('a[href^="tel:"]');if(a)track(6,"call");}catch(err){}},true);
+
+var STATE={avail:null,ev:null,slot:null,vehicles:null,cfg:null};
+
+function fallback(html){ $("#hdr").style.display="none"; $("#flow").style.display="none";
+  var f=$("#fallback"); f.innerHTML=html; f.style.display="block"; }
+
+function fallbackFor(city,events){
+  var next=(events||[]).filter(function(e){return !e.full;})[0];
+  var lines=['<h1 style="font-family:Spectral,serif;color:#3A2E26">That event has passed or isn’t scheduled.</h1>'];
+  if(next){ lines.push('<p>Good news — the next '+city+' event is <strong>'+next.eventLabel+'</strong>.</p>');
+    lines.push('<p><a class="link" style="font-weight:900" href="/book/'+slugify(city)+'-'+next.dateISO+'">See '+next.eventLabel+' times →</a></p>'); }
+  lines.push('<p><a href="/find-your-exact-tune?city='+encodeURIComponent(city||"")+'">Find your exact tune '+(next?'':'or join the Priority Waitlist ')+'→</a></p>');
+  fallback(lines.join(""));
+}
+
+// --- load event + vehicles in parallel ---
+if(!citySlug||!dateISO){ fallbackFor("", []); }
+else{
+  Promise.all([
+    fetch("/.netlify/functions/availability?city="+encodeURIComponent(citySlug.replace(/-/g," "))).then(function(r){return r.json();}),
+    fetch("/vehicles.json").then(function(r){return r.json();})
+  ]).then(function(res){
+    var avail=res[0]; STATE.vehicles=res[1]; STATE.avail=avail;
+    if(!avail||!avail.hasEvent){ fallbackFor(avail&&avail.city||citySlug.replace(/-/g," "), []); return; }
+    var ev=(avail.events||[]).filter(function(e){return e.dateISO===dateISO;})[0];
+    if(!ev){ fallbackFor(avail.city, avail.events||[]); return; }
+    if(ev.full||!ev.openSlots.length){ fallbackFor(avail.city, (avail.events||[]).filter(function(e){return e.dateISO!==dateISO;})); return; }
+    STATE.ev=ev;
+    $("#evTitle").textContent=avail.city+" · "+ev.eventLabel;
+    $("#evSub").textContent="Pick a time, add your details, and you’re booked."+(ev.address?" · "+ev.address:"");
+    renderSlots(ev); populateMakes(); $("#flow").style.display="block";
+    track(5,"book");
+  }).catch(function(){ fallbackFor(citySlug.replace(/-/g," "), []); });
+}
+
+function renderSlots(ev){
+  var box=$("#slots"); box.innerHTML="";
+  ev.openSlots.forEach(function(s){
+    var b=document.createElement("button"); b.dataset.slot=s; b.textContent=(ev.slotLabels||{})[s]||s;
+    b.onclick=function(){ Array.prototype.forEach.call(box.children,function(x){x.classList.remove("sel");});
+      b.classList.add("sel"); STATE.slot=s; $("#form").style.display="block"; update(); };
+    box.appendChild(b);
+  });
+}
+
+function populateMakes(){
+  var mk=$("#bkMake"); Object.keys(STATE.vehicles||{}).forEach(function(k){ var o=document.createElement("option"); o.value=k; o.textContent=k; mk.appendChild(o); });
+  mk.onchange=function(){ var md=$("#bkModel"); md.innerHTML='<option value="">Model…</option>'; md.disabled=!mk.value;
+    if(mk.value) Object.keys(STATE.vehicles[mk.value]).forEach(function(k){ var o=document.createElement("option"); o.value=k; o.textContent=k; md.appendChild(o); });
+    $("#bkConfig").innerHTML='<option value="">Year / engine…</option>'; $("#bkConfig").disabled=true; STATE.cfg=null; update(); };
+  $("#bkModel").onchange=function(){ var md=$("#bkModel"), cf=$("#bkConfig"); cf.innerHTML='<option value="">Year / engine…</option>'; cf.disabled=!md.value; STATE.cfg=null;
+    if(md.value) (STATE.vehicles[$("#bkMake").value][md.value]||[]).forEach(function(c,i){ var o=document.createElement("option"); o.value=String(i); o.textContent=c.y+" · "+c.e; cf.appendChild(o); });
+    update(); };
+  $("#bkConfig").onchange=function(){ var i=$("#bkConfig").value; STATE.cfg=i===""?null:STATE.vehicles[$("#bkMake").value][$("#bkModel").value][Number(i)]; update(); };
+  ["bkName","bkPhone","bkEmail"].forEach(function(id){ document.getElementById(id).oninput=update; });
+}
+
+function update(){
+  var p=$("#bkPrice");
+  p.textContent = STATE.cfg ? ("Your OTT tune: from $"+STATE.cfg.base) : "";
+  var ok=STATE.slot&&$("#bkName").value.trim()&&$("#bkPhone").value.trim()&&STATE.cfg;
+  $("#bkSubmit").disabled=!ok;
+}
+
+$("#bkSubmit").onclick=function(){
+  var btn=$("#bkSubmit"); btn.disabled=true; btn.textContent="Booking…";
+  var vehicle=($("#bkMake").value+" "+$("#bkModel").value+" ("+STATE.cfg.y+" "+STATE.cfg.e+")");
+  var payload={ city:STATE.avail.city, dateISO:dateISO, slot:STATE.slot,
+    name:$("#bkName").value.trim(), phone:$("#bkPhone").value.trim(), email:$("#bkEmail").value.trim(),
+    vehicle:vehicle, modelYear:"", mods:"", goals:"Booked via event link", installer_key:"", bot_field:"",
+    source:"event-link", utm_source:UTM.get("utm_source")||"", utm_medium:UTM.get("utm_medium")||"", utm_campaign:UTM.get("utm_campaign")||"" };
+  fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+    .then(function(r){return r.json();}).then(function(out){
+      if(out.status==="booked"){ track(6,"booked");
+        $("#flow").style.display="none"; $("#hdr").style.display="none";
+        var d=$("#done"); d.style.display="block";
+        d.innerHTML='<h1 style="font-family:Spectral,serif;color:#3A2E26">You’re booked.</h1><p>'+STATE.avail.city+" · "+(out.eventLabel||STATE.ev.eventLabel)+" at "+(STATE.ev.slotLabels[out.slot]||out.slot)+'.</p><p>Check your email for a calendar invite.</p>';
+      } else if(out.status==="conflict"){ btn.textContent="Confirm booking";
+        STATE.ev.openSlots=out.openSlots||[]; STATE.slot=null; renderSlots(STATE.ev); update();
+        var e1=$("#bkErr"); e1.textContent="That time was just taken — fresh times above."; e1.style.display="block";
+      } else { track(6,"priority");
+        $("#flow").style.display="none"; $("#hdr").style.display="none";
+        var d2=$("#done"); d2.style.display="block";
+        d2.innerHTML='<h1 style="font-family:Spectral,serif;color:#3A2E26">You’re on the list.</h1><p>We’ll reach out the moment a slot opens in '+STATE.avail.city+".</p>";
+      }
+    }).catch(function(){ btn.disabled=false; btn.textContent="Confirm booking";
+      var e2=$("#bkErr"); e2.textContent="Something hiccuped — try again, or call/text (612) 406-7117."; e2.style.display="block"; });
+};
+})();
+</script>
+</body>
+</html>
