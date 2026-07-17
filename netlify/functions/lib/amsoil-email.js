@@ -18,7 +18,7 @@ function trackUrl(to, bookingId) {
 
 function firstName(name) { return name ? esc(String(name).trim().split(/\s+/)[0]) : "there"; }
 
-function buildAmsoilEmail({ name, vehicle, modelYear, fluids, bookingId } = {}) {
+function buildAmsoilEmail({ name, vehicle, modelYear, fluids, bookingId, accountUrl } = {}) {
   const hasFluids = !!(fluids && fluids.systems && fluids.systems.length);
   const veh = esc(fluids && fluids.model
     ? (fluids.make + " " + fluids.model + (fluids.engine ? " " + fluids.engine : ""))
@@ -53,6 +53,7 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids, bookingId } = {}) 
         <a href="${url}" style="display:inline-block;background:#191c1e;color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 26px;border-radius:8px;">Shop your fluids &amp; save up to 25% &#9658;</a>
       </div>
       <p style="font-size:13px;color:#8a8f94;text-align:center;margin:8px 0 0;"><a href="${pcUrl}" style="color:#8a8f94;text-decoration:underline;">Become a Preferred Customer under Tuned Yota</a> and save up to 25% for life on every future order.</p>
+      <p style="font-size:13px;color:#8a8f94;text-align:center;margin:8px 0 0;"><a href="${accountUrl || "https://tunedyota.com/account"}" style="color:#8a8f94;text-decoration:underline;">View your certificates &amp; AMSOIL garage</a></p>
     </div>
     <div style="padding:16px 28px;border-top:1px solid #e7e3da;font-size:11px;color:#8a8f94;line-height:1.5;">
       You&rsquo;re receiving this because Tuned Yota tuned your ${veh}. Reply <strong>UNSUBSCRIBE</strong> to stop AMSOIL emails.<br>

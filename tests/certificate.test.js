@@ -127,3 +127,10 @@ test("compact reference page when the vehicle has no fluid data", () => {
   assert.match(html, /AMSOIL Maintenance Reference/);
   assert.ok(!/<table class="fluids"/.test(html), "no fabricated fluids table");
 });
+
+test("certificate never embeds a login token", () => {
+  const { html } = buildCertificate({ name: "A", vehicle: "V", calibration: "Medium",
+    amsoil: { fluids: null, qrSvg: "<svg></svg>" } });
+  assert.ok(!/account\?lt=/.test(html));
+  assert.match(html, /tunedyota\.com\/account/);
+});

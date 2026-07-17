@@ -9,6 +9,7 @@ const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { buildAmsoilEmail } = require("./lib/amsoil-email.js");
+const { accountLink } = require("./lib/client-auth.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -38,7 +39,7 @@ async function runAmsoilFollowup(deps) {
     const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
     if (!fluids) { skipped++; continue; }   // non-catalog vehicle; leave unmarked (self-heals if catalog grows)
     try {
-      const { subject, html, text } = buildAmsoilEmail({ name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], fluids, bookingId: row.id });
+      const { subject, html, text } = buildAmsoilEmail({ name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], fluids, bookingId: row.id, accountUrl: accountLink(f.Email, Date.now(), env) });
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: f.Email, replyTo: OWNER, subject, html, text });
       await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: { "AMSOIL Email Sent": today } });
       sent++;

@@ -104,7 +104,7 @@ function amsoilPage(amsoil, vehicleDisplay) {
         </div>
       </div>
     </div>
-    <div class="ref-fine">Fluids &amp; capacities are a maintenance reference for your vehicle — confirm capacities against your owner&rsquo;s manual before service. &middot; Tuned Yota is an Authorized AMSOIL Dealer. &middot; tunedyota.com/amsoil-garage</div>
+    <div class="ref-fine">Fluids &amp; capacities are a maintenance reference for your vehicle — confirm capacities against your owner&rsquo;s manual before service. &middot; Tuned Yota is an Authorized AMSOIL Dealer. &middot; tunedyota.com/account — your certificates &amp; AMSOIL garage</div>
   </div>`;
 }
 

@@ -314,6 +314,22 @@ test("complete without a signature omits the field (skip path)", async () => {
   assert.ok(!("Customer Signature" in written));
 });
 
+test("customer cert email includes a pre-authenticated account link", async () => {
+  const sent = [];
+  const envWithSecret = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "k", CLIENT_SESSION_SECRET: "test-secret-0123456789" };
+  const out = await processCloseout(
+    { recordId: "recX", action: "complete", calibration: "Medium", customerEmail: "marcus@example.com" },
+    { env: envWithSecret, key: "aaron", admin: false,
+      get: async () => ({ id: "recX", fields: {
+        Installer: "aaron", Name: "Marcus Bell", Vehicle: "2024 Toyota Tacoma 2.4L-T I4",
+        "Model Year": "2024", Email: "marcus@example.com", "Event Date": "2026-07-12", Status: "Booked" } }),
+      update: async () => ({}),
+      send: async (a) => { sent.push(a); },
+    });
+  assert.equal(out.status, "completed");
+  assert.match(sent[0].text, /account\?lt=/);
+});
+
 test("a malformed/oversized signature is ignored, completion still succeeds", async () => {
   let written;
   const deps = { env, key: "aaron", admin: false,

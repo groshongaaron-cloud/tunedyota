@@ -33,3 +33,34 @@ test("degrades safely with no fluids", () => {
   assert.ok(!/<table/.test(html), "no fluids table when unresolved");
   assert.match(html, /amsoil-garage/);
 });
+
+test("built html contains account?lt= when accountUrl carries a token", () => {
+  const fluids = resolveFluids("2024 Toyota Tacoma 2.4L-T I4", "2024");
+  const { html } = buildAmsoilEmail({
+    name: "Marcus", vehicle: "2024 Toyota Tacoma 2.4L-T I4", modelYear: "2024",
+    fluids, bookingId: "recABC",
+    accountUrl: "https://tunedyota.com/account?lt=sometoken123",
+  });
+  assert.match(html, /account\?lt=sometoken123/);
+});
+
+test("plain accountUrl renders a plain /account link", () => {
+  const fluids = resolveFluids("2024 Toyota Tacoma 2.4L-T I4", "2024");
+  const { html } = buildAmsoilEmail({
+    name: "Marcus", vehicle: "2024 Toyota Tacoma 2.4L-T I4", modelYear: "2024",
+    fluids, bookingId: "recABC",
+    accountUrl: "https://tunedyota.com/account",
+  });
+  assert.match(html, /tunedyota\.com\/account/);
+  assert.ok(!/account\?lt=/.test(html), "plain url must not carry a token");
+});
+
+test("accountUrl falls back to plain /account when not provided", () => {
+  const fluids = resolveFluids("2024 Toyota Tacoma 2.4L-T I4", "2024");
+  const { html } = buildAmsoilEmail({
+    name: "Marcus", vehicle: "2024 Toyota Tacoma 2.4L-T I4", modelYear: "2024",
+    fluids, bookingId: "recABC",
+  });
+  assert.match(html, /tunedyota\.com\/account/);
+  assert.ok(!/account\?lt=/.test(html), "no token in fallback");
+});

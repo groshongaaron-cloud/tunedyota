@@ -55,4 +55,12 @@ function resolveClient(headers, now, env) {
   return out;
 }
 
-module.exports = { signSession, verifySession, signLogin, verifyLogin, resolveClient, SESSION_TTL_MS, RENEW_AFTER_MS };
+const ACCOUNT_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+// Account URL for an email body: pre-authenticated when the secret is configured,
+// plain /account otherwise. Never embed in the certificate HTML itself.
+function accountLink(email, now, env) {
+  const lt = signLogin(email, ACCOUNT_LINK_TTL_MS, now, env);
+  return lt ? `https://tunedyota.com/account?lt=${lt}` : "https://tunedyota.com/account";
+}
+
+module.exports = { signSession, verifySession, signLogin, verifyLogin, resolveClient, accountLink, SESSION_TTL_MS, RENEW_AFTER_MS };

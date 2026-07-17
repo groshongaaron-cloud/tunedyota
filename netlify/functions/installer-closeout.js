@@ -9,6 +9,7 @@ const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate
 const { sendEmail } = require("./lib/resend.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
+const { accountLink } = require("./lib/client-auth.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -119,7 +120,7 @@ async function processCloseout(body, deps) {
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to,
       replyTo: OWNER, subject,
       text: toCustomer
-        ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.`
+        ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.\n\nView your certificates & AMSOIL garage anytime: ${accountLink(customerEmail, Date.now(), env)}`
         : `Attached is the Certificate of Calibration for ${f.Name || "your customer"} — no customer email on file; please forward it to them.`,
       attachments: [{ filename: "certificate.html", content: Buffer.from(html).toString("base64") }] });
     await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: { "Certificate Sent": true } });

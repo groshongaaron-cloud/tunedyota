@@ -1,7 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const {
-  signSession, verifySession, signLogin, verifyLogin, resolveClient,
+  signSession, verifySession, signLogin, verifyLogin, resolveClient, accountLink,
   SESSION_TTL_MS, RENEW_AFTER_MS,
 } = require("../netlify/functions/lib/client-auth.js");
 
@@ -47,6 +47,15 @@ test("fails closed when the secret is unset", () => {
   assert.equal(signSession("a@b.co", NOW, {}), null);
   const t = signSession("a@b.co", NOW, ENV);
   assert.equal(verifySession(t, NOW, {}), null);
+});
+
+test("accountLink embeds a 7-day login token, plain when unconfigured", () => {
+  const url = accountLink("a@b.co", NOW, ENV);
+  const m = /lt=([A-Za-z0-9_\-\.]+)/.exec(url);
+  assert.ok(m);
+  assert.ok(verifyLogin(m[1], NOW + 6 * 24 * 3600 * 1000, ENV));
+  assert.equal(verifyLogin(m[1], NOW + 8 * 24 * 3600 * 1000, ENV), null);
+  assert.equal(accountLink("a@b.co", NOW, {}), "https://tunedyota.com/account");
 });
 
 test("resolveClient reads the header; renews only past the renewal window", () => {

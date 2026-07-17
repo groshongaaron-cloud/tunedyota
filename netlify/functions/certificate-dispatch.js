@@ -6,6 +6,7 @@ const { buildCertificate, certSerial } = require("./lib/certificate.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
 const { sendWebPush } = require("./lib/webpush.js");
+const { accountLink } = require("./lib/client-auth.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -53,7 +54,7 @@ async function dispatchCertificates(deps) {
         to, replyTo: OWNER,
         subject,
         text: customerEmail
-          ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.`
+          ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.\n\nView your certificates & AMSOIL garage anytime: ${accountLink(customerEmail, Date.now(), env)}`
           : `Attached is the Certificate of Calibration for ${f.Name || "your customer"} — no customer email on file; please forward it to them.`,
         attachments: [{ filename: "certificate.html", content: Buffer.from(html).toString("base64") }] });
       await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: row.id, fields: {

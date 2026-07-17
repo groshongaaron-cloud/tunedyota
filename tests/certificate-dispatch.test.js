@@ -89,6 +89,19 @@ test("idempotency flag persists even when the new metadata columns are missing",
   const merged = Object.assign({}, ...writes);
   assert.equal(merged["Certificate Sent"], true, "idempotency flag must still persist");
 });
+test("customer cert email includes a pre-authenticated account link", async () => {
+  const sent = [];
+  const r = await dispatchCertificates({
+    list: async () => ([{ id: "rec1", fields: {
+      Status: "Completed", "OTT Calibration": "Medium", Name: "C", Installer: "aaron",
+      Vehicle: "2024 Toyota Tacoma 2.4L-T I4", Email: "cust@example.com", "Calibration Date": "2026-07-12" } }]),
+    update: async () => ({}), send: async (a) => { sent.push(a); }, notify: async () => {},
+    env: { RESEND_API_KEY: "x", CLIENT_SESSION_SECRET: "test-secret-0123456789" },
+  });
+  assert.equal(r.sent, 1);
+  assert.match(sent[0].text, /account\?lt=/);
+});
+
 test("backstop sends to the customer email when present, no cc", async () => {
   const sent = [];
   const r = await dispatchCertificates({
