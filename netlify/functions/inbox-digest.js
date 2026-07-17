@@ -18,7 +18,14 @@ async function runDigest(deps = {}) {
   const log = deps.log || console;
 
   let drafts;
-  try { drafts = await gmail.listDrafts({ env }); } catch (e) { return { count: 0, error: e.message }; }
+  try {
+    drafts = await gmail.listDrafts({ env });
+    // Filter to only drafts created by the sweep: keep drafts whose threadId belongs
+    // to a thread that carries the ty-drafted label (applied by inbox-sweep).
+    const tagged = await gmail.listMessages("label:ty-drafted", { env });
+    const threadIds = new Set(tagged.map((m) => m.threadId));
+    drafts = drafts.filter((d) => threadIds.has(d.threadId));
+  } catch (e) { return { count: 0, error: e.message }; }
   if (!drafts.length) return { count: 0 };
 
   const rows = [];
