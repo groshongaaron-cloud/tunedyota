@@ -308,7 +308,7 @@
   }
   async function testPush(){
     clearMsg();
-    try{ var res = await fetch('/.netlify/functions/push-test', { method:'POST', headers:{ 'x-installer-token':tok() } }); var out = await res.json().catch(function(){return{};}); succeed(out.sent ? 'Test sent — check your notifications.' : 'No device is subscribed yet.'); }
+    try{ var res = await fetch('/.netlify/functions/push-check', { method:'POST', headers:{ 'x-installer-token':tok() } }); var out = await res.json().catch(function(){return{};}); succeed(out.sent ? 'Test sent — check your notifications.' : 'No device is subscribed yet.'); }
     catch(e){ fail('Test failed: ' + (e && e.message ? e.message : 'error')); }
   }
 

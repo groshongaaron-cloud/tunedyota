@@ -1,6 +1,7 @@
-// netlify/functions/push-test.js
+// netlify/functions/push-check.js
 // Installer-token authed: send a test web push to the caller so they can confirm
-// notifications are working on their device.
+// notifications are working on their device. (Named push-check, not push-test,
+// so `node --test` doesn't discover a production function as a test file.)
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { sendWebPush } = require("./lib/webpush.js");
 

@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { processTest } = require("../netlify/functions/push-test.js");
+const { processTest } = require("../netlify/functions/push-check.js");
 
 test("sends a test push to the caller and returns sent count", async () => {
   let calledKey, calledMsg;
