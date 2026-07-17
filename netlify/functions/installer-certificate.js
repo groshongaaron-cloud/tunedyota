@@ -4,10 +4,7 @@
 // stored issue date). Ownership re-checked server-side; admins may view any.
 const { cfg, getRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { keyToInstaller } = require("./lib/routing.js");
-const { buildCertificate, certSerial } = require("./lib/certificate.js");
-const { resolveFluids } = require("./lib/amsoil-fluids.js");
-const { qrSvg } = require("./lib/qr.js");
+const { certHtmlForRecord } = require("./lib/cert-render.js");
 
 async function renderCertificate(recordId, deps) {
   const { env = process.env, fetchImpl = fetch, key, admin = false,
@@ -20,17 +17,7 @@ async function renderCertificate(recordId, deps) {
   const f = (rec && rec.fields) || {};
   const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
   if (!admin && owner !== key) return { status: "error", error: "not-yours" };
-  const inst = keyToInstaller(owner);
-  const calibrationDate = String(f["Calibration Date"] || f["Event Date"] || "").slice(0, 10);
-  const issueDate = String(f["Certificate Issued"] || calibrationDate).slice(0, 10);
-  const certNo = certSerial(recordId, calibrationDate, issueDate);
-  const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
-  const amsoil = { fluids, qrSvg: qrSvg((fluids && fluids.garageUrl) || "https://tunedyota.com/amsoil-garage") };
-  const { html } = buildCertificate({
-    name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin: f.VIN,
-    calibration: f["OTT Calibration"], installer: inst.name, installerRegion: inst.region,
-    calibrationDate, certNo, issueDate, amsoil });
-  return { status: "ok", html };
+  return { status: "ok", html: certHtmlForRecord(rec) };
 }
 
 async function handler(event) {
