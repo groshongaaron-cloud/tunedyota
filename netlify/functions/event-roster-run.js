@@ -11,6 +11,7 @@ const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { renderRosterEmail } = require("./lib/roster-render.js");
 const { getMarket } = require("./lib/markets.js");
+const { secretEquals } = require("./lib/secrets.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -25,7 +26,7 @@ async function runRosterSend(params, deps = {}) {
           listAll = (a) => listAllRecords({ fetchImpl, ...a }),
           send = sendEmail, log = console } = deps;
 
-  if (!env.INTERNAL_TASK_SECRET || String(params.token || "") !== env.INTERNAL_TASK_SECRET) {
+  if (!secretEquals(String(params.token || ""), env.INTERNAL_TASK_SECRET)) {
     return { status: "error", code: 401, error: "unauthorized" };
   }
   const city = norm(params.city);

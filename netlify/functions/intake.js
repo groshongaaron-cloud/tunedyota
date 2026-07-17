@@ -9,12 +9,12 @@ const { getEventForCity } = require("./lib/events.js");
 const EVENTS = require("./lib/events-data.js");
 const { cfg, listRecords, createRecord, createTolerant } = require("./lib/airtable.js");
 const { isValidSlot, computeOpen } = require("./lib/slots.js");
+const { secretEquals } = require("./lib/secrets.js");
 
 function authed(headers, env) {
-  const secret = env && env.INTAKE_SECRET;
-  if (!secret) return false; // fail closed when unconfigured
+  const secret = env && env.INTAKE_SECRET; // fail closed when unconfigured (secretEquals rejects empty)
   const got = (headers["x-intake-secret"] || headers["X-Intake-Secret"] || "").toString();
-  return got === secret;
+  return secretEquals(got, secret);
 }
 
 async function processIntake(body, deps) {

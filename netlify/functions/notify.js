@@ -10,6 +10,7 @@
 // a low-value, self-minted relay key — worst case on leak is channel spam; rotate
 // the one env var. The Slack webhook itself never leaves the server.
 const { notifyOwner } = require("./lib/alert.js");
+const { secretEquals } = require("./lib/secrets.js");
 
 async function handler(event, _ctx, deps = {}) {
   const { env = process.env, notify = notifyOwner, fetchImpl = fetch, log = console } = deps;
@@ -24,7 +25,7 @@ async function handler(event, _ctx, deps = {}) {
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, body: "bad json" }; }
   if (env.NOTIFY_TOKEN) {
     const got = h["x-ty-notify"] || h["X-Ty-Notify"] || h["X-TY-NOTIFY"] || body.token || "";
-    if (got !== env.NOTIFY_TOKEN) return { statusCode: 401, body: "unauthorized" };
+    if (!secretEquals(got, env.NOTIFY_TOKEN)) return { statusCode: 401, body: "unauthorized" };
   }
 
   const text = (body.text || "").toString().trim();

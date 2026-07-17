@@ -3,11 +3,12 @@
 // the internal task secret (server-to-server channel adapters). Fail-closed.
 const { processLeadIngest } = require("./lib/leads.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
+const { secretEquals } = require("./lib/secrets.js");
 
 function taskAuthed(headers, env) {
   const s = env && env.INTERNAL_TASK_SECRET;
   const got = (headers["x-ty-task"] || headers["X-Ty-Task"] || "").toString();
-  return !!(s && got === s);
+  return secretEquals(got, s);
 }
 
 async function handler(event, ctx = {}) {

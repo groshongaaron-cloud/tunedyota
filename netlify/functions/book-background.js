@@ -6,6 +6,7 @@
 // n8n ping — off the synchronous request path, so a cold-start timeout can never drop
 // the ping (the old failure mode) or stall the booking response. Up to 15 min runtime.
 const { cfg, updateRecord } = require("./lib/airtable.js");
+const { secretEquals } = require("./lib/secrets.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { pingN8n } = require("./lib/n8n.js");
@@ -96,12 +97,12 @@ async function processNotifications(job, deps) {
 }
 
 async function handler(event) {
-  // Shared-secret gate, fail closed: jobs must present INTERNAL_TASK_SECRET
-  // (book.js attaches it). An unset secret is a deployment error, not an
-  // open endpoint — same contract as event-roster-run.js.
+  // Shared-secret gate, fail closed + constant-time: jobs must present
+  // INTERNAL_TASK_SECRET (book.js attaches it). An unset secret is a
+  // deployment error, not an open endpoint — same contract as event-roster-run.js.
   const h = event.headers || {};
   const got = h["x-ty-task"] || h["X-Ty-Task"] || h["X-TY-TASK"] || "";
-  if (!process.env.INTERNAL_TASK_SECRET || got !== process.env.INTERNAL_TASK_SECRET) {
+  if (!secretEquals(got, process.env.INTERNAL_TASK_SECRET)) {
     return { statusCode: 401, body: "unauthorized" };
   }
   let job = {};
