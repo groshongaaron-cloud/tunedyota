@@ -256,7 +256,25 @@
   }
   function saveGarage(arr) {
     try { localStorage.setItem(GARAGE_KEY, JSON.stringify(arr)); } catch (e) {}
+    pushGarage(arr, false);
   }
+  // --- Account sync (signed-in clients): localStorage is the cache, the account is truth.
+  var CLIENT_TOKEN = localStorage.getItem("ty_client_token") || "";
+  function pushGarage(arr, merge) {
+    if (!CLIENT_TOKEN) return;
+    fetch("/.netlify/functions/client-garage", { method: "PUT",
+      headers: { "Content-Type": "application/json", "x-client-token": CLIENT_TOKEN },
+      body: JSON.stringify(merge ? { vehicles: arr, merge: true } : { vehicles: arr }) })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (j && j.status === "ok") {
+          try { localStorage.setItem(GARAGE_KEY, JSON.stringify(j.vehicles)); } catch (e) {}
+          renderMyGarage();
+        }
+      })
+      .catch(function () {});
+  }
+  if (CLIENT_TOKEN) pushGarage(savedGarage(), true); // absorb this device's garage once, then render truth
   function currentVehicle() {
     var mk = el("sel-make").value, md = el("sel-model").value, yr = el("sel-year").value;
     if (!mk || !md) return null;
