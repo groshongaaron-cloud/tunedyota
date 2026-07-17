@@ -4,6 +4,9 @@
 // a prospect just gets an empty portal). Action "exchange" verifies the link token,
 // auto-creates/updates the Clients row (no signup form), and returns the 1-year
 // session token + profile. Fail-closed when CLIENT_SESSION_SECRET is unset.
+// ACCEPTED RISK: "request" is unthrottled, so it can be used to mail a victim
+// sign-in links (inherent to magic-link endpoints); revisit with a rate limit
+// if abuse appears in Resend logs.
 const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
 const { signSession, signLogin, verifyLogin } = require("./lib/client-auth.js");
 const { sendEmail } = require("./lib/resend.js");
