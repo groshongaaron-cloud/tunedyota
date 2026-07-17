@@ -6,8 +6,8 @@ const { keyToInstaller } = require("./routing.js");
 const { cfg, createRecord, updateRecord, createTolerant, updateTolerant, listAllRecords } = require("./airtable.js");
 
 const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "other", "ott-national"];
-const STAGES = ["New", "Contacted", "Following up", "Booked", "Not now"];
-const ACTIVE_STAGES = ["New", "Contacted", "Following up"];
+const STAGES = ["New", "Contacted", "Qualified", "Following up", "Booked", "Not now"];
+const ACTIVE_STAGES = ["New", "Contacted", "Qualified", "Following up"];
 
 function validChannel(c) { return CHANNELS.includes(String(c || "")); }
 function validStage(s) { return STAGES.includes(String(s || "")); }
@@ -116,7 +116,10 @@ async function processLeadIngest(body, deps) {
   const fields = {
     Name: name, Phone: phone, Email: email, City: market ? market.city : "Unassigned",
     Vehicle: String(d.vehicle || ""), Goals: String(d.goals || ""),
-    Source: source, Channel: channel, Stage: "New",
+    Source: source, Channel: channel,
+    // NEPQ Stage-2 bar: location routable + vehicle known = Qualified on arrival
+    // (typical OTT lead). Airtable's Stage select gains the option via typecast:true.
+    Stage: (market && String(d.vehicle || "").trim()) ? "Qualified" : "New",
     "Last Contact": new Date(now).toISOString().slice(0, 10), "Activity Log": touch,
     ...(emailThread ? { "Email Thread": emailThread } : {}),
     ...(emailMessageId ? { "Email Message-Id": emailMessageId } : {}),

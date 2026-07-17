@@ -71,7 +71,7 @@ test("processLeadIngest creates a New lead assigned by market", async () => {
   assert.equal(out.status, "lead");
   assert.equal(out.recordId, "recNew");
   assert.equal(out.deduped, false);
-  assert.equal(created.Stage, "New");
+  assert.equal(created.Stage, "Qualified");           // market + vehicle known → Qualified
   assert.equal(created.Channel, "sms");
   assert.equal(created.Installer, "cody");            // Sioux Falls routes to cody
   assert.match(created["Activity Log"], /sms/);
@@ -190,4 +190,29 @@ test("processLeadIngest keeps email refs on a dedupe-append", async () => {
     { list: async () => [existing], update: async (a) => { updated = a.fields; return { id: a.id }; }, create: async () => ({}) });
   assert.equal(updated["Email Thread"], "thr9");
   assert.match(updated["Activity Log"], /old/);
+});
+
+test("Qualified is a valid stage, ordered after Contacted, and active", () => {
+  const { STAGES, ACTIVE_STAGES } = require("../netlify/functions/lib/leads.js");
+  assert.deepEqual(STAGES, ["New", "Contacted", "Qualified", "Following up", "Booked", "Not now"]);
+  assert.ok(ACTIVE_STAGES.includes("Qualified"));
+});
+
+test("ingest auto-qualifies a lead arriving with a routable city AND a vehicle", async () => {
+  const { processLeadIngest } = require("../netlify/functions/lib/leads.js");
+  let created;
+  const deps = { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    list: async () => [], create: async (a) => { created = a; return { id: "L1" }; }, update: async () => ({}) };
+  await processLeadIngest({ name: "Quinn", phone: "9207375148", city: "Fargo", vehicle: "2006 Lexus GX470", channel: "ott-national" }, deps);
+  assert.equal(created.fields.Stage, "Qualified");
+});
+
+test("ingest leaves stage New when city is unknown or vehicle is missing", async () => {
+  const { processLeadIngest } = require("../netlify/functions/lib/leads.js");
+  const mk = () => { const out = {}; return { out, deps: { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    list: async () => [], create: async (a) => { out.a = a; return { id: "L1" }; }, update: async () => ({}) } }; };
+  const a = mk(); await processLeadIngest({ name: "A", phone: "1", city: "Nowhereville", vehicle: "Tundra" }, a.deps);
+  assert.equal(a.out.a.fields.Stage, "New");
+  const b = mk(); await processLeadIngest({ name: "B", phone: "1", city: "Fargo", vehicle: "" }, b.deps);
+  assert.equal(b.out.a.fields.Stage, "New");
 });
