@@ -63,6 +63,7 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids, bookingId, account
   const text = `Hi ${name ? String(name).trim().split(/\s+/)[0] : "there"},\n\n` +
     `Your ${fluids && fluids.model ? fluids.make + " " + fluids.model : "tuned vehicle"} is dialed in. ` +
     `Here are the exact AMSOIL synthetic fluids for your vehicle - shop and save up to 25% as a Preferred Customer: ${url}\n\n` +
+    `View your certificates & AMSOIL garage anytime: ${accountUrl || "https://tunedyota.com/account"}\n\n` +
     `Reply UNSUBSCRIBE to stop AMSOIL emails.\nTuned Yota - Authorized AMSOIL Dealer`;
   return { subject, html, text };
 }

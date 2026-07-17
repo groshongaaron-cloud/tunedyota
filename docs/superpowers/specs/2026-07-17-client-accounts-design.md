@@ -54,7 +54,7 @@ Certificates are **not duplicated** into Clients: they resolve live by matching 
   - list mode → completed bookings where `Email` matches the session email (case-insensitive; Airtable filter built with the existing `escapeFormula`): `[{recordId, name, vehicle, modelYear, calibration, calibrationDate, certIssued}]`.
   - `?recordId=` → re-renders that booking's certificate HTML; **ownership = the booking's `Email` equals the session email**, else 403 `not-yours`. Render path shared with `installer-certificate.js` (extract/reuse its render core rather than copy it).
 - **`netlify/functions/client-garage.js`** (`x-client-token`): GET → `{vehicles}`; PUT `{vehicles}` → validates shape (array of `{make, model, year}`, bounded length ≤ 20, strings capped), writes `Vehicles` JSON. 401 without a session; Airtable failure → retryable `{error:"store-unavailable"}`.
-- Both endpoints return a `renewedToken` field when the sliding renewal fires; the client swaps localStorage.
+- Both endpoints surface the sliding renewal as an `x-renewed-token` response header (the channel the frontend reads — the only one available on HTML cert responses) and, on JSON responses, also as a `renewedToken` body field; the client swaps localStorage.
 
 ## 5. Frontend
 
