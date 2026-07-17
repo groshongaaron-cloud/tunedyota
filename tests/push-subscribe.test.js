@@ -21,6 +21,13 @@ test("registers a new subscription scoped to the installer", async () => {
   assert.equal(JSON.parse(created.fields.Subscription).endpoint, sub.endpoint);
 });
 
+test("a quote in the endpoint cannot break out of the dedupe formula", async () => {
+  let formula;
+  await processSubscribe({ subscription: { endpoint: 'https://push.example/x", {Installer}!="' } }, { env, key: "aaron",
+    list: async (a) => { formula = a.filterByFormula; return []; }, create: async () => ({}), update: async () => ({}) });
+  assert.equal(formula, '{Endpoint}="https://push.example/x\\", {Installer}!=\\""');
+});
+
 test("updates (does not duplicate) a known endpoint", async () => {
   let updatedId, created = false;
   const out = await processSubscribe({ subscription: sub }, { env, key: "noah",

@@ -1,5 +1,11 @@
 // netlify/functions/lib/airtable.js
 const API = "https://api.airtable.com/v0";
+// Escape a value for interpolation into a double-quoted filterByFormula string
+// literal ({Field}="..."), so user input can't break out of the literal and
+// widen the match (formula injection).
+function escapeFormula(v) {
+  return String(v == null ? "" : v).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
 function cfg(env = process.env) {
   return {
     token: env.AIRTABLE_TOKEN,
@@ -98,4 +104,4 @@ async function deleteRecord({ fetchImpl = fetch, token, baseId, table, id }) {
   if (!res.ok) throw new Error(`airtable delete ${res.status}: ${await res.text().catch(() => "")}`);
   return res.json();
 }
-module.exports = { cfg, listRecords, createRecord, createTolerant, updateRecord, updateTolerant, listAllRecords, getRecord, deleteRecord };
+module.exports = { cfg, escapeFormula, listRecords, createRecord, createTolerant, updateRecord, updateTolerant, listAllRecords, getRecord, deleteRecord };

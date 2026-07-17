@@ -2,7 +2,7 @@
 // Installer-token authed: upsert an app device's push token into the "Push Devices"
 // Airtable table, keyed to the installer. Called by the Tuned Yota app after the OS
 // grants notification permission. Dedups by token (update, not duplicate).
-const { cfg, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
+const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
 
 const DEVICES = (env) => env.AIRTABLE_DEVICES_TABLE || "Push Devices";
@@ -19,7 +19,7 @@ async function processRegister(body, deps) {
   const table = DEVICES(env);
   const fields = { Installer: key, Token: token, Platform: platform };
   try {
-    const existing = await list({ token: c.token, baseId: c.baseId, table, filterByFormula: `{Token}="${token}"` });
+    const existing = await list({ token: c.token, baseId: c.baseId, table, filterByFormula: `{Token}="${escapeFormula(token)}"` });
     if (existing.length) { await update({ token: c.token, baseId: c.baseId, table, id: existing[0].id, fields }); return { status: "updated" }; }
     await create({ token: c.token, baseId: c.baseId, table, fields });
     return { status: "registered" };

@@ -5,7 +5,7 @@
 // date (defaults to today), which then flows through the normal close-out → cert +
 // OTT commission report exactly like an at-event walk-in. Ownership is enforced by
 // market routing. See memory: "walk-ins are EVERYDAY, not event-only".
-const { cfg, createRecord, createTolerant, listRecords } = require("./lib/airtable.js");
+const { cfg, createRecord, createTolerant, escapeFormula, listRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller } = require("./lib/routing.js");
@@ -42,7 +42,7 @@ async function processWalkin(body, deps) {
   // fall through to create.
   if (clientKey) {
     try {
-      const dupes = await list({ token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula: `{Client Key}="${clientKey}"` });
+      const dupes = await list({ token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula: `{Client Key}="${escapeFormula(clientKey)}"` });
       if (dupes && dupes.length) {
         const g = dupes[0], gf = g.fields || {};
         return { status: "booked", recordId: g.id, booking: {

@@ -1,6 +1,15 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { cfg, listRecords, createRecord } = require("../netlify/functions/lib/airtable.js");
+const { cfg, listRecords, createRecord, escapeFormula } = require("../netlify/functions/lib/airtable.js");
+
+test("escapeFormula neutralizes quotes and backslashes for formula string literals", () => {
+  assert.equal(escapeFormula("plain"), "plain");
+  assert.equal(escapeFormula('a"b'), 'a\\"b');
+  assert.equal(escapeFormula("a\\b"), "a\\\\b");
+  assert.equal(escapeFormula('a\\"b'), 'a\\\\\\"b');
+  assert.equal(escapeFormula(123), "123");
+  assert.equal(escapeFormula(null), "");
+});
 
 test("cfg reads env with defaults", () => {
   const c = cfg({ AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" });

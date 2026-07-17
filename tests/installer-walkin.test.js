@@ -103,6 +103,13 @@ test("a new clientKey creates and writes Client Key", async () => {
   assert.equal(fields["Client Key"], "ck-2");
 });
 
+test("a quote in the clientKey cannot break out of the dedupe formula", async () => {
+  let formula;
+  await processWalkin({ city: "fargo", name: "Dana", phone: "1", clientKey: 'ck", {Name}!="' },
+    { key: "aaron", admin: false, list: async (a) => { formula = a.filterByFormula; return []; }, create: async () => ({ id: "recNew" }) });
+  assert.equal(formula, '{Client Key}="ck\\", {Name}!=\\""');
+});
+
 test("no clientKey still creates as before (no lookup required)", async () => {
   const out = await processWalkin({ city: "fargo", name: "Dana", phone: "1" },
     { key: "aaron", admin: false, list: async () => [], create: async () => ({ id: "rec3" }) });

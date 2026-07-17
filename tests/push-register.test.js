@@ -11,6 +11,13 @@ test("rejects a missing token", async () => {
   assert.equal(out.error, "missing-token");
 });
 
+test("a quote in the device token cannot break out of the dedupe formula", async () => {
+  let formula;
+  await processRegister({ token: 'tok", {Installer}!="', platform: "ios" }, { env, key: "aaron",
+    list: async (a) => { formula = a.filterByFormula; return []; }, create: async () => ({}), update: async () => ({}) });
+  assert.equal(formula, '{Token}="tok\\", {Installer}!=\\""');
+});
+
 test("registers a new device token scoped to the installer", async () => {
   let created;
   const out = await processRegister({ token: "devTOK", platform: "iOS" }, { env, key: "aaron",

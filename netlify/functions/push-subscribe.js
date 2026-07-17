@@ -2,7 +2,7 @@
 // Installer-token authed: upsert a browser PushSubscription into the "Web Push Subs"
 // Airtable table, keyed to the installer, deduped by endpoint. Called by the console
 // after the browser grants notification permission.
-const { cfg, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
+const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
 
 const SUBS = (env) => env.AIRTABLE_WEBPUSH_TABLE || "Web Push Subs";
@@ -19,7 +19,7 @@ async function processSubscribe(body, deps) {
   const table = SUBS(env);
   const fields = { Installer: key, Endpoint: endpoint, Subscription: JSON.stringify(sub) };
   try {
-    const existing = await list({ token: c.token, baseId: c.baseId, table, filterByFormula: `{Endpoint}="${endpoint}"` });
+    const existing = await list({ token: c.token, baseId: c.baseId, table, filterByFormula: `{Endpoint}="${escapeFormula(endpoint)}"` });
     if (existing.length) { await update({ token: c.token, baseId: c.baseId, table, id: existing[0].id, fields }); return { status: "updated" }; }
     await create({ token: c.token, baseId: c.baseId, table, fields });
     return { status: "registered" };
