@@ -227,7 +227,7 @@ test("site/installer.html Leads tab badge does not use stale 3-stage inline list
 
 test("site/installer.html LEAD_STAGES literal includes Qualified between Contacted and Following up", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
-  const m = html.match(/var LEAD_STAGES\s*=\s*(\[.*?\])/);
+  const m = html.match(/var LEAD_STAGES\s*=\s*(\[[\s\S]*?\])/);
   assert.ok(m, "LEAD_STAGES array not found in installer.html");
   const stages = JSON.parse(m[1].replace(/'/g, '"'));
   const ci = stages.indexOf("Contacted");
@@ -236,4 +236,6 @@ test("site/installer.html LEAD_STAGES literal includes Qualified between Contact
   assert.ok(qi !== -1, "Qualified missing from LEAD_STAGES");
   assert.ok(ci < qi, "Qualified must come after Contacted");
   assert.ok(qi < fi, "Qualified must come before Following up");
+  assert.ok(html.includes("var ACTIVE_LEAD_STAGES=LEAD_STAGES.slice("),
+    "ACTIVE_LEAD_STAGES must be derived from LEAD_STAGES via slice — do not re-inline");
 });

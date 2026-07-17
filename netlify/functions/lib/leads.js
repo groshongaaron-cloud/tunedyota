@@ -117,8 +117,8 @@ async function processLeadIngest(body, deps) {
     Name: name, Phone: phone, Email: email, City: market ? market.city : "Unassigned",
     Vehicle: String(d.vehicle || ""), Goals: String(d.goals || ""),
     Source: source, Channel: channel,
-    // NEPQ Stage-2 bar: location routable + vehicle known = Qualified on arrival
-    // (typical OTT lead). Airtable's Stage select gains the option via typecast:true.
+    // Qualification bar (channel-agnostic, per owner spec): routable location + vehicle known → Qualified on arrival.
+    // Airtable's Stage select gains the option via typecast:true.
     Stage: (market && String(d.vehicle || "").trim()) ? "Qualified" : "New",
     "Last Contact": new Date(now).toISOString().slice(0, 10), "Activity Log": touch,
     ...(emailThread ? { "Email Thread": emailThread } : {}),
