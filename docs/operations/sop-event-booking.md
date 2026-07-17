@@ -60,7 +60,51 @@ failed — investigate).
 
 ---
 
-## 5. Owner checklist per event
+## 5. Per-event booking links + QR *(live 2026-07-17)*
+
+Every scheduled event has its own shareable booking link:
+
+```
+tunedyota.com/book/<city-slug>-<YYYY-MM-DD>
+```
+
+Example: `tunedyota.com/book/des-moines-2026-10-10`. Slug logic lives in
+`netlify/functions/lib/event-links.js` (canonical); the Netlify rewrite in `netlify.toml`
+200-redirects these URLs to `site/book.html`.
+
+### The times-first mini flow (`site/book.html`)
+
+The customer lands directly on that event's open time slots — no city/date picker needed.
+They tap a time → enter name / phone / email + vehicle (make / model / config via the same
+`site/vehicles.json` pickers) → their exact starting price appears before they confirm.
+Booking submits through the standard `/book` endpoint:
+
+- **Source is tagged `event-link`** (plus any `utm_*` parameters from the link are passed through).
+- Feeds the same pipeline as the main funnel: confirmation email + `.ics`, installer email, Slack ping, reminders.
+- **Conflict (slot just taken):** fresh open slots re-render — no dead-end.
+- **Passed / full / unknown event:** the page shows the next event in that city + the funnel / waitlist path — never a dead-end.
+
+### How to generate and share a link
+
+**Installer console (and Tuned Yota app — Jobs view):**
+A "🔗 Share an event booking link" widget (collapsed `<details>` at the top of the
+Jobs view) provides a dropdown of upcoming roster events. Selecting an event reveals the
+link and three action buttons:
+
+| Button | Action |
+|--------|--------|
+| **Share** | Native share sheet (text, Messenger, IG DM, email, etc.) |
+| **Copy** | Copies the link to the clipboard |
+| **QR** | Opens `/.netlify/functions/event-qr?e=<slug>` — a print-crisp SVG QR for posters or show-to-scan at an event |
+
+**Public funnel:** each event listed on `/find-your-exact-tune` also has a per-event share
+icon so customers can forward a link directly to a friend.
+
+Use cases: Facebook posts, event flyers/posters (print the QR), and 1:1 sharing via text or DM.
+
+---
+
+## 6. Owner checklist per event
 
 - [ ] Event is **active** with a correct date + venue address (SOP 7). "To Be Released" venues
       resolved before T−2 weeks (currently open: Rapid City, Green Bay).
@@ -71,7 +115,7 @@ failed — investigate).
 
 ---
 
-## 6. Definition of done (per booking)
+## 7. Definition of done (per booking)
 
 - [ ] Bookings row created, routed to an installer.
 - [ ] Customer received confirmation + `.ics` (or `Email Status = FAILED` was actioned).

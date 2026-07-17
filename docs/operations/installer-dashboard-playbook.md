@@ -15,14 +15,36 @@
 
 ## 1. Getting in
 
-1. Open **`/installer.html`** on your phone or tablet. **Add it to your Home Screen** — it installs as
-   its own app that opens straight to the console (not the website homepage) and **works offline** (§6).
-2. Enter **your personal installer passcode**. It's stored on the device, so you won't retype it each
-   visit. Keep it private — it scopes the console to **your** bookings only.
+### How to reach the console
+
+- **Bookmark / Home Screen add** — go to **`/installer.html`** and add it to your Home Screen. It
+  installs as its own app, opens straight to the console, and **works offline** (§6).
+- **Homepage footer link** *(2026-07-17)* — a subtle **"Console"** link sits at the bottom of
+  `tunedyota.com` (muted, `rel="nofollow"`). It's there as a fallback if you lose your bookmark;
+  it won't appear in any search engine results (`installer.html` is `noindex`).
+- **Native Tuned Yota app** — when the app ships, installers will live there full-time. The same
+  `installer.html` code runs inside the app wrapper.
+
+### Login — once per device
+
+The gate is a proper login **`<form>`** (`id="gate"`). Your passcode is saved to `localStorage` under
+the key `ty_installer_token` the first time you enter it, so **you won't retype it on return visits**.
+
+1. First visit: enter **your personal installer passcode** and tap **Unlock**. The form uses
+   `autocomplete="current-password"`, so **iOS Keychain and Google Password Manager can save it**
+   *(2026-07-17)*. On a new device, a single tap fills it from your saved credentials.
+2. On every return visit the saved token is found and the console unlocks automatically — you go
+   straight to the feed.
 3. If the console ever bounces you back to the passcode screen, your token was rejected — re-enter it.
 
-**On the native app** it also asks for **Face ID / fingerprint** on open. On the plain website that
-step is skipped automatically. **Log out** (top-right) clears the passcode — use it on a shared device.
+**On the native app**, `nativeLock()` additionally prompts for **Face ID / fingerprint** on every
+open, guarding the saved token. On the plain website that step is skipped automatically.
+
+**Log out** (top-right) clears `ty_installer_token` — use it on a shared device. Don't log out with
+items in the pending-sync queue (the console warns you).
+
+> **Security:** the passcode gates all data server-side (fail-closed). If a device is ever lost,
+> rotating that one installer's token locks it out immediately — see SOP 10.
 
 > **After an update:** the installed app may show the previous version once, then load the new one on
 > the next open. If something looks stale, fully close and reopen it.
@@ -55,11 +77,28 @@ The console opens on a **smart feed**: a sticky header up top, your work in prio
   Google-review QR for the customer to scan — appears only when the Owner has enabled it), and, for
   **admins**, **🛢 AMSOIL numbers** (§7).
 - **⏳ N pending sync** appears here only when you have unsynced close-outs/walk-ins waiting to upload (§6).
-- **Search box:** searches **all of your history** — name, VIN, vehicle, city, calibration, phone,
-  Tuning Platform, Calibration Type. Results group by event, newest first. **The walk-in form stays
-  available while you search** — searching never hides it. Clear it (✕) to return to the feed.
+- **Search box:** searches your history — name, VIN, vehicle, city, calibration, phone, Tuning Platform,
+  Calibration Type. Results group by event, newest first. **The walk-in form stays available while you
+  search.** Clear it (✕) to return to the feed.
 
-### The feed sections (top to bottom)
+  **Tab-scoped search *(2026-07-16)*:** when you're on a city sub-tab (see §4 Jobs), the search box
+  filters **only that city's work**. A **"search all markets ›"** link appears next to the results
+  header to jump to All and broaden the scope.
+
+### The Jobs sub-tabs *(2026-07-15)*
+
+Inside the Jobs view, a horizontal sub-tab strip sits above the feed:
+
+| Tab | Shows |
+|-----|-------|
+| **All** | Every market, every open job |
+| **`<City>`** *(one per market)* | Only that city's work; a red dot marks a market with an overdue close-out; a badge shows open count |
+| **✓ Done** | Completed jobs pulled out of the active cards so they don't crowd the close-out UI |
+
+Tap a city tab to focus on one market; tap **✓ Done** to review completed work. Past-dated jobs that
+are still open display a loud **"not closed out — no cert yet"** flag to make stragglers obvious.
+
+### The feed sections (top to bottom — Jobs tab)
 1. **＋ Log a walk-in / call-in** — always first; opens the any-day walk-in form (§3).
 2. **Needs close-out** *(amber)* — past events that still have open bookings. **Clear these first.**
 3. **Today** — today's event(s).
@@ -72,6 +111,12 @@ Each event is a tappable card labelled `<city>` + a relative date, with a **stat
 `✓ Done` group**. Your expand/collapse choices stick. Each booking card shows slot time, customer name
 (walk-ins tagged `· walk-in`, unsynced ones `· ⏳ pending sync`), vehicle, phone, and modifications.
 **Tundras show an amber flex-fuel reminder** (Policy 0011) — reset ethanol learning before you tune.
+
+### OTT badge
+
+Lead cards and booking rows show a dark blue **OTT** badge when the lead or booking originated from
+an OTT national lead. It means the customer came through OTT's national marketing — their commission
+flows through the OTT program for the full close-out lifecycle.
 
 ---
 
@@ -104,11 +149,18 @@ on the correct day and OTT month. Offline, the walk-in is **queued and syncs whe
 
 Do this on the booking card **after the calibration is written and road-verified.**
 
-1. **VIN** — enter all **17 characters** (auto-uppercases), or tap **📷 Scan VIN** to read the barcode
-   off the door jamb/windshield. You **cannot** complete without a valid 17-char VIN. The console
-   **cross-checks the VIN** against the booking's year and make/model and shows an inline warning on a
-   likely typo or mismatch — you can **acknowledge to override** if the VIN is correct (it's advisory,
-   never a hard block).
+1. **VIN** — enter all **17 characters** (auto-uppercases). You **cannot** complete without a valid
+   17-char VIN. Two capture aids are available inside the **📷 Scan VIN** overlay:
+   - **Barcode auto-scan** — point at the door-jamb barcode and the console reads it automatically.
+   - **● Capture VIN** shutter *(live 2026-07-16)* — tap the shutter to photograph a **printed VIN**
+     (dash plate, door sticker, etc.). The photo is sent to `/.netlify/functions/vin-ocr`, which passes
+     it to **Claude vision (Haiku)** and returns the reading. This is **advisory only**: any failure,
+     low-confidence result, or API error falls back to manual entry — the camera **never blocks** a
+     close-out.
+   - **Manual entry** is always available as the fallback and the standard.
+   The console **cross-checks the VIN** against the booking's year and make/model and shows an inline
+   warning on a likely typo or mismatch — you can **acknowledge to override** if the VIN is correct
+   (advisory, never a hard block). The photo is transient (OCR only, never stored).
 2. **OTT Calibration** — pick what you **actually flashed**: Light · Mild · Medium · Spicy · SS, or an
    adjacent combo (Light and Mild · Mild and Medium · Medium and Spicy · Spicy and SS).
 3. **OTT commission fields** (for the monthly report — never printed on the customer certificate):
@@ -193,7 +245,8 @@ Regular installers never see the admin dropdown or the AMSOIL panel.
 - [ ] Every attending customer **Completed**.
 - [ ] Every absent customer **No-show**.
 - [ ] Walk-ins/call-ins logged.
-- [ ] **Needs close-out** section is empty and **⏳ pending sync** shows nothing (everything uploaded).
+- [ ] **Needs close-out** section is empty — check each city sub-tab if working across markets.
+- [ ] **✓ Done** sub-tab shows all vehicles; **⏳ pending sync** shows nothing (everything uploaded).
 
 ---
 
@@ -210,7 +263,8 @@ Regular installers never see the admin dropdown or the AMSOIL panel.
 | VIN mismatch warning | Double-check the VIN against the vehicle. If it's right, **acknowledge to override** and continue. |
 | Certificate didn't reach the customer | It goes to the customer's email when on file, else to you to forward. The daily backstop (`certificate-dispatch.js`, ~9 AM Central) resends once the calibration is set; tell the Owner if urgent. |
 | Wrong calibration selected | Tell the Owner immediately — it locks on the certificate. |
-| VIN won't scan | Type it manually — completion only needs a valid 17-char VIN. |
+| VIN barcode won't auto-scan | Tap **● Capture VIN** to photograph the printed VIN instead — Claude reads it and prefills the field. If that also fails, type it manually. Completion only needs a valid 17-char VIN. |
+| VIN photo capture returns no result | The OCR is advisory — just type the VIN manually. The camera never blocks a close-out. |
 | No **🔔 Enable notifications** / **★ review** / **🛢 AMSOIL** link | That feature isn't switched on for the account (or you're not an admin) — ask the Owner. |
 | Enabled notifications but no test push | iPhone: open the console from its **Home Screen icon** (not Safari) and re-enable. Check the browser didn't block notifications. Re-tap **Send test**. |
 

@@ -13,9 +13,15 @@ call-ins**, not just scheduled events — see the [Installer Dashboard Playbook]
 
 ## 1. Before the event
 
-1. Open `/installer.html`, enter **your** installer passcode (once per device; stored locally).
-2. You see only **your** assigned events and bookings, grouped by city + date.
+1. Open `/installer.html`. The console gate is a login `<form>` — enter your passcode once; it's
+   saved in `localStorage` (`ty_installer_token`) so the console auto-unlocks on every return visit.
+   iOS Keychain / Google Password Manager can save and autofill it *(2026-07-17)*.
+   On the native Tuned Yota app, biometric lock (Face ID / fingerprint, `nativeLock()`) additionally
+   guards the saved token.
+2. You see only **your** assigned events and bookings, grouped by city + date. Use the **Jobs
+   sub-tabs** (All / city / ✓ Done) to focus on one market or review completed work *(2026-07-15)*.
 3. Each booking card shows: slot time, name, vehicle, phone, and any modifications.
+   An **OTT** badge (dark blue) marks bookings that originated from an OTT national lead.
 
 ---
 
@@ -23,11 +29,20 @@ call-ins**, not just scheduled events — see the [Installer Dashboard Playbook]
 
 For each customer, after the calibration is written and road-verified:
 
-1. On the booking card, enter the **VIN** — the full **17 characters** (auto-uppercases;
-   the console will not let you complete until a valid 17-char VIN is entered). Tap **📷 Scan VIN**
-   to read the door-jamb/windshield barcode instead of typing. The console **cross-checks the VIN**
-   against the booking's year and make/model and warns on a likely typo/mismatch — verify, then
-   **acknowledge to override** if the VIN is correct (advisory only, never a hard block).
+1. On the booking card, enter the full **17-character VIN** (auto-uppercases; the console will not
+   let you complete until a valid 17-char VIN is entered). The **📷 Scan VIN** overlay offers three
+   capture paths:
+
+   | Method | How |
+   |--------|-----|
+   | **Type it** | Always available; always the final fallback |
+   | **Barcode auto-scan** | Point at the door-jamb or windshield barcode |
+   | **● Capture VIN** shutter *(live 2026-07-16)* | Tap the shutter to photograph a printed VIN (dash plate, door sticker). The photo is sent to `/.netlify/functions/vin-ocr`; **Claude vision (Haiku)** reads it and prefills the field. **Advisory only** — any failure or low-confidence result falls back to manual entry. The photo is transient (OCR only, never stored). |
+
+   The console **cross-checks the VIN** against the booking's year and make/model and warns on a
+   likely typo/mismatch — verify, then **acknowledge to override** if the VIN is correct (advisory
+   only, never a hard block). VIN accuracy matters: it prints on the customer's certificate and is
+   reported to OTT.
 2. Choose the **OTT Calibration** that was actually flashed:
    **Light · Mild · Medium · Spicy · SS**, or an adjacent combo
    (**Light and Mild · Mild and Medium · Medium and Spicy · Spicy and SS**).

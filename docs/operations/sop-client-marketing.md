@@ -52,7 +52,57 @@ The +1-week captured content recycles into the next city's T−6 announce.
 
 ---
 
-## 4. Brand guardrails (LOCKED — applies to ALL copy)
+## 4. Inbound-response workflow — drafted replies (live 2026-07-17)
+
+Every customer email to `info@tunedyota.com` now gets a reply draft written automatically and
+saved in Gmail for Aaron to review. Nothing is ever auto-sent. This cuts inbox labor while keeping
+every outbound message on-brand and NEPQ-aligned.
+
+**How it works:**
+
+- `inbox-sweep` (`netlify/functions/inbox-sweep.js`) runs every 15 minutes. When it sees an
+  unprocessed customer inquiry or thread reply, it calls Claude Sonnet (`claude-sonnet-4-6`) to
+  draft a reply, then saves that draft **in the same Gmail thread** via `drafts.create`
+  (`lib/gmail.js`). The message receives the Gmail label `ty-drafted`.
+- **Nothing auto-sends.** Aaron opens Gmail, reads the draft, edits if needed, and hits Send.
+  This is a labor-reduction tool, not an automation shortcut.
+
+**NEPQ governs every draft:**
+
+The drafting engine (`lib/email-draft.js`) is grounded in two owner-editable files:
+- `docs/sales/nepq-playbook.md` — the governing sales framework (strategy): diagnose before
+  quoting, never lead with a bare price, every reply ends with exactly ONE question, mirror the
+  customer's words, neutral low-pressure language, 3-option quotes when presenting pricing,
+  never block a ready-to-book buyer.
+- `docs/email-voice.md` — tone guide: short, direct, overlander-to-overlander, zero AI-speak.
+
+Updating either file retunes every future draft without a code deploy.
+
+**Sensitive emails get immediate attention:**
+
+Complaints, warranty/refund/legal topics, and any low-confidence classification are labeled
+`ty-flagged` AND Slack-notified to Aaron immediately — they don't wait for the next digest.
+
+**3× daily batch review instead of all-day inbox monitoring:**
+
+`inbox-digest` (`netlify/functions/inbox-digest.js`) fires at **8am / noon / 7pm CT** and sends
+Aaron an email listing pending `ty-drafted` threads (sender, subject, gist) plus a Slack
+one-liner. Zero drafts = zero digest noise. This creates 3 predictable review windows instead of
+continuous inbox monitoring. The digest counts only `ty-drafted` threads — pre-existing manual
+drafts do not pollute the count.
+
+**What the draft checks before saving (`checkDraftShape` in `lib/email-draft.js`):**
+- Ends with exactly one question or one micro-commitment (1–3 question marks).
+- No banned pressure phrases (from the NEPQ playbook's non-negotiables list).
+- Carries Aaron's sign-off, and isn't too short.
+
+If the shape check fails, one retry then `ty-flagged` for manual handling. The
+"never a bare price to a cold 'how much?'" rule is enforced upstream in the draft
+**prompt** (the NEPQ deflect-with-purpose instruction), not by the shape validator.
+
+---
+
+## 5. Brand guardrails (LOCKED — applies to ALL copy)
 
 - No "Kevin Whitman". No "Stage 2/3". No "MAF".
 - Turbo tier is **"Turbo Performance Calibration"**.
@@ -62,7 +112,7 @@ The +1-week captured content recycles into the next city's T−6 announce.
 
 ---
 
-## 5. Definition of done
+## 6. Definition of done
 
 - [ ] Asset carries the correct per-city UTM.
 - [ ] Copy passes the brand-guardrail grep.

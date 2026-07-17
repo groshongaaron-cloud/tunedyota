@@ -28,7 +28,7 @@ close-out (SOP 4); vehicle basics are derived from the booking; commission is pr
 | **Vehicle Year** | `Model Year` (exact year captured at booking); falls back to the `Vehicle` text's range-start for legacy rows |
 | Date Calibration Applied | `Calibration Date` — **the event day** (see note below) |
 | Tuning Platform · Calibration Type · ECU ID · Gear Size · Mileage | installer-entered at close-out |
-| **Commission** | auto-resolved from the OTT price sheet; **`Commission Override`** wins when the Owner sets one (§3) |
+| **Commission** | auto-resolved from the OTT price sheet; **`Commission Override`** wins when the Owner sets one (§4) |
 | Installer | `Installer` (→ name/region) |
 
 > **`Calibration Date` = the event day, not the close-out day.** Close-out stamps the booking's
@@ -37,7 +37,30 @@ close-out (SOP 4); vehicle basics are derived from the booking; commission is pr
 
 ---
 
-## 2. The monthly flow — draft → review → approve → send
+## 2. OTT lead-conversion line *(live 2026-07-16)*
+
+Both the **owner-draft email** and the **OTT-facing cover email** now include a lead-conversion
+summary line:
+
+> **OTT leads — X received · Y booked · Z completed**
+
+Computed by `leadConversion()` in `netlify/functions/lib/ott-report.js` and rendered by
+`conversionHtml()`:
+
+| Term | Meaning |
+|------|---------|
+| **Received** | Priority List leads with `Channel = ott-national` whose `Created Time` falls within the report month |
+| **Booked** | Those leads where `Stage = Booked` or a `Converted Booking` record exists |
+| **Completed** | Booked leads whose converted Booking has `Status = Completed` |
+
+This proves OTT-lead conversion to OTT and lets the Owner track how many OTT-sourced leads
+made it all the way through to a completed calibration. Because the line appears in the owner
+draft, the Owner can verify the numbers before approving; the same line then travels to OTT
+in the approved send.
+
+---
+
+## 3. The monthly flow — draft → review → approve → send
 
 The report is **never auto-sent to OTT**. The Owner reviews and approves first.
 **Submission is due to OTT by the 7th.** The draft lands on the 1st; a reminder fires on the 5th
@@ -46,7 +69,7 @@ if it still hasn't been submitted.
 | Stage | Function | Trigger | Recipients |
 |-------|----------|---------|-----------|
 | **1. Draft** | `ott-report.js` (scheduled) | 1st of month, for the month just closed | **Owner only** (`info@`) — draft email + `.xlsx` + a private **review** link; Slack "awaiting approval" |
-| **2. Review** | `ott-report-review.js` (HTTP, token-gated) | Owner opens the review console any time (§3) | Owner only — read, edit commissions, download, send |
+| **2. Review** | `ott-report-review.js` (HTTP, token-gated) | Owner opens the review console any time (§4) | Owner only — read, edit commissions, download, send |
 | **3. Reminder** | `ott-report-reminder.js` (scheduled) | **5th of month** (2 days before the deadline) | **Owner only** — re-surfaces the review link + Slack "due by the 7th" if the month has calibrations |
 | **4. Approve & send** | `ott-report-send.js` (HTTP, token-gated) | Owner clicks **Finalize & Send** on the console | **OTT:** `info@overlandtailor.com` + `hgobbels@me.com`, CC `info@`; Slack "SENT (approved by owner)" |
 
@@ -60,7 +83,7 @@ if it still hasn't been submitted.
 
 ---
 
-## 3. The always-on review console (`ott-report-review.js`)
+## 4. The always-on review console (`ott-report-review.js`)
 
 Open the token-gated **OTT Commission Report** page any time — bookmark the review link (defaults
 to the prior reporting month; `?month=YYYY-MM` to switch). It shows two sections:
@@ -83,18 +106,18 @@ Then **Download Excel** (the exact `.xlsx`) or **Finalize & Send to OTT** (owner
 
 ---
 
-## 4. Pricing — auto from the OTT price sheet + manual override
+## 5. Pricing — auto from the OTT price sheet + manual override
 
 The commission engine (`lib/ott-commission.js`) resolves the **OTT Commission** per calibration from
 the April 2026 OTT price sheet (`lib/ott-commission-template.json`), matching vehicle type / year /
 engine / tuning platform / calibration type. Anything the sheet can't map (owner-confirmed cal types,
-superchargers, bench BB) is left blank and the Owner enters it on the review console (§3), saved as
+superchargers, bench BB) is left blank and the Owner enters it on the review console (§4), saved as
 `Commission Override`. The exact model year captured at booking feeds this match, not just the
 platform range.
 
 ---
 
-## 5. Annual rollup (private to Tuned Yota) — LIVE
+## 6. Annual rollup (private to Tuned Yota) — LIVE
 
 Each year's completed calibrations roll into a **per-calendar-year** record, **owned by Tuned Yota
 and private to `info@tunedyota.com`** — never sent to OTT. It totals the **cost Tuned Yota pays OTT**
@@ -106,18 +129,19 @@ and private to `info@tunedyota.com`** — never sent to OTT. It totals the **cos
 
 ---
 
-## 6. Status checklist
+## 7. Status checklist
 
 - [x] Monthly draft → review → approve → send flow, built + tested.
 - [x] `OTT_APPROVE_SECRET` set in Netlify; recipients `info@overlandtailor.com` + `hgobbels@me.com` (CC `info@`).
 - [x] Commissions auto-priced from the OTT price sheet + editable `Commission Override` (column live).
 - [x] Deadline reminder (5th) + 7th submission deadline.
 - [x] Private annual rollup (scheduled Jan 1 + on-demand).
+- [x] OTT lead-conversion line (received · booked · completed) in owner draft + OTT send (live 2026-07-16).
 - [x] 415 tests green.
 
 ---
 
-## 7. Definition of done (each month)
+## 8. Definition of done (each month)
 
 - [ ] Installers captured VIN + calibration + OTT fields for every completed vehicle (SOP 4).
 - [ ] Owner opened the **review console**, filled/confirmed every commission (no red rows).
