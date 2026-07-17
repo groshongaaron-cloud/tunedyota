@@ -26,6 +26,16 @@ test("returns no-image when the image is blank", async () => {
   assert.equal(out.reason, "no-image");
 });
 
+test("returns too-large (without calling the API) when the image exceeds the cap", async () => {
+  let called = false;
+  const big = "A".repeat(7_000_001);
+  const out = await readVinFromImage({ imageBase64: big, mediaType: "image/jpeg" },
+    { apiKey: "k", fetchImpl: async () => { called = true; return { ok: true, json: async () => ({}) }; } });
+  assert.equal(out.ok, false);
+  assert.equal(out.reason, "too-large");
+  assert.equal(called, false);
+});
+
 test("reads a VIN and normalizes surrounding whitespace/case", async () => {
   const out = await readVinFromImage({ imageBase64: IMG, mediaType: "image/jpeg" },
     { apiKey: "k", fetchImpl: stubOk("  jtebu5jr4k5601234 \n") });
@@ -77,4 +87,23 @@ const { handler } = require("../netlify/functions/vin-ocr.js");
 test("handler rejects a request with no installer token (401)", async () => {
   const res = await handler({ headers: {}, body: JSON.stringify({ imageBase64: "AAAA" }) });
   assert.equal(res.statusCode, 401);
+});
+
+test("handler contains an unexpected read error as ok:false (camera never blocks close-out)", async () => {
+  const prev = process.env.INSTALLER_TOKENS;
+  process.env.INSTALLER_TOKENS = JSON.stringify({ cody: "tok" });
+  try {
+    const res = await handler(
+      { headers: { "x-installer-token": "tok" }, body: JSON.stringify({ imageBase64: "AAAA" }) },
+      {},
+      { readImpl: async () => { throw new Error("unexpected boom"); } }
+    );
+    assert.equal(res.statusCode, 200);
+    const out = JSON.parse(res.body);
+    assert.equal(out.ok, false);
+    assert.equal(out.reason, "error");
+  } finally {
+    if (prev === undefined) delete process.env.INSTALLER_TOKENS;
+    else process.env.INSTALLER_TOKENS = prev;
+  }
 });

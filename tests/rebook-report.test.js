@@ -4,6 +4,20 @@ const { runRebookReport } = require("../netlify/functions/rebook-report.js");
 
 const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "k" };
 
+test("a send failure alerts Slack and returns ok:false (never throws)", async () => {
+  const notifies = [];
+  const r = await runRebookReport({
+    env: { ...env, SLACK_WEBHOOK_URL: "https://hooks.slack.test/x" },
+    listAll: async () => [],
+    send: async () => { throw new Error("Resend 403: domain not verified"); },
+    notify: async (a) => { notifies.push(a); return { ok: true }; },
+    log: { error() {}, info() {} },
+  });
+  assert.equal(r.ok, false);
+  assert.equal(notifies.length, 1);
+  assert.match(notifies[0].text, /rebook report FAILED/i);
+});
+
 test("lists outstanding priority rows and emails the owner", async () => {
   let sent = null;
   const listAll = async () => [

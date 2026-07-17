@@ -13,7 +13,11 @@ async function runPoll(deps = {}) {
   const gmail = deps.gmail || gmailLib;
   const post = deps.postImpl || fetch;
   const base = env.LEAD_INGEST_URL || (env.URL ? `${env.URL}/.netlify/functions/lead-ingest` : "https://tunedyota.com/.netlify/functions/lead-ingest");
-  const msgs = await gmail.listMessages(QUERY, { env });
+  // A transient Gmail failure must not crash the 10-minute schedule — return an
+  // error result; unprocessed messages are simply picked up on the next tick.
+  let msgs;
+  try { msgs = await gmail.listMessages(QUERY, { env }); }
+  catch (e) { return { ingested: 0, error: e.message }; }
   let ingested = 0;
   for (const { id } of msgs) {
     try {

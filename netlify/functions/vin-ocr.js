@@ -6,15 +6,24 @@
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { readVinFromImage } = require("./lib/vin-ocr-core.js");
 
-async function handler(event) {
+async function handler(event, _ctx, deps = {}) {
+  const { readImpl = readVinFromImage, log = console } = deps;
   const key = resolveInstaller(event.headers || {}, process.env);
   if (!key) return { statusCode: 401, body: "unauthorized" };
   let body = {};
   try { body = JSON.parse(event.body || "{}"); } catch (e) { return { statusCode: 400, body: "bad json" }; }
-  const out = await readVinFromImage(
-    { imageBase64: body.imageBase64, mediaType: body.mediaType },
-    { apiKey: process.env.ANTHROPIC_API_KEY }
-  );
+  // Advisory only: even an unexpected throw becomes ok:false so the console
+  // falls back to manual VIN entry — the camera never blocks a close-out.
+  let out;
+  try {
+    out = await readImpl(
+      { imageBase64: body.imageBase64, mediaType: body.mediaType },
+      { apiKey: process.env.ANTHROPIC_API_KEY }
+    );
+  } catch (e) {
+    if (log.error) log.error("vin-ocr", e.message);
+    out = { ok: false, reason: "error" };
+  }
   return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 

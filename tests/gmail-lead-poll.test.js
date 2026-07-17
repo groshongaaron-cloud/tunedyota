@@ -35,3 +35,10 @@ test("runPoll labels a parse/ingest failure ty-ingest-failed and continues", asy
   assert.equal(out.ingested, 0);
   assert.deepEqual(labeled[0], ["m1", "ty-ingest-failed"]);
 });
+
+test("a Gmail list failure is contained — returns an error result, never throws", async () => {
+  const out = await runPoll({ env: { INTERNAL_TASK_SECRET: "sec" },
+    gmail: { listMessages: async () => { throw new Error("gmail 500"); } } });
+  assert.equal(out.ingested, 0);
+  assert.match(String(out.error), /gmail 500/);
+});
