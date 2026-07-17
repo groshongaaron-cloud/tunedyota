@@ -13,7 +13,7 @@ fs.rmSync(WWW, { recursive: true, force: true });
 fs.mkdirSync(path.join(WWW, "vendor"), { recursive: true });
 
 fs.copyFileSync(path.join(SITE, "installer.html"), path.join(WWW, "index.html"));
-for (const f of ["site.css", "favicon.ico", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "fox.svg", "site.webmanifest"]) {
+for (const f of ["site.css", "favicon.ico", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "fox.svg", "installer.webmanifest", "commission-tally.js", "offline-queue.js", "sw.js"]) {
   const src = path.join(SITE, f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(WWW, f));
 }
