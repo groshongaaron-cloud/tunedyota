@@ -30,3 +30,6 @@ __pycache__/
 
 # Headroom Guardian runtime state (version pin)
 scripts/headroom_guard/state.json
+
+# Git worktrees (local dev isolation)
+.worktrees/
