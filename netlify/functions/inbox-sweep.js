@@ -43,6 +43,11 @@ async function runSweep(deps = {}) {
     return { scanned: 0, skipped: "no-gmail-config" };
   }
 
+  // Fail-fast: misconfigured task secret must not mislabel leads.
+  if (!String(env.INTERNAL_TASK_SECRET || "").trim()) {
+    return { scanned: 0, skipped: "no-task-secret" };
+  }
+
   const gmail = deps.gmail || gmailLib;
   const classify = deps.classify || ((msg) => classifyEmail(msg, { apiKey: env.ANTHROPIC_API_KEY }));
   const draft = deps.draft || ((prompt) => defaultDraft(prompt, env));
@@ -107,6 +112,7 @@ async function runSweep(deps = {}) {
           await gmail.addLabel(id, "ty-ingested", { env });
           ingested++;
         } else {
+          await notify(`⚠️ OTT lead ingest failed (HTTP ${res.status}) for ${msg.headers.subject} — flagged for manual entry`);
           await gmail.addLabel(id, "ty-flagged", { env });
           flagged++;
         }
@@ -171,6 +177,20 @@ async function runSweep(deps = {}) {
     } catch (e) {
       // Per-message error: log but do NOT label so the next tick retries.
       log.error(`inbox-sweep: error processing message ${id}:`, e.message || e);
+      // Non-transient errors (parse failures, programming errors) will never self-heal.
+      // Flag them so they stop blocking the CAP, and alert for manual review.
+      const isNonTransient = /parse|TypeError|RangeError|SyntaxError/i.test(
+        e.constructor?.name || e.name || ""
+      ) || /parse|TypeError|RangeError|SyntaxError/i.test(e.message || "");
+      if (isNonTransient) {
+        try {
+          await notify(`⚠️ Non-transient error on message ${id}: ${e.message || e} — flagged for manual review`);
+        } catch (_) { /* alerting must never throw */ }
+        try {
+          await gmail.addLabel(id, "ty-flagged", { env });
+          flagged++;
+        } catch (_) { /* labeling must never throw */ }
+      }
     }
   }
 

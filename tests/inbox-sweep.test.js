@@ -66,7 +66,7 @@ test("one throwing message never kills the sweep", async () => {
 // Legacy adapted tests
 test("gmail listMessages throwing returns { scanned:0, error } and never throws", async () => {
   const out = await runSweep({
-    env: { GMAIL_REFRESH_TOKEN: "r" },
+    env: { GMAIL_REFRESH_TOKEN: "r", INTERNAL_TASK_SECRET: "s" },
     gmail: { listMessages: async () => { throw new Error("gmail 500"); } },
     log: { error() {} },
   });
@@ -80,12 +80,61 @@ test("no-gmail-config skips sweep entirely", async () => {
   assert.equal(out.skipped, "no-gmail-config");
 });
 
+// ── Fix 1a: fail-fast on missing INTERNAL_TASK_SECRET ───────────────────────
+test("missing INTERNAL_TASK_SECRET returns { skipped: 'no-task-secret' }, no gmail calls made", async () => {
+  const gmailCalls = [];
+  const h = harness([MSG("m10")], [{ bucket: "ott-lead", stage: "situation", confidence: 0.95, summary: "" }]);
+  // Remove the secret from env
+  h.deps.env = { ...h.deps.env, INTERNAL_TASK_SECRET: "" };
+  // Override gmail to track if it was called
+  h.deps.gmail = {
+    listMessages: async () => { gmailCalls.push("listMessages"); return []; },
+    getMessage: async () => { gmailCalls.push("getMessage"); return MSG("m10"); },
+    addLabel: async () => { gmailCalls.push("addLabel"); },
+    createDraft: async () => { gmailCalls.push("createDraft"); return { id: "d" }; },
+  };
+  const out = await runSweep(h.deps);
+  assert.equal(out.scanned, 0);
+  assert.equal(out.skipped, "no-task-secret");
+  assert.equal(gmailCalls.length, 0, "no gmail calls must be made");
+});
+
+// ── Fix 1b: OTT lead !res.ok branch notifies AND labels ty-flagged ───────────
+test("postImpl returning { ok:false, status:401 } notifies once and labels ty-flagged", async () => {
+  const h = harness([MSG("m11")], [{ bucket: "ott-lead", stage: "situation", confidence: 0.95, summary: "" }]);
+  h.deps.postImpl = async () => ({ ok: false, status: 401 });
+  const out = await runSweep(h.deps);
+  assert.equal(h.notifies.length, 1, "must fire exactly one Slack alert");
+  assert.ok(h.labeled.some(([, lbl]) => lbl === "ty-flagged"), "must add ty-flagged label");
+  assert.equal(out.flagged, 1);
+  assert.equal(out.ingested, 0);
+});
+
+// ── Fix 2: non-transient per-message error → ty-flagged + notify ─────────────
+test("classify throwing TypeError flags message and notifies, does not rethrow", async () => {
+  const h = harness([MSG("m12")], []);
+  h.deps.classify = async () => { throw new TypeError("boom"); };
+  const out = await runSweep(h.deps);
+  assert.ok(h.labeled.some(([, lbl]) => lbl === "ty-flagged"), "TypeError must add ty-flagged");
+  assert.equal(h.notifies.length, 1, "must notify on non-transient error");
+  assert.equal(out.scanned, 1, "sweep must complete");
+});
+
+test("classify throwing transient Error does NOT flag or notify (retry preserved)", async () => {
+  const h = harness([MSG("m13")], []);
+  h.deps.classify = async () => { throw new Error("anthropic 529"); };
+  const out = await runSweep(h.deps);
+  assert.equal(h.labeled.length, 0, "transient error must NOT label — leave for retry");
+  assert.equal(h.notifies.length, 0, "transient error must NOT notify");
+  assert.equal(out.scanned, 1, "sweep must complete");
+});
+
 test("CAP: 25 msgs listed but only 20 processed (scanned === 20)", async () => {
   const msgs = Array.from({ length: 25 }, (_, i) => MSG("m" + i));
   const classifications = Array.from({ length: 25 }, () => ({ bucket: "spam", stage: "connect", confidence: 0.9, summary: "" }));
   let ci = 0;
   const deps = {
-    env: { GMAIL_REFRESH_TOKEN: "r", ANTHROPIC_API_KEY: "k" },
+    env: { GMAIL_REFRESH_TOKEN: "r", ANTHROPIC_API_KEY: "k", INTERNAL_TASK_SECRET: "s" },
     gmail: {
       listMessages: async () => msgs.map((m) => ({ id: m.id, threadId: m.threadId })),
       getMessage: async (id) => msgs.find((m) => m.id === id),
