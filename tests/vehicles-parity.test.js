@@ -11,9 +11,8 @@ const HTML = fs.readFileSync(path.join(__dirname, "..", "site", "find-your-exact
 const JSON_COPY = require("../netlify/functions/lib/vehicles.json");
 
 test("lib/vehicles.json is byte-equal to the funnel's inline VEHICLES config", () => {
-  const m = HTML.match(/const VEHICLES = (\{[^\n]*\});/);
-  assert.ok(m, "could not locate `const VEHICLES = {...};` on a single line in the funnel");
-  const funnel = JSON.parse(m[1]);
+  const { extractVehicles } = require("../scripts/lib/extract-vehicles.cjs");
+  const funnel = extractVehicles(HTML);
   assert.deepEqual(JSON_COPY, funnel,
     "lib/vehicles.json is out of sync with the funnel VEHICLES — run `npm run build:seo` (it regenerates the JSON from the funnel), then re-run tests.");
 });

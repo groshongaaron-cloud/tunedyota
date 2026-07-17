@@ -6,6 +6,7 @@ import { createRequire } from "node:module";
 import sharp from "sharp";
 import * as SD from "./lib/seo-data.mjs";
 import { buildAmsoilPages } from "./build-amsoil-pages.mjs";
+import { buildStatePages } from "./build-state-pages.mjs";
 
 const require = createRequire(import.meta.url);
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -91,9 +92,8 @@ function processEvents() {
 function syncVehicles() {
   const p = path.join(SITE_DIR, "find-your-exact-tune.html");
   const html = fs.readFileSync(p, "utf8");
-  const m = html.match(/const VEHICLES = (\{[^\n]*\});/);
-  if (!m) throw new Error("VEHICLES literal not found in find-your-exact-tune.html");
-  const vehicles = JSON.parse(m[1]); // throws on malformed JSON → fails the build
+  const { extractVehicles } = require("./lib/extract-vehicles.cjs");
+  const vehicles = extractVehicles(html); // brace-matched; throws on missing/malformed → fails the build
   fs.writeFileSync(path.join(ROOT, "netlify", "functions", "lib", "vehicles.json"),
     JSON.stringify(vehicles, null, 2) + "\n");
   console.log("vehicles: synced lib/vehicles.json from funnel VEHICLES");
@@ -124,6 +124,7 @@ function writeSitemap() {
 async function main() {
   await writeImages();
   console.log(`amsoil pages: regenerated ${buildAmsoilPages()}`);
+  console.log(`state pages: regenerated ${buildStatePages()}`);
   for (const f of SD.HEAD_PAGES) processHead(f);
   fixBreadcrumbs();
   processEvents();

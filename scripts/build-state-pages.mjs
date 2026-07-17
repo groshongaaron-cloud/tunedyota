@@ -1,6 +1,8 @@
 // scripts/build-state-pages.mjs
 // Generates the 6 state landing pages from markets.js (cities + installer per state).
-// Run: node scripts/build-state-pages.mjs   (then `npm run build:seo` injects OG/business stub).
+// Wired into build:seo (which then injects the OG/business stub); also runs standalone:
+// node scripts/build-state-pages.mjs. tests/state-pages-parity.test.mjs fails loudly if
+// the committed pages drift from this generator.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -236,12 +238,22 @@ ${FQA11Y}
 `;
 }
 
-let n = 0;
-for (const [code, meta] of Object.entries(STATE)) {
-  const s = byState[code];
-  if (!s) continue;
-  const html = page({ name: meta.name, slug: `toyota-lexus-tuning-${meta.slug}`, cities: s.cities, instKeys: s.inst });
-  fs.writeFileSync(path.join(SITE, `toyota-lexus-tuning-${meta.slug}.html`), html);
-  n++;
+export function renderStatePages() {
+  const out = {};
+  for (const [code, meta] of Object.entries(STATE)) {
+    const s = byState[code];
+    if (!s) continue;
+    out[`toyota-lexus-tuning-${meta.slug}.html`] = page({ name: meta.name, slug: `toyota-lexus-tuning-${meta.slug}`, cities: s.cities, instKeys: s.inst });
+  }
+  return out;
 }
-console.log(`state pages written: ${n}`);
+
+export function buildStatePages() {
+  const pages = renderStatePages();
+  for (const [f, html] of Object.entries(pages)) fs.writeFileSync(path.join(SITE, f), html);
+  return Object.keys(pages).length;
+}
+
+if (process.argv[1] && (import.meta.url === `file://${process.argv[1].replace(/\\/g, "/")}` || process.argv[1].endsWith("build-state-pages.mjs"))) {
+  console.log(`state pages written: ${buildStatePages()}`);
+}
