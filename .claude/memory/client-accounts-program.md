@@ -1,6 +1,6 @@
 ---
 name: client-accounts-program
-description: Client Accounts v1 (sub-project D first half) — magic-link login, /account portal (certs + synced My Garage) — code SHIPPED LIVE 2026-07-17; Clients table creation + live E2E pending owner
+description: Client Accounts v1 (sub-project D first half) — magic-link login, /account portal (certs + synced My Garage) — code SHIPPED LIVE 2026-07-17; Clients table CREATED + write-tested 2026-07-17; only live E2E pending owner
 metadata:
   node_type: memory
   type: project
@@ -16,8 +16,8 @@ metadata:
 
 **Emails:** closeout + certificate-dispatch customer text and the AMSOIL follow-up (html + text) all carry a 7-day pre-authenticated account link → first click = signed in, zero typing.
 
-**⚠ REMAINING (owner-blocked as of 2026-07-17):**
-1. **Create the Airtable `Clients` table** — schema-token clipboard flow (metadata API): fields `Email` (single line, primary), `Name` (single line), `Vehicles` (long text), `Created At` (date), `Last Login` (date) + data-token write-test. Until it exists: login works (exchange swallows the miss) but profiles/Last-Login don't persist and garage GET/PUT return store-unavailable (502).
-2. **Live E2E** — request → email arrives → click link → portal → certs list (owner's email has completed bookings) → add vehicle → reload persists → /amsoil-garage shows the same garage; confirm the next cert/AMSOIL email carries `account?lt=` and clicking it signs in.
+**⚠ REMAINING:**
+1. ✅ **Airtable `Clients` table CREATED 2026-07-17** (id `tblyy4a00RlgHvXwB`, schema-token clipboard flow): `Email` (primary) / `Name` / `Vehicles` (long text) / `Created At` / `Last Login` (dates, iso). Production data-token write-test passed (probe create+delete 200). Persistence fully live.
+2. **Live E2E (owner)** — request → email arrives → click link → portal → certs list (owner's email has completed bookings) → add vehicle → reload persists → /amsoil-garage shows the same garage; confirm the next cert/AMSOIL email carries `account?lt=` and clicking it signs in.
 
 **Deferred (design-noted, not built):** installer identity (other half of D), bookings/history + profile editing, per-user session revocation (rotate `CLIENT_SESSION_SECRET` to revoke ALL), Google sign-in, request-endpoint rate limit.
