@@ -26,6 +26,20 @@ test("extractLeadFields maps LLM JSON to the lead-ingest shape", async () => {
   assert.equal(out.name, "Quinn");
   assert.equal(out.channel, "ott-national");
 });
+test("extractLeadFields: goals starts with customer intent and state is returned standalone", async () => {
+  const out = await extractLeadFields(MSG, { apiKey: "k",
+    fetchImpl: stubText('{"name":"Quinn","phone":"+1920","email":"q@x.com","city":"Green Bay","state":"WI","vehicle":"2006 Lexus GX470","goals":"wants towing power","mods":"None","ghlLink":""}') });
+  assert.ok(out.goals.startsWith("wants towing power"), `goals should start with intent, got: ${out.goals}`);
+  assert.equal(out.state, "WI");
+});
+test("extractLeadFields: goals with mods includes location then mods after intent", async () => {
+  const out = await extractLeadFields(MSG, { apiKey: "k",
+    fetchImpl: stubText('{"name":"Quinn","phone":"+1920","email":"q@x.com","city":"Madison","state":"WI","vehicle":"2019 Tundra","goals":"wants more power","mods":"Banks exhaust","ghlLink":""}') });
+  assert.ok(out.goals.startsWith("wants more power"), `goals should start with intent, got: ${out.goals}`);
+  assert.ok(out.goals.includes("Madison, WI"), `goals should include location, got: ${out.goals}`);
+  assert.ok(out.goals.includes("Banks exhaust"), `goals should include mods, got: ${out.goals}`);
+  assert.equal(out.state, "WI");
+});
 test("extraction without phone AND email returns null (flag, don't ingest junk)", async () => {
   const out = await extractLeadFields(MSG, { apiKey: "k", fetchImpl: stubText('{"name":"Quinn"}') });
   assert.equal(out, null);

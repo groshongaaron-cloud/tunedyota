@@ -14,14 +14,17 @@ const VOICE = read("../../../docs/email-voice.md");
 const VEHICLES = (() => { try { return require("./vehicles.json"); } catch { return {}; } })();
 
 const BANNED = [/act now/i, /best on the market/i, /make an informed decision/i,
-  /i hope this (email )?finds you well/i, /as an ai/i, /do not hesitate/i, /delve/i];
+  /i hope this (email )?finds you well/i, /as an ai/i, /do not hesitate/i, /delve/i,
+  /furthermore/i, /i understand your concern/i];
 
 // Find the model the customer named and return its pricing block as compact text.
 function pricingFor(text) {
   const t = String(text || "").toLowerCase();
   for (const make of Object.keys(VEHICLES)) {
     for (const model of Object.keys(VEHICLES[make])) {
-      if (t.includes(model.toLowerCase())) {
+      const esc = model.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp("\\b" + esc + "(\\b|(?=[0-9]))");
+      if (re.test(t)) {
         return `${make} ${model}: ` + VEHICLES[make][model]
           .map((c) => `${c.y} ${c.e} from $${c.base}`).join(" · ");
       }
@@ -71,6 +74,7 @@ function checkDraftShape(text) {
   if (questions > 3) problems.push("too many questions");
   for (const re of BANNED) if (re.test(t)) problems.push(`banned phrase: ${re}`);
   if (t.length < 40) problems.push("too short");
+  if (!/aaron @ tuned yota/i.test(t)) problems.push("missing sign-off");
   return { ok: problems.length === 0, problems };
 }
 

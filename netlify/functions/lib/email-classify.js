@@ -66,9 +66,14 @@ async function extractLeadFields(msg, deps = {}) {
   try { text = await askClaude(extractPrompt(msg), deps); } catch { return null; }
   const j = parseJson(text);
   if (!j || (!String(j.phone || "").trim() && !String(j.email || "").trim())) return null;
+  const city = String(j.city || "");
+  const state = String(j.state || "");
+  const modsRaw = String(j.mods || "");
+  const modsPart = modsRaw && !/^none?$/i.test(modsRaw) ? `Mods ${modsRaw}` : "";
+  const goals = [String(j.goals || "").trim(), [city, state].filter(Boolean).join(", "), modsPart].filter(Boolean).join(" · ");
   return { name: String(j.name || "OTT National Lead"), phone: String(j.phone || ""), email: String(j.email || ""),
-    city: String(j.city || ""), vehicle: String(j.vehicle || ""),
-    goals: [String(j.city || ""), String(j.state || "")].filter(Boolean).join(", ") + (j.mods && !/^none?$/i.test(j.mods) ? ` · Mods ${j.mods}` : ""),
+    city, state, vehicle: String(j.vehicle || ""),
+    goals,
     ghlLink: String(j.ghlLink || ""), channel: "ott-national", source: "ott-national:email",
     message: "OTT lead (LLM-extracted)", threadId: msg.threadId || "", messageIdHeader: (msg.headers || {}).messageId || "",
     replyTo: ((String((msg.headers || {}).replyTo || (msg.headers || {}).from || "").match(/[\w.+-]+@[\w-]+\.[\w.-]+/) || [])[0]) || "" };
