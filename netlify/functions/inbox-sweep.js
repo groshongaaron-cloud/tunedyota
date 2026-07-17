@@ -6,7 +6,7 @@
 const gmailLib = require("./lib/gmail.js");
 const { parseOttLeadEmail } = require("./lib/ott-email.js");
 const { classifyEmail, extractLeadFields, askClaude } = require("./lib/email-classify.js");
-const { groundingFor, buildDraftPrompt, checkDraftShape } = require("./lib/email-draft.js");
+const { groundingFor, buildDraftPrompt, checkDraftShape, formatThreadContext } = require("./lib/email-draft.js");
 const { notifyOwner } = require("./lib/alert.js");
 
 // newer_than:2d bounds the sweep to FRESH mail — without it, go-live would chew
@@ -126,7 +126,21 @@ async function runSweep(deps = {}) {
       // ---- Inquiry / thread-reply / sensitive -----------------------------
       if (["inquiry", "thread-reply", "sensitive"].includes(classification.bucket)) {
         const grounding = groundingFor({ city: "", state: "", text: msg.textBody });
-        const prompt = buildDraftPrompt({ message: msg, classification, grounding, threadContext: "" });
+
+        // Thread context: thread-reply and sensitive are likely mid-conversation, so
+        // fetch the earlier messages for the drafter. Inquiry = first contact — the
+        // thread is just this message, skip the API call. Fail-open: a context-fetch
+        // hiccup must never block the draft (a context-free draft beats none).
+        let threadContext = "";
+        if (["thread-reply", "sensitive"].includes(classification.bucket)) {
+          try {
+            threadContext = formatThreadContext(await gmail.getThread(msg.threadId, { env }), msg.id);
+          } catch (e) {
+            log.error(`inbox-sweep: thread-context fetch failed for ${id}:`, e.message || e);
+          }
+        }
+
+        const prompt = buildDraftPrompt({ message: msg, classification, grounding, threadContext });
 
         let text = await draft(prompt);
         let shape = checkDraftShape(text);

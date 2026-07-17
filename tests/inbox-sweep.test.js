@@ -4,16 +4,17 @@ const assert = require("node:assert/strict");
 const { runSweep } = require("../netlify/functions/inbox-sweep.js");
 
 function harness(msgs, classifications) {
-  const labeled = [], posted = [], drafts = [], notifies = [];
+  const labeled = [], posted = [], drafts = [], notifies = [], threadFetches = [], prompts = [];
   let ci = 0;
-  return { labeled, posted, drafts, notifies, deps: {
+  return { labeled, posted, drafts, notifies, threadFetches, prompts, deps: {
     env: { GMAIL_REFRESH_TOKEN: "r", ANTHROPIC_API_KEY: "k", INTERNAL_TASK_SECRET: "s", URL: "https://tunedyota.com", SLACK_WEBHOOK_URL: "https://x" },
     gmail: { listMessages: async () => msgs.map((m) => ({ id: m.id, threadId: m.threadId })),
       getMessage: async (id) => msgs.find((m) => m.id === id),
+      getThread: async (threadId) => { threadFetches.push(threadId); return msgs.filter((m) => m.threadId === threadId); },
       addLabel: async (id, name) => { labeled.push([id, name]); },
       createDraft: async (a) => { drafts.push(a); return { id: "d" + drafts.length }; } },
     classify: async () => classifications[ci++],
-    draft: async () => "Happy to help — what year is it?\n— Aaron @ Tuned Yota · (612) 406-7117",
+    draft: async (prompt) => { prompts.push(prompt); return "Happy to help — what year is it?\n— Aaron @ Tuned Yota · (612) 406-7117"; },
     postImpl: async (url, opts) => { posted.push(JSON.parse(opts.body)); return { ok: true, json: async () => ({ status: "lead" }) }; },
     notify: async (a) => { notifies.push(a); return { ok: true }; },
     log: { error() {} },
@@ -62,6 +63,42 @@ test("one throwing message never kills the sweep", async () => {
   h.deps.postImpl = async () => { throw new Error("ingest down"); };
   const out = await runSweep(h.deps);
   assert.equal(out.drafted, 1, "second message still processed");
+});
+
+// ── Thread context for thread-reply / sensitive drafts ───────────────────────
+test("thread-reply draft prompt includes earlier messages from the thread", async () => {
+  const h = harness([MSG("m20", { threadId: "T1", textBody: "yes it's the 2019 crewmax" })],
+    [{ bucket: "thread-reply", stage: "commitment", confidence: 0.9, summary: "year answer" }]);
+  h.deps.gmail.getThread = async (threadId) => { h.threadFetches.push(threadId); return [
+    { id: "m19", threadId: "T1", headers: { from: "info@tunedyota.com", date: "" }, textBody: "What year is your Tundra?" },
+    { id: "m20", threadId: "T1", headers: { from: "jo@x.com", date: "" }, textBody: "yes it's the 2019 crewmax" },
+  ]; };
+  const out = await runSweep(h.deps);
+  assert.equal(out.drafted, 1);
+  assert.deepEqual(h.threadFetches, ["T1"], "thread fetched exactly once");
+  assert.match(h.prompts[0], /EARLIER IN THIS THREAD/);
+  assert.match(h.prompts[0], /What year is your Tundra\?/);
+});
+test("sensitive draft also fetches thread context", async () => {
+  const h = harness([MSG("m21", { textBody: "still waiting on that refund" })],
+    [{ bucket: "sensitive", stage: "connect", confidence: 0.9, summary: "refund" }]);
+  await runSweep(h.deps);
+  assert.equal(h.threadFetches.length, 1, "sensitive must fetch its thread");
+});
+test("inquiry draft does NOT fetch the thread (fresh contact — saves the API call)", async () => {
+  const h = harness([MSG("m22", { textBody: "how much for a tune?" })],
+    [{ bucket: "inquiry", stage: "connect", confidence: 0.9, summary: "price ask" }]);
+  const out = await runSweep(h.deps);
+  assert.equal(out.drafted, 1);
+  assert.equal(h.threadFetches.length, 0, "inquiry must not call getThread");
+});
+test("getThread failure fails open — draft still created without context", async () => {
+  const h = harness([MSG("m23", { textBody: "any update on my tune?" })],
+    [{ bucket: "thread-reply", stage: "connect", confidence: 0.9, summary: "" }]);
+  h.deps.gmail.getThread = async () => { throw new Error("gmail 500"); };
+  const out = await runSweep(h.deps);
+  assert.equal(out.drafted, 1, "context fetch failure must never block the draft");
+  assert.ok(!/EARLIER IN THIS THREAD/.test(h.prompts[0]), "prompt simply omits the context block");
 });
 
 // Legacy adapted tests

@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { buildDraftPrompt, checkDraftShape, groundingFor } = require("../netlify/functions/lib/email-draft.js");
+const { buildDraftPrompt, checkDraftShape, groundingFor, formatThreadContext } = require("../netlify/functions/lib/email-draft.js");
 
 test("groundingFor matches a known market city and pulls pricing for the named model", () => {
   const g = groundingFor({ city: "Fargo", text: "I have a 2019 Tundra that falls on its face towing" });
@@ -51,6 +51,33 @@ test("pricingFor: 'my gx470' matches GX pricing", () => {
   const result = pricingFor("my gx470 needs a tune");
   assert.ok(result && /GX/.test(result), `expected GX pricing for 'gx470', got: ${result}`);
 });
+const TMSG = (id, from, body, date = "") => ({ id, headers: { from, date, subject: "s" }, textBody: body });
+
+test("formatThreadContext renders prior messages, excluding the current one", () => {
+  const out = formatThreadContext([
+    TMSG("m1", "jo@x.com", "how much for a tune?", "Mon, 13 Jul 2026 10:00:00 -0500"),
+    TMSG("m2", "info@tunedyota.com", "What year is your Tundra?"),
+    TMSG("m3", "jo@x.com", "it's a 2019, crewmax"),
+  ], "m3");
+  assert.match(out, /jo@x\.com/);
+  assert.match(out, /how much for a tune\?/);
+  assert.match(out, /What year is your Tundra\?/);
+  assert.ok(!out.includes("crewmax"), "current message must be excluded — it's already in the prompt");
+});
+test("formatThreadContext returns '' for a single-message thread", () => {
+  assert.equal(formatThreadContext([TMSG("m1", "jo@x.com", "how much?")], "m1"), "");
+  assert.equal(formatThreadContext([], "m1"), "");
+  assert.equal(formatThreadContext(null, "m1"), "");
+});
+test("formatThreadContext keeps only the most recent prior messages and truncates long bodies", () => {
+  const msgs = Array.from({ length: 9 }, (_, i) => TMSG("m" + i, "jo@x.com", `message number ${i} ` + "x".repeat(1200)));
+  msgs.push(TMSG("current", "jo@x.com", "latest"));
+  const out = formatThreadContext(msgs, "current");
+  assert.ok(!out.includes("message number 0"), "oldest messages dropped");
+  assert.ok(out.includes("message number 8"), "most recent prior message kept");
+  assert.ok(out.length < 4500, `total stays bounded, got ${out.length}`);
+});
+
 test("pricingFor: '2019 Tundra' matches Tundra pricing", () => {
   const { pricingFor } = require("../netlify/functions/lib/email-draft.js");
   const result = pricingFor("2019 Tundra that falls on its face");

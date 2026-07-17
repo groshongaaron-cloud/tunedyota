@@ -41,6 +41,19 @@ function groundingFor({ city, state, text }) {
   return { market, installerName, stateCities, pricing: pricingFor(text), nextEvent: "" };
 }
 
+// Compact "earlier in this thread" block for the drafter. Prior messages only —
+// the current message is already in the prompt; keep the 6 most recent, bodies
+// truncated, so the block stays inside buildDraftPrompt's 3000-char slice budget.
+function formatThreadContext(messages, currentId) {
+  const prior = (Array.isArray(messages) ? messages : []).filter((m) => m && m.id !== currentId);
+  return prior.slice(-6).map((m) => {
+    const from = (m.headers && m.headers.from) || "";
+    const date = (m.headers && m.headers.date) || "";
+    const body = String(m.textBody || "").trim().slice(0, 600);
+    return `From: ${from}${date ? ` · ${date}` : ""}\n${body}`;
+  }).join("\n---\n");
+}
+
 function buildDraftPrompt({ message, classification, grounding, threadContext }) {
   const g = grounding || {};
   return [
@@ -78,4 +91,4 @@ function checkDraftShape(text) {
   return { ok: problems.length === 0, problems };
 }
 
-module.exports = { groundingFor, buildDraftPrompt, checkDraftShape, pricingFor };
+module.exports = { groundingFor, buildDraftPrompt, checkDraftShape, pricingFor, formatThreadContext };

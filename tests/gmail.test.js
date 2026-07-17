@@ -27,6 +27,25 @@ test("getMessage normalizes headers + decodes the text/plain body", async () => 
   assert.equal(m.textBody, "Hello lead");
 });
 
+test("getThread fetches the full thread and returns simplified messages in order", async () => {
+  const b64 = (s) => Buffer.from(s).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  let seenUrl;
+  const fetchImpl = async (url) => { seenUrl = url; return { ok: true, json: async () => ({ id: "t1", messages: [
+    { id: "m1", threadId: "t1", payload: { headers: [{ name: "From", value: "jo@x.com" }, { name: "Subject", value: "tune?" }],
+      parts: [{ mimeType: "text/plain", body: { data: b64("first message") } }] } },
+    { id: "m2", threadId: "t1", payload: { headers: [{ name: "From", value: "info@tunedyota.com" }, { name: "Subject", value: "Re: tune?" }],
+      parts: [{ mimeType: "text/plain", body: { data: b64("our reply") } }] } },
+  ] }) }; };
+  const out = await G.getThread("t1", { fetchImpl, tokenImpl });
+  assert.match(seenUrl, /\/threads\/t1\?format=full/);
+  assert.equal(out.length, 2);
+  assert.equal(out[0].id, "m1");
+  assert.equal(out[0].headers.from, "jo@x.com");
+  assert.equal(out[0].textBody, "first message");
+  assert.equal(out[1].id, "m2");
+  assert.equal(out[1].textBody, "our reply");
+});
+
 test("sendReply posts a base64url raw message with threadId + In-Reply-To", async () => {
   let body;
   const fetchImpl = async (url, opts) => { body = JSON.parse(opts.body); return { ok: true, json: async () => ({ id: "sent1" }) }; };

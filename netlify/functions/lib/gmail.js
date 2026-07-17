@@ -39,8 +39,7 @@ function pickBody(payload) {
   }
   return { text, html };
 }
-async function getMessage(id, deps) {
-  const j = await authFetch(`/messages/${id}?format=full`, {}, deps);
+function simplifyMessage(j) {
   const h = {};
   for (const { name, value } of (j.payload && j.payload.headers) || []) h[name.toLowerCase()] = value;
   const { text, html } = pickBody(j.payload || {});
@@ -48,6 +47,14 @@ async function getMessage(id, deps) {
     headers: { from: h.from || "", to: h.to || "", cc: h.cc || "", replyTo: h["reply-to"] || "",
       subject: h.subject || "", messageId: h["message-id"] || "", date: h.date || "" },
     textBody: text, htmlBody: html };
+}
+async function getMessage(id, deps) {
+  const j = await authFetch(`/messages/${id}?format=full`, {}, deps);
+  return simplifyMessage(j);
+}
+async function getThread(threadId, deps) {
+  const j = await authFetch(`/threads/${threadId}?format=full`, {}, deps);
+  return (j.messages || []).map(simplifyMessage);
 }
 
 async function ensureLabel(name, deps) {
@@ -82,4 +89,4 @@ async function listDrafts(deps) {
   return (j.drafts || []).map((d) => ({ id: d.id, messageId: d.message && d.message.id, threadId: d.message && d.message.threadId }));
 }
 
-module.exports = { listMessages, getMessage, ensureLabel, addLabel, sendReply, createDraft, listDrafts, b64url, b64urlDecode };
+module.exports = { listMessages, getMessage, getThread, ensureLabel, addLabel, sendReply, createDraft, listDrafts, b64url, b64urlDecode };
