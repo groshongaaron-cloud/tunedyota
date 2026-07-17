@@ -540,14 +540,25 @@
 
     host.appendChild(anydayWalkForm());   // everyday walk-in — always available
 
-    // Search mode (unchanged): flat, all-history, event-grouped results.
+    // Search mode: flat, all-history, event-grouped results. Honors the active city
+    // sub-tab (2026-07-16 owner decision): a city tab scopes the search to that market
+    // with an explicit "search all markets ›" escape hatch; All searches everything.
     if(STATE.q.trim()){
-      var hits=events.map(function(e){ return { e:e, bs:e.bookings.filter(matchesQ) }; })
+      var scopedCity = STATE.jobTab!=='all' && STATE.jobTab!=='done' ? STATE.jobTab : '';
+      var pool = scopedCity ? events.filter(function(e){ return e.city===scopedCity; }) : events;
+      var hits=pool.map(function(e){ return { e:e, bs:e.bookings.filter(matchesQ) }; })
         .filter(function(x){ return x.bs.length; })
         .sort(function(a,b){ return b.e.dateISO.localeCompare(a.e.dateISO); });
       var n=hits.reduce(function(s,x){ return s+x.bs.length; },0);
-      host.appendChild(secHead('Search results ('+n+')',''));
-      if(!n){ host.innerHTML+='<div class="empty">No matches.</div>'; return; }
+      var head=secHead('Search results ('+n+')'+(scopedCity?' · '+scopedCity:''),'');
+      if(scopedCity){
+        var broaden=document.createElement('a'); broaden.href='#'; broaden.className='link'; broaden.id='qall';
+        broaden.style.marginLeft='10px'; broaden.textContent='search all markets ›';
+        broaden.onclick=function(ev){ ev.preventDefault(); STATE.jobTab='all'; renderFeed(); };
+        head.appendChild(broaden);
+      }
+      host.appendChild(head);
+      if(!n){ var qEmpty=document.createElement('div'); qEmpty.className='empty'; qEmpty.textContent='No matches'+(scopedCity?' in '+scopedCity:'')+'.'; host.appendChild(qEmpty); return; }
       hits.forEach(function(x){ host.appendChild(eventCard(x.e, x.bs, true, false, true)); });
       return;
     }
