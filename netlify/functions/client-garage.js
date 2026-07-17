@@ -28,6 +28,10 @@ function parseVehicles(raw) {
   try { const v = JSON.parse(raw || "[]"); return Array.isArray(v) ? v : []; } catch { return []; }
 }
 
+// Concurrent first-time writes (e.g. two tabs racing on first login) can create
+// duplicate Clients rows for the same email. findRow deterministically picks the
+// first row (creation order), so all subsequent reads/writes stay consistent on
+// that one row. Accepted v1 limitation; deduplication can run as a background job.
 async function findRow(email, c, list) {
   const rows = await list({ token: c.token, baseId: c.baseId, table: c.clients,
     filterByFormula: `LOWER({Email})="${escapeFormula(email)}"` });
@@ -69,6 +73,7 @@ async function putGarage(email, body, deps = {}) {
 async function handler(event) {
   const session = resolveClient(event.headers || {}, Date.now(), process.env);
   if (!session) return { statusCode: 401, body: "unauthorized" };
+  const renewHeaders = session.renewedToken ? { "x-renewed-token": session.renewedToken } : {};
   const renew = session.renewedToken ? { renewedToken: session.renewedToken } : {};
   let out;
   if (event.httpMethod === "GET") out = await getGarage(session.email, {});
@@ -78,7 +83,7 @@ async function handler(event) {
     out = await putGarage(session.email, body, {});
   } else return { statusCode: 405, body: "method-not-allowed" };
   return { statusCode: out.status === "ok" ? 200 : 502,
-    headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...out, ...renew }) };
+    headers: { "Content-Type": "application/json", ...renewHeaders }, body: JSON.stringify({ ...out, ...renew }) };
 }
 
 module.exports = { handler, getGarage, putGarage, mergeVehicles };
