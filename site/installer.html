@@ -89,11 +89,16 @@
 <body>
 <main>
   <h1>Tuned Yota — Installer Console</h1>
-  <div id="gate">
-    <input id="tok" type="password" autocomplete="off" placeholder="Your installer passcode">
+  <form id="gate" action="#" autocomplete="on">
+    <!-- Off-screen username so the OS/browser password manager can key + save the
+         passcode (installers have no username in our model — this labels the entry). -->
+    <input id="tokuser" name="username" type="text" autocomplete="username" value="Tuned Yota Installer"
+           readonly tabindex="-1" aria-hidden="true"
+           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <input id="tok" name="password" type="password" autocomplete="current-password" placeholder="Your installer passcode">
     <div style="height:8px"></div>
-    <button class="btn" id="unlock" style="width:100%">Unlock</button>
-  </div>
+    <button class="btn" id="unlock" type="submit" style="width:100%">Unlock</button>
+  </form>
   <div id="app" class="hidden">
     <a class="link" href="/calibration.html">Calibration reference (cal ID · TSB)</a>
     <a class="link" href="#" id="logout" style="margin-left:14px;color:#8a2a2a">Log out</a>
@@ -146,7 +151,7 @@
     return full;
   }
 
-  document.getElementById('unlock').onclick=function(){ var v=document.getElementById('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
+  document.getElementById('gate').onsubmit=function(e){ e.preventDefault(); var v=document.getElementById('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
   if(tok()) showApp();
   document.getElementById('logout').onclick=function(e){ e.preventDefault();
     if(Q().loadQueue(store()).length && !confirm('You have unsynced close-outs/walk-ins. Log out anyway and lose them?')) return;
