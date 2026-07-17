@@ -95,3 +95,9 @@ test("multi-date stepwise: helper, next-date control, and copy present", () => {
 test("booking payload carries the shown event's dateISO", () => {
   assert.ok(/dateISO:\s*\(?BOOK\.events/.test(HTML), "missing dateISO in /book payload");
 });
+
+test("funnel event picker offers a per-event share link (event-link virality)", () => {
+  assert.ok(/tyShareEvent/.test(HTML), "share handler present");
+  assert.ok(/\/book\/'?\s*\+/.test(HTML) || HTML.includes("'/book/'+"), "event link built from /book/ slug");
+  assert.ok(/navigator\.share/.test(HTML), "native share sheet used when available");
+});

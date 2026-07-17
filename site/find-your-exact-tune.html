@@ -910,6 +910,13 @@ function urgencyLine(a){
   const u=eventUrgency({dateISO:a&&a.eventDateISO,label:a&&a.eventLabel,city:a&&a.city,now:new Date()});
   return u?`<div class="tf-urgency${u.tier==="now"||u.tier==="soon"?" hot":""}">${u.text}</div>`:"";
 }
+function tyShareEvent(city,dateISO){
+  var slug=String(city||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")+"-"+dateISO;
+  var url='https://tunedyota.com/book/'+slug;
+  if(navigator.share){ navigator.share({title:'Book your Tuned Yota time — '+city, url:url}).catch(function(){}); }
+  else{ try{ navigator.clipboard.writeText(url); alert('Link copied — share it anywhere.'); }catch(e){} }
+}
+window.tyShareEvent=tyShareEvent;
 async function loadAvailability(city){
   BOOK.avail=null;BOOK.slot=null;BOOK.reason=null;BOOK.events=[];BOOK.eventIdx=0;
   const box=$("#tfSlots"); if(!box) return; box.style.display="block";
@@ -949,7 +956,7 @@ function renderSlots(city,e){
   const open=(e.openSlots||[]).map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
   const taken=(e.takenSlots||[]).map(s=>`<button type="button" class="tf-slot" disabled>${lab(s)}</button>`).join("");
   const sc=scarcityLine((e.openSlots||[]).length, Object.keys(e.slotLabels||{}).length||12, city, day);
-  box.innerHTML=`${urgencyLine({city,eventDateISO:e.dateISO,eventLabel:e.eventLabel})}${sc}<div class="tf-slot-day">${city} · ${day}</div><div class="tf-slotgrid">${open}${taken}</div>`;
+  box.innerHTML=`${urgencyLine({city,eventDateISO:e.dateISO,eventLabel:e.eventLabel})}${sc}<div class="tf-slot-day">${city} · ${day}<button type="button" class="tf-link" style="border:0;background:none;cursor:pointer;font-size:13px;margin-left:8px;opacity:.7" aria-label="Share this event" onclick="event.stopPropagation();tyShareEvent('${city.replace(/'/g,"\\'")}','${e.dateISO}')">📤 share</button></div><div class="tf-slotgrid">${open}${taken}</div>`;
   box.querySelectorAll(".tf-slot:not([disabled])").forEach(b=>b.onclick=()=>{
     box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
     b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();
