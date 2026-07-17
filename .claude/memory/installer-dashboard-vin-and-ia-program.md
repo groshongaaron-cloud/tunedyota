@@ -53,3 +53,15 @@ close-out cards), (5) loud "not closed out — no cert yet" flag on past-dated o
 Jobs search now honors the active city sub-tab with a "search all markets ›" escape hatch that
 jumps to All; Playwright regression tests in `tests/installer-search-scope.test.mjs`.
 Remaining program item: **Task 7 EOD open-jobs push — owner re-confirmed DEFER 2026-07-16.**
+
+**CONSOLE ACCESS + AUTH (shipped 2026-07-17):** (1) Subtle "Console" link in the homepage
+footer at tunedyota.com (opacity .4, rel="nofollow"); installer.html is noindex — obscurity is
+NOT the control, the token gate is. (2) Login now persists + supports password managers: the
+gate is a `<form id="gate">` with an offscreen username field + `autocomplete="current-password"`
+(was `off`, which suppressed managers) and Unlock is a submit — iOS Keychain / Google Password
+Manager now save + autofill the passcode, on top of the existing localStorage persistence
+(`ty_installer_token`, one-time entry, auto-login on return). App adds biometric `nativeLock()`.
+Kept form id="gate" so showApp()'s hide logic is unchanged (a rename broke 7 browser tests
+mid-build — the browser suite caught it). Access model going forward: installers live in the
+Tuned Yota app 100% once live; footer link + bookmark are web fallbacks. Lost-device response =
+rotate that one installer's token in INSTALLER_TOKENS (they re-enter once). See SOP 10.
