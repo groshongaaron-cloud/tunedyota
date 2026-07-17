@@ -1,6 +1,6 @@
 ---
 name: inbox-intelligence-program
-description: "Inbox intelligence LIVE 2026-07-17 (~06:00 UTC): 15-min Gmail sweep (classify → OTT ingest / NEPQ reply drafts, NEVER sends) + 8a/12p/7p CT review digest + OTT provenance chain + Qualified gate. Owner live-verification steps pending; thread-context for thread-reply drafts is the top fast-follow."
+description: "Inbox intelligence LIVE 2026-07-17 (~06:00 UTC): 15-min Gmail sweep (classify → OTT ingest / NEPQ reply drafts, NEVER sends) + 8a/12p/7p CT review digest + OTT provenance chain + Qualified gate. Owner live-verification steps pending. Thread-context fast-follow SHIPPED 2026-07-17 (8a14e5c)."
 metadata:
   node_type: memory
   type: project
@@ -42,8 +42,10 @@ delete the "TEST — inbox intelligence go-live check" draft; personal-address t
 forward test (then delete fake lead); confirm first 8am digest; add `GHL Link` column to
 Priority List (tolerant writes — works without, link invisible until added).
 
-**Fast-follows:** (1) thread-context fetch for thread-reply drafts (buildDraftPrompt slot
-exists, sweep passes ""); (2) digest could dedupe manual drafts even harder via draft-id
-tracking if noise reappears. Related: [[booking-model-year-capture]],
+**Fast-follows:** (1) ✅ DONE 2026-07-17 (master @ 8a14e5c, 820 tests): `gmail.getThread` +
+`formatThreadContext` (6 most recent prior msgs, 600-char bodies, current msg excluded) feed
+`buildDraftPrompt` for **thread-reply AND sensitive** buckets; inquiry skips the fetch (first
+contact); fetch failure fails OPEN to a context-free draft (never blocks). (2) digest could
+dedupe manual drafts even harder via draft-id tracking if noise reappears. Related: [[booking-model-year-capture]],
 [[installer-dashboard-vin-and-ia-program]]; FB/IG + Twilio feeders + 1-2yr AMSOIL backfill
 remain parked (see mem0 backlog).
