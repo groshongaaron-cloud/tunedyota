@@ -15,7 +15,7 @@ const UNGATED_SIDE_EFFECTING = [
   "amsoil-followup",      // emails customers
   "rebook-report",        // emails owner backlog
   "email-health",         // sends canary email
-  "gmail-lead-poll",      // reads Gmail, posts leads to lead-ingest
+  "inbox-sweep",          // reads Gmail, classifies, ingests OTT leads, creates NEPQ drafts
 ];
 
 function scheduledFunctions() {

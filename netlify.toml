@@ -50,8 +50,9 @@
 [functions."lead-followups"]
   schedule = "0 13 * * *"
 
-[functions."gmail-lead-poll"]
-  schedule = "*/10 * * * *"
+# Inbox sweep: classify info@ mail, ingest OTT leads, create NEPQ reply drafts.
+[functions."inbox-sweep"]
+  schedule = "*/15 * * * *"
 
 [functions."ott-reply-sweep"]
   schedule = "*/15 * * * *"
