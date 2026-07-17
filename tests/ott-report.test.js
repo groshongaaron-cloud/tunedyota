@@ -269,3 +269,24 @@ test("approveAndSend reports empty months and surfaces send failures", async () 
   assert.equal(failed.status, "error");
   assert.equal(failed.error, "send-failed");
 });
+
+test("leadConversion counts month OTT leads received / booked / completed", () => {
+  const { leadConversion } = require("../netlify/functions/lib/ott-report.js");
+  const month = { key: "2026-06", label: "June 2026" }; // match priorMonth() shape
+  const leads = [
+    { Channel: "ott-national", "Created Time": "2026-06-03", Stage: "Booked", "Converted Booking": "b1" },
+    { Channel: "ott-national", "Created Time": "2026-06-10", Stage: "Contacted" },
+    { Channel: "email", "Created Time": "2026-06-11", Stage: "Booked" },
+    { Channel: "ott-national", "Created Time": "2026-05-30", Stage: "Booked" },
+  ];
+  const bookings = [{ id: "b1", Status: "Completed" }];
+  const c = leadConversion(leads, bookings, month);
+  assert.deepEqual(c, { received: 2, booked: 1, completed: 1 });
+});
+
+test("owner draft html includes the OTT conversion section when provided", () => {
+  const { renderOwnerDraftHtml } = require("../netlify/functions/lib/ott-report.js");
+  const html = renderOwnerDraftHtml([], { key: "2026-06", label: "June 2026" }, "https://x", { received: 12, booked: 4, completed: 3 });
+  assert.match(html, /OTT leads/i);
+  assert.match(html, /12/);
+});

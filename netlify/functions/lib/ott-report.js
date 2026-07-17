@@ -220,13 +220,31 @@ function subTable(subRows) {
   return h + "</table>";
 }
 
-function renderOwnerDraftHtml(subRows, month, approveUrl) {
+// OTT lead → booking → completed conversion for the month (leads = flattened
+// Priority rows, bookings = flattened Bookings rows). "Received" is by lead
+// Created Time within the month; "completed" via the Converted Booking's Status.
+function leadConversion(leads, bookings, month) {
+  const inMonth = (d) => String(d || "").slice(0, 7) === month.key;
+  const ott = (leads || []).filter((l) => (l.Channel === "ott-national" || /(^|[:\s])ott-/i.test(l.Source || "")) && inMonth(l["Created Time"]));
+  const byId = new Map((bookings || []).map((b) => [b.id, b]));
+  const booked = ott.filter((l) => l.Stage === "Booked" || l["Converted Booking"]);
+  const completed = booked.filter((l) => { const b = byId.get(l["Converted Booking"]); return b && b.Status === "Completed"; });
+  return { received: ott.length, booked: booked.length, completed: completed.length };
+}
+
+function conversionHtml(c) {
+  if (!c) return "";
+  return `<h3 style="color:#3A2E26">OTT leads — ${c.received} received · ${c.booked} booked · ${c.completed} completed</h3>`;
+}
+
+function renderOwnerDraftHtml(subRows, month, approveUrl, conversion) {
   const u = unresolved(subRows), total = totalCommission(subRows);
   let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:820px">`;
   html += `<h1 style="color:#3A2E26">OTT Commission Submission — DRAFT for your approval</h1>`;
   html += `<p style="color:#7c8472">${esc(month.label)} · ${subRows.length} calibration${subRows.length === 1 ? "" : "s"} · commission total <strong>$${total}</strong></p>`;
   html += `<p><strong>Nothing has been sent to OTT yet.</strong> Review the attached workbook (OTT's exact 15-column format) or open the online review to check it, download the Excel, and send.</p>`;
   if (u.length) html += `<p style="color:#8a2a2a"><strong>${u.length} row(s) need a commission confirmed</strong> — the amount was ambiguous or the platform was bench (BB). Fill those cells in the attached .xlsx before submitting, or fix the close-out data.</p>`;
+  html += conversionHtml(conversion);
   html += `<p style="margin:18px 0"><a href="${esc(approveUrl)}" style="background:#5B4B42;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">Review &amp; send to OTT</a></p>`;
   html += `<p style="color:#7c8472;font-size:13px">This review link is private to you — do not forward it. Vehicle Type/Year/Engine are auto-derived; verify them in the sheet.</p>`;
   html += subTable(subRows);
@@ -236,12 +254,13 @@ function renderOwnerDraftHtml(subRows, month, approveUrl) {
 
 // Cover email to OTT — a short transmittal only. The line-by-line detail lives in
 // the attached workbook (OTT's 15-column format), so it is NOT repeated here.
-function renderOttEmailHtml(subRows, month) {
+function renderOttEmailHtml(subRows, month, conversion) {
   const total = totalCommission(subRows);
   let html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:820px">`;
   html += `<h1 style="color:#3A2E26">Tuned Yota — OTT Commission Submission</h1>`;
   html += `<p style="color:#7c8472">${esc(month.label)} · ${subRows.length} completed calibration${subRows.length === 1 ? "" : "s"} · commission total <strong>$${total}</strong></p>`;
   html += `<p>Tuned Yota, an authorized Overland Tailor Tuning installer, submits its completed calibrations for ${esc(month.label)}. The full submission — every calibration with its details — is attached as a workbook in OTT's standard 15-column format.</p>`;
+  html += conversionHtml(conversion);
   html += `</div>`;
   return html;
 }
@@ -249,5 +268,5 @@ function renderOttEmailHtml(subRows, month) {
 module.exports = {
   priorMonth, monthFromKey, recipients, SUBMISSION_HEADERS,
   buildSubmissionRows, buildOpenBookings, renderOttXlsx, renderOwnerDraftHtml, renderOttEmailHtml,
-  totalCommission, unresolved, subTable,
+  totalCommission, unresolved, subTable, leadConversion, conversionHtml,
 };

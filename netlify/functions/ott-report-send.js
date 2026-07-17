@@ -5,7 +5,7 @@ const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { flattenRecords } = require("./lib/report-sources.js");
-const { monthFromKey, buildSubmissionRows, renderOttXlsx, renderOttEmailHtml, recipients, totalCommission } = require("./lib/ott-report.js");
+const { monthFromKey, buildSubmissionRows, renderOttXlsx, renderOttEmailHtml, recipients, totalCommission, leadConversion } = require("./lib/ott-report.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -22,16 +22,22 @@ async function approveAndSend(params, deps) {
   if (!month) return { status: "error", code: 400, error: "bad-month" };
 
   const c = cfg(env);
-  const bRecs = await listAll({ token: c.token, baseId: c.baseId, table: c.bookings });
-  const subRows = buildSubmissionRows(flattenRecords(bRecs), month, { retailer: env.OTT_RETAILER, sendDate: now.toISOString().slice(0, 10) });
+  const [bRecs, pRecs] = await Promise.all([
+    listAll({ token: c.token, baseId: c.baseId, table: c.bookings }),
+    listAll({ token: c.token, baseId: c.baseId, table: c.priority }),
+  ]);
+  const flatBookings = flattenRecords(bRecs);
+  const subRows = buildSubmissionRows(flatBookings, month, { retailer: env.OTT_RETAILER, sendDate: now.toISOString().slice(0, 10) });
   if (!subRows.length) return { status: "empty", code: 200, month: month.key, label: month.label };
 
+  const conversion = leadConversion(flattenRecords(pRecs), flatBookings, month);
   const to = recipients(env), total = totalCommission(subRows), xlsx = renderOttXlsx(subRows);
+  const convText = `OTT leads this month: ${conversion.received} received, ${conversion.booked} booked, ${conversion.completed} completed.`;
   try {
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to, cc: OWNER, replyTo: OWNER,
       subject: `Tuned Yota — OTT Commission Submission (${month.label})`,
-      html: renderOttEmailHtml(subRows, month),
-      text: `${subRows.length} completed calibration(s) for ${month.label}, commission total $${total}. Full submission attached (.xlsx) in OTT's 15-column format.`,
+      html: renderOttEmailHtml(subRows, month, conversion),
+      text: `${subRows.length} completed calibration(s) for ${month.label}, commission total $${total}. Full submission attached (.xlsx) in OTT's 15-column format. ${convText}`,
       attachments: [{ filename: `ott-commissions-${month.key}.xlsx`, content: Buffer.from(xlsx).toString("base64") }] });
   } catch (e) {
     if (log.error) log.error("ott send", e.message);
