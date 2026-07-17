@@ -9,7 +9,10 @@ const { classifyEmail, extractLeadFields, askClaude } = require("./lib/email-cla
 const { groundingFor, buildDraftPrompt, checkDraftShape } = require("./lib/email-draft.js");
 const { notifyOwner } = require("./lib/alert.js");
 
-const QUERY = "in:inbox -label:ty-ingested -label:ty-drafted -label:ty-skipped -label:ty-flagged -from:me";
+// newer_than:2d bounds the sweep to FRESH mail — without it, go-live would chew
+// through the entire historical inbox 20 msgs/tick, drafting replies to months-old
+// threads (the owner's 1-2yr backfill is a separate, deliberate project).
+const QUERY = "in:inbox newer_than:2d -label:ty-ingested -label:ty-drafted -label:ty-skipped -label:ty-flagged -from:me";
 const CAP = 20;
 
 // Default draft call: reuse askClaude from email-classify with the appropriate model/tokens.

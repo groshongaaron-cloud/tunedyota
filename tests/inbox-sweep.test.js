@@ -151,3 +151,13 @@ test("CAP: 25 msgs listed but only 20 processed (scanned === 20)", async () => {
   const out = await runSweep(deps);
   assert.equal(out.scanned, 20, "CAP of 20 must be enforced");
 });
+
+test("sweep query is bounded to fresh mail and excludes all state labels", () => {
+  const src = require("node:fs").readFileSync(require("node:path").join(__dirname, "..", "netlify", "functions", "inbox-sweep.js"), "utf8");
+  const m = src.match(/const QUERY = "([^"]+)"/);
+  assert.ok(m, "QUERY const found");
+  const q = m[1];
+  assert.ok(q.includes("newer_than:"), "date bound present — without it the sweep drafts replies to the whole historical inbox");
+  for (const l of ["ty-ingested", "ty-drafted", "ty-skipped", "ty-flagged"]) assert.ok(q.includes("-label:" + l), l);
+  assert.ok(q.includes("-from:me"), "excludes own sends");
+});
