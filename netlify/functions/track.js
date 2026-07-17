@@ -2,6 +2,10 @@
 // Always 204 (beacons ignore the response); never throws into the request.
 const { cfg, createRecord } = require("./lib/airtable.js");
 
+// Public unauthenticated beacon: cap every string before it reaches Airtable so
+// a hostile client can't stuff megabytes into a row.
+const cap = (v) => String(v == null ? "" : v).slice(0, 200);
+
 async function processTrack(body, deps) {
   const { fetchImpl = fetch, create = (a) => createRecord({ fetchImpl, ...a }), env = process.env, log = console } = deps;
   const d = body || {};
@@ -11,8 +15,8 @@ async function processTrack(body, deps) {
   const table = env.AIRTABLE_FUNNEL_TABLE || "Funnel Events";
   try {
     await create({ token: c.token, baseId: c.baseId, table, fields: {
-      Session: String(d.sid), Step: d.step, "Step Name": d.name || "",
-      "UTM Source": d.utm_source || "", "UTM Medium": d.utm_medium || "", "UTM Campaign": d.utm_campaign || "",
+      Session: cap(d.sid), Step: d.step, "Step Name": cap(d.name),
+      "UTM Source": cap(d.utm_source), "UTM Medium": cap(d.utm_medium), "UTM Campaign": cap(d.utm_campaign),
     } });
     return { stored: true };
   } catch (e) { if (log.error) log.error("track", e.message); return { stored: false, reason: "store" }; }

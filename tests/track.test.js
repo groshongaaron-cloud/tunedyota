@@ -31,6 +31,17 @@ test("invalid / honeypot payloads do not write", async () => {
   assert.equal((await processTrack({ sid: "s", step: 1, bot_field: "x" }, d)).stored, false);
   assert.equal(d._creates.length, 0);
 });
+test("oversized string fields are capped before writing (public beacon, no auth)", async () => {
+  const d = deps();
+  const big = "x".repeat(5000);
+  const r = await processTrack({ sid: big, step: 1, name: big, utm_source: big, utm_medium: big, utm_campaign: big }, d);
+  assert.equal(r.stored, true);
+  const f = d._creates[0].fields;
+  for (const k of ["Session", "Step Name", "UTM Source", "UTM Medium", "UTM Campaign"]) {
+    assert.ok(String(f[k]).length <= 200, `${k} should be capped to 200 chars (got ${String(f[k]).length})`);
+  }
+});
+
 test("a store error is swallowed (never throws)", async () => {
   const d = deps({ create: async () => { throw new Error("airtable 429"); } });
   const r = await processTrack({ sid: "s", step: 0, name: "make" }, d);

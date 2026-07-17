@@ -19,6 +19,9 @@ async function readVinFromImage(input, deps) {
   if (!apiKey) return { ok: false, reason: "unconfigured" };
   const b64 = String(imageBase64 == null ? "" : imageBase64).replace(/^data:[^,]*,/, "");
   if (!b64) return { ok: false, reason: "no-image" };
+  // ~5MB decoded (the Anthropic per-image limit) — reject before spending the
+  // API call; the console falls back to manual entry like every non-success.
+  if (b64.length > 7_000_000) return { ok: false, reason: "too-large" };
   const mt = /^image\/(jpeg|png|webp)$/.test(mediaType || "") ? mediaType : "image/jpeg";
   let res;
   try {
