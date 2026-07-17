@@ -175,14 +175,18 @@ test("roster booking rows expose an ott flag from Source", async () => {
         Name: "Scott", Source: "" } },
     { id: "r4", fields: { Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Booked",
         Name: "Dave", Source: "find-your-exact-tune" } },
+    { id: "r5", fields: { Installer: "aaron", City: "X", "Event Date": "2026-07-16", Status: "Booked",
+        Name: "Eve", Source: "OTT Update" } },
   ];
   const out = await buildRoster({ key: "aaron", env: {}, list, loadEvents: async () => [] });
   const alice = out.bookings.find((b) => b.name === "Alice");
   const bob   = out.bookings.find((b) => b.name === "Bob");
   const scott = out.bookings.find((b) => b.name === "Scott");
   const dave  = out.bookings.find((b) => b.name === "Dave");
+  const eve   = out.bookings.find((b) => b.name === "Eve");
   assert.equal(alice.ott, true,  "lead:ott-national should be ott");
   assert.equal(bob.ott,   true,  "ott-national:fb-ads should be ott");
   assert.equal(scott.ott, false, "empty Source (Scott) should NOT be ott");
   assert.equal(dave.ott,  false, "find-your-exact-tune should NOT be ott");
+  assert.equal(eve.ott,   false, "'OTT Update' re-flash source must NOT be ott");
 });
