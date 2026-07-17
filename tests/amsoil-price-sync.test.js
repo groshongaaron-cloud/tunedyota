@@ -25,6 +25,16 @@ test("applies when there was no prior price", () => {
   const d = S.decide({ retailPrice: null, salePrice: null }, { retail: 20, sale: null });
   assert.equal(d.action, "apply");
 });
+test("first verification: unchanged price with DRAFT priceVerifiedAt applies (stamps the date)", () => {
+  const d = S.decide({ retailPrice: 20.45, salePrice: null, priceVerifiedAt: "DRAFT" }, { retail: 20.45, sale: null });
+  assert.equal(d.action, "apply");
+  assert.equal(d.to, 20.45);
+  assert.match(d.reason, /verif/i);
+});
+test("DRAFT price beyond the guardrail still holds (parse-error protection)", () => {
+  const d = S.decide({ retailPrice: 20.45, salePrice: null, priceVerifiedAt: "DRAFT" }, { retail: 3.0, sale: null });
+  assert.equal(d.action, "hold");
+});
 test("tracks a sale price as the effective 'to'", () => {
   const d = S.decide({ retailPrice: 25.5, salePrice: null }, { retail: 25.5, sale: 19.95 });
   assert.equal(d.action, "apply");

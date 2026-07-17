@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-13",
+  "updated": "2026-07-17",
   "products": {
     "SS-0W20-QT": {
       "sku": "SS-0W20-QT",
@@ -39,7 +39,7 @@
       "image": "/images/amsoil/ea15k09.jpg",
       "retailPrice": 17.2,
       "salePrice": null,
-      "priceVerifiedAt": "DRAFT"
+      "priceVerifiedAt": "2026-07-17"
     },
     "EA15K51": {
       "sku": "EA15K51",
@@ -49,7 +49,7 @@
       "image": "/images/amsoil/ea15k51.jpg",
       "retailPrice": 19.55,
       "salePrice": null,
-      "priceVerifiedAt": "DRAFT"
+      "priceVerifiedAt": "2026-07-17"
     },
     "EA15K02": {
       "sku": "EA15K02",
@@ -59,7 +59,7 @@
       "image": "/images/amsoil/ea15k02.jpg",
       "retailPrice": 20.45,
       "salePrice": null,
-      "priceVerifiedAt": "DRAFT"
+      "priceVerifiedAt": "2026-07-17"
     },
     "EA15K49": {
       "sku": "EA15K49",
@@ -69,7 +69,7 @@
       "image": "/images/amsoil/ea15k49.jpg",
       "retailPrice": 35.8,
       "salePrice": null,
-      "priceVerifiedAt": "DRAFT"
+      "priceVerifiedAt": "2026-07-17"
     },
     "EA15K04": {
       "sku": "EA15K04",
@@ -79,7 +79,7 @@
       "image": "/images/amsoil/ea15k04.jpg",
       "retailPrice": 19.45,
       "salePrice": null,
-      "priceVerifiedAt": "DRAFT"
+      "priceVerifiedAt": "2026-07-17"
     },
     "SVL-QT": {
       "sku": "SVL-QT",
@@ -97,9 +97,9 @@
       "name": "SEVERE GEAR 80W-90 100% Synthetic Gear Lube",
       "productPath": "/p/amsoil-severe-gear-80w-90-100-synthetic-gear-lube-agl/",
       "image": "/images/amsoil/aglpk-80w90.jpg",
-      "retailPrice": 19.49,
+      "retailPrice": 21.39,
       "salePrice": null,
-      "priceVerifiedAt": "2026-07-13"
+      "priceVerifiedAt": "2026-07-17"
     },
     "SVG-75W90-QT": {
       "sku": "SVG-75W90-QT",
@@ -127,9 +127,9 @@
       "name": "Signature Series Multi-Vehicle 100% Synthetic ATF",
       "productPath": "/p/amsoil-signature-series-multi-vehicle-100-synthetic-automatic-transmission-fluid-atf/",
       "image": "/images/amsoil/atf.jpg",
-      "retailPrice": 21.19,
+      "retailPrice": 24.19,
       "salePrice": null,
-      "priceVerifiedAt": "2026-07-13"
+      "priceVerifiedAt": "2026-07-17"
     }
   },
   "vehicles": {

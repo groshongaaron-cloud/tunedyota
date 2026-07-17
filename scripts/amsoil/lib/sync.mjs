@@ -8,7 +8,12 @@ export function decide(current, parsed, guardrail = GUARDRAIL) {
   if (to == null || isNaN(to) || to <= 0) return { action: "hold", from: null, to: null, reason: "no price parsed" };
   const from = current && (current.salePrice != null ? current.salePrice : current.retailPrice);
   if (from == null) return { action: "apply", from: null, to, reason: "no prior price" };
-  if (to === from) return { action: "noop", from, to, reason: "unchanged" };
+  if (to === from) {
+    // A DRAFT price confirmed by a live parse IS a verification — apply so the
+    // date gets stamped. Dated products stay noop (no weekly commit churn).
+    if (current.priceVerifiedAt === "DRAFT") return { action: "apply", from, to, reason: "first live verification" };
+    return { action: "noop", from, to, reason: "unchanged" };
+  }
   const delta = Math.abs(to - from) / from;
   if (delta > guardrail) return { action: "hold", from, to, reason: `Δ${(delta * 100).toFixed(0)}% exceeds ±${guardrail * 100}% guardrail` };
   return { action: "apply", from, to, reason: `Δ${(delta * 100).toFixed(0)}%` };
