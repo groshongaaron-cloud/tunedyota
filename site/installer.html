@@ -745,7 +745,7 @@
   }
 
   // ---- Leads pipeline ----
-  var LEAD_STAGES=['New','Contacted','Following up','Booked','Not now'];
+  var LEAD_STAGES=['New','Contacted','Qualified','Following up','Booked','Not now'];
   var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶','ott-national':'🇺🇸',other:'•'};
   async function loadLeads(){
     try{
@@ -769,8 +769,8 @@
       var inStage=visible.filter(function(l){ return (l.stage||'New')===stage; });
       if(!inStage.length) return;
       inStage.sort(function(a,b){
-        var ao=(['New','Contacted','Following up'].indexOf(a.stage)>=0 && a.nextFollowup && a.nextFollowup<=STATE.today)?0:1;
-        var bo=(['New','Contacted','Following up'].indexOf(b.stage)>=0 && b.nextFollowup && b.nextFollowup<=STATE.today)?0:1;
+        var ao=(['New','Contacted','Qualified','Following up'].indexOf(a.stage)>=0 && a.nextFollowup && a.nextFollowup<=STATE.today)?0:1;
+        var bo=(['New','Contacted','Qualified','Following up'].indexOf(b.stage)>=0 && b.nextFollowup && b.nextFollowup<=STATE.today)?0:1;
         if(ao!==bo) return ao-bo; return (b.lastContact||'').localeCompare(a.lastContact||'');
       });
       host.appendChild(secHead(stage+' ('+inStage.length+')',''));
@@ -779,7 +779,7 @@
     if(!visible.length){ var em=document.createElement('div'); em.className='empty'; em.textContent='No leads yet. Use "＋ Log a lead" above.'; host.appendChild(em); }
   }
   function leadCard(l){
-    var overdue=(['New','Contacted','Following up'].indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
+    var overdue=(['New','Contacted','Qualified','Following up'].indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
     var det=document.createElement('details'); det.className='evt';
     var sum=document.createElement('summary');
     sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' '+esc(l.name)+'</span>'+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+

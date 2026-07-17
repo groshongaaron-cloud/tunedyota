@@ -3,7 +3,7 @@
 // only their own leads; an admin sees all (optionally filtered by ?installer= or ?scope=unassigned).
 const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { toLeadView, scopeLeads } = require("./lib/leads.js");
+const { toLeadView, scopeLeads, ACTIVE_STAGES } = require("./lib/leads.js");
 
 function summarize(leads) {
   const byChannel = {}, byStage = {};
@@ -12,7 +12,7 @@ function summarize(leads) {
   for (const l of leads) {
     byChannel[l.channel] = (byChannel[l.channel] || 0) + 1;
     byStage[l.stage] = (byStage[l.stage] || 0) + 1;
-    if (["New", "Contacted", "Following up"].includes(l.stage) && l.nextFollowup && l.nextFollowup <= today) dueOrOverdue++;
+    if (ACTIVE_STAGES.includes(l.stage) && l.nextFollowup && l.nextFollowup <= today) dueOrOverdue++;
   }
   const won = byStage.Booked || 0;
   return { byChannel, byStage, dueOrOverdue, total: leads.length,

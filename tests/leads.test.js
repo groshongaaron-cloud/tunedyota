@@ -1,6 +1,8 @@
 // tests/leads.test.js
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const L = require("../netlify/functions/lib/leads.js");
 
 test("normalizeChannel maps sources to one of the seven channels", () => {
@@ -215,4 +217,17 @@ test("ingest leaves stage New when city is unknown or vehicle is missing", async
   assert.equal(a.out.a.fields.Stage, "New");
   const b = mk(); await processLeadIngest({ name: "B", phone: "1", city: "Fargo", vehicle: "" }, b.deps);
   assert.equal(b.out.a.fields.Stage, "New");
+});
+
+test("site/installer.html LEAD_STAGES literal includes Qualified between Contacted and Following up", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
+  const m = html.match(/var LEAD_STAGES\s*=\s*(\[.*?\])/);
+  assert.ok(m, "LEAD_STAGES array not found in installer.html");
+  const stages = JSON.parse(m[1].replace(/'/g, '"'));
+  const ci = stages.indexOf("Contacted");
+  const qi = stages.indexOf("Qualified");
+  const fi = stages.indexOf("Following up");
+  assert.ok(qi !== -1, "Qualified missing from LEAD_STAGES");
+  assert.ok(ci < qi, "Qualified must come after Contacted");
+  assert.ok(qi < fi, "Qualified must come before Following up");
 });

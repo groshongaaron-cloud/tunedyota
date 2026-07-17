@@ -92,6 +92,20 @@ test("lead-update convert creates a booking, links it, sets Booked", async () =>
   assert.equal(patched.Stage, "Booked");
 });
 
+test("summarize counts a Qualified lead with nextFollowup <= today as dueOrOverdue", () => {
+  const { summarize } = require("../netlify/functions/leads-list.js");
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Chicago" });
+  const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-CA", { timeZone: "America/Chicago" });
+  const leads = [
+    { stage: "Qualified", channel: "sms", nextFollowup: yesterday },   // overdue → counted
+    { stage: "Qualified", channel: "phone", nextFollowup: today },      // due today → counted
+    { stage: "Qualified", channel: "email", nextFollowup: "" },         // no follow-up → not counted
+    { stage: "Booked",    channel: "sms",   nextFollowup: yesterday },  // terminal → not counted
+  ];
+  const s = summarize(leads);
+  assert.equal(s.dueOrOverdue, 2, "Qualified leads with nextFollowup <= today must be counted dueOrOverdue");
+});
+
 const sweep = require("../netlify/functions/lead-followups.js");
 
 test("runFollowups pushes one message per installer with due leads", async () => {
