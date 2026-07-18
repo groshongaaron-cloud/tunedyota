@@ -30,9 +30,16 @@ echoing it into logs or chat.
 
 ## 2. Principle of least privilege
 
-- The **data token** (`AIRTABLE_TOKEN`) should hold only the scopes it needs. Schema-management
-  scopes (`schema.bases:write/read`) are powerful — grant them only when doing schema work
-  (e.g. adding the `VIN` column) and consider narrowing afterward.
+- The **data token** (`AIRTABLE_TOKEN`) holds data scopes only. Schema-management scopes
+  (`schema.bases:read/write`) are powerful — grant them **temporarily** for schema work and
+  **remove them as soon as the work is verified**, in the same sitting. The working procedure
+  (practiced 2026-07-17 for the `Events` table):
+  1. At airtable.com/create/tokens, edit the production token (match it by its `pat…` ID —
+     never regenerate; that changes the secret and breaks the live site) and add
+     `schema.bases:read` + `schema.bases:write`.
+  2. Run the schema work (e.g. `setup-airtable.mjs`) and verify data reads/writes still work.
+  3. Remove both schema scopes immediately. Data operations need no schema scope, so
+     nothing live is affected.
 - The **Slack webhook** is never placed in a routine prompt or client code — it's called only
   server-side, and cloud routines reach it through the `/notify` relay (`NOTIFY_TOKEN`-gated).
 - Installer passcodes scope each installer to **their own** bookings; ownership is re-checked
