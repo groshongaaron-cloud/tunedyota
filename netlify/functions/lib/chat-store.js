@@ -30,6 +30,7 @@ async function loadSession(id, { env = process.env, fetchImpl = fetch } = {}) {
   const c = cfg(env);
   const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
     filterByFormula: `{Session ID}="${escapeFormula(id)}"` });
+  if (recs.length > 1) recs.sort((a, b) => (String((a.fields || {}).Created || "") < String((b.fields || {}).Created || "") ? -1 : 1));
   return recs.length ? fromRecord(recs[0]) : null;
 }
 

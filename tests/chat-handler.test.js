@@ -87,6 +87,34 @@ test("escalate: routes by city, creates lead, notifies, logs escalation — best
   assert.match(lead.vehicle, /2019 Toyota Tacoma/);
 });
 
+test("already-escalated session never re-fires escalation fan-out", async () => {
+  let escCalls = 0;
+  const transfer = { customerName: "Ty", contactMethod: "phone", contactValue: "1", vehicleMake: "T", vehicleModel: "T",
+    modelYear: "1", city: "Rochester", state: "MN", questionSummary: "q", reason: "no-answer" };
+  const out = await processChat({ session: "s1", message: "another question", page: "default" },
+    baseDeps({
+      load: async () => ({ id: "s1", recordId: "r", status: "escalated", installer: "aaron", turns: [], lastActivity: new Date().toISOString() }),
+      ai: async () => ({ reply: "sure", transfer }),
+      doEscalate: async () => { escCalls++; return { installer: { key: "aaron", name: "A", phone: "p" } }; } }));
+  assert.equal(escCalls, 0);
+  assert.equal(out.body.escalated, true);
+  assert.equal(out.body.reply, "sure");
+});
+
+test("AI failure → saved session has fallback as last assistant turn", async () => {
+  const saved = [];
+  const out = await processChat({ session: "s1", message: "hi", page: "default" },
+    baseDeps({
+      ai: async () => { throw new Error("anthropic 529"); },
+      save: async (s) => { saved.push(JSON.parse(JSON.stringify(s))); return s; } }));
+  assert.equal(out.status, 200);
+  assert.match(out.body.reply, /\(612\) 406-7117/);
+  assert.equal(saved.length > 0, true);
+  const lastTurn = saved[0].turns[saved[0].turns.length - 1];
+  assert.equal(lastTurn.role, "assistant");
+  assert.match(lastTurn.text, /\(612\) 406-7117/);
+});
+
 test("escalate: notify failures never throw; customer still gets installer info", async () => {
   const r = await escalate({ transfer: { customerName: "T", contactMethod: "phone", contactValue: "1", vehicleMake: "T",
       vehicleModel: "T", modelYear: "1", city: "Nowhere", state: "ZZ", questionSummary: "q", reason: "guardrail" },

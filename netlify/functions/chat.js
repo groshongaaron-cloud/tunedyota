@@ -90,12 +90,13 @@ async function processChat(body, deps) {
   try { out = await ai({ turns: sess.turns, pageContext: sess.pageContext }); }
   catch (e) {
     if (log.error) log.error("chat ai", e.message);
+    sess.turns.push({ role: "assistant", text: OWNER_FALLBACK, at: Date.now() });
     try { await save(sess); } catch {}
     return { status: 200, body: { reply: OWNER_FALLBACK, degraded: true } };
   }
 
-  let reply = out.reply, escalated = false;
-  if (out.transfer) {
+  let reply = out.reply, escalated = sess.status === "escalated";
+  if (out.transfer && sess.status !== "escalated") {
     const { installer } = await doEscalate({ transfer: out.transfer, sess });
     sess.status = "escalated";
     sess.customerName = out.transfer.customerName;

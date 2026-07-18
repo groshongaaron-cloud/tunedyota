@@ -32,6 +32,17 @@ test("loadSession returns null when not found; maps fields when found", async ()
   assert.equal(s.turns.length, 1);
 });
 
+test("loadSession with duplicate records returns the oldest (by Created)", async () => {
+  // Newer record appears first in the array — loadSession must sort ascending by Created and return the older one
+  const newerRec = { id: "recNewer", fields: { "Session ID": "s1", Status: "ai", Transcript: "[]",
+    "Page Context": "default", "Last Activity": "2026-07-17T11:59:00Z", Created: "2026-07-17T10:00:00Z" } };
+  const olderRec = { id: "recOlder", fields: { "Session ID": "s1", Status: "ai", Transcript: "[]",
+    "Page Context": "default", "Last Activity": "2026-07-17T11:58:00Z", Created: "2026-07-17T09:00:00Z" } };
+  const fetchImpl = async () => ({ ok: true, json: async () => ({ records: [newerRec, olderRec] }) });
+  const s = await loadSession("s1", { env: ENV, fetchImpl });
+  assert.equal(s.recordId, "recOlder");
+});
+
 test("saveSession creates when no recordId, patches when present", async () => {
   const calls = [];
   const fetchImpl = async (url, opts) => { calls.push({ url: String(url), method: opts.method, body: JSON.parse(opts.body) }); return { ok: true, json: async () => ({ id: "recNew", fields: {} }) }; };
