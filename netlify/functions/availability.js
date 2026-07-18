@@ -9,7 +9,7 @@ async function getAvailability(city, deps) {
   const { fetchImpl = fetch, env = process.env, log = console, now } = deps;
   const market = getMarket(city);
   if (!market) return { city, hasEvent: false, error: "unknown-city" };
-  const list = await getEventsForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }, now);
+  const list = await getEventsForCity(market.city, { fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }, now);
   if (!list.length) return { city: market.city, hasEvent: false, events: [] };
   const c = cfg(env);
   const slotLabels = Object.fromEntries(SLOT_TIMES.map((s) => [s, formatSlot(s)]));

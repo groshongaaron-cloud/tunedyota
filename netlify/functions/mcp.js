@@ -60,7 +60,7 @@ const TOOLS = [
 ];
 
 async function findEvents(args, deps) {
-  const events = await getAllActiveEvents({ fetchImpl: deps.fetchImpl, sheetId: deps.env.EVENTS_SHEET_ID, baked: EVENTS, log: deps.log });
+  const events = await getAllActiveEvents({ fetchImpl: deps.fetchImpl, env: deps.env, sheetId: deps.env.EVENTS_SHEET_ID, baked: EVENTS, log: deps.log });
   const today = todayISO(deps.now);
   const st = args.state ? String(args.state).toUpperCase() : null;
   const city = args.city ? String(args.city).trim().toLowerCase() : null;

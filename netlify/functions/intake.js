@@ -25,7 +25,7 @@ async function processIntake(body, deps) {
             const recs = await listRecords({ fetchImpl, token, baseId, table, filterByFormula: formula, fields: ["Slot"] });
             return recs.map((r) => r.fields.Slot).filter(Boolean);
           },
-          loadEvent = (city) => getEventForCity(city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
+          loadEvent = (city) => getEventForCity(city, { fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
 
   const d = body || {};
   const channel = String(d.channel || "other").toLowerCase();

@@ -22,7 +22,7 @@ async function processBooking(body, deps) {
   if (!d.name || (!d.phone && !d.email)) return { status: "error", error: "missing-contact" };
   const inst = keyToInstaller(market.inst);
   const c = cfg(env);
-  const list = await getEventsForCity(market.city, { fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }, nowDate);
+  const list = await getEventsForCity(market.city, { fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }, nowDate);
   const event = d.dateISO ? list.find((e) => e.dateISO === d.dateISO) : list[0];
 
   // Schedule the slow notifications without blocking this response. Best-effort:

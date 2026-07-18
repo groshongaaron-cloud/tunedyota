@@ -25,7 +25,7 @@ async function buildRoster(deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false, log = console,
           eventsTimeoutMs = 6000,
           list = (a) => listRecords({ fetchImpl, ...a }),
-          loadEvents = () => getAllActiveEvents({ fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
+          loadEvents = () => getAllActiveEvents({ fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
   const c = cfg(env);
   // Admins see every installer's roster; regular installers are scoped to their own key.
   const filterByFormula = admin

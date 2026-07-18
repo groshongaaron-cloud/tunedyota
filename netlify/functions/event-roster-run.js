@@ -32,7 +32,7 @@ async function runRosterSend(params, deps = {}) {
   const city = norm(params.city);
   if (!city) return { status: "error", code: 400, error: "missing city" };
 
-  const eventMap = await loadEvents({ fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
+  const eventMap = await loadEvents({ fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
   const evs = asArray(eventMap[city]).filter((e) => e && e.dateISO)
     .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
   const ev = params.date ? evs.find((e) => e.dateISO === params.date) : evs[0];

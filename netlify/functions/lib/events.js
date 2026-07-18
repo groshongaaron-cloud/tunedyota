@@ -68,8 +68,65 @@ function todayISO(now) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
-// --- fetch: city -> array, sheet wins per city, backfill city on each element ---
-async function fetchEvents({ fetchImpl, sheetId, baked = {}, log = console }) {
+// --- Airtable "Events" table: the owner-editable source of truth ---
+// Rows map Market/Date/Label/Active/Event/Details/Address to the same event shape
+// the sheet parser produces. Results are cached briefly so the booking path doesn't
+// pay an Airtable round-trip per request, and a stale cache is served if a refresh
+// fails — the live table degrades to last-known-good, then to sheet/baked data.
+const _airtableEventsCache = new Map(); // `${baseId}/${table}` -> { at, byCity }
+
+function eventFromAirtableFields(f = {}) {
+  const s = (v) => String(v == null ? "" : v).trim();
+  const dateText = s(f.Date);
+  return {
+    city: s(f.Market),
+    label: s(f.Label) || dateText,
+    dateISO: toISO(dateText),
+    active: f.Active === true,
+    event: s(f.Event),
+    details: s(f.Details),
+    address: s(f.Address),
+  };
+}
+
+async function fetchAirtableEvents({ fetchImpl, env, log = console, cacheTtlMs = 60000 }) {
+  const token = env && env.AIRTABLE_TOKEN, baseId = env && env.AIRTABLE_BASE_ID;
+  if (!token || !baseId) return null;
+  const table = env.AIRTABLE_EVENTS_TABLE || "Events";
+  const key = `${baseId}/${table}`;
+  const hit = _airtableEventsCache.get(key);
+  if (hit && Date.now() - hit.at < cacheTtlMs) return hit.byCity;
+  try {
+    const records = [];
+    let offset;
+    do {
+      const params = new URLSearchParams();
+      if (offset) params.set("offset", offset);
+      const res = await fetchImpl(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}?${params}`,
+        { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(`airtable events ${res.status}`);
+      const body = await res.json();
+      records.push(...(body.records || []));
+      offset = body.offset;
+    } while (offset);
+    const byCity = {};
+    for (const r of records) {
+      const e = eventFromAirtableFields(r && r.fields);
+      if (!e.city) continue;
+      const k = e.city.toLowerCase();
+      (byCity[k] || (byCity[k] = [])).push(e);
+    }
+    _airtableEventsCache.set(key, { at: Date.now(), byCity });
+    return byCity;
+  } catch (e) {
+    if (log.warn) log.warn("airtable events fetch failed", e.message);
+    return hit ? hit.byCity : null; // stale-but-known beats empty
+  }
+}
+
+// --- fetch: city -> array; per city, Airtable wins over sheet, sheet over baked ---
+async function fetchEvents(deps) {
+  const { fetchImpl, sheetId, baked = {}, log = console } = deps;
   let fromSheet = {};
   if (sheetId) {
     const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
@@ -79,9 +136,11 @@ async function fetchEvents({ fetchImpl, sheetId, baked = {}, log = console }) {
       else if (log.warn) log.warn("events fetch status", res.status);
     } catch (e) { if (log.warn) log.warn("events fetch failed", e.message); }
   }
+  const fromAirtable = (await fetchAirtableEvents(deps)) || {};
   const merged = {};
   for (const key of Object.keys(baked)) merged[key] = asArray(baked[key]);
   for (const key of Object.keys(fromSheet)) merged[key] = fromSheet[key]; // a configured sheet overrides baked
+  for (const key of Object.keys(fromAirtable)) merged[key] = fromAirtable[key]; // the Events table overrides both
   // Baked entries are keyed by city but don't embed a `city` field. Downstream
   // routing (getMarket) + roster/booking filtering key off ev.city — backfill it
   // from the map key so baked events don't route to unknown-city:undefined.
@@ -120,4 +179,4 @@ async function getEventForCity(city, deps) {
   return list[0] || null;
 }
 
-module.exports = { parseCsv, toISO, parseEvents, fetchEvents, getEventForCity, getEventsForCity, getCurrentEventForCity, getAllActiveEvents, flattenEvents, asArray };
+module.exports = { parseCsv, toISO, parseEvents, fetchEvents, fetchAirtableEvents, getEventForCity, getEventsForCity, getCurrentEventForCity, getAllActiveEvents, flattenEvents, asArray };

@@ -116,3 +116,89 @@ test("a configured sheet replaces the baked entry for that city", async () => {
   const list = await getEventsForCity("Fargo", { fetchImpl, sheetId: "x", baked }, NOW);
   assert.deepEqual(list.map((e) => e.dateISO), ["2026-08-01"]);
 });
+
+// --- Airtable-backed events (Events table wins over sheet and baked) ---
+// Route stub fetches by URL: api.airtable.com -> Airtable, docs.google.com -> sheet.
+function airtableFetch(pages, sheetCsv) {
+  let call = 0;
+  const impl = async (url) => {
+    if (String(url).includes("api.airtable.com")) {
+      const body = pages[Math.min(call, pages.length - 1)]; call++;
+      if (body === "fail") return { ok: false, status: 500, json: async () => ({}) };
+      if (body === "throw") throw new Error("network down");
+      return { ok: true, json: async () => body };
+    }
+    if (sheetCsv) return { ok: true, text: async () => sheetCsv };
+    return { ok: false };
+  };
+  impl.calls = () => call;
+  return impl;
+}
+const rec = (fields) => ({ id: "rec" + Math.random().toString(36).slice(2), fields });
+let tableSeq = 0;
+const freshEnv = (extra) => ({ AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", AIRTABLE_EVENTS_TABLE: `Events-test-${++tableSeq}`, ...extra });
+
+test("airtable events override sheet and baked for that city", async () => {
+  const baked = { fargo: { dateISO: "2026-07-03", active: true } };
+  const fetchImpl = airtableFetch(
+    [{ records: [rec({ Market: "Fargo", Date: "2026-09-05", Active: true })] }],
+    "Market,Date,Active\nFargo,2026-08-01,yes\n");
+  const list = await getEventsForCity("Fargo", { fetchImpl, env: freshEnv(), sheetId: "x", baked }, NOW);
+  assert.deepEqual(list.map((e) => e.dateISO), ["2026-09-05"]);
+});
+test("airtable row maps all fields; label falls back to Date text; unchecked Active is inactive", async () => {
+  const fetchImpl = airtableFetch([{ records: [
+    rec({ Market: "Rochester", Date: "September 26, 2026", Active: true, Event: "Fall OTT", Details: "d", Address: "1 Dyno Rd" }),
+    rec({ Market: "Rochester", Date: "2026-10-03" }), // Active unchecked -> field absent -> inactive
+  ] }]);
+  const list = await getEventsForCity("Rochester", { fetchImpl, env: freshEnv(), baked: {} }, NOW);
+  assert.equal(list.length, 1);
+  const e = list[0];
+  assert.equal(e.dateISO, "2026-09-26");
+  assert.equal(e.label, "September 26, 2026");
+  assert.equal(e.event, "Fall OTT");
+  assert.equal(e.address, "1 Dyno Rd");
+  assert.equal(e.city, "Rochester");
+});
+test("airtable failure falls back to baked without throwing", async () => {
+  const baked = { fargo: { dateISO: "2026-08-02", active: true } };
+  for (const mode of ["fail", "throw"]) {
+    const fetchImpl = airtableFetch([mode]);
+    const list = await getEventsForCity("Fargo", { fetchImpl, env: freshEnv(), baked, log: { warn: () => {} } }, NOW);
+    assert.deepEqual(list.map((e) => e.dateISO), ["2026-08-02"], mode);
+  }
+});
+test("airtable fetch is cached within the TTL", async () => {
+  const env = freshEnv();
+  const fetchImpl = airtableFetch([{ records: [rec({ Market: "Fargo", Date: "2026-09-05", Active: true })] }]);
+  const deps = { fetchImpl, env, baked: {}, cacheTtlMs: 60000 };
+  await getEventsForCity("Fargo", deps, NOW);
+  await getEventsForCity("Fargo", deps, NOW);
+  assert.equal(fetchImpl.calls(), 1);
+});
+test("stale cache is served when a refresh fails", async () => {
+  const env = freshEnv();
+  const ok = { records: [rec({ Market: "Fargo", Date: "2026-09-05", Active: true })] };
+  const fetchImpl = airtableFetch([ok, "throw"]);
+  const deps = { fetchImpl, env, baked: {}, cacheTtlMs: -1, log: { warn: () => {} } }; // always stale -> refetch each call
+  await getEventsForCity("Fargo", deps, NOW);
+  const list = await getEventsForCity("Fargo", deps, NOW); // refresh throws -> stale served
+  assert.deepEqual(list.map((e) => e.dateISO), ["2026-09-05"]);
+  assert.equal(fetchImpl.calls(), 2);
+});
+test("airtable pagination follows offset across pages", async () => {
+  const fetchImpl = airtableFetch([
+    { records: [rec({ Market: "Fargo", Date: "2026-09-05", Active: true })], offset: "next" },
+    { records: [rec({ Market: "Fargo", Date: "2026-10-05", Active: true })] },
+  ]);
+  const list = await getEventsForCity("Fargo", { fetchImpl, env: freshEnv(), baked: {} }, NOW);
+  assert.deepEqual(list.map((e) => e.dateISO), ["2026-09-05", "2026-10-05"]);
+  assert.equal(fetchImpl.calls(), 2);
+});
+test("no airtable env means no airtable fetch attempt", async () => {
+  const fetchImpl = airtableFetch([{ records: [rec({ Market: "Fargo", Date: "2026-09-05", Active: true })] }]);
+  const baked = { fargo: { dateISO: "2026-07-03", active: true } };
+  const list = await getEventsForCity("Fargo", { fetchImpl, baked }, NOW);
+  assert.deepEqual(list.map((e) => e.dateISO), ["2026-07-03"]);
+  assert.equal(fetchImpl.calls(), 0);
+});

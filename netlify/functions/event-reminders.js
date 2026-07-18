@@ -37,7 +37,7 @@ async function runReminders(deps) {
   if (nowCentral.hour !== 7) return { ok: true, skipped: "off-hour" };
 
   const c = cfg(env);
-  const eventMap = await loadEvents({ fetchImpl, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
+  const eventMap = await loadEvents({ fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log });
   const events = flattenEvents(eventMap);
   const [bRecs, pRecs] = await Promise.all([
     listAll({ token: c.token, baseId: c.baseId, table: c.bookings }),

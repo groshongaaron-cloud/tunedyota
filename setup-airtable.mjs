@@ -44,6 +44,13 @@ const SCHEMA = {
     txt("Session"), num("Step"), txt("Step Name"),
     txt("UTM Source"), txt("UTM Medium"), txt("UTM Campaign"),
   ],
+  // Owner-editable event schedule read by lib/events.js (Airtable wins over the
+  // baked list per city). Date is TEXT on purpose — ISO or "September 26, 2026"
+  // both parse; Label (optional) overrides the customer-facing date text.
+  "Events": [
+    txt("Market"), txt("Date"), txt("Label"), chk("Active"),
+    txt("Event"), txt("Details"), txt("Address"),
+  ],
 };
 
 async function api(url, opts) {
