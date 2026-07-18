@@ -51,6 +51,18 @@ const SCHEMA = {
     txt("Market"), txt("Date"), txt("Label"), chk("Active"),
     txt("Event"), txt("Details"), txt("Address"),
   ],
+  // Chat widget sessions (lib/chat-store.js). Transcript is a JSON array of
+  // {role:"user"|"assistant"|"installer", text, at} kept in a long-text field.
+  "Chat Sessions": [
+    txt("Session ID"), sel("Status", ["ai", "escalated", "closed"]), txt("Page Context"),
+    txt("Customer Name"), txt("Phone"), txt("Vehicle"), txt("City"),
+    sel("Installer", INSTALLERS), { name: "Transcript", type: "multilineText" }, txt("Created"), txt("Last Activity"),
+  ],
+  // Questions the AI couldn't answer — the owner mines these to grow its knowledge.
+  "Chat Escalations": [
+    txt("Question"), sel("Reason", ["asked-for-human", "guardrail", "no-answer"]),
+    txt("Page Context"), txt("Session ID"), txt("Date"), sel("Status", ["New", "Answer added"]),
+  ],
 };
 
 async function api(url, opts) {
