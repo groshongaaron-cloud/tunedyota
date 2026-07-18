@@ -19,6 +19,8 @@ All secrets are **Netlify environment variables** (production) — never committ
 | `INSTALLER_TOKENS` | Per-installer console passcodes (JSON map) | |
 | `INTERNAL_TASK_SECRET` | Gates `/lead-ingest`; `inbox-sweep` presents it on every ingest POST; constant-time compared in `lib/secrets.js`; if unset, sweep fails fast with `no-task-secret` | |
 | `N8N_BOOKING_WEBHOOK_URL`, `N8N_API_KEY` | n8n integration | |
+| `TWILIO_FROM_NUMBER` | Outbound SMS sender (chat escalation notifies installers) | The business Twilio line |
+| `INSTALLER_SMS_NUMBERS` | JSON map installer-key → real cell; overrides the public phone for chat-escalation SMS + relay identity | Needed for aaron (public phone IS the Twilio line) |
 | `ANTHROPIC_API_KEY` | Claude vision (VIN OCR) + `inbox-sweep` classify/draft (`claude-haiku` classify, `claude-sonnet-4-6` NEPQ draft) | Set + verified 2026-07-16 |
 | `GMAIL_REFRESH_TOKEN` | info@ Gmail OAuth — `inbox-sweep` read + label + draft; `inbox-digest` read | Token requires `gmail.modify` + `gmail.compose` / drafts scope; verified working 2026-07-17 |
 | `GMAIL_CLIENT_ID` / `GMAIL_CLIENT_SECRET` | info@ Gmail OAuth client credentials | Paired with `GMAIL_REFRESH_TOKEN` |
