@@ -51,3 +51,14 @@ test("relayInstallerReply ignores blank installer texts", async () => {
   });
   assert.equal(r.relayed, false);
 });
+
+test("relay matches installer via INSTALLER_SMS_NUMBERS override", async () => {
+  let saved;
+  const r = await relayInstallerReply({ from: "+16125550999", text: "Aaron from my cell" }, {
+    env: { INSTALLER_SMS_NUMBERS: '{"aaron":"+16125550999"}' },
+    findSession: async (key) => key === "aaron" ? { id: "s1", recordId: "r", status: "escalated", turns: [], lastActivity: new Date().toISOString() } : null,
+    save: async (s) => { saved = s; return s; },
+  });
+  assert.equal(r.relayed, true);
+  assert.match(saved.turns[0].text, /from my cell/);
+});

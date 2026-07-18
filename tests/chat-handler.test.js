@@ -125,3 +125,15 @@ test("escalate: notify failures never throw; customer still gets installer info"
   });
   assert.equal(r.installer.key, "aaron"); // unknown city → fallback installer
 });
+
+test("escalate uses INSTALLER_SMS_NUMBERS override for the SMS destination", async () => {
+  let smsTo;
+  await escalate({ transfer: { customerName: "T", contactMethod: "phone", contactValue: "1", vehicleMake: "T",
+      vehicleModel: "T", modelYear: "1", city: "Rochester", state: "MN", questionSummary: "q", reason: "no-answer" },
+    sess: { id: "s1", turns: [], pageContext: "default" } }, {
+    env: { ...ENV, INSTALLER_SMS_NUMBERS: '{"aaron":"+16125550999"}' }, log: { error: () => {} },
+    ingest: async () => ({}), push: async () => ({}), logEscalation: async () => {},
+    sms: async (a) => { smsTo = a.to; return { ok: true }; },
+  });
+  assert.equal(smsTo, "+16125550999");
+});

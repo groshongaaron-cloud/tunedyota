@@ -3,7 +3,7 @@
 // installer's reply into their active escalated chat session — no lead, no
 // auto-reply — or (b) the original behavior: ingest a tracked lead + auto-reply.
 const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead } = require("./lib/twilio.js");
-const { INSTALLERS } = require("./lib/routing.js");
+const { INSTALLERS, parseSmsOverrides } = require("./lib/routing.js");
 const { loadEscalatedForInstaller, saveSession } = require("./lib/chat-store.js");
 
 const REPLY = "Thanks for texting Tuned Yota! We got your message and a team member will reach out shortly. " +
@@ -12,9 +12,15 @@ const EMPTY_TWIML = '<?xml version="1.0" encoding="UTF-8"?><Response></Response>
 
 const last10 = (p) => String(p || "").replace(/\D/g, "").slice(-10);
 
-function installerForNumber(from) {
+function installerForNumber(from, env) {
   const d = last10(from);
-  return Object.values(INSTALLERS).find((i) => d && last10(i.phone) === d) || null;
+  if (!d) return null;
+  // Check INSTALLER_SMS_NUMBERS overrides first (real cell may differ from public Twilio number).
+  const overrides = parseSmsOverrides(env);
+  for (const [key, num] of Object.entries(overrides)) {
+    if (last10(num) === d && INSTALLERS[key]) return INSTALLERS[key];
+  }
+  return Object.values(INSTALLERS).find((i) => last10(i.phone) === d) || null;
 }
 
 // If `from` is an installer with an active escalated session, append their text
@@ -23,7 +29,7 @@ async function relayInstallerReply({ from, text }, deps = {}) {
   const { env = process.env, log = console,
     findSession = (k) => loadEscalatedForInstaller(k, { env }),
     save = (s) => saveSession(s, { env }) } = deps;
-  const inst = installerForNumber(from);
+  const inst = installerForNumber(from, env);
   if (!inst) return { relayed: false };
   let sess = null;
   try { sess = await findSession(inst.key); } catch (e) { if (log.error) log.error("relay find", e.message); }

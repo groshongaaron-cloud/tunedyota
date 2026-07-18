@@ -6,7 +6,7 @@
 const { loadSession, saveSession, isStale } = require("./lib/chat-store.js");
 const { runChat } = require("./lib/chat-agent.js");
 const { getMarket } = require("./lib/markets.js");
-const { keyToInstaller, FALLBACK_KEY } = require("./lib/routing.js");
+const { keyToInstaller, FALLBACK_KEY, smsNumberFor } = require("./lib/routing.js");
 const { ingestLead, sendSms } = require("./lib/twilio.js");
 const { sendWebPush } = require("./lib/webpush.js");
 const { cfg, createRecord } = require("./lib/airtable.js");
@@ -40,9 +40,8 @@ async function escalate({ transfer, sess }, deps) {
       vehicle, goals: transfer.questionSummary,
       message: `Chat escalation (${transfer.reason}). ${contact}\n--- transcript ---\n${transcriptTail}` });
   } catch (e) { if (log.error) log.error("chat lead", e.message); }
-  const digits = String(inst.phone || "").replace(/\D/g, "");
   try {
-    await sms({ to: digits.length === 10 ? `+1${digits}` : inst.phone,
+    await sms({ to: smsNumberFor(inst.key, env),
       body: `Tuned Yota chat: ${transfer.customerName} (${contact}) — ${vehicle}, ${transfer.city} ${transfer.state}. Q: ${transfer.questionSummary}. Reply to this text and it appears in their chat window.` });
   } catch (e) { if (log.error) log.error("chat sms", e.message); }
   try { await push(inst.key, { title: "Live chat transfer", body: `${transfer.customerName} — ${vehicle}`, url: "/installer.html" }); }
