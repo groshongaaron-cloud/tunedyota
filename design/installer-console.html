@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tuned Yota — Installer Console</title>
+<style>
+/* ============ base ============ */
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  transition:background .35s ease;
+  display:flex;justify-content:center;
+}
+body[data-theme="night"]{background:#000;}
+body[data-theme="field"]{background:#dfe2e8;}
+body[data-theme="heritage"]{background:#d3cab7;}
+
+.app{
+  width:100%;max-width:430px;height:100dvh;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.appview{display:none;flex:1;min-height:0;flex-direction:column;position:relative;}
+.appview.on{display:flex;}
+.scroll{flex:1;overflow-y:auto;scrollbar-width:none;}
+.scroll::-webkit-scrollbar{display:none;}
+
+/* ============ theme switcher sheet ============ */
+.sheet-veil{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40;}
+.sheet-veil.open{opacity:1;pointer-events:auto;}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:41;background:#fff;border-radius:22px 22px 0 0;
+  padding:18px 18px 34px;transform:translateY(105%);transition:transform .3s cubic-bezier(.32,.72,.28,1);
+  box-shadow:0 -12px 40px rgba(0,0,0,.25);
+}
+.sheet.open{transform:translateY(0);}
+.sheet .grab{width:38px;height:5px;border-radius:99px;background:#d8d6cf;margin:0 auto 14px;}
+.sheet h4{font-size:16px;font-weight:800;color:#16130e;margin-bottom:3px;}
+.sheet .hint{font-size:12.5px;color:#8a857a;margin-bottom:14px;}
+.theme-opt{
+  display:flex;align-items:center;gap:13px;border:2px solid #eceae4;border-radius:15px;
+  padding:12px 13px;margin-bottom:9px;cursor:pointer;background:#fff;width:100%;text-align:left;
+  font-family:inherit;transition:border-color .15s;
+}
+.theme-opt.sel{border-color:#16130e;}
+.swatch{width:46px;height:46px;border-radius:12px;flex:0 0 46px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.swatch.night{background:linear-gradient(140deg,#1a1a19 55%,#3a3117);color:#fab219;}
+.swatch.field{background:linear-gradient(140deg,#f4f5f7 55%,#dce9f8);color:#1c5cab;}
+.swatch.heritage{background:linear-gradient(140deg,#f6f1e7 55%,#eadfc5);color:#8a6512;}
+.theme-opt b{font-size:14.5px;color:#16130e;display:block;}
+.theme-opt span{font-size:12px;color:#8a857a;display:block;margin-top:1px;}
+.theme-opt .check{margin-left:auto;font-size:17px;color:#16130e;opacity:0;}
+.theme-opt.sel .check{opacity:1;}
+
+/* paint button shared */
+.paintbtn{cursor:pointer;border:none;font-family:inherit;}
+
+/* toast */
+.toast{position:absolute;left:50%;bottom:112px;transform:translateX(-50%) translateY(8px);z-index:50;
+  background:#16130e;color:#fff;font-size:12.5px;font-weight:700;padding:9px 16px;border-radius:99px;
+  opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ================================================================
+   THEME 1 — NIGHT SHIFT
+================================================================ */
+.t1{background:#0d0d0d;color:#fff;}
+.t1 .scroll{padding:10px 16px 118px;}
+.t1 .appbar{display:flex;align-items:center;gap:10px;padding:14px 4px 16px;}
+.t1 .logo{width:38px;height:38px;border-radius:11px;background:#fab219;color:#161206;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;}
+.t1 .titles{flex:1;min-width:0;}
+.t1 .app-title{font-size:16px;font-weight:800;}
+.t1 .viewing{font-size:12px;color:#898781;}
+.t1 .viewing b{color:#c3c2b7;font-weight:600;}
+.t1 .iconbtn{width:38px;height:38px;border-radius:12px;background:#1a1a19;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:16px;color:#c3c2b7;position:relative;}
+.t1 .iconbtn .dot{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:#e66767;border:2px solid #0d0d0d;}
+.t1 .hero{background:linear-gradient(160deg,#262112 0%,#1a1a19 55%);border:1px solid rgba(250,178,25,.25);border-radius:16px;padding:18px 18px 16px;margin-bottom:12px;}
+.t1 .tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fab219;margin-bottom:8px;}
+.t1 .tag::before{content:"";width:7px;height:7px;border-radius:50%;background:#fab219;box-shadow:0 0 8px rgba(250,178,25,.8);}
+.t1 .hero h2{font-size:26px;font-weight:800;line-height:1.1;}
+.t1 .when{font-size:14px;color:#c3c2b7;margin-top:4px;}
+.t1 .meta{display:flex;gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);}
+.t1 .meta div{font-size:12px;color:#898781;}
+.t1 .meta b{display:block;font-size:16px;font-weight:700;color:#fff;margin-bottom:1px;}
+.t1 .cta-row{display:flex;gap:8px;margin-top:14px;}
+.t1 .btn{flex:1;padding:11px 0;border-radius:12px;font-size:13.5px;font-weight:700;text-align:center;border:none;cursor:pointer;font-family:inherit;}
+.t1 .btn.primary{background:#fab219;color:#161206;}
+.t1 .btn.ghost{background:#242422;color:#c3c2b7;border:1px solid rgba(255,255,255,.1);}
+.t1 .alert{display:flex;align-items:center;gap:12px;background:#1a1a19;border:1px solid rgba(230,103,103,.35);border-radius:16px;padding:13px 14px;margin-bottom:12px;}
+.t1 .alert .icon{width:34px;height:34px;border-radius:10px;background:rgba(230,103,103,.14);display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 34px;}
+.t1 .alert .body{flex:1;}
+.t1 .alert b{font-size:13.5px;font-weight:700;display:block;}
+.t1 .alert span{font-size:12px;color:#898781;}
+.t1 .alert .act{font-size:12.5px;font-weight:700;color:#e66767;white-space:nowrap;}
+.t1 .kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.t1 .tile{background:#1a1a19;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 12px 10px;}
+.t1 .tile .label{font-size:11px;color:#898781;margin-bottom:4px;}
+.t1 .tile .value{font-size:21px;font-weight:700;}
+.t1 .tile .delta{font-size:11px;font-weight:600;margin-top:2px;}
+.t1 .delta.up{color:#0ca30c;}
+.t1 .tile .sub{font-size:11px;color:#898781;margin-top:2px;}
+.t1 .lifetime{display:flex;justify-content:space-between;align-items:center;background:#1a1a19;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:10px 14px;margin-bottom:16px;font-size:12.5px;color:#898781;}
+.t1 .lifetime b{color:#c3c2b7;font-weight:700;}
+.t1 .seg{display:flex;background:#1a1a19;border:1px solid rgba(255,255,255,.1);border-radius:13px;padding:4px;margin-bottom:12px;}
+.t1 .seg button{flex:1;padding:9px 0;border:none;border-radius:10px;background:transparent;color:#898781;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.t1 .seg button.on{background:#2e2e2b;color:#fff;}
+.t1 .seg .count{font-weight:600;font-size:12px;opacity:.7;}
+.t1 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;}
+.t1 .chips::-webkit-scrollbar{display:none;}
+.t1 .chip{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:999px;background:#1a1a19;border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:600;color:#c3c2b7;}
+.t1 .chip.on{background:#fab219;color:#161206;border-color:#fab219;}
+.t1 .chip .n{font-size:11.5px;font-weight:700;background:rgba(255,255,255,.14);padding:1px 7px;border-radius:99px;}
+.t1 .chip.on .n{background:rgba(0,0,0,.15);}
+.t1 .chip .att{width:6px;height:6px;border-radius:50%;background:#e66767;}
+.t1 .datehead{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#898781;margin:4px 2px 8px;}
+.t1 .job{background:#1a1a19;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:13px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:center;}
+.t1 .job .avatar{width:40px;height:40px;border-radius:12px;background:#2e2e2b;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#c3c2b7;flex:0 0 40px;}
+.t1 .job .info{flex:1;min-width:0;}
+.t1 .job .who{font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.t1 .badge{font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:99px;text-transform:uppercase;}
+.t1 .badge.booked{background:rgba(250,178,25,.14);color:#fab219;}
+.t1 .badge.paid{background:rgba(12,163,12,.14);color:#4ec84e;}
+.t1 .job .what{font-size:12.5px;color:#c3c2b7;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.t1 .job .where{font-size:11.5px;color:#898781;margin-top:2px;}
+.t1 .job .time{text-align:right;flex:0 0 auto;}
+.t1 .job .time b{display:block;font-size:13.5px;font-weight:700;}
+.t1 .job .time span{font-size:11px;color:#898781;}
+.t1 .bottombar{position:absolute;left:0;right:0;bottom:0;padding:10px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(13,13,13,0) 0%,rgba(13,13,13,.92) 30%,#0d0d0d 100%);z-index:5;}
+.t1 .bar-inner{display:flex;gap:8px;align-items:center;}
+.t1 .fab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fab219;color:#161206;font-weight:800;font-size:14px;padding:15px 0;border-radius:16px;box-shadow:0 8px 24px rgba(250,178,25,.25);cursor:pointer;}
+.t1 .bar-icon{width:52px;height:52px;border-radius:16px;background:#242422;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:18px;color:#c3c2b7;flex:0 0 52px;cursor:pointer;}
+
+/* ================================================================
+   THEME 2 — FIELD DAY
+================================================================ */
+.t2{background:#f4f5f7;color:#101318;}
+.t2 .scroll{padding:10px 16px 128px;}
+.t2 .head{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 4px 4px;}
+.t2 .date{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a909c;}
+.t2 h2{font-size:25px;font-weight:800;margin-top:2px;}
+.t2 .sub{font-size:13px;color:#4c5361;margin-top:3px;}
+.t2 .sub b{color:#1c5cab;}
+.t2 .avatar{width:42px;height:42px;border-radius:50%;background:#1c5cab;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px;position:relative;}
+.t2 .avatar .bell{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:#d03b3b;border:2.5px solid #f4f5f7;}
+.t2 .search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(16,19,24,.08);border-radius:14px;padding:12px 14px;margin:14px 0 16px;color:#8a909c;font-size:14px;box-shadow:0 1px 2px rgba(16,19,24,.04);}
+.t2 .month{background:#fff;border:1px solid rgba(16,19,24,.08);border-radius:18px;padding:16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(16,19,24,.05);}
+.t2 .row1{display:flex;justify-content:space-between;align-items:baseline;}
+.t2 .label{font-size:12.5px;font-weight:700;color:#8a909c;letter-spacing:.06em;text-transform:uppercase;}
+.t2 .frac{font-size:13px;color:#4c5361;font-weight:600;}
+.t2 .big{display:flex;align-items:baseline;gap:8px;margin:8px 0 12px;}
+.t2 .big b{font-size:34px;font-weight:800;}
+.t2 .big span{font-size:14px;color:#4c5361;}
+.t2 .meter{height:10px;border-radius:99px;background:#eef0f3;overflow:hidden;display:flex;}
+.t2 .fill{width:25%;background:#2a78d6;border-radius:99px;}
+.t2 .fill.pending{width:18%;background:#9ec5f4;margin-left:2px;}
+.t2 .meter-legend{display:flex;gap:16px;margin-top:9px;font-size:11.5px;color:#4c5361;}
+.t2 .meter-legend i{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:5px;}
+.t2 .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.t2 .tile{background:#fff;border:1px solid rgba(16,19,24,.08);border-radius:18px;padding:14px;box-shadow:0 1px 3px rgba(16,19,24,.05);}
+.t2 .tile .label{font-size:11.5px;}
+.t2 .tile .value{font-size:24px;font-weight:800;margin-top:5px;}
+.t2 .tile .sub2{font-size:11.5px;color:#4c5361;margin-top:3px;}
+.t2 .tile .sub2.up{color:#006300;font-weight:700;}
+.t2 .agenda-head{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 10px;}
+.t2 .agenda-head h3{font-size:16px;font-weight:800;}
+.t2 .agenda-head a{font-size:12.5px;font-weight:700;color:#1c5cab;text-decoration:none;}
+.t2 .day{display:flex;gap:12px;margin-bottom:4px;}
+.t2 .rail{display:flex;flex-direction:column;align-items:center;width:44px;flex:0 0 44px;}
+.t2 .dow{font-size:10.5px;font-weight:700;color:#8a909c;text-transform:uppercase;letter-spacing:.06em;}
+.t2 .dom{font-size:19px;font-weight:800;margin-top:1px;}
+.t2 .line{flex:1;width:2px;background:rgba(16,19,24,.08);margin-top:6px;border-radius:2px;}
+.t2 .rail.today .dom{color:#1c5cab;}
+.t2 .daycards{flex:1;padding-bottom:14px;min-width:0;}
+.t2 .event{background:#fff;border:1px solid rgba(16,19,24,.08);border-radius:18px;padding:14px;box-shadow:0 1px 3px rgba(16,19,24,.05);margin-bottom:8px;}
+.t2 .event.due{border-color:rgba(208,59,59,.35);}
+.t2 .top{display:flex;justify-content:space-between;align-items:center;}
+.t2 .city{font-size:15.5px;font-weight:800;}
+.t2 .pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;}
+.t2 .pill.blue{background:#e3edf9;color:#1c5cab;}
+.t2 .pill.red{background:#fbe9e9;color:#d03b3b;}
+.t2 .pill.green{background:#e4f3e4;color:#006300;}
+.t2 .emeta{font-size:12.5px;color:#4c5361;margin-top:3px;}
+.t2 .slotbar{display:flex;gap:3px;margin-top:11px;}
+.t2 .slot{flex:1;height:7px;border-radius:99px;background:#eef0f3;}
+.t2 .slot.f{background:#2a78d6;}
+.t2 .slots-label{font-size:11px;color:#8a909c;margin-top:6px;}
+.t2 .actions{display:flex;gap:8px;margin-top:12px;}
+.t2 .chipbtn{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:9px 0;border-radius:11px;background:#eef0f3;color:#4c5361;cursor:pointer;}
+.t2 .chipbtn.hot{background:#1c5cab;color:#fff;}
+.t2 .chipbtn.danger{background:#d03b3b;color:#fff;}
+.t2 .empty{font-size:12.5px;color:#8a909c;background:#fff;border:1px dashed rgba(16,19,24,.15);border-radius:18px;padding:13px 14px;margin-bottom:8px;}
+.t2 .empty b{color:#4c5361;}
+.t2 .tabbar{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid rgba(16,19,24,.08);display:flex;align-items:flex-end;padding:8px 10px calc(12px + env(safe-area-inset-bottom));z-index:5;}
+.t2 .tab{flex:1;text-align:center;font-size:10.5px;font-weight:700;color:#8a909c;cursor:pointer;}
+.t2 .tab .ic{font-size:20px;display:block;margin-bottom:3px;}
+.t2 .tab.on{color:#1c5cab;}
+.t2 .tab-fab{width:58px;height:58px;flex:0 0 58px;border-radius:50%;background:#1c5cab;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 6px;box-shadow:0 10px 22px rgba(28,92,171,.35);transform:translateY(-14px);cursor:pointer;}
+
+/* ================================================================
+   THEME 3 — HERITAGE GARAGE
+================================================================ */
+.t3{background:#f6f1e7;color:#231a10;}
+.t3 .scroll{padding:10px 16px 122px;}
+.t3 .mast{display:flex;align-items:center;justify-content:space-between;padding:14px 4px 14px;border-bottom:2px solid #2b2016;margin-bottom:14px;}
+.t3 .brand{font-size:19px;font-weight:900;}
+.t3 .brand span{color:#8a6512;}
+.t3 .right{display:flex;gap:8px;align-items:center;}
+.t3 .mini{width:36px;height:36px;border-radius:10px;background:#fffdf8;border:1px solid rgba(43,32,22,.12);display:flex;align-items:center;justify-content:center;font-size:15px;position:relative;cursor:pointer;}
+.t3 .mini .dot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:#c23b2e;border:2px solid #f6f1e7;}
+.t3 .installer-pill{display:flex;align-items:center;gap:8px;background:#2b2016;color:#f6f1e7;padding:7px 12px 7px 8px;border-radius:99px;font-size:13px;font-weight:700;}
+.t3 .installer-pill .av{width:24px;height:24px;border-radius:50%;background:#b98a2e;color:#2b2016;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;}
+.t3 .hero{background:#fffdf8;border:1px solid rgba(43,32,22,.12);border-radius:14px;padding:18px 18px 16px;margin-bottom:10px;box-shadow:0 2px 6px rgba(43,32,22,.06);}
+.t3 .label{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#988a75;}
+.t3 .figure{font-size:46px;font-weight:800;line-height:1.05;margin:6px 0 2px;}
+.t3 .hsub{font-size:13px;color:#5c5140;}
+.t3 .hsub b{color:#3d6b35;}
+.t3 .tally{display:flex;margin-top:14px;border-top:1px solid rgba(43,32,22,.12);padding-top:13px;}
+.t3 .tally div{flex:1;text-align:center;border-right:1px solid rgba(43,32,22,.12);}
+.t3 .tally div:last-child{border-right:none;}
+.t3 .tally b{display:block;font-size:19px;font-weight:800;}
+.t3 .tally span{font-size:11px;color:#988a75;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+.t3 .tallymarks{margin-top:13px;display:flex;align-items:center;gap:10px;}
+.t3 .tallymarks span{font-size:11.5px;color:#988a75;}
+.t3 .ledger{display:flex;align-items:center;gap:12px;background:#f7e5e2;border:1px solid rgba(194,59,46,.3);border-radius:14px;padding:12px 14px;margin-bottom:14px;}
+.t3 .stamp{font-size:10px;font-weight:900;letter-spacing:.08em;color:#c23b2e;border:2px solid #c23b2e;border-radius:6px;padding:3px 6px;transform:rotate(-4deg);flex:0 0 auto;}
+.t3 .ledger .body{flex:1;}
+.t3 .ledger b{font-size:13.5px;display:block;}
+.t3 .ledger span{font-size:11.5px;color:#5c5140;}
+.t3 .go{font-weight:800;color:#c23b2e;font-size:13px;white-space:nowrap;}
+.t3 .shead{display:flex;align-items:center;gap:10px;margin:4px 2px 10px;}
+.t3 .shead h3{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#5c5140;}
+.t3 .rule{flex:1;height:1px;background:rgba(43,32,22,.12);}
+.t3 .shead a{font-size:12px;font-weight:800;color:#8a6512;text-decoration:none;}
+.t3 .ticket{background:#fffdf8;border:1px solid rgba(43,32,22,.12);border-radius:14px;margin-bottom:10px;box-shadow:0 2px 6px rgba(43,32,22,.06);overflow:hidden;position:relative;}
+.t3 .main{padding:14px 16px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.t3 .city{font-size:17px;font-weight:800;}
+.t3 .when{font-size:12.5px;color:#5c5140;margin-top:2px;}
+.t3 .est{text-align:right;flex:0 0 auto;}
+.t3 .est b{display:block;font-size:16px;font-weight:800;}
+.t3 .est span{font-size:11px;color:#988a75;}
+.t3 .stub{border-top:1px dashed rgba(43,32,22,.25);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(185,138,46,.05);}
+.t3 .stub .jobs{font-size:12px;font-weight:700;color:#5c5140;}
+.t3 .stub .jobs i{font-style:normal;color:#8a6512;}
+.t3 .acts{display:flex;gap:6px;}
+.t3 .stubbtn{font-size:11.5px;font-weight:800;padding:7px 11px;border-radius:9px;background:#2b2016;color:#f6f1e7;cursor:pointer;}
+.t3 .stubbtn.lite{background:#efe7d7;color:#5c5140;}
+.t3 .ticket::before,.t3 .ticket::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#f6f1e7;border:1px solid rgba(43,32,22,.12);}
+.t3 .ticket::before{left:-9px;bottom:34px;}
+.t3 .ticket::after{right:-9px;bottom:34px;}
+.t3 .ticket.next .city::after{content:"NEXT";font-size:9px;font-weight:900;letter-spacing:.1em;color:#fffdf8;background:#8a6512;border-radius:5px;padding:2.5px 6px;margin-left:8px;vertical-align:3px;}
+.t3 .pipe{background:#fffdf8;border:1px solid rgba(43,32,22,.12);border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 2px 6px rgba(43,32,22,.06);}
+.t3 .pipe .intro-line{font-size:12.5px;color:#5c5140;}
+.t3 .pipe .intro-line b{color:#3d6b35;}
+.t3 .bars{display:flex;align-items:flex-end;gap:2px;height:64px;margin-top:10px;}
+.t3 .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;}
+.t3 .bar i{display:block;width:100%;max-width:56px;border-radius:5px 5px 0 0;background:#b98a2e;}
+.t3 .bar:nth-child(2) i{background:#a3782a;}
+.t3 .bar:nth-child(3) i{background:#3a2d1e;}
+.t3 .bar b{font-size:13px;font-weight:800;}
+.t3 .lbls{display:flex;gap:2px;margin-top:7px;}
+.t3 .lbls span{flex:1;text-align:center;font-size:10.5px;font-weight:700;color:#988a75;letter-spacing:.04em;text-transform:uppercase;}
+.t3 .dock{position:absolute;left:16px;right:16px;bottom:calc(10px + env(safe-area-inset-bottom));background:#2b2016;border-radius:18px;display:flex;align-items:center;padding:8px;box-shadow:0 14px 30px rgba(43,32,22,.35);z-index:5;}
+.t3 .main-act{flex:1;background:#b98a2e;color:#2b2016;font-weight:900;font-size:13.5px;text-align:center;padding:13px 0;border-radius:12px;cursor:pointer;}
+.t3 .d-icon{width:46px;height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:center;color:#cfc4ae;font-size:17px;cursor:pointer;}
+</style>
+</head>
+<body data-theme="night">
+<div class="app" id="app">
+
+  <!-- ============ THEME 1: NIGHT SHIFT ============ -->
+  <div class="appview t1 on" id="view-night">
+    <div class="scroll">
+      <div class="appbar">
+        <div class="logo">TY</div>
+        <div class="titles">
+          <div class="app-title">Installer Console</div>
+          <div class="viewing">Viewing <b>Aaron</b> ▾ · Admin</div>
+        </div>
+        <button class="iconbtn paintbtn" onclick="openSheet()" title="Change layout">🎨</button>
+        <div class="iconbtn">🔔<span class="dot"></span></div>
+      </div>
+
+      <div class="hero">
+        <div class="tag">Next event · in 18 hrs</div>
+        <h2>Coon Rapids</h2>
+        <div class="when">Tomorrow, Sun Jul 19 · 9:00a – 4:00p · O’Reilly lot, Main St</div>
+        <div class="meta">
+          <div><b>8</b>jobs open</div>
+          <div><b>$640</b>est. commission</div>
+          <div><b>3</b>cal files staged</div>
+          <div><b>✓</b>AMSOIL stocked</div>
+        </div>
+        <div class="cta-row">
+          <button class="btn primary">Event sheet</button>
+          <button class="btn ghost">Directions</button>
+        </div>
+      </div>
+
+      <div class="alert">
+        <div class="icon">⚠️</div>
+        <div class="body"><b>Twin Cities needs close-out</b><span>Jul 16 · 1 job still open — 2 days old</span></div>
+        <div class="act">Close out →</div>
+      </div>
+
+      <div class="kpis">
+        <div class="tile"><div class="label">Done · July</div><div class="value">6</div><div class="delta up">▲ 2 vs June</div></div>
+        <div class="tile"><div class="label">Open · July</div><div class="value">18</div><div class="sub">across 5 cities</div></div>
+        <div class="tile"><div class="label">Est. payout</div><div class="value">$1,010</div><div class="delta up">▲ on pace</div></div>
+      </div>
+
+      <div class="lifetime">
+        <span>Lifetime <b>15 tunes ✓</b> · <b>$2,165</b> commission</span>
+        <svg width="88" height="24" viewBox="0 0 88 24">
+          <polyline points="2,20 14,18 26,19 38,14 50,15 62,10 74,9 86,4" fill="none" stroke="#5b5647" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="86" cy="4" r="4" fill="#fab219" stroke="#1a1a19" stroke-width="2"/>
+        </svg>
+      </div>
+
+      <div class="seg">
+        <button class="on">Jobs <span class="count">18</span></button>
+        <button>Leads <span class="count">7</span></button>
+      </div>
+
+      <div class="chips">
+        <div class="chip on">All <span class="n">18</span></div>
+        <div class="chip"><span class="att"></span> Coon Rapids <span class="n">8</span></div>
+        <div class="chip"><span class="att"></span> Cedar Rapids <span class="n">5</span></div>
+        <div class="chip">Des Moines <span class="n">2</span></div>
+        <div class="chip">Davenport <span class="n">0</span></div>
+      </div>
+
+      <div class="datehead">Tomorrow — Coon Rapids</div>
+      <div class="job">
+        <div class="avatar">MT</div>
+        <div class="info">
+          <div class="who">Marcus T. <span class="badge paid">Paid</span></div>
+          <div class="what">’21 Tacoma TRD OR · KDMax Pro V2</div>
+          <div class="where">VIN …4R7182 · booked via event link</div>
+        </div>
+        <div class="time"><b>9:40a</b><span>slot 1</span></div>
+      </div>
+      <div class="job">
+        <div class="avatar">SL</div>
+        <div class="info">
+          <div class="who">Sarah L. <span class="badge booked">Booked</span></div>
+          <div class="what">’19 4Runner SR5 · Tune + AMSOIL bundle</div>
+          <div class="where">VIN …9K3320 · walk-in, Jul 12</div>
+        </div>
+        <div class="time"><b>10:30a</b><span>slot 2</span></div>
+      </div>
+      <div class="job">
+        <div class="avatar">DO</div>
+        <div class="info">
+          <div class="who">D. Okafor <span class="badge booked">Booked</span></div>
+          <div class="what">’22 Tundra · KDMax Pro · tow package cal</div>
+          <div class="where">VIN …1T8804 · called in</div>
+        </div>
+        <div class="time"><b>11:20a</b><span>slot 3</span></div>
+      </div>
+    </div>
+
+    <div class="bottombar"><div class="bar-inner">
+      <div class="bar-icon">🔍</div>
+      <div class="fab">＋ Log walk-in / call-in</div>
+      <div class="bar-icon">🔗</div>
+    </div></div>
+  </div>
+
+  <!-- ============ THEME 2: FIELD DAY ============ -->
+  <div class="appview t2" id="view-field">
+    <div class="scroll">
+      <div class="head">
+        <div>
+          <div class="date">Saturday, July 18</div>
+          <h2>Morning, Aaron 👋</h2>
+          <div class="sub">Viewing as admin · <b>switch installer ▾</b></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="paintbtn" onclick="openSheet()" title="Change layout" style="width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid rgba(16,19,24,.08);font-size:17px;">🎨</button>
+          <div class="avatar">A<span class="bell"></span></div>
+        </div>
+      </div>
+
+      <div class="search">🔍 Search name, VIN, vehicle, city…</div>
+
+      <div class="month">
+        <div class="row1"><span class="label">July goal</span><span class="frac">6 of 24 tunes</span></div>
+        <div class="big"><b>25%</b><span>to goal · 13 days left</span></div>
+        <div class="meter"><div class="fill"></div><div class="fill pending"></div></div>
+        <div class="meter-legend">
+          <span><i style="background:#2a78d6"></i>6 done</span>
+          <span><i style="background:#9ec5f4"></i>18 booked</span>
+          <span><i style="background:#eef0f3"></i>remaining</span>
+        </div>
+      </div>
+
+      <div class="duo">
+        <div class="tile"><div class="label">Est. this month</div><div class="value">$1,010</div><div class="sub2 up">▲ pacing +12% vs June</div></div>
+        <div class="tile"><div class="label">Lifetime</div><div class="value">$2,165</div><div class="sub2">15 tunes completed ✓</div></div>
+      </div>
+
+      <div class="agenda-head"><h3>Your week</h3><a href="#">Jobs · Leads · Map</a></div>
+
+      <div class="day">
+        <div class="rail today"><div class="dow">Sat</div><div class="dom">18</div><div class="line"></div></div>
+        <div class="daycards">
+          <div class="event due">
+            <div class="top"><span class="city">Twin Cities</span><span class="pill red">Close-out due</span></div>
+            <div class="emeta">From Jul 16 · 1 job open, 0 closed · 2 days overdue</div>
+            <div class="actions"><div class="chipbtn danger">Close out now</div><div class="chipbtn">View job</div></div>
+          </div>
+          <div class="empty">No events today — <b>share a booking link</b> or log a walk-in for any day.</div>
+        </div>
+      </div>
+
+      <div class="day">
+        <div class="rail"><div class="dow">Sun</div><div class="dom">19</div><div class="line"></div></div>
+        <div class="daycards">
+          <div class="event">
+            <div class="top"><span class="city">Coon Rapids</span><span class="pill blue">Next up</span></div>
+            <div class="emeta">9:00a – 4:00p · 8 booked · est. $640</div>
+            <div class="slotbar">
+              <div class="slot f"></div><div class="slot f"></div><div class="slot f"></div><div class="slot f"></div>
+              <div class="slot f"></div><div class="slot f"></div><div class="slot f"></div><div class="slot f"></div>
+              <div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div>
+            </div>
+            <div class="slots-label">8 of 12 slots filled — link still open</div>
+            <div class="actions"><div class="chipbtn hot">Run sheet</div><div class="chipbtn">Share link</div><div class="chipbtn">Directions</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="day">
+        <div class="rail"><div class="dow">Sat</div><div class="dom">25</div><div class="line"></div></div>
+        <div class="daycards">
+          <div class="event">
+            <div class="top"><span class="city">Cedar Rapids</span><span class="pill green">5 booked</span></div>
+            <div class="emeta">10:00a – 5:00p · est. $400 · 2 leads to confirm</div>
+            <div class="actions"><div class="chipbtn hot">Fill slots</div><div class="chipbtn">Share link</div></div>
+          </div>
+          <div class="event">
+            <div class="top"><span class="city">Des Moines</span><span class="pill blue">2 booked</span></div>
+            <div class="emeta">Pop-up · needs 3 more to confirm the stop</div>
+            <div class="actions"><div class="chipbtn hot">Nudge leads</div><div class="chipbtn">Share link</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab on"><span class="ic">🏠</span>Today</div>
+      <div class="tab"><span class="ic">📋</span>Jobs</div>
+      <div class="tab-fab">＋</div>
+      <div class="tab"><span class="ic">✨</span>Leads</div>
+      <div class="tab"><span class="ic">📖</span>Reference</div>
+    </div>
+  </div>
+
+  <!-- ============ THEME 3: HERITAGE GARAGE ============ -->
+  <div class="appview t3" id="view-heritage">
+    <div class="scroll">
+      <div class="mast">
+        <div class="brand">TUNED <span>YOTA</span></div>
+        <div class="right">
+          <button class="mini paintbtn" onclick="openSheet()" title="Change layout">🎨</button>
+          <div class="mini">🔔<span class="dot"></span></div>
+          <div class="installer-pill"><span class="av">A</span> Aaron ▾</div>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="label">July · estimated payout</div>
+        <div class="figure">$1,010</div>
+        <div class="hsub">6 tunes done · 18 booked · <b>▲ ahead of June's pace</b></div>
+        <div class="tally">
+          <div><b>15</b><span>lifetime tunes</span></div>
+          <div><b>$2,165</b><span>lifetime comm.</span></div>
+          <div><b>#2</b><span>on the crew</span></div>
+        </div>
+        <div class="tallymarks">
+          <svg width="150" height="22" viewBox="0 0 150 22" aria-label="15 lifetime tunes as tally marks">
+            <g stroke="#b98a2e" stroke-width="2.4" stroke-linecap="round">
+              <line x1="4" y1="3" x2="4" y2="19"/><line x1="11" y1="3" x2="11" y2="19"/>
+              <line x1="18" y1="3" x2="18" y2="19"/><line x1="25" y1="3" x2="25" y2="19"/>
+              <line x1="0" y1="16" x2="29" y2="5"/>
+              <line x1="44" y1="3" x2="44" y2="19"/><line x1="51" y1="3" x2="51" y2="19"/>
+              <line x1="58" y1="3" x2="58" y2="19"/><line x1="65" y1="3" x2="65" y2="19"/>
+              <line x1="40" y1="16" x2="69" y2="5"/>
+              <line x1="84" y1="3" x2="84" y2="19"/><line x1="91" y1="3" x2="91" y2="19"/>
+              <line x1="98" y1="3" x2="98" y2="19"/><line x1="105" y1="3" x2="105" y2="19"/>
+              <line x1="80" y1="16" x2="109" y2="5"/>
+            </g>
+          </svg>
+          <span>every tune, on the wall</span>
+        </div>
+      </div>
+
+      <div class="ledger">
+        <div class="stamp">OPEN</div>
+        <div class="body"><b>Twin Cities · Jul 16 needs close-out</b><span>1 job unresolved · settle it before Coon Rapids</span></div>
+        <div class="go">Settle →</div>
+      </div>
+
+      <div class="shead"><h3>Event tickets</h3><div class="rule"></div><a href="#">＋ New event link</a></div>
+
+      <div class="ticket next">
+        <div class="main">
+          <div><div class="city">Coon Rapids</div><div class="when">Tomorrow · Sun Jul 19 · 9a–4p · O'Reilly lot</div></div>
+          <div class="est"><b>$640</b><span>est. payout</span></div>
+        </div>
+        <div class="stub">
+          <div class="jobs"><i>8 booked</i> · 4 slots open</div>
+          <div class="acts"><div class="stubbtn">Run sheet</div><div class="stubbtn lite">Share link</div></div>
+        </div>
+      </div>
+
+      <div class="ticket">
+        <div class="main">
+          <div><div class="city">Cedar Rapids</div><div class="when">Sat Jul 25 · 10a–5p</div></div>
+          <div class="est"><b>$400</b><span>est. payout</span></div>
+        </div>
+        <div class="stub">
+          <div class="jobs"><i>5 booked</i> · 2 leads pending</div>
+          <div class="acts"><div class="stubbtn">Fill slots</div><div class="stubbtn lite">Share link</div></div>
+        </div>
+      </div>
+
+      <div class="ticket">
+        <div class="main">
+          <div><div class="city">Des Moines</div><div class="when">Sat Jul 25 · pop-up · needs 3 more to confirm</div></div>
+          <div class="est"><b>$160</b><span>if confirmed</span></div>
+        </div>
+        <div class="stub">
+          <div class="jobs"><i>2 booked</i> · below minimum</div>
+          <div class="acts"><div class="stubbtn">Nudge leads</div><div class="stubbtn lite">Share link</div></div>
+        </div>
+      </div>
+
+      <div class="shead" style="margin-top:16px"><h3>Pipeline · July</h3><div class="rule"></div><a href="#">All leads →</a></div>
+
+      <div class="pipe">
+        <div class="intro-line">Leads are converting at <b>64%</b> this month</div>
+        <div class="bars">
+          <div class="bar"><b>28</b><i style="height:56px"></i></div>
+          <div class="bar"><b>18</b><i style="height:36px"></i></div>
+          <div class="bar"><b>6</b><i style="height:12px"></i></div>
+        </div>
+        <div class="lbls"><span>Leads</span><span>Booked</span><span>Done</span></div>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="d-icon">🔍</div>
+      <div class="main-act">＋ Log walk-in / call-in</div>
+      <div class="d-icon">🔗</div>
+    </div>
+  </div>
+
+  <!-- ============ theme switcher ============ -->
+  <div class="sheet-veil" id="veil" onclick="closeSheet()"></div>
+  <div class="sheet" id="sheet">
+    <div class="grab"></div>
+    <h4>Choose your layout</h4>
+    <div class="hint">Each installer can pick the style that fits how they work. Same data, three looks.</div>
+    <button class="theme-opt sel" data-theme="night" onclick="setTheme('night')">
+      <div class="swatch night">🌙</div>
+      <div><b>Night Shift</b><span>Dark mission-control · next event leads · thumb bar</span></div>
+      <div class="check">✓</div>
+    </button>
+    <button class="theme-opt" data-theme="field" onclick="setTheme('field')">
+      <div class="swatch field">📅</div>
+      <div><b>Field Day</b><span>Clean agenda · goal meter · week at a glance</span></div>
+      <div class="check">✓</div>
+    </button>
+    <button class="theme-opt" data-theme="heritage" onclick="setTheme('heritage')">
+      <div class="swatch heritage">🎟️</div>
+      <div><b>Heritage Garage</b><span>Brand classic · earnings ledger · event tickets</span></div>
+      <div class="check">✓</div>
+    </button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+  var THEMES = { night:'Night Shift', field:'Field Day', heritage:'Heritage Garage' };
+  var current = 'night';           // per-installer preference lives in app state
+  var toastTimer = null;
+
+  function openSheet(){
+    document.getElementById('veil').classList.add('open');
+    document.getElementById('sheet').classList.add('open');
+  }
+  function closeSheet(){
+    document.getElementById('veil').classList.remove('open');
+    document.getElementById('sheet').classList.remove('open');
+  }
+  function setTheme(t){
+    if (t !== current){
+      current = t;
+      document.body.setAttribute('data-theme', t);
+      var views = { night:'view-night', field:'view-field', heritage:'view-heritage' };
+      Object.keys(views).forEach(function(k){
+        document.getElementById(views[k]).classList.toggle('on', k === t);
+      });
+      document.querySelectorAll('.theme-opt').forEach(function(btn){
+        btn.classList.toggle('sel', btn.getAttribute('data-theme') === t);
+      });
+      showToast('Layout: ' + THEMES[t] + ' — saved for Aaron');
+    }
+    closeSheet();
+  }
+  function showToast(msg){
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+  }
+</script>
+</body>
+</html>

@@ -16,7 +16,7 @@
 <style>
   :root{--ink:#3A2E26;--accent:#5B4B42;--line:#d8d2ca;--muted:#7c8472;}
   *{box-sizing:border-box;} body{font-family:-apple-system,Arial,sans-serif;color:var(--ink);margin:0;background:#faf8f5;}
-  main{max-width:640px;margin:0 auto;padding:16px 14px 60px;}
+  main{max-width:640px;margin:0 auto;padding:16px 14px 110px;}
   h1{font-size:19px;color:var(--accent);margin:6px 0 10px;}
   input{width:100%;padding:12px;font-size:16px;border:1px solid var(--line);border-radius:8px;}
   .btn{padding:12px;font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:8px;cursor:pointer;}
@@ -84,6 +84,144 @@
   .reviewbox{background:#fff;border-radius:14px;padding:22px;max-width:360px;width:100%;text-align:center;}
   .reviewh{font-weight:800;color:var(--accent);font-size:16px;margin-bottom:14px;}
   .reviewqr{width:70vw;max-width:300px;height:auto;display:block;margin:0 auto 12px;border:1px solid var(--line);border-radius:8px;}
+  /* ============ switchable theme layouts (source: design/installer-console.html) ============
+     One functional console, three skins. Each theme sets the --t-* palette; the shared rules
+     below repaint the existing components from those vars. Default = heritage (set at boot),
+     the closest evolution of the console's classic warm palette. */
+  body[data-theme="heritage"]{--t-bg:#f6f1e7;--t-ink:#231a10;--t-muted:#988a75;--t-soft:#5c5140;
+    --t-card:#fffdf8;--t-line:rgba(43,32,22,.14);--t-accent:#b98a2e;--t-accent-ink:#2b2016;
+    --t-strong:#2b2016;--t-strong-ink:#f6f1e7;--t-ok:#3d6b35;--t-ok-bg:#e4efe0;
+    --t-warn:#8a6512;--t-warn-bg:#f5ead1;--t-danger:#c23b2e;--t-danger-bg:#f7e5e2;
+    --t-pill:#efe7d7;--t-input:#fffdf8;--t-radius:14px;}
+  body[data-theme="night"]{--t-bg:#0d0d0d;--t-ink:#fff;--t-muted:#898781;--t-soft:#c3c2b7;
+    --t-card:#1a1a19;--t-line:rgba(255,255,255,.12);--t-accent:#fab219;--t-accent-ink:#161206;
+    --t-strong:#fab219;--t-strong-ink:#161206;--t-ok:#4ec84e;--t-ok-bg:rgba(12,163,12,.14);
+    --t-warn:#fab219;--t-warn-bg:rgba(250,178,25,.14);--t-danger:#e66767;--t-danger-bg:rgba(230,103,103,.14);
+    --t-pill:#242422;--t-input:#242422;--t-radius:16px;}
+  body[data-theme="field"]{--t-bg:#f4f5f7;--t-ink:#101318;--t-muted:#8a909c;--t-soft:#4c5361;
+    --t-card:#fff;--t-line:rgba(16,19,24,.09);--t-accent:#1c5cab;--t-accent-ink:#fff;
+    --t-strong:#1c5cab;--t-strong-ink:#fff;--t-ok:#006300;--t-ok-bg:#e4f3e4;
+    --t-warn:#8a5a12;--t-warn-bg:#f7ecd9;--t-danger:#d03b3b;--t-danger-bg:#fbe9e9;
+    --t-pill:#eef0f3;--t-input:#fff;--t-radius:18px;}
+  body[data-theme]{background:var(--t-bg);color:var(--t-ink);}
+  body[data-theme] h1{color:var(--t-ink);}
+  body[data-theme] .hdr{background:var(--t-bg);border-bottom-color:var(--t-line);}
+  body[data-theme] .card,body[data-theme] details{background:var(--t-card);border-color:var(--t-line);border-radius:var(--t-radius);}
+  body[data-theme] details[open]>summary,body[data-theme] .evt[open]>summary{border-bottom-color:var(--t-line);}
+  body[data-theme] .evt .etitle{color:var(--t-ink);}
+  body[data-theme] .evt.warn{border-color:var(--t-danger);}
+  body[data-theme] .evt.today{border-color:var(--t-accent);}
+  body[data-theme] .evt .edate,body[data-theme] .meta,body[data-theme] .count,body[data-theme] .sec .lbl,
+  body[data-theme] .empty,body[data-theme] .donehdr,body[data-theme] .otthdr{color:var(--t-muted);}
+  body[data-theme] .sec.warn .lbl{color:var(--t-warn);}
+  body[data-theme] .walkmini .fld{color:var(--t-muted);}
+  body[data-theme] input,body[data-theme] select{background:var(--t-input);color:var(--t-ink);border-color:var(--t-line);}
+  body[data-theme] input::placeholder{color:var(--t-muted);}
+  body[data-theme] .search input{background:var(--t-input);color:var(--t-ink);border-color:var(--t-line);}
+  body[data-theme] .search .x{background:var(--t-pill);color:var(--t-soft);}
+  body[data-theme] .btn{background:var(--t-strong);color:var(--t-strong-ink);}
+  body[data-theme] .btn.ns{background:transparent;color:var(--t-danger);border:1px solid var(--t-danger);}
+  body[data-theme] .addwalk,body[data-theme] .scanvin{background:var(--t-strong);color:var(--t-strong-ink);}
+  body[data-theme] .link{color:var(--t-accent);}
+  body[data-theme] #logout{color:var(--t-danger) !important;}
+  body[data-theme] .pill{background:var(--t-pill);color:var(--t-muted);}
+  body[data-theme] .pill.hasopen{background:var(--t-warn-bg);color:var(--t-warn);}
+  body[data-theme] .pill.alldone{background:var(--t-ok-bg);color:var(--t-ok);}
+  body[data-theme] .tabbtn{background:var(--t-card);border-color:var(--t-line);color:var(--t-soft);}
+  body[data-theme] .tabbtn.on{background:var(--t-accent);color:var(--t-accent-ink);border-color:var(--t-accent);}
+  body[data-theme] .tabbadge{background:var(--t-danger);color:#fff;}
+  body[data-theme] .done{color:var(--t-ok);} body[data-theme] .noshow{color:var(--t-danger);}
+  body[data-theme] .msg.ok{color:var(--t-ok);} body[data-theme] .err{color:var(--t-danger);}
+  body[data-theme] .showmore{background:transparent;color:var(--t-accent);border-color:var(--t-line);}
+  body[data-theme] .card .installer-tag{background:var(--t-pill);color:var(--t-soft);}
+  body[data-theme="night"] .ffnote,body[data-theme="night"] .vinwarn,body[data-theme="night"] .banner{background:#26200f;border-color:rgba(250,178,25,.4);color:#e8c87a;}
+  body[data-theme="night"] .nsconfirm{color:#e66767;}
+  /* --- themed dashboard summary (rendered by renderSummary) --- */
+  #summary{margin:8px 0 2px;}
+  .sm-hero{border:1px solid var(--t-line);border-radius:var(--t-radius);background:var(--t-card);padding:16px;margin-bottom:10px;}
+  body[data-theme="night"] .sm-hero{background:linear-gradient(160deg,#262112 0%,#1a1a19 55%);border-color:rgba(250,178,25,.25);}
+  .sm-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t-accent);margin-bottom:6px;}
+  .sm-tag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--t-accent);}
+  body[data-theme="night"] .sm-tag::before{box-shadow:0 0 8px rgba(250,178,25,.8);}
+  .sm-hero h2{font-size:24px;font-weight:800;margin:0;line-height:1.1;color:var(--t-ink);}
+  .sm-when{font-size:13px;color:var(--t-soft);margin-top:3px;}
+  .sm-meta{display:flex;gap:16px;margin-top:12px;padding-top:10px;border-top:1px solid var(--t-line);font-size:12px;color:var(--t-muted);}
+  .sm-meta b{display:block;font-size:16px;color:var(--t-ink);}
+  .sm-cta{display:flex;gap:8px;margin-top:12px;}
+  .sm-cta .btn{flex:1;padding:10px 0;}
+  .sm-alert{display:flex;align-items:center;gap:12px;background:var(--t-card);border:1px solid var(--t-danger);border-radius:var(--t-radius);padding:12px 14px;margin-bottom:10px;cursor:pointer;}
+  .sm-alert .icon{width:34px;height:34px;border-radius:10px;background:var(--t-danger-bg);display:flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 34px;}
+  .sm-alert b{font-size:13.5px;display:block;color:var(--t-ink);}
+  .sm-alert span{font-size:12px;color:var(--t-muted);}
+  .sm-alert .act{font-size:12.5px;font-weight:700;color:var(--t-danger);white-space:nowrap;}
+  .sm-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+  .sm-tile{background:var(--t-card);border:1px solid var(--t-line);border-radius:var(--t-radius);padding:11px 12px 9px;}
+  .sm-tile .label{font-size:11px;color:var(--t-muted);margin-bottom:3px;}
+  .sm-tile .value{font-size:20px;font-weight:800;color:var(--t-ink);}
+  .sm-tile .sub{font-size:11px;color:var(--t-muted);margin-top:2px;}
+  .sm-life{display:flex;justify-content:space-between;align-items:center;background:var(--t-card);border:1px solid var(--t-line);border-radius:var(--t-radius);padding:10px 14px;margin-bottom:10px;font-size:12.5px;color:var(--t-muted);}
+  .sm-life b{color:var(--t-ink);}
+  .sm-head{display:flex;justify-content:space-between;align-items:flex-start;padding:2px 2px 8px;}
+  .sm-date{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t-muted);}
+  .sm-head h2{font-size:23px;font-weight:800;margin:2px 0 0;color:var(--t-ink);}
+  .sm-sub{font-size:13px;color:var(--t-soft);margin-top:2px;}
+  .sm-month{background:var(--t-card);border:1px solid var(--t-line);border-radius:var(--t-radius);padding:14px 16px;margin-bottom:10px;}
+  .sm-row1{display:flex;justify-content:space-between;align-items:baseline;}
+  .sm-label{font-size:12px;font-weight:700;color:var(--t-muted);letter-spacing:.06em;text-transform:uppercase;}
+  .sm-frac{font-size:13px;color:var(--t-soft);font-weight:600;}
+  .sm-big{display:flex;align-items:baseline;gap:8px;margin:7px 0 10px;}
+  .sm-big b{font-size:30px;font-weight:800;color:var(--t-ink);}
+  .sm-big span{font-size:13px;color:var(--t-soft);}
+  .sm-meter{height:10px;border-radius:99px;background:var(--t-pill);overflow:hidden;display:flex;}
+  .sm-fill{background:var(--t-accent);border-radius:99px;}
+  .sm-legend{display:flex;gap:14px;margin-top:8px;font-size:11.5px;color:var(--t-soft);}
+  .sm-legend i{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:5px;}
+  .sm-duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+  .sm-fig{font-size:40px;font-weight:800;line-height:1.05;margin:4px 0 2px;color:var(--t-ink);}
+  .sm-hsub{font-size:13px;color:var(--t-soft);}
+  .sm-hsub b{color:var(--t-ok);}
+  .sm-tally{display:flex;margin-top:12px;border-top:1px solid var(--t-line);padding-top:11px;}
+  .sm-tally div{flex:1;text-align:center;border-right:1px solid var(--t-line);}
+  .sm-tally div:last-child{border-right:none;}
+  .sm-tally b{display:block;font-size:18px;font-weight:800;color:var(--t-ink);}
+  .sm-tally span{font-size:10.5px;color:var(--t-muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+  .sm-marks{margin-top:11px;display:flex;align-items:center;gap:10px;}
+  .sm-marks span{font-size:11.5px;color:var(--t-muted);}
+  .sm-ledger{display:flex;align-items:center;gap:12px;background:var(--t-danger-bg);border:1px solid var(--t-danger);border-radius:var(--t-radius);padding:12px 14px;margin-bottom:10px;cursor:pointer;}
+  .sm-stamp{font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--t-danger);border:2px solid var(--t-danger);border-radius:6px;padding:3px 6px;transform:rotate(-4deg);flex:0 0 auto;}
+  .sm-ledger b{font-size:13.5px;display:block;color:var(--t-ink);}
+  .sm-ledger span{font-size:11.5px;color:var(--t-soft);}
+  .sm-ledger .go{font-weight:800;color:var(--t-danger);font-size:13px;white-space:nowrap;margin-left:auto;}
+  .sm-adminline{font-size:12px;color:var(--t-muted);margin:2px 2px 8px;}
+  .sm-adminline b{color:var(--t-ink);}
+  /* --- bottom action bar --- */
+  .bbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;pointer-events:none;}
+  .bbar .inner{pointer-events:auto;display:flex;gap:8px;align-items:center;width:100%;max-width:640px;padding:18px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(250,248,245,0) 0%,#faf8f5 55%);}
+  body[data-theme="night"] .bbar .inner{background:linear-gradient(180deg,rgba(13,13,13,0) 0%,#0d0d0d 55%);}
+  body[data-theme="field"] .bbar .inner{background:linear-gradient(180deg,rgba(244,245,247,0) 0%,#f4f5f7 55%);}
+  body[data-theme="heritage"] .bbar .inner{background:linear-gradient(180deg,rgba(246,241,231,0) 0%,#f6f1e7 55%);}
+  .bbar .fab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--t-accent,#5B4B42);color:var(--t-accent-ink,#fff);font-weight:800;font-size:14px;padding:14px 0;border-radius:14px;border:0;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18);font-family:inherit;}
+  .bbar .bico{width:48px;height:48px;border-radius:14px;background:var(--t-card,#fff);border:1px solid var(--t-line,#d8d2ca);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--t-soft,#5B4B42);flex:0 0 48px;cursor:pointer;font-family:inherit;}
+  /* --- theme switcher sheet + toast --- */
+  .veil{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:60;}
+  .veil.open{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;left:50%;transform:translate(-50%,105%);bottom:0;width:100%;max-width:640px;z-index:61;background:#fff;border-radius:22px 22px 0 0;padding:18px 18px 34px;transition:transform .3s cubic-bezier(.32,.72,.28,1);box-shadow:0 -12px 40px rgba(0,0,0,.25);}
+  .sheet.open{transform:translate(-50%,0);}
+  .sheet .grab{width:38px;height:5px;border-radius:99px;background:#d8d6cf;margin:0 auto 14px;}
+  .sheet h4{font-size:16px;font-weight:800;color:#16130e;margin:0 0 3px;}
+  .sheet .hint{font-size:12.5px;color:#8a857a;margin-bottom:14px;}
+  .theme-opt{display:flex;align-items:center;gap:13px;border:2px solid #eceae4;border-radius:15px;padding:12px 13px;margin-bottom:9px;cursor:pointer;background:#fff;width:100%;text-align:left;font-family:inherit;transition:border-color .15s;}
+  .theme-opt.sel{border-color:#16130e;}
+  .swatch{width:46px;height:46px;border-radius:12px;flex:0 0 46px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+  .swatch.night{background:linear-gradient(140deg,#1a1a19 55%,#3a3117);color:#fab219;}
+  .swatch.field{background:linear-gradient(140deg,#f4f5f7 55%,#dce9f8);color:#1c5cab;}
+  .swatch.heritage{background:linear-gradient(140deg,#f6f1e7 55%,#eadfc5);color:#8a6512;}
+  .theme-opt b{font-size:14.5px;color:#16130e;display:block;}
+  .theme-opt span{font-size:12px;color:#8a857a;display:block;margin-top:1px;}
+  .theme-opt .check{margin-left:auto;font-size:17px;color:#16130e;opacity:0;}
+  .theme-opt.sel .check{opacity:1;}
+  .toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%) translateY(8px);z-index:70;background:#16130e;color:#fff;font-size:12.5px;font-weight:700;padding:9px 16px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -105,11 +243,28 @@
     <a class="link" href="#" id="reviewlink" style="display:none;margin-left:14px">★ Ask for a review</a>
     <a class="link" href="#" id="pushlink" style="display:none;margin-left:14px">🔔 Enable notifications</a>
     <a class="link" href="#" id="amsoillink" style="display:none;margin-left:14px">🛢 AMSOIL numbers</a>
+    <a class="link" href="#" id="themelink" style="margin-left:14px" title="Change layout">🎨 Layout</a>
     <div id="header" class="hdr"></div>
+    <div id="summary"></div>
     <div id="feed"></div>
     <div id="msg" class="msg"></div>
+    <div class="bbar" id="bbar"><div class="inner">
+      <button type="button" class="bico" id="bbsearch" title="Search" aria-label="Search">🔍</button>
+      <button type="button" class="fab" id="bbwalk">＋ Log walk-in / call-in</button>
+      <button type="button" class="bico" id="bbshare" title="Share a booking link" aria-label="Share a booking link">🔗</button>
+    </div></div>
   </div>
 </main>
+<div class="veil" id="veil"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Choose your layout">
+  <div class="grab"></div>
+  <h4>Choose your layout</h4>
+  <div class="hint">Pick the style that fits how you work. Same data, three looks — saved to your profile.</div>
+  <button type="button" class="theme-opt" data-theme="night"><div class="swatch night">🌙</div><div><b>Night Shift</b><span>Dark mission-control · next event leads · thumb bar</span></div><div class="check">✓</div></button>
+  <button type="button" class="theme-opt" data-theme="field"><div class="swatch field">📅</div><div><b>Field Day</b><span>Clean agenda · month meter · at a glance</span></div><div class="check">✓</div></button>
+  <button type="button" class="theme-opt" data-theme="heritage"><div class="swatch heritage">🎟️</div><div><b>Heritage Garage</b><span>Brand classic · earnings ledger · tally wall</span></div><div class="check">✓</div></button>
+</div>
+<div class="toast" id="toast"></div>
 <script>
   var CAL = ["Light","Mild","Medium","Spicy","SS","Light and Mild","Mild and Medium","Medium and Spicy","Spicy and SS"];
   var TP = ["VFT","HPT","PCM","BB"];
@@ -118,7 +273,8 @@
   var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:''
     , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:''
     , jobTab: 'all'      // 'all' | '<city>' | 'done'
-    , doneCity: '' };    // optional city filter applied inside the Done view
+    , doneCity: ''       // optional city filter applied inside the Done view
+    , theme: '', me: '' };
   function Q(){ return window.OfflineQueue; }
   function store(){ return window.localStorage; }
 
@@ -151,12 +307,60 @@
     return full;
   }
 
+  // --- Switchable theme layouts (source: design/installer-console.html) ---
+  // The choice applies instantly from localStorage (zero-flash boot) and is persisted
+  // server-side per installer (installer-prefs) so it follows them across devices; the
+  // server value wins on the next load unless the installer just picked one here.
+  var THEME_NAMES={night:'Night Shift',field:'Field Day',heritage:'Heritage Garage'};
+  var THEME_COLORS={night:'#0d0d0d',field:'#f4f5f7',heritage:'#f6f1e7'};
+  var themeTouched=false, toastTimer=null;
+  function applyTheme(t){
+    if(!THEME_NAMES[t]) t='heritage';
+    STATE.theme=t; document.body.setAttribute('data-theme',t);
+    var m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=THEME_COLORS[t];
+    Array.prototype.forEach.call(document.querySelectorAll('.theme-opt'),function(b){ b.classList.toggle('sel', b.getAttribute('data-theme')===t); });
+  }
+  function openSheet(){ document.getElementById('veil').classList.add('open'); document.getElementById('sheet').classList.add('open'); }
+  function closeSheet(){ document.getElementById('veil').classList.remove('open'); document.getElementById('sheet').classList.remove('open'); }
+  function setTheme(t){
+    closeSheet();
+    if(t===STATE.theme) return;
+    themeTouched=true;
+    applyTheme(t); try{ localStorage.setItem('ty_theme',t); }catch(e){}
+    if(STATE.today) renderAll();   // re-render only once the roster is in — never stomp "Loading…"
+    saveThemePref(t);
+  }
+  async function saveThemePref(t){
+    try{
+      var res=await fetch('/.netlify/functions/installer-prefs',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({theme:t})});
+      var out=await res.json().catch(function(){return{};});
+      showToast('Layout: '+THEME_NAMES[t]+(res.ok&&out.status==='ok'?' — saved to your profile':' — saved on this device'));
+    }catch(e){ showToast('Layout: '+THEME_NAMES[t]+' — saved on this device'); }
+  }
+  async function loadThemePref(){
+    try{
+      var res=await fetch('/.netlify/functions/installer-prefs',{headers:{'x-installer-token':tok()}});
+      if(!res.ok) return;
+      var out=await res.json().catch(function(){return{};});
+      if(out.status==='ok' && out.theme && !themeTouched && out.theme!==STATE.theme){
+        applyTheme(out.theme); try{ localStorage.setItem('ty_theme',out.theme); }catch(e){}
+        if(STATE.today) renderAll();   // roster not in yet → applyRoster's renderAll will paint it
+      }
+    }catch(e){}
+  }
+  function showToast(msg){
+    var el=document.getElementById('toast'); if(!el) return;
+    el.textContent=msg; el.classList.add('show');
+    clearTimeout(toastTimer); toastTimer=setTimeout(function(){ el.classList.remove('show'); },2200);
+  }
+  applyTheme(localStorage.getItem('ty_theme')||'heritage');
+
   document.getElementById('gate').onsubmit=function(e){ e.preventDefault(); var v=document.getElementById('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
   if(tok()) showApp();
   document.getElementById('logout').onclick=function(e){ e.preventDefault();
     if(Q().loadQueue(store()).length && !confirm('You have unsynced close-outs/walk-ins. Log out anyway and lose them?')) return;
     localStorage.removeItem('ty_installer_token'); location.reload(); };
-  async function showApp(){ registerServiceWorker(); renderPendingBadge(); if(!(await nativeLock())) return; document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); }
+  async function showApp(){ registerServiceWorker(); renderPendingBadge(); if(!(await nativeLock())) return; document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); loadThemePref(); }
   function fail(m){ var el=document.getElementById('msg'); el.className='msg err'; el.textContent=m; el.scrollIntoView({block:'nearest'}); }
   function succeed(m){ var el=document.getElementById('msg'); el.className='msg ok'; el.textContent=m; el.scrollIntoView({block:'nearest'}); }
   function clearMsg(){ var el=document.getElementById('msg'); el.className='msg'; el.textContent=''; }
@@ -382,6 +586,7 @@
   function applyRoster(data){
     STATE.today = localToday(); STATE.bookings = data.bookings||[]; STATE.events = data.events||[];
     STATE.admin = !!data.admin;
+    STATE.me = data.installer || '';
     STATE.reviewUrl = data.reviewUrl || '';
     var rl = document.getElementById('reviewlink');
     if(rl){
@@ -433,13 +638,12 @@
     var host=document.getElementById('header'); if(!host || host.dataset.built) return; host.dataset.built='1';
     host.innerHTML =
       (STATE.admin?'<div style="margin-bottom:6px"><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)">Admin — viewing </label><select id="who"></select></div>':'')+
-      '<div id="tally" class="tally"></div>'+
       '<div class="search"><input id="q" type="search" autocomplete="off" placeholder="Search name, VIN, vehicle, city…"><button class="x" id="qx" aria-label="Clear search" style="display:none">×</button></div>';
     var q=document.getElementById('q'), qx=document.getElementById('qx');
     q.oninput=function(){ STATE.q=this.value; qx.style.display=this.value?'':'none'; renderFeed(); };
     qx.onclick=function(){ STATE.q=''; q.value=''; qx.style.display='none'; q.focus(); renderFeed(); };
     var who=document.getElementById('who');
-    if(who){ who.onchange=function(){ STATE.installerFilter=this.value; renderTally(); renderFeed(); }; }
+    if(who){ who.onchange=function(){ STATE.installerFilter=this.value; renderAll(); }; }
   }
 
   function renderTally(){
@@ -450,32 +654,176 @@
       keys.sort();
       who.innerHTML='<option value="">All installers</option>'+keys.map(function(k){ return '<option value="'+esc(k)+'"'+(STATE.installerFilter===k?' selected':'')+'>'+esc(cap(k))+'</option>'; }).join('');
     }
-    var host=document.getElementById('tally'); if(!host) return;
-    var mo=STATE.today.slice(0,7), mDone=0,mOpen=0,mNo=0,life=0;
-    visibleBookings().forEach(function(b){
-      if(b.status==='Completed') life++;
-      if(ym(b.dateISO)===mo){ if(b.status==='Completed')mDone++; else if(b.status==='No-show')mNo++; else if(isOpen(b))mOpen++; }
-    });
-    var next=null;
-    buildEvents().forEach(function(e){ if(e.dateISO>=STATE.today && (!next||e.dateISO<next.dateISO)) next=e; });
-    var ct = (window.commissionTally
-      ? window.commissionTally(visibleBookings(), mo)
-      : { month:{total:0,tunes:0,pending:0}, lastMonth:{total:0}, lifetime:{total:0}, byInstaller:{} });
-    var adminLines = '';
-    if(STATE.admin && !STATE.installerFilter){
-      var keys = Object.keys(ct.byInstaller).sort();
-      if(keys.length) adminLines += '<span>'+keys.map(function(k){ return esc(cap(k))+' '+money(ct.byInstaller[k]); }).join(' · ')+'</span>';
-      adminLines += '<span>Last month · est. <b>'+money(ct.lastMonth.total)+'</b> — report due by the 7th</span>';
-    }
-    host.innerHTML=
-      '<span>This month <b class="g">'+mDone+'</b> done · <b class="o">'+mOpen+'</b> open'+(mNo?' · <b class="r">'+mNo+'</b> no-show':'')+'</span>'+
-      '<span>This month · est. <b>'+money(ct.month.total)+'</b> · '+ct.month.tunes+' tunes'+(ct.month.pending?' · '+ct.month.pending+' pending':'')+'</span>'+
-      '<span>Lifetime <b>'+life+'</b> tunes ✓ · <b>'+money(ct.lifetime.total)+'</b> commission</span>'+
-      adminLines+
-      (next?'<span class="next">Next: '+esc(next.city)+' · '+esc(relDate(next.dateISO))+'</span>':'');
   }
 
-  function renderAll(){ renderTally(); renderTabs();
+  // ---- Themed dashboard summary (Night Shift / Field Day / Heritage Garage) ----
+  // Same data, three looks: everything below binds to visibleBookings()/buildEvents()/
+  // commissionTally() — the numbers the console already loads. Mockup-only fictions
+  // (monthly goals, cal files staged, crew rank) are dropped, not faked.
+  function monthStats(){
+    var mo=STATE.today.slice(0,7), s={done:0,open:0,no:0,life:0};
+    visibleBookings().forEach(function(b){
+      if(b.status==='Completed') s.life++;
+      if(ym(b.dateISO)===mo){ if(b.status==='Completed')s.done++; else if(b.status==='No-show')s.no++; else if(isOpen(b))s.open++; }
+    });
+    return s;
+  }
+  function monthLabel(){ return MONTHS[parseInt(STATE.today.slice(5,7),10)-1]; }
+  function needsCloseoutEvents(){
+    return buildEvents().filter(function(e){ return e.dateISO<STATE.today && e.hasOpen; })
+      .sort(function(a,b){ return a.dateISO.localeCompare(b.dateISO); });
+  }
+  function nextEvent(){
+    var n=null;
+    buildEvents().forEach(function(e){ if(e.dateISO>=STATE.today && (!n||e.dateISO<n.dateISO)) n=e; });
+    return n;
+  }
+  // Completed tunes per month, trailing 8 months — the Night Shift sparkline (real data).
+  function monthlySeries(){
+    var y=+STATE.today.slice(0,4), m=+STATE.today.slice(5,7), months=[];
+    for(var i=7;i>=0;i--){ var mm=m-i, yy=y; while(mm<1){mm+=12;yy--;} months.push(yy+'-'+String(mm).padStart(2,'0')); }
+    var counts={};
+    visibleBookings().forEach(function(b){ if(b.status==='Completed'){ var k=ym(b.dateISO); counts[k]=(counts[k]||0)+1; } });
+    return months.map(function(k){ return counts[k]||0; });
+  }
+  function sparkline(series){
+    var max=Math.max.apply(null,series.concat([1]));
+    var pts=series.map(function(v,i){
+      var x=2+i*(84/(series.length-1)), yv=20-(v/max)*16;
+      return x.toFixed(1)+','+yv.toFixed(1);
+    });
+    var last=pts[pts.length-1].split(',');
+    return '<svg width="88" height="24" viewBox="0 0 88 24" aria-hidden="true">'+
+      '<polyline points="'+pts.join(' ')+'" fill="none" stroke="var(--t-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<circle cx="'+last[0]+'" cy="'+last[1]+'" r="4" fill="var(--t-accent)"/></svg>';
+  }
+  // Lifetime tunes as tally marks (groups of five), capped at 4 groups + remainder so the
+  // wall never overflows the card; the caption carries the exact count.
+  function tallyMarksSvg(n){
+    var groups=Math.floor(n/5), rem=n%5, shown=Math.min(groups,4), svg='', x=0, g, i, r;
+    for(g=0;g<shown;g++){
+      for(i=0;i<4;i++){ svg+='<line x1="'+(x+4+i*7)+'" y1="3" x2="'+(x+4+i*7)+'" y2="19"/>'; }
+      svg+='<line x1="'+x+'" y1="16" x2="'+(x+29)+'" y2="5"/>'; x+=40;
+    }
+    if(shown===groups && rem){ for(r=0;r<rem;r++){ svg+='<line x1="'+(x+4+r*7)+'" y1="3" x2="'+(x+4+r*7)+'" y2="19"/>'; } x+=rem*7+8; }
+    if(!svg) return '';
+    return '<svg width="'+x+'" height="22" viewBox="0 0 '+x+' 22" aria-label="'+n+' lifetime tunes as tally marks">'+
+      '<g stroke="var(--t-accent)" stroke-width="2.4" stroke-linecap="round">'+svg+'</g></svg>';
+  }
+  function greeting(){ var h=new Date().getHours(); return h<12?'Morning':(h<17?'Afternoon':'Evening'); }
+  function renderSummary(){
+    var host=document.getElementById('summary'); if(!host) return;
+    if(STATE.tab==='leads'){ host.innerHTML=''; return; }   // the summary is the Jobs dashboard
+    var s=monthStats(), mo=STATE.today.slice(0,7), mL=monthLabel(), mAb=mL.slice(0,3);
+    var ct=(window.commissionTally
+      ? window.commissionTally(visibleBookings(), mo)
+      : { month:{total:0,tunes:0,pending:0}, lastMonth:{total:0}, lifetime:{total:0}, byInstaller:{} });
+    var needs=needsCloseoutEvents(), next=nextEvent();
+    var adminLine='';
+    if(STATE.admin && !STATE.installerFilter){
+      var keys=Object.keys(ct.byInstaller).sort();
+      adminLine='<div class="sm-adminline">'+
+        (keys.length?keys.map(function(k){ return esc(cap(k))+' <b>'+money(ct.byInstaller[k])+'</b>'; }).join(' · ')+' · ':'')+
+        'Last month <b>'+money(ct.lastMonth.total)+'</b> — report due by the 7th</div>';
+    }
+    var alertCard = needs.length
+      ? '<div class="sm-alert" id="smalert"><div class="icon">⚠️</div><div style="flex:1;min-width:0">'+
+        '<b>'+esc(needs[0].city)+' needs close-out</b><span>'+esc(relDate(needs[0].dateISO))+' · '+needs[0].open+' open'+
+        (needs.length>1?' · +'+(needs.length-1)+' more event'+(needs.length>2?'s':''):'')+'</span></div>'+
+        '<div class="act">Close out →</div></div>'
+      : '';
+    var html='';
+    if(STATE.theme==='night'){
+      html+='<div class="sm-hero">'+
+        (next
+          ? '<div class="sm-tag">Next event</div><h2>'+esc(next.city)+'</h2>'+
+            '<div class="sm-when">'+esc(relDate(next.dateISO))+(STATE.admin&&next.installer?' · '+esc(cap(next.installer)):'')+'</div>'+
+            '<div class="sm-meta"><div><b>'+next.open+'</b>jobs open</div><div><b>'+next.total+'</b>booked</div><div><b>'+s.done+'</b>done · '+mAb+'</div></div>'
+          : '<div class="sm-tag">No upcoming events</div><h2>Book the next stop</h2>'+
+            '<div class="sm-when">Share a booking link or log a walk-in below.</div>')+
+        '<div class="sm-cta"><button type="button" class="btn" id="smshare">🔗 Share booking link</button></div></div>';
+      html+=alertCard;
+      html+='<div class="sm-kpis">'+
+        '<div class="sm-tile"><div class="label">Done · '+mAb+'</div><div class="value">'+s.done+'</div>'+(s.no?'<div class="sub">'+s.no+' no-show</div>':'')+'</div>'+
+        '<div class="sm-tile"><div class="label">Open · '+mAb+'</div><div class="value">'+s.open+'</div></div>'+
+        '<div class="sm-tile"><div class="label">Est. payout</div><div class="value">'+money(ct.month.total)+'</div>'+(ct.month.pending?'<div class="sub">'+ct.month.pending+' pending</div>':'')+'</div></div>';
+      html+=adminLine;
+      html+='<div class="sm-life"><span>Lifetime <b>'+s.life+' tunes ✓</b> · <b>'+money(ct.lifetime.total)+'</b> commission</span>'+sparkline(monthlySeries())+'</div>';
+    } else if(STATE.theme==='field'){
+      var d=new Date(STATE.today+'T00:00:00');
+      var dows=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var pctBase=s.done+s.open, pct=pctBase?Math.round(100*s.done/pctBase):0;
+      html+='<div class="sm-head"><div>'+
+        '<div class="sm-date">'+dows[d.getDay()]+', '+mL+' '+parseInt(STATE.today.slice(8,10),10)+'</div>'+
+        '<h2>'+greeting()+(STATE.me?', '+esc(cap(STATE.me)):'')+' 👋</h2>'+
+        (STATE.admin?'<div class="sm-sub">Viewing as admin'+(STATE.installerFilter?' · '+esc(cap(STATE.installerFilter)):' · all installers')+'</div>':'')+
+        '</div></div>';
+      html+=alertCard;
+      html+='<div class="sm-month"><div class="sm-row1"><span class="sm-label">'+mL+'</span><span class="sm-frac">'+s.done+' done · '+s.open+' open</span></div>'+
+        (pctBase
+          ? '<div class="sm-big"><b>'+pct+'%</b><span>of this month’s jobs closed out</span></div>'+
+            '<div class="sm-meter"><div class="sm-fill" style="width:'+pct+'%"></div></div>'+
+            '<div class="sm-legend"><span><i style="background:var(--t-accent)"></i>'+s.done+' done</span><span><i style="background:var(--t-pill)"></i>'+s.open+' open</span>'+(s.no?'<span><i style="background:var(--t-danger)"></i>'+s.no+' no-show</span>':'')+'</div>'
+          : '<div class="sm-big"><b>—</b><span>no jobs on the books this month yet</span></div>')+
+        '</div>';
+      html+='<div class="sm-duo">'+
+        '<div class="sm-tile"><div class="label">Est. this month</div><div class="value">'+money(ct.month.total)+'</div><div class="sub">'+ct.month.tunes+' tunes'+(ct.month.pending?' · '+ct.month.pending+' pending':'')+'</div></div>'+
+        '<div class="sm-tile"><div class="label">Lifetime</div><div class="value">'+money(ct.lifetime.total)+'</div><div class="sub">'+s.life+' tunes completed ✓</div></div></div>';
+      html+=adminLine;
+      if(next) html+='<div class="sm-adminline">Next: <b>'+esc(next.city)+'</b> · '+esc(relDate(next.dateISO))+'</div>';
+    } else {   // heritage
+      var marks=tallyMarksSvg(s.life);
+      html+='<div class="sm-hero"><div class="sm-label">'+mL+' · estimated payout</div>'+
+        '<div class="sm-fig">'+money(ct.month.total)+'</div>'+
+        '<div class="sm-hsub">'+s.done+' done · '+s.open+' open'+(ct.month.pending?' · '+ct.month.pending+' pending':'')+
+        (next?' · <b>next: '+esc(next.city)+' '+esc(relDate(next.dateISO))+'</b>':'')+'</div>'+
+        '<div class="sm-tally"><div><b>'+s.life+'</b><span>lifetime tunes</span></div>'+
+        '<div><b>'+money(ct.lifetime.total)+'</b><span>lifetime comm.</span></div>'+
+        '<div><b>'+ct.month.tunes+'</b><span>'+esc(mAb)+' tunes</span></div></div>'+
+        (marks?'<div class="sm-marks">'+marks+'<span>every tune, on the wall</span></div>':'')+
+        '</div>';
+      if(needs.length){
+        html+='<div class="sm-ledger" id="smledger"><div class="sm-stamp">OPEN</div><div style="flex:1;min-width:0">'+
+          '<b>'+esc(needs[0].city)+' · '+esc(relDate(needs[0].dateISO))+' needs close-out</b>'+
+          '<span>'+needs[0].open+' job'+(needs[0].open>1?'s':'')+' unresolved'+
+          (needs.length>1?' · +'+(needs.length-1)+' more event'+(needs.length>2?'s':''):'')+
+          (next?' · settle before '+esc(next.city):'')+'</span></div>'+
+          '<div class="go">Settle →</div></div>';
+      }
+      html+=adminLine;
+    }
+    host.innerHTML=html;
+    var a=host.querySelector('#smalert')||host.querySelector('#smledger');
+    if(a) a.onclick=jumpToCloseout;
+    var sh=host.querySelector('#smshare'); if(sh) sh.onclick=jumpToShare;
+  }
+  function findEventCard(key){
+    var all=document.querySelectorAll('#feed details.evt[data-key]');
+    for(var i=0;i<all.length;i++){ if(all[i].getAttribute('data-key')===key) return all[i]; }
+    return null;
+  }
+  function jumpToCloseout(){
+    STATE.tab='jobs'; STATE.jobTab='all'; STATE.q='';
+    var q=document.getElementById('q'); if(q){ q.value=''; } var qx=document.getElementById('qx'); if(qx) qx.style.display='none';
+    var needs=needsCloseoutEvents(); if(needs[0]) STATE.eventOpen[needs[0].key]=true;
+    renderAll();
+    if(needs[0]){ var el=findEventCard(needs[0].key); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }
+  }
+  function jumpToShare(){
+    if(STATE.tab!=='jobs'){ STATE.tab='jobs'; renderAll(); }
+    var d=document.getElementById('evshare'); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'start'}); }
+  }
+  function jumpToWalkin(){
+    STATE.tab='jobs'; STATE.walkOpen['__anyday__']=true; renderAll();
+    var d=document.getElementById('anydayform');
+    if(d){ d.scrollIntoView({behavior:'smooth',block:'start'}); var f=d.querySelector('input'); if(f) f.focus(); }
+  }
+  function jumpToSearch(){
+    if(STATE.tab!=='jobs'){ STATE.tab='jobs'; renderAll(); }
+    var q=document.getElementById('q'); if(q){ q.scrollIntoView({behavior:'smooth',block:'center'}); q.focus(); }
+  }
+
+  function renderAll(){ renderTally(); renderSummary(); renderTabs();
     var st=document.getElementById('subtabs'); if(st) st.style.display = STATE.tab==='leads' ? 'none' : 'flex';
     if(STATE.tab==='leads'){ renderLeads(); } else { renderFeed(); } }
   function renderTabs(){
@@ -615,6 +963,7 @@
     var det=document.createElement('details');
     det.className='evt'+(e.dateISO<STATE.today&&e.hasOpen?' warn':(e.dateISO===STATE.today?' today':''));
     det.open=open;
+    det.setAttribute('data-key', e.key);
     det.addEventListener('toggle',function(){ STATE.eventOpen[e.key]=det.open; });
     var pillCls=e.total===0?'':(e.hasOpen?'hasopen':'alldone');
     var pillTxt=e.total===0?'no bookings':(e.done+' done'+(e.open?' · '+e.open+' open':'')+(e.no?' · '+e.no+' no-show':''));
@@ -703,7 +1052,7 @@
   // report. Creates a normal booking dated that day; it then appears in the feed.
   function anydayWalkForm(){
     var K='__anyday__';
-    var det=document.createElement('details'); det.className='evt'; det.open=!!STATE.walkOpen[K];
+    var det=document.createElement('details'); det.className='evt'; det.id='anydayform'; det.open=!!STATE.walkOpen[K];
     det.addEventListener('toggle',function(){ STATE.walkOpen[K]=det.open; });
     var sum=document.createElement('summary');
     sum.innerHTML='<span class="etitle">＋ Log a walk-in / call-in</span><span class="pill">any day</span>';
@@ -1154,6 +1503,13 @@
       navigator.serviceWorker.ready.then(function(reg){ if(reg.sync) reg.sync.register('ty-flush').catch(function(){}); }).catch(function(){});
     }
   }
+  // Theme switcher + bottom action bar wiring (the elements exist — this script runs at body end).
+  document.getElementById('themelink').onclick=function(e){ e.preventDefault(); openSheet(); };
+  document.getElementById('veil').onclick=closeSheet;
+  Array.prototype.forEach.call(document.querySelectorAll('.theme-opt'),function(b){ b.onclick=function(){ setTheme(b.getAttribute('data-theme')); }; });
+  document.getElementById('bbsearch').onclick=jumpToSearch;
+  document.getElementById('bbwalk').onclick=jumpToWalkin;
+  document.getElementById('bbshare').onclick=jumpToShare;
   window.addEventListener('online', flushQueue);
   window.addEventListener('beforeunload', function(e){ if(Q().loadQueue(store()).length){ e.preventDefault(); e.returnValue=''; return ''; } });
 </script>
