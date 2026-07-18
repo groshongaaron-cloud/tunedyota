@@ -78,6 +78,7 @@ function toMessages(turns) {
 }
 
 async function runChat({ turns, pageContext }, { env = process.env, fetchImpl = fetch } = {}) {
+  if (!env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY not configured");
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 20000);
   try {

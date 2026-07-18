@@ -52,3 +52,11 @@ test("runChat sends installer turns as user-role context", async () => {
   assert.equal(body.model, "claude-sonnet-4-6");
   assert.equal(body.tools[0].name, "transfer_to_installer");
 });
+
+test("runChat throws on non-ok response and missing api key", async () => {
+  const bad = async () => ({ ok: false, status: 500, json: async () => ({}) });
+  await assert.rejects(() => runChat({ turns: [{ role: "user", text: "hi" }], pageContext: "default" },
+    { env: { ANTHROPIC_API_KEY: "k" }, fetchImpl: bad }), /anthropic 500/);
+  await assert.rejects(() => runChat({ turns: [], pageContext: "default" },
+    { env: {}, fetchImpl: async () => ({ ok: true, json: async () => ({}) }) }), /not configured/);
+});
