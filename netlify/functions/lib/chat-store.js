@@ -34,12 +34,12 @@ async function loadSession(id, { env = process.env, fetchImpl = fetch } = {}) {
 }
 
 // Load the most recently active escalated session for an installer key (SMS relay).
-async function loadEscalatedForInstaller(key, { env = process.env, fetchImpl = fetch } = {}) {
+async function loadEscalatedForInstaller(key, { env = process.env, fetchImpl = fetch, now = Date.now } = {}) {
   const c = cfg(env);
   const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
     filterByFormula: `AND({Installer}="${escapeFormula(key)}",{Status}="escalated")` });
-  const sessions = recs.map(fromRecord).filter((s) => !isStale(s, Date.now()));
-  sessions.sort((a, b) => String(b.lastActivity).localeCompare(String(a.lastActivity)));
+  const sessions = recs.map(fromRecord).filter((s) => !isStale(s, now()));
+  sessions.sort((a, b) => (a.lastActivity < b.lastActivity ? 1 : -1));
   return sessions[0] || null;
 }
 

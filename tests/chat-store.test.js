@@ -34,10 +34,12 @@ test("loadSession returns null when not found; maps fields when found", async ()
 
 test("saveSession creates when no recordId, patches when present", async () => {
   const calls = [];
-  const fetchImpl = async (url, opts) => { calls.push({ url: String(url), method: opts.method }); return { ok: true, json: async () => ({ id: "recNew", fields: {} }) }; };
+  const fetchImpl = async (url, opts) => { calls.push({ url: String(url), method: opts.method, body: JSON.parse(opts.body) }); return { ok: true, json: async () => ({ id: "recNew", fields: {} }) }; };
   await saveSession({ id: "s1", status: "ai", turns: [], pageContext: "default" }, { env: ENV, fetchImpl, now: () => 0 });
   await saveSession({ id: "s1", recordId: "recX", status: "ai", turns: [] }, { env: ENV, fetchImpl, now: () => 0 });
   assert.equal(calls[0].method, "POST");
   assert.equal(calls[1].method, "PATCH");
   assert.ok(calls[1].url.includes("recX"));
+  assert.ok(calls[0].body.fields.Created); // POST sets Created
+  assert.equal(calls[1].body.fields.Created, undefined); // PATCH must not
 });
