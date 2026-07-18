@@ -23,3 +23,21 @@ test("falls back to Aaron / info@ for unknown or empty key", () => {
 test("INSTALLERS table is exported for reuse", () => {
   assert.ok(INSTALLERS.aaron && INSTALLERS.noah && INSTALLERS.cody);
 });
+
+const { smsNumberFor, parseSmsOverrides } = require("../netlify/functions/lib/routing.js");
+
+test("smsNumberFor returns E.164 for noah with no override", () => {
+  assert.equal(smsNumberFor("noah", {}), "+19208607050");
+});
+
+test("smsNumberFor returns override number for aaron when INSTALLER_SMS_NUMBERS is set", () => {
+  assert.equal(smsNumberFor("aaron", { INSTALLER_SMS_NUMBERS: '{"aaron":"+16125550999"}' }), "+16125550999");
+});
+
+test("parseSmsOverrides returns empty object for invalid JSON", () => {
+  assert.deepEqual(parseSmsOverrides({ INSTALLER_SMS_NUMBERS: "not json" }), {});
+});
+
+test("parseSmsOverrides returns empty object for missing env var", () => {
+  assert.deepEqual(parseSmsOverrides({}), {});
+});

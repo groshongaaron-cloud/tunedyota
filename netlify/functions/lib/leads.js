@@ -5,7 +5,7 @@ const { getMarket } = require("./markets.js");
 const { keyToInstaller } = require("./routing.js");
 const { cfg, createRecord, updateRecord, createTolerant, updateTolerant, listAllRecords } = require("./airtable.js");
 
-const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "other", "ott-national"];
+const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "chat", "other", "ott-national"];
 const STAGES = ["New", "Contacted", "Qualified", "Following up", "Booked", "Not now"];
 const ACTIVE_STAGES = ["New", "Contacted", "Qualified", "Following up"];
 
@@ -16,7 +16,7 @@ function validStage(s) { return STAGES.includes(String(s || "")); }
 // one channel value.
 function normalizeChannel(source, reason) {
   const s = (String(source == null ? "" : source) + " " + String(reason == null ? "" : reason)).toLowerCase();
-  for (const ch of ["email", "facebook", "instagram", "sms", "phone", "walk-in"]) {
+  for (const ch of ["email", "facebook", "instagram", "sms", "phone", "walk-in", "chat"]) {
     if (s.includes(ch)) return ch;
   }
   if (s.includes("text")) return "sms";

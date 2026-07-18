@@ -270,6 +270,7 @@ ${FQSCRIPT}
 ${FOOTER}
 ${FQA11Y}
 ${TRACK}
+<script src="/chat.js" defer></script>
 </body>
 </html>
 `;
@@ -629,6 +630,7 @@ ${FQSCRIPT}
 ${FOOTER}
 ${FQA11Y}
 ${TRACK}
+<script src="/chat.js" defer></script>
 </body>
 </html>
 `;
@@ -757,6 +759,7 @@ ${FQSCRIPT}
 ${FOOTER}
 ${FQA11Y}
 ${TRACK}
+<script src="/chat.js" defer></script>
 </body>
 </html>
 `;

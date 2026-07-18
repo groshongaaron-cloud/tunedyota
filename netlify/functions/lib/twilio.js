@@ -119,6 +119,24 @@ async function ingestLead(body, deps = {}) {
   } catch (e) { return { ok: false, error: e.message }; }
 }
 
+// Outbound SMS via the Twilio REST API. Best-effort: returns {ok:false} on any
+// missing config or network error — callers must never break on notify failure.
+async function sendSms({ to, body }, deps = {}) {
+  const { env = process.env, fetchImpl = fetch, log = console } = deps;
+  const sid = env.TWILIO_ACCOUNT_SID, token = env.TWILIO_AUTH_TOKEN, from = env.TWILIO_FROM_NUMBER;
+  if (!sid || !token || !from || !to) return { ok: false, skipped: true };
+  try {
+    const res = await fetchImpl(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+      method: "POST",
+      headers: { Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
+        "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ To: to, From: from, Body: String(body || "").slice(0, 1500) }).toString(),
+    });
+    if (!res.ok) { if (log.error) log.error("sendSms", res.status); return { ok: false }; }
+    return { ok: true };
+  } catch (e) { if (log.error) log.error("sendSms", e.message); return { ok: false }; }
+}
+
 module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers,
   escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, GREETING,
-  parseInboundSms, parseInboundCall, parseTranscription, ingestLead };
+  parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms };

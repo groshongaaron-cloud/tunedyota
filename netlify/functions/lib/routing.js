@@ -13,4 +13,18 @@ function keyToInstaller(key) {
   return INSTALLERS[key] || INSTALLERS[FALLBACK_KEY];
 }
 
-module.exports = { INSTALLERS, FALLBACK_KEY, keyToInstaller };
+// Where to SMS an installer, and which inbound number identifies them. The
+// public INSTALLERS phone can be the Twilio line itself (it forwards), so
+// INSTALLER_SMS_NUMBERS ({"key":"+1..."}) overrides with the real cell.
+function parseSmsOverrides(env) {
+  try { const v = JSON.parse((env && env.INSTALLER_SMS_NUMBERS) || "{}"); return v && typeof v === "object" ? v : {}; }
+  catch { return {}; }
+}
+function smsNumberFor(key, env) {
+  const over = parseSmsOverrides(env)[key];
+  if (over) return String(over);
+  const digits = String((INSTALLERS[key] || {}).phone || "").replace(/\D/g, "");
+  return digits.length === 10 ? `+1${digits}` : String((INSTALLERS[key] || {}).phone || "");
+}
+
+module.exports = { INSTALLERS, FALLBACK_KEY, keyToInstaller, parseSmsOverrides, smsNumberFor };
