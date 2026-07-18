@@ -234,6 +234,11 @@ test("ingest stores GHL Link on the lead (tolerant)", async () => {
   assert.equal(created.fields["GHL Link"], "https://app.gohighlevel.com/x");
 });
 
+test("chat is a first-class channel", () => {
+  assert.equal(L.validChannel("chat"), true);
+  assert.equal(L.normalizeChannel("chat:widget"), "chat");
+});
+
 test("site/installer.html LEAD_STAGES literal includes Qualified between Contacted and Following up", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
   const m = html.match(/var LEAD_STAGES\s*=\s*(\[[\s\S]*?\])/);
