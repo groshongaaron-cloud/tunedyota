@@ -43,3 +43,11 @@ test("handler: normal SMS unchanged — ingests lead and auto-replies", async ()
   assert.equal(ingested, true);
   assert.ok(res.body.includes("<Message>"));
 });
+
+test("relayInstallerReply ignores blank installer texts", async () => {
+  const r = await relayInstallerReply({ from: "+16124067117", text: "   " }, {
+    findSession: async () => ({ id: "s1", recordId: "r", status: "escalated", turns: [], lastActivity: new Date().toISOString() }),
+    save: async () => { throw new Error("must not save"); },
+  });
+  assert.equal(r.relayed, false);
+});

@@ -28,7 +28,9 @@ async function relayInstallerReply({ from, text }, deps = {}) {
   let sess = null;
   try { sess = await findSession(inst.key); } catch (e) { if (log.error) log.error("relay find", e.message); }
   if (!sess) return { relayed: false };
-  sess.turns.push({ role: "installer", text: String(text || "").trim(), at: Date.now() });
+  const clean = String(text || "").trim();
+  if (!clean) return { relayed: false }; // blank/media-only texts fall through to normal handling
+  sess.turns.push({ role: "installer", text: clean, at: Date.now() });
   try { await save(sess); } catch (e) { if (log.error) log.error("relay save", e.message); return { relayed: false }; }
   return { relayed: true };
 }
