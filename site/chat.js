@@ -5,7 +5,7 @@
 (function () {
   var path = location.pathname.toLowerCase();
   var CTX = path.indexOf("amsoil") >= 0 ? "amsoil" : (path.indexOf("magnuson") >= 0 ? "magnuson" : "default");
-  var LABEL = CTX === "amsoil" ? "💬 Chat with a AMSOIL Fluid Specialist"
+  var LABEL = CTX === "amsoil" ? "💬 Chat with an AMSOIL Fluid Specialist"
     : CTX === "magnuson" ? "💬 Chat with a Magnuson Supercharger Specialist"
     : "💬 Chat with an OTT installer NOW";
   var FN = "/.netlify/functions/chat";
@@ -66,7 +66,7 @@
     panel.appendChild(head); panel.appendChild(log); panel.appendChild(form);
     document.body.appendChild(panel);
     addMsg("ai", "Thank you for using Tuned Yota's chat agent. What can I help you with — your truck, a tune, or an upcoming event?");
-    close.addEventListener("click", function () { panel.remove(); open = false; btn.style.display = ""; });
+    close.addEventListener("click", function () { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } panel.remove(); open = false; btn.style.display = ""; });
     form.addEventListener("submit", function (ev) { ev.preventDefault(); var t = input.value.trim(); if (t) { input.value = ""; send(t); } });
     if (escalated) startPolling();
     input.focus();

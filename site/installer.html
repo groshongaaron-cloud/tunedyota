@@ -1157,6 +1157,5 @@
   window.addEventListener('online', flushQueue);
   window.addEventListener('beforeunload', function(e){ if(Q().loadQueue(store()).length){ e.preventDefault(); e.returnValue=''; return ''; } });
 </script>
-<script src="/chat.js" defer></script>
 </body>
 </html>

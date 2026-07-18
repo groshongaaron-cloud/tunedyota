@@ -99,3 +99,19 @@ test("stubbed send shows user message and stub reply", async (t) => {
   assert.ok(aiTexts.some((t) => t === "stub reply"), `ai messages: ${JSON.stringify(aiTexts)}`);
   await page.close();
 });
+
+test("clicking close button hides panel and shows button again", async (t) => {
+  if (!browserOk) return t.skip("no browser");
+  const page = await (await browser.newContext()).newPage();
+  await page.goto(base + "/index.html");
+  await page.waitForSelector("#ty-chat-btn");
+  await page.click("#ty-chat-btn");
+  await page.waitForSelector("#ty-chat-panel");
+  await page.click("#ty-chat-head button");
+  await page.waitForFunction(() => !document.getElementById("ty-chat-panel"));
+  const panelExists = await page.$("#ty-chat-panel");
+  assert.equal(panelExists, null, "#ty-chat-panel should be gone");
+  const btnVisible = await page.isVisible("#ty-chat-btn");
+  assert.ok(btnVisible, "#ty-chat-btn should be visible again");
+  await page.close();
+});
