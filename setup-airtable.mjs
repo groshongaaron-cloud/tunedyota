@@ -21,6 +21,7 @@ const txt = (name) => ({ name, type: "singleLineText" });
 const sel = (name, choices) => ({ name, type: "singleSelect", options: { choices: choices.map((c) => ({ name: c })) } });
 const chk = (name) => ({ name, type: "checkbox", options: { icon: "check", color: "greenBright" } });
 const num = (name) => ({ name, type: "number", options: { precision: 0 } });
+const multiline = (name) => ({ name, type: "multilineText" });
 
 const SLOTS = ["9:00","9:20","9:40","10:00","10:20","10:40","11:00","11:20","11:40","12:00","12:20","12:40"];
 const INSTALLERS = ["aaron", "noah", "cody"];
@@ -56,7 +57,7 @@ const SCHEMA = {
   "Chat Sessions": [
     txt("Session ID"), sel("Status", ["ai", "escalated", "closed"]), txt("Page Context"),
     txt("Customer Name"), txt("Phone"), txt("Vehicle"), txt("City"),
-    sel("Installer", INSTALLERS), { name: "Transcript", type: "multilineText" }, txt("Created"), txt("Last Activity"),
+    sel("Installer", INSTALLERS), multiline("Transcript"), txt("Created"), txt("Last Activity"),
   ],
   // Questions the AI couldn't answer — the owner mines these to grow its knowledge.
   "Chat Escalations": [
