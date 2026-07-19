@@ -527,6 +527,7 @@ const MARKETS = [
   {city:"Brainerd",     state:"MN", lat:46.3580, lng:-94.2008,  inst:"aaron"},
   {city:"Eau Claire",   state:"WI", lat:44.8113, lng:-91.4985,  inst:"aaron", date:"August 14, 2027", event:"Eau Claire, Wisconsin Summer 2027 OTT Event"},
   {city:"Green Bay",    state:"WI", lat:44.5133, lng:-88.0133,  inst:"noah", date:"September 12, 2026", event:"Green Bay, Wisconsin Fall 2026 OTT Event"},
+  {city:"Kohler",       state:"WI", lat:43.7392, lng:-87.7817,  inst:"noah"},
   {city:"Madison",      state:"WI", lat:43.0731, lng:-89.4012,  inst:"aaron", date:"August 1, 2026", event:"Madison, Wisconsin Summer 2026 OTT Event"},
   {city:"Milwaukee",    state:"WI", lat:43.0389, lng:-87.9065,  inst:"noah", date:"August 22, 2026", event:"Milwaukee, Wisconsin Summer 2026 OTT Event"},
   {city:"Des Moines",   state:"IA", lat:41.5868, lng:-93.6250,  inst:"aaron", date:"October 10, 2026", event:"Des Moines, Iowa Fall 2026 OTT Event"},
@@ -956,7 +957,10 @@ function renderSlots(city,e){
   const open=(e.openSlots||[]).map(s=>`<button type="button" class="tf-slot" data-slot="${s}">${lab(s)}</button>`).join("");
   const taken=(e.takenSlots||[]).map(s=>`<button type="button" class="tf-slot" disabled>${lab(s)}</button>`).join("");
   const sc=scarcityLine((e.openSlots||[]).length, Object.keys(e.slotLabels||{}).length||12, city, day);
-  box.innerHTML=`${urgencyLine({city,eventDateISO:e.dateISO,eventLabel:e.eventLabel})}${sc}<div class="tf-slot-day">${city} · ${day}<button type="button" class="tf-link" style="border:0;background:none;cursor:pointer;font-size:13px;margin-left:8px;opacity:.7" aria-label="Share this event" onclick="event.stopPropagation();tyShareEvent('${city.replace(/'/g,"\\'")}','${e.dateISO}')">📤 share</button></div><div class="tf-slotgrid">${open}${taken}</div>`;
+  // Slot-mode markets (Noah's) sell generic slots; the installer confirms the exact time.
+  const generic=(e.openSlots||[]).concat(e.takenSlots||[]).some(s=>/^Slot \d+$/.test(s));
+  const note=generic?`<div style="font-size:13px;opacity:.75;margin-top:6px">Reserve a slot — your installer will confirm your exact arrival time before the event.</div>`:"";
+  box.innerHTML=`${urgencyLine({city,eventDateISO:e.dateISO,eventLabel:e.eventLabel})}${sc}<div class="tf-slot-day">${city} · ${day}<button type="button" class="tf-link" style="border:0;background:none;cursor:pointer;font-size:13px;margin-left:8px;opacity:.7" aria-label="Share this event" onclick="event.stopPropagation();tyShareEvent('${city.replace(/'/g,"\\'")}','${e.dateISO}')">📤 share</button></div><div class="tf-slotgrid">${open}${taken}</div>${note}`;
   box.querySelectorAll(".tf-slot:not([disabled])").forEach(b=>b.onclick=()=>{
     box.querySelectorAll(".tf-slot").forEach(x=>x.classList.remove("sel"));
     b.classList.add("sel"); BOOK.slot=b.dataset.slot; updateBookCta();

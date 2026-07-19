@@ -201,3 +201,12 @@ test("non-admin roster formula matches legacy long-label Installer values too", 
   assert.equal(out.bookings.length, 1);
   assert.equal(out.bookings[0].installer, "noah");   // normalized, not the raw label
 });
+
+test("roster carries Scheduled Time through as scheduledTime", async () => {
+  const out = await buildRoster({ env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, key: "noah",
+    list: async () => [{ id: "r1", fields: { City: "Green Bay", "Event Date": "2026-09-12", Slot: "Slot 3",
+      Name: "L", Installer: ["noah"], Status: "Booked", "Scheduled Time": "10:30 AM" } }],
+    loadEvents: async () => [] });
+  assert.equal(out.bookings[0].scheduledTime, "10:30 AM");
+  assert.equal(out.bookings[0].slotLabel, "Slot 3");
+});

@@ -2,7 +2,7 @@
 const { getMarket } = require("./lib/markets.js");
 const { getEventsForCity } = require("./lib/events.js");
 const { cfg, listRecords } = require("./lib/airtable.js");
-const { SLOT_TIMES, CAPACITY, computeOpen, formatSlot } = require("./lib/slots.js");
+const { slotsFor, capacityFor, slotMode, computeOpen, formatSlot } = require("./lib/slots.js");
 const EVENTS = require("./lib/events-data.js");
 
 async function getAvailability(city, deps) {
@@ -12,7 +12,8 @@ async function getAvailability(city, deps) {
   const list = await getEventsForCity(market.city, { fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }, now);
   if (!list.length) return { city: market.city, hasEvent: false, events: [] };
   const c = cfg(env);
-  const slotLabels = Object.fromEntries(SLOT_TIMES.map((s) => [s, formatSlot(s)]));
+  const allSlots = slotsFor(market.inst);
+  const slotLabels = Object.fromEntries(allSlots.map((s) => [s, formatSlot(s)]));
   const events = [];
   for (const event of list) {
     let taken = [];
@@ -24,16 +25,16 @@ async function getAvailability(city, deps) {
       if (log.error) log.error("availability list failed", e.message);
       return { city: market.city, hasEvent: true, error: "store-unavailable", events: [] };
     }
-    const openSlots = computeOpen(taken);
+    const openSlots = computeOpen(taken, market.inst);
     events.push({
       dateISO: event.dateISO, eventLabel: event.label, details: event.details || "", address: event.address || "",
-      openSlots, takenSlots: SLOT_TIMES.filter((s) => !openSlots.includes(s)),
+      openSlots, takenSlots: allSlots.filter((s) => !openSlots.includes(s)),
       full: openSlots.length === 0, slotLabels,
     });
   }
   const soonest = events[0];
   return {
-    city: market.city, hasEvent: true, capacity: CAPACITY, events,
+    city: market.city, hasEvent: true, capacity: capacityFor(market.inst), slotMode: slotMode(market.inst), events,
     eventDateISO: soonest.dateISO, eventLabel: soonest.eventLabel, details: soonest.details,
     openSlots: soonest.openSlots, takenSlots: soonest.takenSlots, full: soonest.full, slotLabels,
   };

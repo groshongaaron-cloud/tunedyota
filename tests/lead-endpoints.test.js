@@ -144,3 +144,25 @@ test("runFollowups pushes one message per installer with due leads", async () =>
   assert.match(sent[0][1], /2 lead/);
   assert.equal(out.installersNotified, 1);
 });
+
+test("convert accepts a scheduled time and writes it to the booking + activity log", async () => {
+  let booking, patched;
+  const res = await upd.handler(
+    { headers: { "x-installer-token": "cody-tok" }, body: JSON.stringify({ id: "recL", action: "convert", dateISO: "2026-08-01", time: "10:30 AM" }) },
+    { env: updEnv, getImpl: async () => leadRec,
+      createBookingImpl: async (a) => { booking = a.fields; return { id: "recBk9" }; },
+      updateImpl: async (a) => { patched = a.fields; return { id: a.id }; } });
+  assert.equal(res.statusCode, 200);
+  assert.equal(booking["Scheduled Time"], "10:30 AM");
+  assert.match(patched["Activity Log"], /2026-08-01 10:30 AM/);
+});
+
+test("convert without a time leaves Scheduled Time unset", async () => {
+  let booking;
+  await upd.handler(
+    { headers: { "x-installer-token": "cody-tok" }, body: JSON.stringify({ id: "recL", action: "convert", dateISO: "2026-08-01" }) },
+    { env: updEnv, getImpl: async () => leadRec,
+      createBookingImpl: async (a) => { booking = a.fields; return { id: "recBk10" }; },
+      updateImpl: async (a) => ({ id: a.id }) });
+  assert.equal("Scheduled Time" in booking, false);
+});

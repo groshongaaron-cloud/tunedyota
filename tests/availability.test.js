@@ -46,3 +46,21 @@ test("full soonest date reports full", async () => {
   assert.equal(r.events[0].full, true);
   assert.equal(r.events[0].openSlots.length, 0);
 });
+
+test("noah market (Green Bay) offers 10 generic slots and slotMode generic", async () => {
+  const events = "Market,Date,Active\nGreen Bay,2026-09-12,yes\n";
+  const r = await getAvailability("Green Bay", { fetchImpl: fakeFetch({ events, taken: ["Slot 1"] }), env, now: NOW });
+  assert.equal(r.hasEvent, true);
+  assert.equal(r.capacity, 10);
+  assert.equal(r.slotMode, "generic");
+  assert.equal(r.events[0].openSlots.length, 9);
+  assert.ok(r.events[0].openSlots.includes("Slot 2"));
+  assert.ok(!r.events[0].openSlots.includes("9:00"));
+  assert.equal(r.slotLabels["Slot 2"], "Slot 2");
+});
+test("timed market still reports slotMode times", async () => {
+  const events = "Market,Date,Active\nSioux Falls,2026-07-12,yes\n";
+  const r = await getAvailability("Sioux Falls", { fetchImpl: fakeFetch({ events, taken: [] }), env, now: NOW });
+  assert.equal(r.slotMode, "times");
+  assert.equal(r.capacity, 12);
+});

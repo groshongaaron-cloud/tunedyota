@@ -14,6 +14,7 @@ const MARKETS = [
   { city: "Brainerd", state: "MN", inst: "aaron" },
   { city: "Eau Claire", state: "WI", inst: "aaron" },
   { city: "Green Bay", state: "WI", inst: "noah" },
+  { city: "Kohler", state: "WI", inst: "noah" },
   { city: "Madison", state: "WI", inst: "aaron" },
   { city: "Milwaukee", state: "WI", inst: "noah" },
   { city: "Des Moines", state: "IA", inst: "aaron" },

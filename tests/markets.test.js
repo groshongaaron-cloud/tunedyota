@@ -2,7 +2,7 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { MARKETS, getMarket } = require("../netlify/functions/lib/markets.js");
 
-test("has 21 markets", () => { assert.equal(MARKETS.length, 21); });
+test("has 22 markets", () => { assert.equal(MARKETS.length, 22); });
 test("Coon Rapids (Carlson Toyota event) is an aaron market", () => {
   assert.equal(getMarket("Coon Rapids").inst, "aaron");
 });
@@ -23,4 +23,11 @@ test("getMarket is case-insensitive and trims", () => {
 test("getMarket returns null for unknown/empty", () => {
   assert.equal(getMarket("Atlantis"), null);
   assert.equal(getMarket(""), null);
+});
+
+test("Kohler WI routes to noah", () => {
+  const m = getMarket("Kohler");
+  assert.ok(m, "Kohler market missing");
+  assert.equal(m.state, "WI");
+  assert.equal(m.inst, "noah");
 });

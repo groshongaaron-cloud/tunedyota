@@ -39,7 +39,7 @@ async function processBooking(body, deps) {
       Reason: reason === "full" ? "Event full" : "No event scheduled",
       "Event Date": event ? event.dateISO : "",
     };
-    if (reason === "full" && isValidSlot(d.slot)) pfields["Requested Slot"] = d.slot; // only set when a preference was picked
+    if (reason === "full" && isValidSlot(d.slot, market.inst)) pfields["Requested Slot"] = d.slot; // only set when a preference was picked
     let pid;
     try {
       const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications", "Model Year"]);
@@ -58,9 +58,9 @@ async function processBooking(body, deps) {
     taken = recs.map((r) => r.fields.Slot).filter(Boolean);
   } catch (e) { if (log.error) log.error("list", e.message); return { status: "error", error: "store-unavailable" }; }
 
-  const open = computeOpen(taken);
+  const open = computeOpen(taken, market.inst);
   if (open.length === 0) return priority("full");
-  if (!d.slot || !isValidSlot(d.slot) || !open.includes(d.slot)) return { status: "conflict", openSlots: open };
+  if (!d.slot || !isValidSlot(d.slot, market.inst) || !open.includes(d.slot)) return { status: "conflict", openSlots: open };
 
   let bid;
   try {

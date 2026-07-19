@@ -90,7 +90,9 @@ else{
     if(ev.full||!ev.openSlots.length){ fallbackFor(avail.city, (avail.events||[]).filter(function(e){return e.dateISO!==dateISO;})); return; }
     STATE.ev=ev;
     $("#evTitle").textContent=avail.city+" · "+ev.eventLabel;
-    $("#evSub").textContent="Pick a time, add your details, and you’re booked."+(ev.address?" · "+ev.address:"");
+    $("#evSub").textContent=(avail.slotMode==="generic"
+      ? "Reserve a slot, add your details — your installer confirms your exact time."
+      : "Pick a time, add your details, and you’re booked.")+(ev.address?" · "+ev.address:"");
     renderSlots(ev); populateMakes(); $("#flow").style.display="block";
     track(5,"book");
   }).catch(function(){ fallbackFor(citySlug.replace(/-/g," "), []); });

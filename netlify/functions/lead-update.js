@@ -35,16 +35,20 @@ async function handler(event, ctx = {}) {
   if (action === "convert") {
     const dateISO = String(body.dateISO || "").trim() || new Date(now).toISOString().slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) return { statusCode: 400, body: JSON.stringify({ error: "bad-date" }) };
+    // Optional installer-assigned time ("10:30 AM"). Free text — Noah's slot-mode
+    // markets have no fixed slot times, so the installer names the exact time.
+    const time = String(body.time || "").trim().slice(0, 40);
     const market = getMarket(lead.city);
     const owner = market ? keyToInstaller(market.inst).key : (lead.installer || key);
     const fields = { City: market ? market.city : lead.city, "Event Date": dateISO, Name: lead.name,
       Vehicle: lead.vehicle, Phone: lead.phone, Email: lead.email, Goals: lead.goals,
       Status: "Booked", Source: `lead:${lead.channel || "convert"}`, Installer: owner };
+    if (time) fields["Scheduled Time"] = time;
     let bk;
-    try { bk = await createTolerant(createBookingImpl, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Goals"]); }
+    try { bk = await createTolerant(createBookingImpl, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Goals", "Scheduled Time"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
     const patch = { "Converted Booking": bk && bk.id, Stage: "Booked",
-      "Activity Log": appendActivity(lead.activity, logLine(now, `converted → booking ${bk && bk.id} (${dateISO})`)) };
+      "Activity Log": appendActivity(lead.activity, logLine(now, `converted → booking ${bk && bk.id} (${dateISO}${time ? " " + time : ""})`)) };
     try { await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: patch }, ["Converted Booking", "Stage", "Activity Log"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
     return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", bookingId: bk && bk.id, stage: "Booked" }) };

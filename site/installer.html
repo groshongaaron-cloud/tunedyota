@@ -1187,9 +1187,21 @@
     body.appendChild(fu);
     var note=mkInput('Log a contact note'); var logb=act('Log contact',function(){ leadUpdate(l.id,{action:'logContact',note:note.value}); });
     var mini=document.createElement('div'); mini.className='walkmini'; mini.appendChild(note); mini.appendChild(logb); body.appendChild(mini);
+    // Convert with a real schedule: date + optional exact time, with a quick-pick of
+    // this market's upcoming events (choosing one sets the date → the booking lands
+    // on that event's roster). Available to every installer on their own leads.
     var conv=document.createElement('div'); conv.className='walkmini';
     var cd=document.createElement('input'); cd.type='date'; cd.value=STATE.today;
-    conv.appendChild(cd); conv.appendChild(act('Convert to booking',function(){ leadUpdate(l.id,{action:'convert',dateISO:cd.value}); }));
+    var evs=(STATE.events||[]).filter(function(e){ return (e.city||'').toLowerCase()===(l.city||'').toLowerCase(); });
+    if(evs.length){
+      var evSel=document.createElement('select');
+      evSel.innerHTML='<option value="">Assign to event…</option>'+evs.map(function(e){ return '<option value="'+esc(e.dateISO)+'">'+esc(e.city+' — '+e.dateISO)+'</option>'; }).join('');
+      evSel.onchange=function(){ if(evSel.value) cd.value=evSel.value; };
+      conv.appendChild(evSel);
+    }
+    var ctime=mkInput('Time (e.g. 10:30 AM)');
+    conv.appendChild(cd); conv.appendChild(ctime);
+    conv.appendChild(act('Convert to booking',function(){ leadUpdate(l.id,{action:'convert',dateISO:cd.value,time:(ctime.value||'').trim()}); }));
     body.appendChild(conv);
     if(l.activity){ var log=document.createElement('div'); log.className='edate'; log.style.whiteSpace='pre-wrap'; log.style.marginTop='6px'; log.textContent=l.activity; body.appendChild(log); }
     det.appendChild(body); return det;
@@ -1368,7 +1380,7 @@
 
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
-    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+esc(b.name)+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
+    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+(b.scheduledTime?esc(b.scheduledTime)+' · ':'')+esc(b.name)+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
       (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'');
     var overdue = isOpen(b) && b.dateISO < STATE.today;
@@ -1394,6 +1406,11 @@
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
+      '<details style="margin:6px 0"><summary class="link" style="cursor:pointer">🕓 '+(b.scheduledTime?'Time: '+esc(b.scheduledTime)+' — change':'Set time / date')+'</summary>'+
+      '<div class="row-actions" style="margin-top:6px">'+
+      '<input type="date" id="rd_'+b.id+'" value="'+esc(b.dateISO||'')+'">'+
+      '<input id="rt_'+b.id+'" autocomplete="off" placeholder="Time (e.g. 10:30 AM)" value="'+esc(b.scheduledTime||'')+'">'+
+      '<button class="btn" id="rs_'+b.id+'">Save</button></div></details>'+
       '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
       (canScan()?'<button type="button" class="btn scanvin" id="scan_'+b.id+'">📷 Scan VIN</button>':'')+
       '<div id="vinwarn_'+b.id+'" class="vinwarn hidden"></div>'+
@@ -1409,6 +1426,7 @@
       '<label class="nsconfirm"><input type="checkbox" id="nsc_'+b.id+'"> Customer didn\'t show — add to waitlist</label>'+
       '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
+    c.querySelector('#rs_'+b.id).onclick=function(){ reschedule(b.id); };
     if(canScan()){ var sb=c.querySelector('#scan_'+b.id); if(sb) sb.onclick=function(){ startScan(b.id); }; }
     var cb=c.querySelector('#nsc_'+b.id), nsb=c.querySelector('#ns_'+b.id);
     cb.onchange=function(){ nsb.disabled=!cb.checked; };
@@ -1432,6 +1450,25 @@
     if(STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I've verified this VIN is correct'."); return; } }
     var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem};
     openSignOverlay(id, extra);
+  }
+
+  // Set/adjust an open booking's date and assign the exact time. Built for Noah's
+  // slot-mode markets (customer reserves "Slot N", Noah names the time), works for
+  // any installer on their own bookings.
+  async function reschedule(id){
+    clearMsg();
+    var d=val('rd_'+id), t=val('rt_'+id);
+    if(!d && !t){ fail('Pick a date or enter a time.'); return; }
+    try{
+      var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,dateISO:d,time:t})});
+      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      var out=await res.json().catch(function(){return{};});
+      if(res.ok && out.status==='ok'){
+        var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
+        if(b){ if(d) b.dateISO=d; if(t) b.scheduledTime=t; }
+        succeed('✓ Schedule updated.'); renderAll();
+      } else { fail('Could not update: '+(out.error||res.status)); }
+    }catch(e){ fail('Network error — try again.'); }
   }
 
   async function closeout(id,extra){

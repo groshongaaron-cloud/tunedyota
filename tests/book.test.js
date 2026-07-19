@@ -207,3 +207,42 @@ test("an unknown dateISO for the city falls back to the priority waitlist", asyn
   assert.equal(r.status, "priority");
   assert.equal(r.reason, "no-event");
 });
+
+// ---- Slot-mode (generic slots) for Noah's markets ----
+const slotDeps = (taken = []) => {
+  const created = [];
+  return {
+    env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    fetchImpl: async (url, opts) => {
+      if (String(url).includes("docs.google.com")) return { ok: true, text: async () => "Market,Date,Active\nGreen Bay,2026-09-12,yes\n" };
+      if (String(url).includes("api.airtable.com") && (!opts || !opts.method)) return { ok: true, json: async () => ({ records: taken.map((s) => ({ fields: { Slot: s } })) }) };
+      if (String(url).includes("api.airtable.com")) { created.push(JSON.parse(opts.body)); return { ok: true, json: async () => ({ id: "recNew" }) }; }
+      throw new Error("unexpected " + url);
+    },
+    trigger: async () => ({}), log: { error() {} }, nowDate: new Date("2026-07-01T12:00:00Z"),
+    _created: created,
+  };
+};
+
+test("Green Bay books a generic slot", async () => {
+  const d = slotDeps(["Slot 1"]);
+  const out = await processBooking({ city: "Green Bay", name: "N", phone: "1", slot: "Slot 2", dateISO: "2026-09-12" }, d);
+  assert.equal(out.status, "booked");
+  assert.equal(out.slot, "Slot 2");
+  assert.equal(d._created[0].fields.Slot, "Slot 2");
+});
+
+test("Green Bay rejects a timed slot value with the open generic slots", async () => {
+  const d = slotDeps([]);
+  const out = await processBooking({ city: "Green Bay", name: "N", phone: "1", slot: "9:00", dateISO: "2026-09-12" }, d);
+  assert.equal(out.status, "conflict");
+  assert.ok(out.openSlots.includes("Slot 1"));
+  assert.equal(out.openSlots.length, 10);
+});
+
+test("Green Bay full after 10 generic slots -> priority waitlist", async () => {
+  const d = slotDeps(Array.from({ length: 10 }, (_, i) => `Slot ${i + 1}`));
+  const out = await processBooking({ city: "Green Bay", name: "N", phone: "1", slot: "Slot 1", dateISO: "2026-09-12" }, d);
+  assert.equal(out.status, "priority");
+  assert.equal(out.reason, "full");
+});
