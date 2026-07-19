@@ -6,6 +6,7 @@
 // this request and is never stored.
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-haiku-4-5"; // owner-approved: cheap/fast, ample to read a VIN
+const { vinCheckDigitOk } = require("./vin.js");
 
 // Normalize an OCR'd candidate to a valid 17-char VIN or "" (VINs exclude I/O/Q).
 function normalizeVin(raw) {
@@ -56,7 +57,10 @@ async function readVinFromImage(input, deps) {
   try { json = await res.json(); } catch (e) { return { ok: false, reason: "unavailable" }; }
   const text = (json && json.content && json.content[0] && json.content[0].text) || "";
   const vin = normalizeVin(text);
-  if (!vin) return { ok: false, reason: "no-vin" };
+  // Check digit too, not just shape: a vision model can transcribe a blurry photo
+  // into 17 perfectly legal — and wrong — characters. Better "couldn't read it"
+  // (installer retakes or types) than a confidently populated bad VIN.
+  if (!vin || !vinCheckDigitOk(vin)) return { ok: false, reason: "no-vin" };
   return { ok: true, vin };
 }
 

@@ -38,9 +38,9 @@ test("returns too-large (without calling the API) when the image exceeds the cap
 
 test("reads a VIN and normalizes surrounding whitespace/case", async () => {
   const out = await readVinFromImage({ imageBase64: IMG, mediaType: "image/jpeg" },
-    { apiKey: "k", fetchImpl: stubOk("  jtebu5jr4k5601234 \n") });
+    { apiKey: "k", fetchImpl: stubOk("  jtebu5jr3k5601234 \n") });
   assert.equal(out.ok, true);
-  assert.equal(out.vin, "JTEBU5JR4K5601234");
+  assert.equal(out.vin, "JTEBU5JR3K5601234");
 });
 
 test("strips a data: URL prefix from the image before sending", async () => {
@@ -106,4 +106,11 @@ test("handler contains an unexpected read error as ok:false (camera never blocks
     if (prev === undefined) delete process.env.INSTALLER_TOKENS;
     else process.env.INSTALLER_TOKENS = prev;
   }
+});
+
+test("rejects a plausible-but-invalid OCR read (check digit) — falls back to manual entry", async () => {
+  const out = await readVinFromImage({ imageBase64: IMG, mediaType: "image/jpeg" },
+    { apiKey: "k", fetchImpl: stubOk("JTEBU5JR4K5601234") });   // 17 legal chars, fails ISO 3779
+  assert.equal(out.ok, false);
+  assert.equal(out.reason, "no-vin");
 });

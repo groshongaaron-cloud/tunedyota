@@ -1295,6 +1295,28 @@
     var s=String(raw==null?'':raw).toUpperCase().replace(/[^A-Z0-9]/g,'');
     return /^[A-HJ-NPR-Z0-9]{17}$/.test(s)?s:'';
   }
+  // ISO 3779 check digit (position 9) — on every North American VIN. Shape alone
+  // let a misdecoded barcode or wrong OCR read populate the field; this catches
+  // virtually every single-character misread offline.
+  function vinCheckDigitOk(vin){
+    var s=String(vin==null?'':vin).toUpperCase();
+    if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(s)) return false;
+    var V={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9};
+    var W=[8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2], sum=0;
+    for(var i=0;i<17;i++){ var c=s.charAt(i); sum+=(c>='0'&&c<='9'?+c:V[c])*W[i]; }
+    var r=sum%11;
+    return s.charAt(8)===(r===10?'X':String(r));
+  }
+  // Accept a live barcode read only when it passes the check digit AND two
+  // consecutive decodes agree — a blurred Code-39 frame or a stray non-VIN
+  // sticker barcode can otherwise populate a perfectly-shaped wrong VIN.
+  function acceptScan(id,candidate){
+    if(!scanState || scanState.id!==id || !candidate) return false;
+    if(!vinCheckDigitOk(candidate)){ scanState.lastRead=''; setScanMsg(id,'Caught a bad read — hold steady over the VIN barcode…'); return false; }
+    if(scanState.lastRead===candidate){ onVin(id,candidate); return true; }
+    scanState.lastRead=candidate; setScanMsg(id,'Confirming…');
+    return false;
+  }
   function canScan(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
   var scanState=null, zxingLoading=null;
   function loadZXing(){
@@ -1347,8 +1369,11 @@
       try{
         var nres=await window.Capacitor.Plugins.BarcodeScanner.scan();
         var ncodes=(nres&&nres.barcodes)||[];
-        for(var ni=0;ni<ncodes.length;ni++){ var nvin=normalizeScannedVin(ncodes[ni].rawValue||ncodes[ni].displayValue); if(nvin){ onVin(id,nvin); return; } }
-        fail('No VIN barcode found — try again or type it.');
+        var nbad=false;
+        for(var ni=0;ni<ncodes.length;ni++){ var nvin=normalizeScannedVin(ncodes[ni].rawValue||ncodes[ni].displayValue);
+          if(nvin && vinCheckDigitOk(nvin)){ onVin(id,nvin); return; }
+          if(nvin) nbad=true; }
+        fail(nbad ? 'Scanned code failed the VIN check — rescan or type it.' : 'No VIN barcode found — try again or type it.');
       }catch(e){ /* cancelled */ }
       return;
     }
@@ -1376,7 +1401,7 @@
       var tick=async function(){
         if(!scanState || scanState.id!==id) return;
         try{ var codes=await det.detect(video);
-          for(var i=0;i<codes.length;i++){ var vin=normalizeScannedVin(codes[i].rawValue); if(vin){ onVin(id,vin); return; } }
+          for(var i=0;i<codes.length;i++){ if(acceptScan(id,normalizeScannedVin(codes[i].rawValue))) return; }
         }catch(e){}
         scanState.raf=requestAnimationFrame(tick);
       };
@@ -1395,7 +1420,7 @@
       }catch(e){ reader=new Z.BrowserMultiFormatReader(); }
       scanState.reader=reader;
       reader.decodeFromVideoDevice(null, video, function(result){
-        if(result){ var vin=normalizeScannedVin(result.getText?result.getText():result.text); if(vin){ onVin(id,vin); } }
+        if(result){ acceptScan(id, normalizeScannedVin(result.getText?result.getText():result.text)); }
       });
     }
   }
