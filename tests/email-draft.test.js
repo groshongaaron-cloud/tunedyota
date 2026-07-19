@@ -83,3 +83,44 @@ test("pricingFor: '2019 Tundra' matches Tundra pricing", () => {
   const result = pricingFor("2019 Tundra that falls on its face");
   assert.ok(result && /Tundra/.test(result), `expected Tundra pricing, got: ${result}`);
 });
+
+// Model-year narrowing: a stated year must limit the engines the drafter can offer.
+// Regression: a "23 tacoma" lead was drafted a 2.4L-turbo option (2024+ only).
+test("pricingFor: '23 tacoma' narrows to 2016-2023 engines and excludes the 2024+ turbo", () => {
+  const { pricingFor } = require("../netlify/functions/lib/email-draft.js");
+  const result = pricingFor("Howdy, I have a 23 tacoma. I was wondering about doing a tune to it.");
+  assert.ok(/3\.5L V6/.test(result), `expected 3.5L V6, got: ${result}`);
+  assert.ok(/2\.7L I4/.test(result), `expected 2.7L I4, got: ${result}`);
+  assert.ok(!/2\.4L/.test(result), `2.4L turbo is 2024+ and must be excluded, got: ${result}`);
+  assert.ok(/ONLY engines/i.test(result), `expected the only-engines guard note, got: ${result}`);
+});
+test("pricingFor: '2025 Tacoma' narrows to the 2024+ turbo only", () => {
+  const { pricingFor } = require("../netlify/functions/lib/email-draft.js");
+  const result = pricingFor("just bought a 2025 Tacoma, can you tune it?");
+  assert.ok(/2\.4L-T/.test(result), `expected 2.4L-T, got: ${result}`);
+  assert.ok(!/3\.5L V6/.test(result), `3.5L V6 ended in 2023 and must be excluded, got: ${result}`);
+});
+test("pricingFor: no stated year still lists every generation", () => {
+  const { pricingFor } = require("../netlify/functions/lib/email-draft.js");
+  const result = pricingFor("thinking about tuning my tacoma");
+  assert.ok(/2\.4L-T/.test(result) && /3\.5L V6/.test(result) && /4\.0L V6/.test(result),
+    `expected all generations when no year stated, got: ${result}`);
+});
+test("pricingFor: year outside all known ranges falls back to the full list", () => {
+  const { pricingFor } = require("../netlify/functions/lib/email-draft.js");
+  const result = pricingFor("I have a 1999 tacoma");
+  assert.ok(/3\.5L V6/.test(result) && /2\.4L-T/.test(result),
+    `expected full list for an unmatched year, got: ${result}`);
+});
+test("pricingFor: 'my gx470' does not misread the 47 in gx470 as a model year", () => {
+  const { pricingFor } = require("../netlify/functions/lib/email-draft.js");
+  const result = pricingFor("my gx470 needs a tune");
+  assert.ok(/GX/.test(result), `expected GX pricing, got: ${result}`);
+  assert.ok(!/ONLY engines/i.test(result), `must not narrow without a real year, got: ${result}`);
+});
+test("buildDraftPrompt states the model-year engine guard as a non-negotiable", () => {
+  const p = buildDraftPrompt({ message: { headers: { from: "jo@x.com", subject: "tune?" }, textBody: "23 tacoma tune?" },
+    classification: { bucket: "inquiry", stage: "connect", summary: "tacoma inquiry" },
+    grounding: { market: null, installerName: "", pricing: "", nextEvent: "" }, threadContext: "" });
+  assert.match(p, /ONLY engines valid for/i);
+});

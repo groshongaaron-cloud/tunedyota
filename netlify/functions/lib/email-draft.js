@@ -17,7 +17,31 @@ const BANNED = [/act now/i, /best on the market/i, /make an informed decision/i,
   /i hope this (email )?finds you well/i, /as an ai/i, /do not hesitate/i, /delve/i,
   /furthermore/i, /i understand your concern/i];
 
+// Model year the customer stated, if any. Adjacent-to-model 4-digit first, then
+// any 4-digit year, then a 2-digit year adjacent to the model ("23 tacoma").
+// Guards: no digit may precede/follow the 2-digit form ("gx470" is not '47),
+// and 2-digit values 40-89 are treated as not-a-year.
+function statedYear(t, modelEsc) {
+  const Y4 = "(19[89]\\d|20[0-3]\\d)";
+  let m = t.match(new RegExp(Y4 + "\\s+" + modelEsc)) || t.match(new RegExp(modelEsc + "\\s+'?" + Y4 + "(?!\\d)"));
+  if (m) return Number(m[1]);
+  m = t.match(new RegExp("(?<!\\d)" + Y4 + "(?!\\d)"));
+  if (m) return Number(m[1]);
+  m = t.match(new RegExp("(?<!\\d)'?(\\d{2})\\s+" + modelEsc)) || t.match(new RegExp(modelEsc + "\\s+'?(\\d{2})(?!\\d)"));
+  if (m) { const n = Number(m[1]); return n >= 90 ? 1900 + n : n <= 39 ? 2000 + n : null; }
+  return null;
+}
+
+// Does a vehicles.json year range ("2016-2023", "2024+", "2023") cover the year?
+function coversYear(y, range) {
+  const m = String(range).match(/^(\d{4})(?:-(\d{4})|(\+))?$/);
+  return !!m && y >= Number(m[1]) && y <= (m[2] ? Number(m[2]) : m[3] ? 9999 : Number(m[1]));
+}
+
 // Find the model the customer named and return its pricing block as compact text.
+// When the customer also stated a model year, narrow to the engines actually
+// offered that year — a '23 Tacoma must never be offered the 2024+ 2.4L turbo.
+// A year matching no known range falls back to the full list (drafter will ask).
 function pricingFor(text) {
   const t = String(text || "").toLowerCase();
   for (const make of Object.keys(VEHICLES)) {
@@ -25,8 +49,15 @@ function pricingFor(text) {
       const esc = model.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const re = new RegExp("\\b" + esc + "(\\b|(?=[0-9]))");
       if (re.test(t)) {
-        return `${make} ${model}: ` + VEHICLES[make][model]
-          .map((c) => `${c.y} ${c.e} from $${c.base}`).join(" · ");
+        const combos = VEHICLES[make][model];
+        const line = (list) => list.map((c) => `${c.y} ${c.e} from $${c.base}`).join(" · ");
+        const year = statedYear(t, esc);
+        const fit = year == null ? [] : combos.filter((c) => coversYear(year, c.y));
+        if (fit.length) {
+          return `${make} ${model} (${year}): ` + line(fit)
+            + ` — the ONLY engines offered for a ${year}; never mention engines from other model years.`;
+        }
+        return `${make} ${model}: ` + line(combos);
       }
     }
   }
@@ -63,6 +94,7 @@ function buildDraftPrompt({ message, classification, grounding, threadContext })
     "- NEVER give a bare price/number to a cold price ask — deflect-with-purpose per the playbook.",
     "- If the customer shows explicit booking intent, go straight to calm, low-friction scheduling.",
     "- Mirror the customer's exact words. Neutral language. 3-6 sentences.",
+    "- When engines come up, offer ONLY engines valid for their stated model year per the pricing facts — never an engine from a different generation.",
     "- Sign off: — Aaron @ Tuned Yota · (612) 406-7117",
     "Output ONLY the email body text (no subject, no commentary).",
     "", "== NEPQ PLAYBOOK ==", PLAYBOOK.slice(0, 14000),
