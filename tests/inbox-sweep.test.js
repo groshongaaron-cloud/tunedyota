@@ -198,3 +198,33 @@ test("sweep query is bounded to fresh mail and excludes all state labels", () =>
   for (const l of ["ty-ingested", "ty-drafted", "ty-skipped", "ty-flagged"]) assert.ok(q.includes("-label:" + l), l);
   assert.ok(q.includes("-from:me"), "excludes own sends");
 });
+
+// ── Self-mail guard: our own transactional/internal mail must never be drafted ──
+// Regression: the sweep drafted a "consultation" reply to a new-booking
+// notification from events@send.tunedyota.events (Reply-To = the customer).
+test("a new-booking notification from send.tunedyota.events is skipped deterministically — no classify, no draft", async () => {
+  const h = harness([MSG("m30", {
+    headers: { from: "Tuned Yota <events@send.tunedyota.events>", subject: "New booking — Coon Rapids July 18, 2026 @ 12:00", messageId: "<m30@x>", replyTo: "tsuyang@yahoo.com" },
+    textBody: "New booking routed to Aaron Groshong.\nName: Sou Yang\nGoals: Maximum power",
+  })], []);
+  let classifyCalls = 0;
+  h.deps.classify = async () => { classifyCalls++; return { bucket: "inquiry", stage: "connect", confidence: 0.9, summary: "" }; };
+  const out = await runSweep(h.deps);
+  assert.equal(out.skipped, 1);
+  assert.equal(classifyCalls, 0, "self-mail must not spend a classify call");
+  assert.equal(h.drafts.length, 0, "self-mail must never get a reply draft");
+  assert.deepEqual(h.labeled[0], ["m30", "ty-skipped"]);
+});
+test("internal mail from our own domain (aaron@tunedyota.com) is skipped, not drafted", async () => {
+  const h = harness([MSG("m31", { headers: { from: "Aaron <aaron@tunedyota.com>", subject: "fwd", messageId: "<m31@x>", replyTo: "" } })], []);
+  const out = await runSweep(h.deps);
+  assert.equal(out.skipped, 1);
+  assert.equal(h.drafts.length, 0);
+  assert.deepEqual(h.labeled[0], ["m31", "ty-skipped"]);
+});
+test("sweep query also excludes the transactional sender domain", () => {
+  const src = require("node:fs").readFileSync(require("node:path").join(__dirname, "..", "netlify", "functions", "inbox-sweep.js"), "utf8");
+  const m = src.match(/const QUERY = "([^"]+)"/);
+  assert.ok(m, "QUERY const found");
+  assert.ok(m[1].includes("-from:send.tunedyota.events"), "booking/digest notifications excluded at the query");
+});

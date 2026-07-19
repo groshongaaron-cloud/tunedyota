@@ -12,8 +12,14 @@ const { notifyOwner } = require("./lib/alert.js");
 // newer_than:2d bounds the sweep to FRESH mail — without it, go-live would chew
 // through the entire historical inbox 20 msgs/tick, drafting replies to months-old
 // threads (the owner's 1-2yr backfill is a separate, deliberate project).
-const QUERY = "in:inbox newer_than:2d -label:ty-ingested -label:ty-drafted -label:ty-skipped -label:ty-flagged -from:me";
+const QUERY = "in:inbox newer_than:2d -label:ty-ingested -label:ty-drafted -label:ty-skipped -label:ty-flagged -from:me -from:send.tunedyota.events";
 const CAP = 20;
+
+// Our own transactional + internal senders. New-booking notifications
+// (events@send.tunedyota.events) carry Reply-To = the customer, so a drafted
+// "reply" would go to a client who already got their booking confirmation —
+// never draft these. Deterministic guard, belt to the QUERY's suspenders.
+const SELF_SENDERS = /@(send\.tunedyota\.events|tunedyota\.com)\b/i;
 
 // Default draft call: reuse askClaude from email-classify with the appropriate model/tokens.
 async function defaultDraft(prompt, env) {
@@ -77,6 +83,15 @@ async function runSweep(deps = {}) {
     scanned++;
     try {
       const msg = await gmail.getMessage(id, { env });
+
+      // Self-mail (booking notifications, digests, internal) — skip before
+      // spending a classify call; there is nothing to reply to.
+      if (SELF_SENDERS.test(msg.headers.from || "")) {
+        await gmail.addLabel(id, "ty-skipped", { env });
+        skipped++;
+        continue;
+      }
+
       const classification = await classify(msg);
 
       // ---- OTT lead -------------------------------------------------------
