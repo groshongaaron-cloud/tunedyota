@@ -29,6 +29,9 @@
   .vinwarn{background:#fdf0dd;border:1px solid #e6c99a;color:#8a5a12;border-radius:7px;padding:8px 10px;font-size:12.5px;line-height:1.35;margin:2px 0 8px;}
   .vinwarn-h{font-weight:700;margin-bottom:2px;} .vinwarn ul{margin:2px 0 4px;padding-left:18px;}
   select{padding:9px;font-size:15px;border:1px solid var(--line);border-radius:8px;width:100%;margin:6px 0;}
+  /* Day-view booking picker: 16px+ stops iOS auto-zoom; bold + accent border marks it
+     as the day's primary control. */
+  .bookingpick{font-size:16px;font-weight:700;padding:12px;border-width:2px;border-color:var(--accent);}
   .row-actions{display:flex;gap:8px;margin-top:6px;} .row-actions .btn{flex:1;}
   .ns{background:#8a6a3a;} .done{color:#2f5d2a;font-weight:700;} .noshow{color:#8a2a2a;font-weight:700;}
   .hidden{display:none;} .msg{margin-top:8px;font-size:13px;} .err{color:#8a2a2a;} .msg.ok{color:#2f5d2a;font-weight:700;}
@@ -270,7 +273,7 @@
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:''
+  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, eventSel:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:''
     , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:''
     , jobTab: 'all'      // 'all' | '<city>' | 'done'
     , doneCity: ''       // optional city filter applied inside the Done view
@@ -957,8 +960,8 @@
 
   // One event = one <details> card. defaultOpen sets the initial state; the user's own
   // toggle is remembered in STATE.eventOpen so a close-out never collapses it. canAdd
-  // shows the per-event walk-in adder (actionable events only).
-  function eventCard(e, bookings, defaultOpen, canAdd, showDone){
+  // includes the "＋ Add a new booking…" picker option (actionable events only).
+  function eventCard(e, bookings, defaultOpen, canAdd){
     var open=(e.key in STATE.eventOpen)?STATE.eventOpen[e.key]:defaultOpen;
     var det=document.createElement('details');
     det.className='evt'+(e.dateISO<STATE.today&&e.hasOpen?' warn':(e.dateISO===STATE.today?' today':''));
@@ -973,17 +976,57 @@
       '<span class="pill '+pillCls+'">'+esc(pillTxt)+'</span>';
     det.appendChild(sum);
     var body=document.createElement('div'); body.className='ebody';
-    if(canAdd) body.appendChild(walkAdder(e));
-    bookings.filter(isOpen).sort(bySlot).forEach(function(b){ body.appendChild(rowCard(b)); });
-    bookings.filter(function(b){return b.status==='No-show';}).sort(bySlot).forEach(function(b){ body.appendChild(rowCard(b)); });
-    var doneB=bookings.filter(function(b){return b.status==='Completed';}).sort(bySlot);
-    if(doneB.length){
-      if(showDone){ var h=document.createElement('div'); h.className='donehdr'; h.textContent='✓ Done ('+doneB.length+')'; body.appendChild(h); doneB.forEach(function(b){ body.appendChild(rowCard(b)); }); }
-      else { var lk=document.createElement('a'); lk.href='#'; lk.className='link'; lk.textContent='✓ '+doneB.length+' done — view ›';
-        lk.onclick=function(ev){ ev.preventDefault(); STATE.jobTab='done'; STATE.doneCity=e.city; renderFeed(); }; body.appendChild(lk); }
-    }
-    if(!bookings.length && !canAdd){ var m=document.createElement('div'); m.className='empty'; m.textContent='No bookings.'; body.appendChild(m); }
+    body.appendChild(bookingPicker(e, bookings, canAdd));
     det.appendChild(body); return det;
+  }
+
+  // One-record-at-a-time day view (2026-07-19 owner decision): a native <select> —
+  // the OS wheel on phones — lists the day's bookings grouped by status, plus
+  // "＋ Add a new booking…". Only the SELECTED record renders below it, so the
+  // installer is never scrolling a wall of close-out forms mid-event. The choice
+  // persists per event in STATE.eventSel, so a re-render (close-out, sync) never
+  // yanks the record out from under them.
+  function bookingPicker(e, bookings, canAdd){
+    var opens=bookings.filter(isOpen).sort(bySlot);
+    var nos=bookings.filter(function(b){return b.status==='No-show';}).sort(bySlot);
+    var dones=bookings.filter(function(b){return b.status==='Completed';}).sort(bySlot);
+    var all=opens.concat(nos,dones);
+    if(!all.length && !canAdd){ var m=document.createElement('div'); m.className='empty'; m.textContent='No bookings.'; return m; }
+    var wrap=document.createElement('div');
+    var sel=document.createElement('select'); sel.className='bookingpick';
+    sel.setAttribute('aria-label','Choose a booking — '+e.city+' '+e.dateISO);
+    function optLabel(b,mark){ return (mark?mark+' ':'')+(b.scheduledTime||b.slotLabel||'—')+' · '+b.name+(b.vehicle?' · '+b.vehicle:''); }
+    function group(label,list,mark){ if(!list.length) return; var g=document.createElement('optgroup'); g.label=label;
+      list.forEach(function(b){ var o=document.createElement('option'); o.value=b.id; o.textContent=optLabel(b,mark); g.appendChild(o); }); sel.appendChild(g); }
+    group('Open ('+opens.length+')',opens,'');
+    group('No-show ('+nos.length+')',nos,'✗');
+    group('Completed ('+dones.length+')',dones,'✓');
+    if(canAdd){ var add=document.createElement('option'); add.value='__add__'; add.textContent='＋ Add a new booking…'; sel.appendChild(add); }
+    // Restore the remembered choice; default to the first OPEN job (slot order) so
+    // the next actionable record is zero taps away.
+    var cur=STATE.eventSel[e.key];
+    var valid=(cur==='__add__'&&canAdd) || all.some(function(b){return b.id===cur;});
+    if(!valid) cur = opens.length?opens[0].id : (all.length?all[0].id:'__add__');
+    STATE.eventSel[e.key]=cur;
+    var slot=document.createElement('div');
+    function renderSel(){
+      slot.innerHTML='';
+      if(STATE.eventSel[e.key]==='__add__'){ STATE.walkOpen[e.key]=true; slot.appendChild(walkAdder(e)); return; }
+      var b=all.filter(function(x){return x.id===STATE.eventSel[e.key];})[0];
+      if(!b) return;
+      slot.appendChild(rowCard(b));
+      // Just settled this one? Offer the next open job without touching the wheel.
+      if(!isOpen(b)){
+        var next=opens.filter(function(x){return x.id!==b.id;})[0];
+        if(next){ var nb=document.createElement('button'); nb.className='btn'; nb.textContent='Next open job → '+(next.scheduledTime||next.slotLabel||next.name);
+          nb.onclick=function(){ STATE.eventSel[e.key]=next.id; sel.value=next.id; renderSel(); };
+          slot.appendChild(nb); }
+      }
+    }
+    sel.value=cur;
+    sel.onchange=function(){ STATE.eventSel[e.key]=sel.value; renderSel(); };
+    wrap.appendChild(sel); wrap.appendChild(slot); renderSel();
+    return wrap;
   }
 
   // Per-event walk-in adder. Its open state persists in STATE.walkOpen[key] so it stays
