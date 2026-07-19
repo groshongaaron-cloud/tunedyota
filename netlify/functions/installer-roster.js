@@ -1,6 +1,9 @@
 // netlify/functions/installer-roster.js
 // Live, per-installer event roster. Scoped to the authenticated installer's key.
-const { cfg, listRecords } = require("./lib/airtable.js");
+// listAllRecords, not listRecords: the live base holds >100 non-cancelled bookings,
+// and Airtable caps a page at 100 — a single-page fetch silently drops the rest
+// from the console (roster, search, tally).
+const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { formatSlot } = require("./lib/slots.js");
 const { flexFuelNote } = require("./lib/flex-fuel.js");
@@ -24,7 +27,7 @@ function withTimeout(promise, ms, msg) {
 async function buildRoster(deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false, log = console,
           eventsTimeoutMs = 6000,
-          list = (a) => listRecords({ fetchImpl, ...a }),
+          list = (a) => listAllRecords({ fetchImpl, ...a }),
           loadEvents = () => getAllActiveEvents({ fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
   const c = cfg(env);
   // Admins see every installer's roster; regular installers are scoped to their own

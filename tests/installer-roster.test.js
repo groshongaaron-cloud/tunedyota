@@ -210,3 +210,19 @@ test("roster carries Scheduled Time through as scheduledTime", async () => {
   assert.equal(out.bookings[0].scheduledTime, "10:30 AM");
   assert.equal(out.bookings[0].slotLabel, "Slot 3");
 });
+
+test("roster follows Airtable pagination — bookings past the 100-record page are NOT dropped", async () => {
+  // Two pages from the default (non-injected) list path: the live base already
+  // holds 108 non-cancelled bookings, so a single-page fetch silently loses data.
+  const page1 = { records: Array.from({ length: 100 }, (_, i) => ({ id: "p1_" + i,
+    fields: { City: "Omaha", "Event Date": "2026-07-03", Name: "N" + i, Installer: "cody", Status: "Booked" } })), offset: "next" };
+  const page2 = { records: [{ id: "p2_0", fields: { City: "Omaha", "Event Date": "2026-07-04", Name: "Tail", Installer: "cody", Status: "Booked" } }] };
+  const fetchImpl = async (url) => {
+    if (String(url).includes("offset=next")) return { ok: true, json: async () => page2 };
+    return { ok: true, json: async () => page1 };
+  };
+  const out = await buildRoster({ env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    fetchImpl, loadEvents: async () => [] });
+  assert.equal(out.bookings.length, 101);
+  assert.ok(out.bookings.some((b) => b.name === "Tail"), "record beyond page 1 present");
+});

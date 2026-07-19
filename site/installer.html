@@ -879,8 +879,16 @@
 
   function matchesQ(b){
     var q=STATE.q.trim().toLowerCase(); if(!q) return true;
-    return [b.name,b.vehicle,b.vin,b.city,b.calibration,b.phone,b.tuningPlatform,b.calibrationType]
+    var hit=[b.name,b.vehicle,b.vin,b.city,b.calibration,b.phone,b.email,b.ecuId,b.dateISO,b.scheduledTime,b.tuningPlatform,b.calibrationType]
       .some(function(v){ return String(v||'').toLowerCase().indexOf(q)>=0; });
+    if(hit) return true;
+    // Digits-only query (4+): match the phone with formatting stripped, so
+    // 6125551234 finds "(612) 555-1234".
+    var qd=q.replace(/[^0-9]/g,'');
+    if(qd.length>=4 && qd===q.replace(/[^a-z0-9]/g,'')){
+      return String(b.phone||'').replace(/[^0-9]/g,'').indexOf(qd)>=0;
+    }
+    return false;
   }
 
   function secHead(label,cls){ var d=document.createElement('div'); d.className='sec'+(cls?' '+cls:''); d.innerHTML='<span class="lbl">'+esc(label)+'</span>'; return d; }

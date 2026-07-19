@@ -84,11 +84,13 @@ async function getRecord({ fetchImpl = fetch, token, baseId, table, id }) {
   if (!res.ok) throw new Error(`airtable get ${res.status}`);
   return res.json();
 }
-async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSize = 100 }) {
+async function listAllRecords({ fetchImpl = fetch, token, baseId, table, pageSize = 100, filterByFormula, fields }) {
   const out = [];
   let offset;
   do {
     const params = new URLSearchParams({ pageSize: String(pageSize) });
+    if (filterByFormula) params.set("filterByFormula", filterByFormula);
+    (fields || []).forEach((f) => params.append("fields[]", f));
     if (offset) params.set("offset", offset);
     const url = `${API}/${baseId}/${encodeURIComponent(table)}?${params.toString()}`;
     const res = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` } });

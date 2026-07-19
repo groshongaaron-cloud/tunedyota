@@ -95,3 +95,22 @@ test("getRecord throws on non-ok", async () => {
   const fetchImpl = async () => ({ ok: false, status: 404 });
   await assert.rejects(getRecord({ fetchImpl, token: "t", baseId: "b", table: "Bookings", id: "x" }), /airtable get 404/);
 });
+
+test("listAllRecords forwards filterByFormula and fields[] on every page", async () => {
+  const urls = [];
+  const pages = [
+    { records: [{ id: "a", fields: {} }], offset: "p2" },
+    { records: [{ id: "b", fields: {} }] },
+  ];
+  let call = 0;
+  const fetchImpl = async (url) => { urls.push(String(url)); const body = pages[call++]; return { ok: true, json: async () => body }; };
+  const { listAllRecords } = require("../netlify/functions/lib/airtable.js");
+  const recs = await listAllRecords({ fetchImpl, token: "t", baseId: "b", table: "Bookings",
+    filterByFormula: '{Status}!="Cancelled"', fields: ["Name", "Slot"] });
+  assert.equal(recs.length, 2);
+  for (const u of urls) {
+    // URLSearchParams (form-urlencoded) encoding: { %7B, } %7D, ! %21, " %22
+    assert.ok(u.includes("filterByFormula=%7BStatus%7D%21%3D%22Cancelled%22"), "filter on every page: " + u);
+    assert.ok(u.includes("fields%5B%5D=Name") && u.includes("fields%5B%5D=Slot"), "fields on every page: " + u);
+  }
+});
