@@ -6,7 +6,7 @@ const { formatSlot } = require("./lib/slots.js");
 const { flexFuelNote } = require("./lib/flex-fuel.js");
 const { getAllActiveEvents } = require("./lib/events.js");
 const { getMarket } = require("./lib/markets.js");
-const { keyToInstaller } = require("./lib/routing.js");
+const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 const EVENTS = require("./lib/events-data.js");
 const { deriveVehicle, resolveCommission } = require("./lib/ott-commission.js");
 
@@ -27,17 +27,21 @@ async function buildRoster(deps) {
           list = (a) => listRecords({ fetchImpl, ...a }),
           loadEvents = () => getAllActiveEvents({ fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }) } = deps;
   const c = cfg(env);
-  // Admins see every installer's roster; regular installers are scoped to their own key.
+  // Admins see every installer's roster; regular installers are scoped to their own
+  // key. FIND (not equality) so records tagged with a legacy long-label option
+  // ("Noah - Milwaukee, …") still reach their installer; keys are trusted values
+  // from resolveInstaller, never user input.
   const filterByFormula = admin
     ? `{Status}!="Cancelled"`
-    : `AND({Installer}="${key}",{Status}!="Cancelled")`;
+    : `AND(FIND("${key}", LOWER({Installer}&""))>0,{Status}!="Cancelled")`;
   const recs = await list({ token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula });
   const today = now.toISOString().slice(0, 10);
   const bookings = recs.map((r) => {
     const f = r.fields || {};
     const src = String(f.Source || "");
-    // Installer arrives as a single-select string OR a multi-select array — normalize.
-    const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+    // Installer arrives as a single-select string, multi-select array, or legacy
+    // long label — normalize to the canonical key.
+    const owner = normalizeInstallerKey(f.Installer);
     let commission = null;
     if (f.Status === "Completed") {
       const dv = deriveVehicle(f.Vehicle || "");

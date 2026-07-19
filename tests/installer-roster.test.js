@@ -15,7 +15,7 @@ test("scopes to installer, includes past + future, flags walk-ins, sorts by date
     ];
   };
   const out = await buildRoster({ env, key: "cody", now: new Date("2026-07-03T12:00:00Z"), list });
-  assert.match(formula, /\{Installer\}="cody"/);
+  assert.match(formula, /FIND\("cody", LOWER\(\{Installer\}&""\)\)/);
   assert.match(formula, /\{Status\}!="Cancelled"/);
   assert.equal(out.installer, "cody");
   assert.equal(out.today, "2026-07-03");
@@ -189,4 +189,15 @@ test("roster booking rows expose an ott flag from Source", async () => {
   assert.equal(scott.ott, false, "empty Source (Scott) should NOT be ott");
   assert.equal(dave.ott,  false, "find-your-exact-tune should NOT be ott");
   assert.equal(eve.ott,   false, "'OTT Update' re-flash source must NOT be ott");
+});
+test("non-admin roster formula matches legacy long-label Installer values too", async () => {
+  let formula = "";
+  const out = await buildRoster({ env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, key: "noah",
+    list: async (a) => { formula = a.filterByFormula; return [
+      { id: "r1", fields: { City: "Milwaukee", "Event Date": "2026-07-18", Name: "L", Installer: ["Noah - Milwaukee, Green Bay, Kohler, "], Status: "Booked" } },
+    ]; },
+    loadEvents: async () => [] });
+  assert.match(formula, /FIND\("noah", LOWER\(\{Installer\}&""\)\)/);
+  assert.equal(out.bookings.length, 1);
+  assert.equal(out.bookings[0].installer, "noah");   // normalized, not the raw label
 });

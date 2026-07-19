@@ -13,7 +13,7 @@
 //   POST { token, op, ... }                 → op: "overrides" | "complete" | "walkin"
 const { cfg, listAllRecords, updateRecord, createRecord, updateTolerant, createTolerant, getRecord, deleteRecord } = require("./lib/airtable.js");
 const { flattenRecords } = require("./lib/report-sources.js");
-const { keyToInstaller, INSTALLERS } = require("./lib/routing.js");
+const { keyToInstaller, INSTALLERS, normalizeInstallerKey } = require("./lib/routing.js");
 const { CAL_OPTIONS } = require("./lib/certificate.js");
 const { ecuCandidates, defaultGear } = require("./lib/ecu-ids.js");
 const { commissionCandidates, resolveCommission } = require("./lib/ott-commission.js");
@@ -473,7 +473,7 @@ async function noShow(params, deps) {
   catch (e) { if (log.error) log.error("ott noshow", e.message); return { status: "error", code: 502, error: "save-failed", detail: e.message }; }
   let waitlisted = false;
   try {
-    const inst = Array.isArray(f.Installer) ? f.Installer[0] : (f.Installer || "");
+    const inst = normalizeInstallerKey(f.Installer);
     const fields = { City: f.City || "", Name: f.Name || "", Phone: f.Phone || "", Email: f.Email || "",
       Vehicle: f.Vehicle || "", Modifications: f.Modifications || "", Installer: inst,
       Reason: `No-show — ${f.City || ""} ${String(f["Event Date"] || "").slice(0, 10)}`.trim(), Source: "owner:no-show" };

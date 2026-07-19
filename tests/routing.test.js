@@ -41,3 +41,24 @@ test("parseSmsOverrides returns empty object for invalid JSON", () => {
 test("parseSmsOverrides returns empty object for missing env var", () => {
   assert.deepEqual(parseSmsOverrides({}), {});
 });
+
+const { normalizeInstallerKey } = require("../netlify/functions/lib/routing.js");
+
+test("normalizeInstallerKey: canonical keys and multi-select arrays pass through", () => {
+  assert.equal(normalizeInstallerKey("noah"), "noah");
+  assert.equal(normalizeInstallerKey(["cody"]), "cody");
+  assert.equal(normalizeInstallerKey(["AARON"]), "aaron");
+});
+
+test("normalizeInstallerKey: legacy long-label Airtable options map to the canonical key", () => {
+  assert.equal(normalizeInstallerKey("Noah - Milwaukee, Green Bay, Kohler, "), "noah");
+  assert.equal(normalizeInstallerKey(["Aaron - Twin Cities, Duluth, Cedar Rapids, Des Moines, Fargo, Madison, Eau Claire"]), "aaron");
+  assert.equal(normalizeInstallerKey("Cody - Omaha, Lincoln, Sioux Falls, Rapid City"), "cody");
+});
+
+test("normalizeInstallerKey: unknown or empty values -> empty string", () => {
+  assert.equal(normalizeInstallerKey(""), "");
+  assert.equal(normalizeInstallerKey(undefined), "");
+  assert.equal(normalizeInstallerKey("someone else"), "");
+  assert.equal(normalizeInstallerKey([]), "");
+});

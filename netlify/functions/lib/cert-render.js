@@ -2,15 +2,14 @@
 // Shared "booking record -> certificate HTML" core, used by BOTH the installer
 // repository (installer-certificate.js) and the client portal (client-certs.js).
 // Deterministic: stable serial + stored issue date. Callers own auth/ownership.
-const { keyToInstaller } = require("./routing.js");
+const { keyToInstaller, normalizeInstallerKey } = require("./routing.js");
 const { buildCertificate, certSerial } = require("./certificate.js");
 const { resolveFluids } = require("./amsoil-fluids.js");
 const { qrSvg } = require("./qr.js");
 
 function certHtmlForRecord(rec) {
   const f = (rec && rec.fields) || {};
-  const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
-  const inst = keyToInstaller(owner);
+  const inst = keyToInstaller(normalizeInstallerKey(f.Installer));
   const calibrationDate = String(f["Calibration Date"] || f["Event Date"] || "").slice(0, 10);
   const issueDate = String(f["Certificate Issued"] || calibrationDate).slice(0, 10);
   const certNo = certSerial(rec.id, calibrationDate, issueDate);

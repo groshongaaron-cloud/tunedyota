@@ -13,6 +13,20 @@ function keyToInstaller(key) {
   return INSTALLERS[key] || INSTALLERS[FALLBACK_KEY];
 }
 
+// Normalize an Airtable Installer field value to a canonical key. The live base's
+// Installer column is a multi-select whose options include both canonical keys
+// ("noah") and legacy long labels ("Noah - Milwaukee, Green Bay, Kohler, "), so a
+// value can arrive as a string or array of either form. Returns "" when nothing
+// matches, so callers keep their own fallback semantics.
+function normalizeInstallerKey(value) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const s = String(raw == null ? "" : raw).trim().toLowerCase();
+  if (!s) return "";
+  if (INSTALLERS[s]) return s;
+  const first = (s.match(/^([a-z]+)/) || [])[1];
+  return INSTALLERS[first] ? first : "";
+}
+
 // Where to SMS an installer, and which inbound number identifies them. The
 // public INSTALLERS phone can be the Twilio line itself (it forwards), so
 // INSTALLER_SMS_NUMBERS ({"key":"+1..."}) overrides with the real cell.
@@ -27,4 +41,4 @@ function smsNumberFor(key, env) {
   return digits.length === 10 ? `+1${digits}` : String((INSTALLERS[key] || {}).phone || "");
 }
 
-module.exports = { INSTALLERS, FALLBACK_KEY, keyToInstaller, parseSmsOverrides, smsNumberFor };
+module.exports = { INSTALLERS, FALLBACK_KEY, keyToInstaller, normalizeInstallerKey, parseSmsOverrides, smsNumberFor };

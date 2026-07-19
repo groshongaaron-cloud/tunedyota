@@ -4,7 +4,7 @@
 // certificate-dispatch backstops any send failure). Ownership is re-checked server-side.
 const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { keyToInstaller } = require("./lib/routing.js");
+const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate.js");
 const { sendEmail } = require("./lib/resend.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
@@ -30,8 +30,9 @@ async function processCloseout(body, deps) {
   catch (e) { if (log.error) log.error("closeout get", e.message); return { status: "error", error: "store-unavailable" }; }
   const f = (rec && rec.fields) || {};
   // Airtable returns Installer as a single-select string OR a multi-select array
-  // (the live base uses multi-select → ["aaron"]). Normalize before the ownership check.
-  const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+  // (the live base uses multi-select → ["aaron"]), and legacy options carry long
+  // labels ("Noah - Milwaukee, …"). Normalize before the ownership check.
+  const owner = normalizeInstallerKey(f.Installer);
   // Admins may close out any installer's booking; regular installers only their own.
   // The certificate + waitlist still route to the OWNING installer (see below), so an
   // admin close-out never misattributes the job.

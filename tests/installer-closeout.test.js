@@ -339,3 +339,15 @@ test("a malformed/oversized signature is ignored, completion still succeeds", as
   assert.equal(out.status, "completed");
   assert.ok(!("Customer Signature" in written));
 });
+
+test("a booking tagged with the legacy long-label Installer option is still closeable by its installer", async () => {
+  const updates = []; let sent = null;
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
+    { env, key: "noah", now: new Date("2026-07-18T12:00:00Z"),
+      get: async () => recFor(["Noah - Milwaukee, Green Bay, Kohler, "]),
+      update: async (a) => { updates.push(a.fields); return {}; },
+      send: async (m) => { sent = m; return { ok: true }; } });
+  assert.equal(out.status, "completed");
+  assert.equal(updates[0].Status, "Completed");
+  assert.equal(sent.to, "noah@tunedyota.com");   // fallback routes to noah, not the aaron default
+});

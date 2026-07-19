@@ -1,7 +1,7 @@
 const { cfg, listRecords, updateRecord, updateTolerant } = require("./lib/airtable.js");
 const { sendEmail } = require("./lib/resend.js");
 const { notifyOwner } = require("./lib/alert.js");
-const { keyToInstaller } = require("./lib/routing.js");
+const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 const { buildCertificate, certSerial } = require("./lib/certificate.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
@@ -33,11 +33,11 @@ async function dispatchCertificates(deps) {
     // than send a blank one. Left unmarked, so a later run sends it once set.
     if (!calibration) {
       held.push(f.Name || row.id);
-      const heldOwner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+      const heldOwner = normalizeInstallerKey(f.Installer);
       if (heldOwner) { try { await push(heldOwner, { title: "Certificate on hold", body: `Set the OTT calibration for ${f.Name || "a customer"}`, url: "/installer.html" }); } catch (e) { if (log.error) log.error("held webpush", e.message); } }
       continue;
     }
-    const inst = keyToInstaller(f.Installer);
+    const inst = keyToInstaller(normalizeInstallerKey(f.Installer));
     const customerEmail = String(f.Email || "").trim();
     const to = customerEmail || inst.email;
     const fluids = resolveFluids(f.Vehicle, f["Model Year"]);

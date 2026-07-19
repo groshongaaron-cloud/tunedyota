@@ -4,6 +4,7 @@
 // an admin. View-only proof of acceptance; the image is never in the roster payload.
 const { cfg, getRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
+const { normalizeInstallerKey } = require("./lib/routing.js");
 
 async function getSignature(id, deps) {
   const { env = process.env, fetchImpl = fetch, key, admin = false, log = console,
@@ -14,7 +15,7 @@ async function getSignature(id, deps) {
   try { rec = await get({ token: c.token, baseId: c.baseId, table: c.bookings, id }); }
   catch (e) { if (log.error) log.error("signature get", e.message); return { status: "error", error: "store-unavailable" }; }
   const f = (rec && rec.fields) || {};
-  const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+  const owner = normalizeInstallerKey(f.Installer);
   if (!admin && owner !== key) return { status: "error", error: "not-yours" };
   const sig = String(f["Customer Signature"] || "").trim();
   if (!sig) return { status: "none" };

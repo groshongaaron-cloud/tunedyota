@@ -115,3 +115,18 @@ test("backstop sends to the customer email when present, no cc", async () => {
   assert.equal(sent[0].to, "cust@example.com");
   assert.equal(sent[0].cc, undefined);
 });
+
+test("multi-select Installer array routes the fallback cert to the actual installer, not Aaron", async () => {
+  const d = deps({ list: async () => [{ id: "b7", fields: { Name: "Lee", Vehicle: "Tundra", Installer: ["cody"],
+    "Calibration Date": "2026-07-01", Status: "Completed", "OTT Calibration": "Medium" } }] });
+  await dispatchCertificates(d);
+  assert.equal(d._sends[0].to, "cody@tunedyota.com");
+});
+
+test("legacy long-label Installer value still routes to the right installer", async () => {
+  const d = deps({ list: async () => [{ id: "b8", fields: { Name: "Kim", Vehicle: "Tacoma",
+    Installer: ["Noah - Milwaukee, Green Bay, Kohler, "],
+    "Calibration Date": "2026-07-01", Status: "Completed", "OTT Calibration": "Medium" } }] });
+  await dispatchCertificates(d);
+  assert.equal(d._sends[0].to, "noah@tunedyota.com");
+});

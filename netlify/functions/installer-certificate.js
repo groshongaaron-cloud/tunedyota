@@ -5,6 +5,7 @@
 const { cfg, getRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { certHtmlForRecord } = require("./lib/cert-render.js");
+const { normalizeInstallerKey } = require("./lib/routing.js");
 
 async function renderCertificate(recordId, deps) {
   const { env = process.env, fetchImpl = fetch, key, admin = false,
@@ -15,7 +16,7 @@ async function renderCertificate(recordId, deps) {
   try { rec = await get({ token: c.token, baseId: c.baseId, table: c.bookings, id: recordId }); }
   catch { return { status: "error", error: "store-unavailable" }; }
   const f = (rec && rec.fields) || {};
-  const owner = Array.isArray(f.Installer) ? f.Installer[0] : f.Installer;
+  const owner = normalizeInstallerKey(f.Installer);
   if (!admin && owner !== key) return { status: "error", error: "not-yours" };
   return { status: "ok", html: certHtmlForRecord(rec) };
 }
