@@ -33,13 +33,21 @@ throughput or reduced fees but need extra approvals.
 - **Number:** +1 612-406-7117
 - **Use case:** Customer Care (conversational + transactional). **Not** marketing.
 
-## Campaign description
-> Tuned Yota sends conversational and transactional text messages to customers who
-> contact us about our vehicle-tuning services. Messages include appointment
-> confirmations and reminders, scheduling and follow-up about a customer's build or
-> service, replies to customer questions, and messages relayed between a customer and
-> their assigned installer. We only message people who have contacted us or given us
-> their number for this purpose. We do not send promotional or marketing content.
+## Campaign description (v3, filed 2026-07-20 — v2 was rejected w/ 30886; TCR wants
+## WHO SENDS / WHO RECEIVES / WHY stated mechanically, not implied)
+> Tuned Yota (tunedyota.com) is a Toyota and Lexus vehicle-calibration business located
+> in Lakeville, Minnesota. WHO SENDS: Tuned Yota staff and its assigned vehicle
+> installers send messages from our registered business number. WHO RECEIVES: existing
+> and prospective Tuned Yota customers who have opted in by (1) submitting the booking
+> form at tunedyota.com/find-your-exact-tune with a consent disclosure, (2) texting our
+> business number first, or (3) giving us their number in person and asking us to text
+> them. WHY: this CUSTOMER_CARE campaign sends conversational and transactional messages
+> only - appointment confirmations and reminders for scheduled calibration installs,
+> scheduling and follow-up about the customer's vehicle or service request, replies to
+> customer questions, and messages relayed between a customer and their assigned
+> installer. Message frequency varies with each customer's conversation. Recipients can
+> reply STOP to opt out or HELP for help at any time. We do not send marketing or
+> promotional messages.
 
 ## Opt-in / Call-to-Action / message flow  (most-scrutinized field — paste verbatim)
 > End users provide express consent to receive text messages in one of three ways:
