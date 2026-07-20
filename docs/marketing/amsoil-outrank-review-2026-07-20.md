@@ -72,6 +72,37 @@ The guide library (0W-20/5W-30/ATF/filter guides live) and state pages keep
 compounding, but new investment goes to Plays 1-3 first: the niche lane is
 uncontested TODAY; the generic lane is a multi-year domain-age grind.
 
+## Revenue forecast (grounded on Aaron's number: ~40 installs/month)
+
+Channel-stacked monthly run-rate, conservative → target:
+
+| Channel | Mechanics | Oct (Tier-1 checkpoint) |
+|---|---|---|
+| Install attach | 40 installs × 40-50% attach × kit AOV | $3K (oil kit ~$180) → **$6-7K (full refresh ~$350)** |
+| Events / local pickup | walk-ups + Reserve pickups, Elavon card-present | $1-2K |
+| Web funnel (referral + Reserve) | Play-1 wedge + guides + GBP, 30-day ?zo cookie | $2-4K (validated by Aug/Sep snapshots) |
+| PC recurring | ~15-20 new PCs/mo from installs+web → ~50-60 by Oct | ~$2K |
+| **Total** | | **~$8-15K** |
+
+**The honest read:** at 40 installs/mo, Tier 1 by Oct 13 is achievable but TIGHT,
+and only if the flagship offer is the **"Tuned-Truck Full Fluid Refresh"**
+(~$350: engine oil + filter + front/rear diff + transfer where applicable — the
+natural severe-service pitch for a freshly tuned truck) rather than a $180 oil
+kit. Attach rate is the single highest-leverage operating number; track it
+per event.
+
+**Tier 2 ($30K by year-end) does NOT pencil on retail alone** at current install
+volume (~$17-20K ceiling). It requires BOTH: (1) the **commercial/B2B lane**
+pulled forward to September — fleets/contractors/ag; the dealer library has a
+ready 10-email commercial drip + market briefs; 2-4 accounts at $2-3K/mo closes
+the gap; and (2) **install-volume growth** (more events/installer capacity —
+every added install is tune revenue AND an AMSOIL attach + future PC).
+
+Monthly checkpoints (measurement snapshot + amsoil-go click log + AMSOIL
+dealer-zone sales report): **Aug ≈ $4-6K · Sep ≈ $9-11K · Oct 13 ≈ $15K** —
+if a checkpoint misses by >30%, the lagging channel gets diagnosed or the plan
+gets re-cut rather than riding hope.
+
 ## Why we win
 
 Every prominent dealer is a marketing site wrapping the same referral link.
