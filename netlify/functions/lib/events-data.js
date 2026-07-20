@@ -38,7 +38,7 @@ module.exports = {
     { dateISO: "2027-11-13", label: "November 13, 2027", active: true, event: "Twin Cities, Minnesota Fall 2027 OTT Event", details: "", address: "To Be Released" },
   ],
   "rapid city": [
-    { dateISO: "2026-07-16", label: "July 16, 2026", active: true, event: "Rapid City, South Dakota Summer 2026 OTT Event", details: "", address: "To Be Released" },
+    { dateISO: "2026-07-16", label: "July 16, 2026", active: false, event: "Rapid City, South Dakota Summer 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2026-09-19", label: "September 19, 2026", active: true, event: "Rapid City, South Dakota Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-07-17", label: "July 17, 2027", active: true, event: "Rapid City, South Dakota Summer 2027 OTT Event", details: "", address: "To Be Released" },
   ],
@@ -78,7 +78,7 @@ module.exports = {
     { dateISO: "2026-09-26", label: "September 26, 2026", active: true, event: "Rochester, Minnesota Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-08-07", label: "August 7, 2027", active: true, event: "Rochester, Minnesota Summer 2027 OTT Event", details: "", address: "To Be Released" },
   ],
-  "coon rapids": { dateISO: "2026-07-18", label: "July 18, 2026", active: true, event: "Carlson Toyota Tacos & Tacomas — Coon Rapids, MN OTT Event", details: "10:30 AM – 1:00 PM", address: "Carlson Toyota, 12880 Riverdale Dr NW, Coon Rapids, MN 55448" },
+  "coon rapids": { dateISO: "2026-07-18", label: "July 18, 2026", active: false, event: "Carlson Toyota Tacos & Tacomas — Coon Rapids, MN OTT Event", details: "10:30 AM – 1:00 PM", address: "Carlson Toyota, 12880 Riverdale Dr NW, Coon Rapids, MN 55448" },
   "mankato":     { dateISO: "2027-08-08", label: "August 8, 2027", active: true, event: "Mankato, Minnesota Summer 2027 OTT Event", details: "", address: "To Be Released" },
   "davenport":   { dateISO: "2027-06-06", label: "June 6, 2027", active: true, event: "Davenport, Iowa Summer 2027 OTT Event", details: "", address: "To Be Released" },
   "sioux city":  { dateISO: "2027-06-27", label: "June 27, 2027", active: true, event: "Sioux City, Iowa Summer 2027 OTT Event", details: "", address: "To Be Released" },
