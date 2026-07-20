@@ -60,6 +60,10 @@
 /gift-card                                    /                                             301
 /payment-request-page                         /                                             301
 
+# ── Old Wix blog → new pages (specific rule before the catch-all) ──
+/blog/categories/drivability-problems         /ott-tune                                     301
+/blog/*                                       /                                             301
+
 # ── Catch-alls for any old booking/service slug not matched above ──
 /service-page/*                               /find-your-exact-tune                         301
 /booking-calendar/*                           /find-your-exact-tune                         301
