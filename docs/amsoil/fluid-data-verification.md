@@ -1,9 +1,29 @@
 # AMSOIL Garage — Fluid Data Verification Checklist
 
-**Status: ALL ENTRIES ARE DRAFT — nothing below is authoritative until verified by an installer or the owner.**
+**Status (2026-07-20): engine-oil + differential + transfer-case capacities are
+cross-source VERIFIED for every row** (see `scripts/amsoil-capacity-reconciliation.json`,
+`amsoil-driveline-reconciliation.json`, `amsoil-flagged-reconciliation.json` for sources
+per value). Transmissions are deliberately unverified (sealed/overflow fill — no honest
+single number). The draft-era checklist below remains for re-verification workflow.
 
-Generated: 2026-07-10
-Branch: `amsoil-fluid-data`
+Generated: 2026-07-10 · Branch: `amsoil-fluid-data`
+
+---
+
+## Storefront catalog refresh (monthly, or when AMSOIL adds products)
+
+The on-site "Shop All AMSOIL" store (`/amsoil-garage`) renders `site/amsoil-catalog.json` —
+a point-in-time build from AMSOIL's product sitemap with per-product images. One command
+refreshes all of it (sitemap re-scrape via Firecrawl → shared categorization rules →
+og:image harvest via curl; images are carried over between runs, only new products fetch):
+
+```
+npm run refresh:amsoil-catalog
+```
+
+Then `npm test`, review the diff (new/renamed/removed products, category counts, anything
+landing in "Other Specialty" — tighten `scripts/amsoil-categorize.mjs` if so), commit and
+push. Requires the local Firecrawl key (read from `~/.claude.json`) — cloud/CI can't run it.
 
 ---
 

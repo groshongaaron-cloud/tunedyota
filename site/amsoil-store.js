@@ -17,7 +17,9 @@
     var items = filtered(), CAP = 240;
     count.textContent = items.length + " of " + CAT.count + " products";
     grid.innerHTML = items.slice(0, CAP).map(function (p) {
-      return '<div class="asx-card"><div class="asx-cat">' + esc(p.category) + "</div>" +
+      return '<div class="asx-card">' +
+        (p.img ? '<div class="asx-img"><img src="' + esc(p.img) + '" alt="' + esc(p.name) + '" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>' : "") +
+        '<div class="asx-cat">' + esc(p.category) + "</div>" +
         '<div class="asx-name">' + esc(p.name) + "</div>" +
         '<div class="asx-code">Stock #' + esc(p.code) + "</div>" +
         '<a class="asx-buy" href="' + esc(p.buyUrl) + '" target="_blank" rel="noopener">Buy at AMSOIL &rarr;</a></div>';
