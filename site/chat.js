@@ -63,7 +63,9 @@
     input = el("input", { id: "ty-chat-input", placeholder: "Type a message…", maxlength: "1000" });
     sendBtn = el("button", { id: "ty-chat-send", type: "submit" }, "Send");
     form.appendChild(input); form.appendChild(sendBtn);
-    panel.appendChild(head); panel.appendChild(log); panel.appendChild(form);
+    var fine = el("div", { id: "ty-chat-fine", style: "font-size:10px;line-height:1.45;color:#9aa08f;padding:2px 12px 9px;text-align:center" });
+    fine.innerHTML = 'By sharing your contact info here, you agree we may reply by text. Msg &amp; data rates may apply; reply STOP to opt out, HELP for help. <a href="/privacy" target="_blank" rel="noopener" style="color:#9aa08f;text-decoration:underline">Privacy</a> &middot; <a href="/terms" target="_blank" rel="noopener" style="color:#9aa08f;text-decoration:underline">Terms</a>.';
+    panel.appendChild(head); panel.appendChild(log); panel.appendChild(form); panel.appendChild(fine);
     document.body.appendChild(panel);
     addMsg("ai", "Thank you for using Tuned Yota's chat agent. What can I help you with — your truck, a tune, or an upcoming event?");
     close.addEventListener("click", function () { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } panel.remove(); open = false; btn.style.display = ""; });

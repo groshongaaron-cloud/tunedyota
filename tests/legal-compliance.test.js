@@ -45,6 +45,13 @@ test("privacy + terms are linked in the site footer", () => {
   }
 });
 
+test("chat widget carries the SMS opt-in disclosure", () => {
+  const js = read("chat.js");
+  assert.match(js, /agree we may reply by text/i, "chat consent line");
+  assert.match(js, /\bSTOP\b/, "chat STOP");
+  assert.ok(js.includes('href="/privacy"') && js.includes('href="/terms"'), "chat links Privacy + Terms");
+});
+
 test("booking form shows the text-consent line at the point of phone capture", () => {
   const html = read("find-your-exact-tune.html");
   const idx = html.indexOf('id="fSubmit"');
