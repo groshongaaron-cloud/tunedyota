@@ -196,8 +196,8 @@ function page(model, models) {
   const faqSchema = faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
   const faqVisible = faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
 
-  const title = `AMSOIL Synthetic Oil &amp; Fluids for the ${ESC(name)} | Tuned Yota`;
-  const desc = `The exact AMSOIL synthetic oil, filter, gear lube, and ATF for your ${ESC(name)} — recommended grades and severe-service intervals for tuned and towing builds. Order online from Tuned Yota, an Authorized AMSOIL Dealer.`;
+  const title = `AMSOIL Synthetic Oil &amp; Filter for the ${ESC(name)} — Best for Tuned &amp; Towing | Tuned Yota`;
+  const desc = `The exact AMSOIL synthetic oil, filter, gear lube, and ATF for your ${ESC(name)} — recommended grades and severe-service intervals for tuned and towing builds. Order online from Tuned Yota, an Authorized AMSOIL Dealer shipping direct nationwide.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -208,7 +208,7 @@ function page(model, models) {
 <meta name="description" content="${desc}">
 <link rel="canonical" href="${url}">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","@id":"${url}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${url}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"Country","name":"United States"},"description":${JSON.stringify(`AMSOIL synthetic motor oil, filters, gear lube, and ATF for the ${name}, sold by Tuned Yota, an Authorized AMSOIL Dealer.`)}${offers ? `,"hasOfferCatalog":{"@type":"OfferCatalog","name":${JSON.stringify(`AMSOIL fluids for the ${name}`)},"itemListElement":[${offers}]}` : ""}}
+{"@context":"https://schema.org","@type":"Store","@id":"${url}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${url}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"},{"@type":"Country","name":"United States"}],"description":${JSON.stringify(`AMSOIL synthetic motor oil, filters, gear lube, and ATF for the ${name}, sold by Tuned Yota, an Authorized AMSOIL Dealer.`)}${offers ? `,"hasOfferCatalog":{"@type":"OfferCatalog","name":${JSON.stringify(`AMSOIL fluids for the ${name}`)},"itemListElement":[${offers}]}` : ""}}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[${faqSchema}]}
@@ -261,7 +261,7 @@ ${vehHub(models, slug)}
 
   <div class="lp-links">
     <strong>More on the ${ESC(name)}:</strong><br>
-    <a href="${ottPage(slug)}">${ESC(name)} OTT Tune</a><a href="amsoil-garage.html">AMSOIL Garage</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a><a href="ott-tune.html">What is the OTT Tune?</a>
+    <a href="${ottPage(slug)}">${ESC(name)} OTT Tune</a><a href="amsoil-garage.html">AMSOIL Garage</a><a href="amsoil-vs-oem-toyota-lexus-fluids.html">AMSOIL vs. OEM fluids</a><a href="amsoil-synthetic-motor-oil-guide.html">AMSOIL oil guide</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a><a href="ott-tune.html">What is the OTT Tune?</a>
   </div>
   <div class="lp-final"><a class="btn primary" href="amsoil-garage.html?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}">Open your AMSOIL Garage →</a></div>
   <p class="lp-disc">Product, viscosity, and filter recommendations are from AMSOIL's official vehicle guide. Fill capacities and drain intervals shown in the interactive AMSOIL Garage are verified per configuration as our installers confirm them — check your owner's manual or contact us before service. Checkout completes on amsoil.com.</p>
@@ -329,7 +329,7 @@ function garageOfferCatalog() {
 export function buildAmsoilGarageStore() {
   const file = path.join(SITE, "amsoil-garage.html");
   let html = fs.readFileSync(file, "utf8");
-  const store = `{"@context":"https://schema.org","@type":"Store","@id":"${GARAGE_URL}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${GARAGE_URL}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":{"@type":"Country","name":"United States"},"description":"Authorized AMSOIL Dealer selling synthetic motor oil, oil and air filters, gear lube, and ATF for Toyota and Lexus vehicles, with capacities and severe-service intervals for tuned and towing builds.","hasOfferCatalog":{"@type":"OfferCatalog","name":"AMSOIL synthetic fluids for Toyota & Lexus","itemListElement":[${garageOfferCatalog()}]}}`;
+  const store = `{"@context":"https://schema.org","@type":"Store","@id":"${GARAGE_URL}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${GARAGE_URL}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"},{"@type":"Country","name":"United States"}],"description":"Authorized AMSOIL Dealer selling synthetic motor oil, oil and air filters, gear lube, and ATF for Toyota and Lexus vehicles, with capacities and severe-service intervals for tuned and towing builds.","hasOfferCatalog":{"@type":"OfferCatalog","name":"AMSOIL synthetic fluids for Toyota & Lexus","itemListElement":[${garageOfferCatalog()}]}}`;
   const inner = `<script type="application/ld+json">\n${store}\n</script>`;
   const block = `<!-- SEO:AMSOIL-STORE:START -->\n${inner}\n<!-- SEO:AMSOIL-STORE:END -->`;
   const re = /<!-- SEO:AMSOIL-STORE:START -->[\s\S]*?<!-- SEO:AMSOIL-STORE:END -->/;

@@ -51,6 +51,35 @@ test("INTEGRITY: no capacity/interval numbers leak while every generation is ver
   }
 });
 
+test("SEO: title targets the vehicle + oil/filter intent, and links the topical cluster", async () => {
+  const { AMSOIL_PAGE_FILES } = await mod();
+  for (const f of AMSOIL_PAGE_FILES) {
+    const html = fs.readFileSync(path.join(SITE, f), "utf8");
+    const title = (html.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || "";
+    assert.match(title, /AMSOIL Synthetic Oil &amp; Filter for the /, `${f} title targets oil+filter`);
+    assert.match(title, /Best for Tuned &amp; Towing/, `${f} title carries the niche superlative`);
+    // Topical cluster: each vehicle page links the comparison + oil-guide hubs.
+    assert.ok(html.includes('href="amsoil-vs-oem-toyota-lexus-fluids.html"'), `${f} links the AMSOIL-vs-OEM page`);
+    assert.ok(html.includes('href="amsoil-synthetic-motor-oil-guide.html"'), `${f} links the oil guide`);
+  }
+});
+
+test("SEO: Store schema carries the Upper-Midwest service area (local intent)", async () => {
+  const { AMSOIL_PAGE_FILES } = await mod();
+  const files = [...AMSOIL_PAGE_FILES, "amsoil-garage.html"];
+  for (const f of files) {
+    const html = fs.readFileSync(path.join(SITE, f), "utf8");
+    const store = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+      .map((m) => JSON.parse(m[1])).find((o) => o["@type"] === "Store");
+    assert.ok(store, `${f} has a Store block`);
+    const areas = [].concat(store.areaServed).map((a) => a && a.name);
+    for (const st of ["Minnesota", "Iowa", "Wisconsin", "North Dakota", "South Dakota", "Nebraska"]) {
+      assert.ok(areas.includes(st), `${f} Store areaServed includes ${st}`);
+    }
+    assert.ok(areas.includes("United States"), `${f} Store areaServed keeps national shipping`);
+  }
+});
+
 test("order links carry the Tuned Yota dealer referral (zo)", async () => {
   const { AMSOIL_PAGE_FILES } = await mod();
   for (const f of AMSOIL_PAGE_FILES) {
