@@ -220,10 +220,56 @@
     });
     var total = AmsoilGarage.bundleTotal(gen, CAT.products);
     var kit = '<div class="bundle"><strong>&#128722; Full service kit — ' + resolved.make + ' ' + resolved.model + ' ' + gen.y + '</strong>' +
-      '<p style="margin:6px 0 0">Every fluid this build needs. Add each item to your AMSOIL cart (they stay for 30 days) — total about <strong>' + money(total) + '</strong> retail.</p></div>' +
+      '<p style="margin:6px 0 0">Every fluid this build needs. Add each item to your AMSOIL cart (they stay for 30 days) — total about <strong>' + money(total) + '</strong> retail.</p>' +
+      '<div id="ag-reserve-zone" style="margin-top:12px">' +
+        '<button type="button" id="ag-reserve-open" class="ag-add-btn" style="font-weight:800">&#128230; Reserve this kit — pick up locally or at your install</button>' +
+        '<form id="ag-reserve-form" hidden style="margin-top:10px">' +
+          '<p style="margin:0 0 8px;font-size:13px;color:var(--sage-d)">No online payment — we hold your kit and confirm personally; pay when you pick it up or at your install.</p>' +
+          '<input class="agr-f" name="name" placeholder="Your name" autocomplete="name" required style="width:100%;margin:3px 0;padding:10px;border:1.5px solid var(--line);border-radius:10px">' +
+          '<input class="agr-f" name="email" type="email" placeholder="Email" autocomplete="email" style="width:100%;margin:3px 0;padding:10px;border:1.5px solid var(--line);border-radius:10px">' +
+          '<input class="agr-f" name="phone" type="tel" placeholder="Phone" autocomplete="tel" style="width:100%;margin:3px 0;padding:10px;border:1.5px solid var(--line);border-radius:10px">' +
+          '<input name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">' +
+          '<label style="font-size:13px;margin-right:14px"><input type="radio" name="fulfillment" value="pickup" checked> Pickup / install day</label>' +
+          '<label style="font-size:13px"><input type="radio" name="fulfillment" value="delivery"> Delivery (we\'ll confirm)</label>' +
+          '<button type="submit" class="ag-add-btn" style="display:block;margin-top:8px;font-weight:800">Reserve my kit</button>' +
+          '<div id="ag-reserve-msg" style="font-weight:700;margin-top:6px"></div>' +
+        '</form>' +
+      '</div></div>' +
       '<p style="font-size:12px;color:var(--sage-d);margin:10px 2px 0">Capacities are for the standard configuration. Some variants differ — e.g. a TRD e-locker rear differential holds about a quart more than the standard axle — so check your owner\'s manual or ask us before you buy.</p>';
     g.innerHTML = '<h2 style="font-family:Spectral,serif;color:var(--ink);margin:18px 0 12px">' +
       resolved.make + ' ' + resolved.model + ' <span style="color:var(--sage-d);font-size:15px">' + gen.e + '</span></h2>' + rows + kit;
+    wireReserve(resolved, gen);
+  }
+
+  // "Reserve this kit" — the compliant AMSOIL checkout: no online payment; the
+  // reservation lands in the lead pipeline and we confirm personally.
+  function wireReserve(resolved, gen) {
+    var open = el("ag-reserve-open"), form = el("ag-reserve-form");
+    if (!open || !form) return;
+    open.onclick = function () { form.hidden = !form.hidden; };
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var f = form.elements, m = el("ag-reserve-msg");
+      var payload = {
+        name: f.name.value.trim(), email: f.email.value.trim(), phone: f.phone.value.trim(),
+        company: f.company.value, fulfillment: f.fulfillment.value,
+        vehicle: resolved.make + " " + resolved.model + " " + gen.y + " " + gen.e,
+        kit: gen.bundle || []
+      };
+      if (!payload.name || (!payload.email && !payload.phone)) {
+        m.textContent = "Add your name plus an email or phone so we can confirm."; m.style.color = "#b3261e"; return;
+      }
+      m.textContent = "Reserving…"; m.style.color = "";
+      fetch("/.netlify/functions/amsoil-reserve", { method: "POST",
+        headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.status === "ok") {
+            form.innerHTML = '<p style="font-weight:800;color:#1d7a3d;margin:6px 0">&#10003; Kit reserved — we\'ll confirm personally and have it ready.</p>';
+          } else { m.textContent = "Couldn't reserve just now — call or text 612-406-7117 and we'll set it aside."; m.style.color = "#b3261e"; }
+        })
+        .catch(function () { m.textContent = "Couldn't reserve just now — call or text 612-406-7117 and we'll set it aside."; m.style.color = "#b3261e"; });
+    };
   }
 
   var makes = Object.keys(CAT.vehicles);

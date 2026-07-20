@@ -14,11 +14,17 @@ credentials exist.
   sales and price inquiries shall be conducted by directing customers to the
   AMSOIL online store…"* (§7.3 and §7.11 reinforce it). A dealer-owned cart
   selling AMSOIL at posted prices risks the dealer agreement — the same class of
-  risk as the OTT IP boundary. The **compliant AMSOIL "checkout" is exactly what
-  is already live**: the on-site store hands off to amsoil.com under the
-  `?zo=30713116` referral, and the Preferred-Customer path locks in the recurring
-  attribution. If Aaron wants to revisit, the move is asking his AMSOIL regional
-  rep in writing — not building first.
+  risk as the OTT IP boundary. The **compliant AMSOIL "checkout" has two legs**:
+  (1) the referral hand-off — on-site store → amsoil.com under `?zo=30713116`,
+  PC path for recurring attribution; (2) **the Reserve flow (shipped 2026-07-20)**
+  — the customer builds their kit in the AMSOIL Garage and reserves it with NO
+  online payment (`amsoil-reserve` function → lead pipeline → personal
+  confirmation, which is the "personal communications" channel §7.6 sanctions);
+  payment completes in person via **Elavon card-present** at pickup/install or a
+  personal 1:1 invoice. Aaron's business context (2026-07-20): physical location
+  holds stock for pickup/delivery, and all posted prices are AMSOIL's full MSRP —
+  Aaron holds this pricing display compliant; the §7.6/§7.11 text does not carve
+  out MSRP, so written rep confirmation is still the recommended backstop.
 - **Tuned Yota app: YES for Magnuson** — the same `create-payment-session`
   function serves the app; the Converge Lightbox opens in a WebView/system
   browser. No separate gateway work expected (see the Elavon ask-list below).
