@@ -89,3 +89,17 @@ test("client message on an escalated session notifies the installer, ai session 
   await processChat({ session: "s1", message: "hello" }, mk("ai"));
   assert.equal(pings.length, 1);
 });
+
+test("sync-throwing notify does not prevent customer from receiving a 200 reply", async () => {
+  const { processChat } = require("../netlify/functions/chat.js");
+  const deps = {
+    env: ENV, log: { error: () => {} },
+    load: async () => SESS({ status: "escalated", lastActivity: new Date().toISOString() }),
+    save: async (s) => s,
+    ai: async () => ({ reply: "ok", transfer: null }),
+    notify: function () { throw new Error("sync boom"); },
+  };
+  const out = await processChat({ session: "s1", message: "still there?" }, deps);
+  assert.equal(out.status, 200);
+  assert.ok(out.body.reply);
+});

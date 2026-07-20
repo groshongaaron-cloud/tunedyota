@@ -881,18 +881,22 @@
         '<button type="submit">Send</button> '+
         '<button type="button" id="chatclose">Close chat</button></form>';
     var log = document.getElementById('chatlog'); if(log) log.scrollTop = log.scrollHeight;
+    if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; }
     if(!CHAT_POLL) CHAT_POLL = setInterval(function(){ if(STATE.tab==='chats' && STATE.chatOpen) renderChatThread(host); }, 5000);
     var back = document.getElementById('chatback');
-    if(back) back.onclick = function(e){ e.preventDefault(); STATE.chatOpen=null; loadChats(); };
+    if(back) back.onclick = function(e){ e.preventDefault(); STATE.chatOpen=null; if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; } loadChats(); };
     var form = document.getElementById('chatreply');
     if(form) form.onsubmit = async function(e){
       e.preventDefault();
       var tin = document.getElementById('chattext');
       if(!tin || !tin.value.trim()) return;
       var replyId = STATE.chatOpen;
+      var btn = form.querySelector('button[type="submit"]');
+      tin.disabled = true; if(btn) btn.disabled = true;
       try{ await chatApi({op:'reply', session:replyId, text:tin.value}); tin.value='';
         if(STATE.tab==='chats' && STATE.chatOpen===replyId) renderChatThread(host);
       }catch(err){}
+      finally{ tin.disabled = false; if(btn) btn.disabled = false; }
     };
     var closeBtn = document.getElementById('chatclose');
     if(closeBtn) closeBtn.onclick = async function(){

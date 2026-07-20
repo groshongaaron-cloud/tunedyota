@@ -91,7 +91,7 @@ async function processChat(body, deps) {
   // Notify the assigned installer when a customer sends a message on an escalated session.
   // Fire-and-forget: never await so a slow push never delays the customer reply.
   if (sess.status === "escalated" && sess.installer) {
-    notify(sess, message).catch(function () {});
+    try { notify(sess, message).catch(function () {}); } catch (e) {}
   }
 
   let out;
