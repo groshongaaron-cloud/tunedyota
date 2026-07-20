@@ -24,41 +24,40 @@
     return ["referral"];
   }
 
-  function ciKey(obj, want) {
-    if (!obj) return null;
-    var w = String(want || "").toLowerCase();
-    var keys = Object.keys(obj);
-    for (var i = 0; i < keys.length; i++) if (keys[i].toLowerCase() === w) return keys[i];
-    return null;
-  }
-
   function magnusonItems(vehicle, catalog) {
     if (!vehicle || !catalog || !Array.isArray(catalog.applications)) return [];
     var name = (String(vehicle.make || "") + " " + String(vehicle.model || "")).trim().toLowerCase();
+    // Fix 1: null year must return [] — no year means no fitment determination is possible
     var y = yearNum(vehicle.year);
+    if (y == null) return [];
     var out = [];
     catalog.applications.forEach(function (app) {
       if (String(app.vehicle || "").toLowerCase() !== name) return;
-      if (y != null && !AG.inRange(app.years, y)) return;
+      if (!AG.inRange(app.years, y)) return;
       (app.kits || []).forEach(function (k) {
-        out.push({ sku: k.sku, name: k.name, price: k.retail, blurb: k.note || (app.engine + " · " + app.years), url: "/" + app.slug });
+        // Fix 5: skip kits without sku; safe url and blurb fallback
+        if (!k.sku) return;
+        out.push({
+          sku: k.sku,
+          name: k.name,
+          price: k.retail,
+          blurb: k.note || ((app.engine ? app.engine + " · " : "") + (app.years || "")),
+          url: app.slug ? "/" + app.slug : null
+        });
       });
     });
     return out;
   }
 
+  // Fix 4: delegate to canonical resolveVehicle; split "|" garage option value
+  // resolveVehicle signature: resolveVehicle(params, catalog, currentYear, includeUnverified)
+  // returns: { make, model, gen, matches } or null; verified-only by default (no includeUnverified)
   function amsoilGen(vehicle, garage) {
     if (!vehicle || !garage || !garage.vehicles) return null;
-    var mk = ciKey(garage.vehicles, vehicle.make);
-    var md = mk ? ciKey(garage.vehicles[mk], vehicle.model) : null;
-    if (!md) return null;
-    var gens = garage.vehicles[mk][md];
-    var byOption = AG.genForOption(gens, String(vehicle.year || ""));
-    if (byOption) return byOption;
-    var y = yearNum(vehicle.year);
-    if (y == null) return null;
-    for (var i = 0; i < gens.length; i++) if (AG.inRange(gens[i].y, y)) return gens[i];
-    return null;
+    var seg = String(vehicle.year || "").split("|");
+    var params = { make: vehicle.make, model: vehicle.model, year: seg[0], engine: seg[1] || "" };
+    var resolved = AG.resolveVehicle(params, garage);
+    return resolved && resolved.gen ? resolved.gen : null;
   }
 
   function amsoilItems(vehicle, garage) {

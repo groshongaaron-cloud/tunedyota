@@ -33,11 +33,15 @@ test("magnuson fitment: 2015 Tundra gets kits, prices match server lookup", () =
   }
 });
 
-test("amsoil fitment: 2015 Tundra bundle resolves to priced items", () => {
+test("amsoil fitment: 2015 Tundra bundle resolves to priced items, ctas match checkout mode", () => {
   const out = lines.linesFor(TUNDRA, DATA);
   const am = out.find((l) => l.id === "amsoil");
   assert.ok(am.items.length >= 2, "expected a fluid bundle");
   for (const it of am.items) assert.equal(typeof it.price, "number");
+  // Fix 2: ctas integration assertion — linesFor must embed correct CTA arrays
+  assert.deepEqual(am.ctas, ["reserve", "referral"]);
+  const mag = out.find((l) => l.id === "magnuson");
+  assert.deepEqual(mag.ctas, ["buy"]);
 });
 
 test("unknown vehicle -> empty items, lines still listed", () => {
@@ -48,6 +52,8 @@ test("unknown vehicle -> empty items, lines still listed", () => {
 
 test("no vehicle -> empty items (shop 'view all' handles catalog itself)", () => {
   const out = lines.linesFor(null, DATA);
+  // Fix 3: vacuous no-vehicle test — assert line count before item loop
+  assert.equal(out.length, lines.LINES.length);
   for (const l of out) assert.deepEqual(l.items, []);
 });
 
@@ -55,4 +61,11 @@ test("garage year-option values like '2024|2.4L-T I4' resolve", () => {
   const out = lines.linesFor({ make: "Toyota", model: "Tacoma", year: "2024|2.4L-T I4" }, DATA);
   const am = out.find((l) => l.id === "amsoil");
   assert.ok(am.items.length >= 1);
+});
+
+// Fix 1: magnuson null-year bypass — unknown year must return [] not all apps
+test("magnuson fitment: empty year string returns no items (no year = no fitment)", () => {
+  const out = lines.linesFor({ make: "Toyota", model: "Tundra", year: "" }, DATA);
+  const mag = out.find((l) => l.id === "magnuson");
+  assert.deepEqual(mag.items, []);
 });
