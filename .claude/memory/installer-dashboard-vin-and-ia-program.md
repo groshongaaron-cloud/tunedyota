@@ -37,9 +37,9 @@ close-out cards), (5) loud "not closed out — no cert yet" flag on past-dated o
 `node --test`, inject `fetchImpl`. **Task 7 (OPTIONAL end-of-day open-jobs push) DEFERRED** — not built.
 
 **Owner setup STILL OWED (feature degrades gracefully until done):**
-1. `ANTHROPIC_API_KEY` in Netlify → activates live VIN OCR (until set, `/vin-ocr` returns
-   `{ok:false,reason:"unconfigured"}` and the console falls back to manual VIN entry — no dead UI).
-   Capture via clipboard, never chat.
+1. ~~`ANTHROPIC_API_KEY`~~ **DONE — confirmed SET + VALID in Netlify prod 2026-07-20**
+   (arrived with the installer-chat work ~07-17; verified via a live chat-agent probe,
+   same key/runtime). VIN OCR is ACTIVE at close-out.
 2. Recover Shannon (record `reciytsQ4mMdJxBWy`, still `Booked`) — needs Aaron's VIN/calibration/ECU/
    gear/mileage; close her out through the console so her cert emails. Don't fabricate.
 3. Rotate `RESEND_API_KEY` (see [[pending-secret-rotation]]).
