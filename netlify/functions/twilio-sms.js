@@ -7,7 +7,8 @@ const { INSTALLERS, parseSmsOverrides } = require("./lib/routing.js");
 const { loadEscalatedForInstaller, saveSession } = require("./lib/chat-store.js");
 
 const REPLY = "Thanks for texting Tuned Yota! We got your message and a team member will reach out shortly. " +
-  "For the fastest help, reply with your vehicle + what you're after (OTT tune, supercharger, build, or a question).";
+  "For the fastest help, reply with your vehicle + what you're after (OTT tune, supercharger, build, or a question). " +
+  "Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
 const EMPTY_TWIML = '<?xml version="1.0" encoding="UTF-8"?><Response></Response>';
 
 const last10 = (p) => String(p || "").replace(/\D/g, "").slice(-10);
