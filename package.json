@@ -13,7 +13,8 @@
     "build:signals": "node scripts/build-signals-sheet.js",
     "ingest:signals": "node scripts/ingest-signals.js",
     "render:dealer-kit": "node docs/marketing/dealer-kit/render.js",
-    "sync:amsoil-prices": "node scripts/amsoil/price-sync.mjs"
+    "sync:amsoil-prices": "node scripts/amsoil/price-sync.mjs",
+    "indexnow": "node scripts/indexnow-submit.mjs"
   },
   "dependencies": {
     "google-auth-library": "^10.9.0",
