@@ -112,8 +112,12 @@ short, and number-led; no blast tooling, these are 1:1 sends from Aaron.
 - [ ] Build the first target list: 20 businesses per territory (landscape/snow
       first), from GBP maps + the Midwest Tuning Group network + event-city
       drive-bys. Log each as a `commercial` lead before the first visit.
-- [ ] Print 10 Fleet Fluid Audit one-pagers (template: garage-style table —
-      unit / product / capacity / interval).
+- [ ] Print 10 blank Fleet Fluid Audit capture forms:
+      `node scripts/amsoil-fleet-audit.mjs --blank` → open the HTML, print.
+      Finished audits: capture the fleet on the form, transcribe to an
+      equipment JSON (shape in the script header), run
+      `node scripts/amsoil-fleet-audit.mjs equipment.json` → branded one-pager;
+      Toyota/Lexus units carry ✓-verified capacities + stock numbers.
 - [ ] Walk Noah and Cody through this kit (30 minutes) — same scripts, same
       tallies as SOP 11.
 - [ ] Week 1: 5 Touch-1 visits per territory. That's the whole week's goal.

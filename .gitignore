@@ -33,3 +33,4 @@ scripts/headroom_guard/state.json
 
 # Git worktrees (local dev isolation)
 .worktrees/
+fleet-audit-*.html
