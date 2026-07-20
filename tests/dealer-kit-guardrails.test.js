@@ -36,11 +36,16 @@ test("emissions-intact positioning is present in the compliance statement", () =
   assert.match(fs.readFileSync(f, "utf8"), /emissions[-\s]intact/i);
 });
 
-test("both legal artifacts carry the counsel-review draft flag", () => {
+// Aaron reviewed and SIGNED OFF the legal artifacts 2026-07-20 (his own legal
+// sign-off; see OPEN-ITEMS.md). The pre-signoff guardrail ("must stay DRAFT")
+// flips to the post-signoff invariant: the approved artifacts must ship CLEAN —
+// no stray draft class or counsel banner may reappear without a new review.
+test("signed-off legal artifacts ship clean (no draft flag or counsel banner)", () => {
   for (const name of ["01-compliance-statement.html", "02-warranty-magnuson-moss.html"]) {
     const f = path.join(KIT, name);
-    if (!fs.existsSync(f)) continue; // skip until authored
-    assert.match(fs.readFileSync(f, "utf8"), /class="draft"/, `${name} missing body.draft`);
-    assert.match(fs.readFileSync(f, "utf8"), /COUNSEL[-\s]REVIEW/i, `${name} missing counsel banner`);
+    if (!fs.existsSync(f)) continue;
+    const html = fs.readFileSync(f, "utf8");
+    assert.doesNotMatch(html, /class="draft"/, `${name} has a draft flag — did copy change without Aaron's re-approval?`);
+    assert.doesNotMatch(html, /COUNSEL[-\s]REVIEW/i, `${name} has a counsel banner — re-render after review state changes`);
   }
 });
