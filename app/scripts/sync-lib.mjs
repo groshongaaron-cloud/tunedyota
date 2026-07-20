@@ -15,6 +15,9 @@ export const PAGES = [
   ["app.html", "index.html"],
   ["installer.html", "installer.html"],
   ["book.html", "book.html"],
+  ["privacy.html", "privacy.html"],
+  ["terms.html", "terms.html"],
+  ["calibration.html", "calibration.html"],
 ];
 
 export const ASSETS = [
@@ -44,5 +47,12 @@ export function assemble() {
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(WWW, f));
   }
   fs.copyFileSync(path.join(SITE, "vendor", "zxing.min.js"), path.join(WWW, "vendor", "zxing.min.js"));
-  console.log("app/www assembled: client shell (index) + installer console + booking");
+  // Extensionless /privacy and /terms: create index.html inside each dir so
+  // Capacitor's local server resolves /privacy and /terms without redirects.
+  for (const name of ["privacy", "terms"]) {
+    const dir = path.join(WWW, name);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.copyFileSync(path.join(WWW, name + ".html"), path.join(dir, "index.html"));
+  }
+  console.log("app/www assembled: client shell (index) + installer console + booking + privacy/terms/calibration");
 }

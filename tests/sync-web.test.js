@@ -11,11 +11,14 @@ test("injectNativeFetch adds the bootstrap tag once, right after <head>", async 
   assert.equal(injectNativeFetch(out), out, "idempotent");
 });
 
-test("PAGES maps app.html to the app index and keeps installer + book", async () => {
+test("PAGES maps app.html to the app index and keeps installer + book + privacy/terms/calibration", async () => {
   const { PAGES, ASSETS } = await import("../app/scripts/sync-lib.mjs");
   assert.deepEqual(PAGES.find((p) => p[1] === "index.html"), ["app.html", "index.html"]);
   assert.ok(PAGES.some((p) => p[0] === "installer.html"));
   assert.ok(PAGES.some((p) => p[0] === "book.html"));
+  assert.ok(PAGES.some((p) => p[0] === "privacy.html" && p[1] === "privacy.html"), "privacy.html in PAGES");
+  assert.ok(PAGES.some((p) => p[0] === "terms.html" && p[1] === "terms.html"), "terms.html in PAGES");
+  assert.ok(PAGES.some((p) => p[0] === "calibration.html" && p[1] === "calibration.html"), "calibration.html in PAGES");
   for (const need of ["app-shell.js", "product-lines.js", "native-fetch.js", "payment-checkout.js", "magnuson-catalog.js", "amsoil-garage-render.js", "amsoil-garage.json", "vehicles.json", "chat.js", "chat.css"]) {
     assert.ok(ASSETS.includes(need), need + " missing from bundle");
   }
