@@ -57,6 +57,11 @@ Work through these with the Elavon rep — each one unblocks a specific piece:
 11. **App usage** — confirm the hosted-payments session/Lightbox may be opened
     from a mobile WebView, and whether any domain/referrer allow-listing needs
     tunedyota.com registered.
+12. **Apple Pay / Google Pay in the Lightbox** — ask whether Converge Hosted
+    Payments supports wallet buttons (Apple Pay / Google Pay) in the Lightbox,
+    and what enablement/registration each needs (Apple Pay requires merchant
+    domain validation). One-tap wallets are the app's standing no-barrier
+    directive — if supported, we want it enabled from day one.
 
 Hand items 2, 4 (ID + PIN), 6, and 7 to the build as Netlify env vars (table
 below) — everything else is account configuration on Elavon's side.
