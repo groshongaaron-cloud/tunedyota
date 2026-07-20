@@ -88,7 +88,9 @@ function buildBookingCustomerEmail(d, inst, market, event) {
     (addr ? `Address: ${addr}\n` : "") +
     `Date: ${event.label || event.dateISO}\nTime: ${d.slot}\nInstaller: ${inst.name} (${inst.phone})\n\n` +
     (addr ? "" : `We'll email you the exact address before your event.\n\n`) +
-    `A calendar invite is attached. Need to change it? Call or text ${inst.phone}.\n\n— Tuned Yota · Undeniable Performance\n`;
+    `A calendar invite is attached. Need to change it? Call or text ${inst.phone}.\n\n` +
+    `We may text you about this appointment at the number you provided. Msg & data rates may apply; reply STOP to opt out, HELP for help. Privacy: https://tunedyota.com/privacy\n\n` +
+    `— Tuned Yota · Undeniable Performance\n`;
   const html =
     `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px">` +
     `<h2 style="color:#5B4B42">You're booked, ${esc(first)}.</h2>` +
@@ -99,6 +101,7 @@ function buildBookingCustomerEmail(d, inst, market, event) {
     `</table>` +
     (addr ? "" : `<p style="margin-top:10px;color:#7c8472">We'll email you the exact address before your event.</p>`) +
     `<p style="margin-top:14px">A calendar invite is attached. Need to change it? Call or text <strong>${esc(inst.phone)}</strong>.</p>` +
+    `<p style="font-size:12px;color:#9aa08f;margin-top:16px">We may text you about this appointment at the number you provided. Msg &amp; data rates may apply; reply <strong>STOP</strong> to opt out, <strong>HELP</strong> for help. See our <a href="https://tunedyota.com/privacy" style="color:#9aa08f">Privacy Policy</a>.</p>` +
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
   return { subject, html, text };
 }
