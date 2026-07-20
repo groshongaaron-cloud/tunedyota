@@ -9,7 +9,7 @@ test("matches a Tacoma by engine + year and resolves products", () => {
   assert.equal(r.model, "Tacoma");
   const oil = r.systems.find((s) => s.system === "Engine Oil");
   assert.match(oil.product, /Signature Series 0W-20/);
-  assert.equal(oil.stockNo, "ASMQT");
+  assert.equal(oil.stockNo, "ASMQT-EA");   // real AMSOIL order code (Firecrawl-verified)
   assert.equal(oil.capacity, 4.8);
   assert.equal(oil.tunedInterval, "7,500 mi");
   assert.match(r.garageUrl, /amsoil-garage\?make=Toyota&model=Tacoma&year=2024/);
