@@ -65,7 +65,7 @@ test("accountUrl falls back to plain /account when not provided", () => {
   assert.ok(!/account\?lt=/.test(html), "no token in fallback");
 });
 
-test("review ask renders only when a reviewUrl is provided (GBP_REVIEW_URL gate)", () => {
+test("review ask renders only when a reviewUrl is provided (GOOGLE_REVIEW_URL gate)", () => {
   const { buildAmsoilEmail } = require("../netlify/functions/lib/amsoil-email.js");
   const withUrl = buildAmsoilEmail({ name: "Ana", reviewUrl: "https://g.page/r/tunedyota-review" });
   assert.match(withUrl.html, /Leave a Google review/);
