@@ -95,6 +95,11 @@ export function buildOgTags({ title, description, canonical }) {
 export const BUSINESS_STUB = JSON.stringify({
   "@context": "https://schema.org", "@type": "AutomotiveBusiness", "@id": BIZ_ID,
   name: "Tuned Yota", url: `${SITE}/`, telephone: "+1-612-406-7117", email: "info@tunedyota.com",
+  // NAP: must stay character-identical to the Google Business Profile address.
+  // Interim location (2026-07-20) until the garage-condo closing — update BOTH
+  // here and on GBP together when it changes.
+  address: { "@type": "PostalAddress", streetAddress: "18758 Iden Avenue",
+    addressLocality: "Lakeville", addressRegion: "MN", postalCode: "55044", addressCountry: "US" },
   priceRange: "$$", slogan: "Undeniable Performance",
   logo: { "@type": "ImageObject", url: `${SITE}/logo.png`, width: 512, height: 512 },
   image: `${SITE}/og-image.png`,
