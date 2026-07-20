@@ -943,7 +943,7 @@
        "system": "Engine Oil",
        "sku": "SS-0W20-QT",
        "unit": "qt",
-       "capacity": 7.9,
+       "capacity": 8.5,
        "factoryInterval": "5,000 mi",
        "tunedInterval": "5,000 mi"
       },
@@ -1157,7 +1157,7 @@
        "system": "Engine Oil",
        "sku": "SS-0W20-QT",
        "unit": "qt",
-       "capacity": 7.9,
+       "capacity": 8.5,
        "factoryInterval": "5,000 mi",
        "tunedInterval": "5,000 mi"
       },
@@ -1403,7 +1403,7 @@
        "system": "Engine Oil",
        "sku": "SS-0W20-QT",
        "unit": "qt",
-       "capacity": 7.9,
+       "capacity": 8.5,
        "factoryInterval": "5,000 mi",
        "tunedInterval": "5,000 mi"
       },
@@ -1464,7 +1464,7 @@
        "system": "Engine Oil",
        "sku": "SS-0W20-QT",
        "unit": "qt",
-       "capacity": 7.9,
+       "capacity": 8.5,
        "factoryInterval": "5,000 mi",
        "tunedInterval": "5,000 mi"
       },
@@ -2082,7 +2082,7 @@
        "system": "Engine Oil",
        "sku": "SS-0W20-QT",
        "unit": "qt",
-       "capacity": 7.9,
+       "capacity": 8.5,
        "factoryInterval": "5,000 mi",
        "tunedInterval": "5,000 mi"
       },
