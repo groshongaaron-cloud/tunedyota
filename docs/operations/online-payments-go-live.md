@@ -5,6 +5,56 @@
 pricing page uses the reservation flow (mailto) until the Elavon merchant account
 credentials exist.
 
+## Scope (what checkout covers — and what it can't)
+
+- **Magnuson products (kits, tunes, install packages): YES** — direct checkout on
+  tunedyota.com and later in the app. This is what the pre-built code sells.
+- **AMSOIL products: NO direct checkout — AMSOIL Dealer Policies forbid it.**
+  G-4000 §7.6: *"Only AMSOIL INC. may post AMSOIL product pricing online. All
+  sales and price inquiries shall be conducted by directing customers to the
+  AMSOIL online store…"* (§7.3 and §7.11 reinforce it). A dealer-owned cart
+  selling AMSOIL at posted prices risks the dealer agreement — the same class of
+  risk as the OTT IP boundary. The **compliant AMSOIL "checkout" is exactly what
+  is already live**: the on-site store hands off to amsoil.com under the
+  `?zo=30713116` referral, and the Preferred-Customer path locks in the recurring
+  attribution. If Aaron wants to revisit, the move is asking his AMSOIL regional
+  rep in writing — not building first.
+- **Tuned Yota app: YES for Magnuson** — the same `create-payment-session`
+  function serves the app; the Converge Lightbox opens in a WebView/system
+  browser. No separate gateway work expected (see the Elavon ask-list below).
+
+## What to request from US Bank / Elavon (Aaron's onboarding checklist)
+
+Work through these with the Elavon rep — each one unblocks a specific piece:
+
+1. **Converge gateway boarding** — confirm the merchant account is boarded onto
+   the **Converge** gateway with **e-commerce / card-not-present** enabled (not
+   just an in-person processing MID).
+2. **Converge account ID** — the **6-7 digit Converge account ID** (they'll also
+   quote a 10-digit Elavon merchant ID; we need the Converge one for the API).
+3. **Converge admin login** for you at convergepay.com (to manage users/receipts).
+4. **Hosted API User + 64-char PIN** — a Converge user **flagged "Hosted API
+   User"** in the Converge UI, and its 64-character PIN. This is the credential
+   our server uses; ask the rep to walk you through creating it if it's
+   self-serve.
+5. **Hosted Payments / Lightbox enablement** — confirm "Hosted Payments Page /
+   Lightbox (PayWithConverge)" is enabled on the account.
+6. **Demo/sandbox credentials** — a Converge **demo account**
+   (api.demo.convergepay.com) so we integration-test before any real card.
+7. **Vendor ID** — if they issue one for third-party/hosted integrations.
+8. **Card brands** — confirm Visa/MC/Discover/AMEX acceptance as desired
+   (AMEX is often a separate enablement + rate).
+9. **Fraud controls** — ask that **AVS + CVV rules** are configured; at
+   $1,500-$8,395 tickets, also ask about 3-D Secure availability on Converge.
+10. **Statement descriptor** — set the customer-facing descriptor to
+    "TUNED YOTA" so charges are recognized (fewer chargebacks).
+11. **App usage** — confirm the hosted-payments session/Lightbox may be opened
+    from a mobile WebView, and whether any domain/referrer allow-listing needs
+    tunedyota.com registered.
+
+Hand items 2, 4 (ID + PIN), 6, and 7 to the build as Netlify env vars (table
+below) — everything else is account configuration on Elavon's side.
+
 History: the original plan was Stripe. The old `netlify/functions/create-checkout.js`
 stub (fully commented-out Stripe implementation, returned 503, zero callers) was removed
 2026-07-16. Recover it anytime for reference:
