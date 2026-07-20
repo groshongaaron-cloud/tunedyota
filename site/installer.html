@@ -241,6 +241,7 @@
     <button class="btn" id="unlock" type="submit" style="width:100%">Unlock</button>
   </form>
   <div id="app" class="hidden">
+    <a class="link" href="/index.html" id="backapp" style="display:none">‹ App</a>
     <a class="link" href="/calibration.html">Calibration reference (cal ID · TSB)</a>
     <a class="link" href="#" id="logout" style="margin-left:14px;color:#8a2a2a">Log out</a>
     <a class="link" href="#" id="reviewlink" style="display:none;margin-left:14px">★ Ask for a review</a>
@@ -277,7 +278,9 @@
     , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:''
     , jobTab: 'all'      // 'all' | '<city>' | 'done'
     , doneCity: ''       // optional city filter applied inside the Done view
-    , theme: '', me: '' };
+    , theme: '', me: ''
+    , chats:[], chatOpen:null, chatsLoaded:false };
+  var CHAT_POLL = null;
   function Q(){ return window.OfflineQueue; }
   function store(){ return window.localStorage; }
 
@@ -291,6 +294,13 @@
   function val(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
   function tok(){ return localStorage.getItem('ty_installer_token') || ''; }
   function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
+  async function chatApi(body){
+    var res = await fetch('/.netlify/functions/chat', { method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-installer-token':tok() },
+      body: JSON.stringify(Object.assign({installer:true}, body)) });
+    if(!res.ok) throw new Error('chat '+res.status);
+    return res.json();
+  }
   function ym(iso){ return (iso||'').slice(0,7); }
   function isOpen(b){ return b.status!=='Completed' && b.status!=='No-show' && b.status!=='Cancelled'; }
   function cap(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):''; }
@@ -609,7 +619,9 @@
       else { al.style.display = 'none'; }
     }
     buildHeaderOnce();
+    if(isNative()){ var ba=document.getElementById('backapp'); if(ba) ba.style.display=''; }
     renderAll();
+    if(location.hash==='#chats'){ STATE.tab='chats'; loadChats(); }
     registerPush();
   }
 
@@ -826,17 +838,83 @@
     var q=document.getElementById('q'); if(q){ q.scrollIntoView({behavior:'smooth',block:'center'}); q.focus(); }
   }
 
-  function renderAll(){ renderTally(); renderSummary(); renderTabs();
-    var st=document.getElementById('subtabs'); if(st) st.style.display = STATE.tab==='leads' ? 'none' : 'flex';
+  function renderAll(){
+    if(STATE.tab!=='chats' && CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; }
+    renderTally(); renderSummary(); renderTabs();
+    var st=document.getElementById('subtabs'); if(st) st.style.display = (STATE.tab==='leads'||STATE.tab==='chats') ? 'none' : 'flex';
+    if(STATE.tab==='chats'){ renderChats(); return; }
     if(STATE.tab==='leads'){ renderLeads(); } else { renderFeed(); } }
+  async function loadChats(){
+    try{ var j = await chatApi({op:'list'}); STATE.chats = j.sessions||[]; STATE.chatsLoaded = true; }
+    catch(e){ STATE.chats = []; STATE.chatsLoaded = true; }
+    renderAll();
+  }
+  function renderChats(){
+    var host = document.getElementById('feed');
+    if(STATE.chatOpen) return renderChatThread(host);
+    if(!CHAT_POLL) CHAT_POLL = setInterval(loadChats, 15000);
+    host.innerHTML = STATE.chats.length ? STATE.chats.map(function(s){
+      return '<div class="card" data-chat="'+esc(s.id)+'" style="cursor:pointer"><b>'+esc(s.customerName||'Customer')+'</b>'+
+        (s.lastRole==='user'?' <span style="color:var(--sand,#c8a44e);font-weight:700">● new</span>':'')+
+        '<div class="muted">'+esc(s.vehicle||'')+(s.city?' · '+esc(s.city):'')+'</div>'+
+        '<div class="muted">'+esc(s.lastText||'')+'</div></div>';
+    }).join('') : '<p class="muted" style="padding:14px">No active chats. Escalations land here (and still SMS you).</p>';
+    host.onclick = function(e){ var c=e.target.closest('[data-chat]'); if(c){ STATE.chatOpen=c.getAttribute('data-chat'); renderAll(); } };
+  }
+  async function renderChatThread(host){
+    var openId = STATE.chatOpen;
+    var j;
+    try{ j = await chatApi({op:'transcript', session:openId}); }
+    catch(e){ STATE.chatOpen=null; renderAll(); return; }
+    // Guard: user may have navigated away while the fetch was in-flight
+    if(STATE.tab!=='chats' || STATE.chatOpen!==openId) return;
+    host.innerHTML =
+      '<p><a href="#" id="chatback">‹ Chats</a> · <b>'+esc(j.customerName||'Customer')+'</b> '+esc(j.vehicle||'')+
+      (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+'</p>'+
+      '<div id="chatlog" style="max-height:50vh;overflow:auto">'+
+        (j.turns||[]).map(function(t){
+          var who = t.role==='user'?'Customer':(t.role==='installer'?'You':'AI');
+          return '<p><b>'+esc(who)+':</b> '+esc(t.text)+'</p>';
+        }).join('')+
+      '</div>'+
+      '<form id="chatreply"><input id="chattext" placeholder="Reply…" style="width:70%"> '+
+        '<button type="submit">Send</button> '+
+        '<button type="button" id="chatclose">Close chat</button></form>';
+    var log = document.getElementById('chatlog'); if(log) log.scrollTop = log.scrollHeight;
+    if(!CHAT_POLL) CHAT_POLL = setInterval(function(){ if(STATE.tab==='chats' && STATE.chatOpen) renderChatThread(host); }, 5000);
+    var back = document.getElementById('chatback');
+    if(back) back.onclick = function(e){ e.preventDefault(); STATE.chatOpen=null; loadChats(); };
+    var form = document.getElementById('chatreply');
+    if(form) form.onsubmit = async function(e){
+      e.preventDefault();
+      var tin = document.getElementById('chattext');
+      if(!tin || !tin.value.trim()) return;
+      var replyId = STATE.chatOpen;
+      try{ await chatApi({op:'reply', session:replyId, text:tin.value}); tin.value='';
+        if(STATE.tab==='chats' && STATE.chatOpen===replyId) renderChatThread(host);
+      }catch(err){}
+    };
+    var closeBtn = document.getElementById('chatclose');
+    if(closeBtn) closeBtn.onclick = async function(){
+      var closeId = STATE.chatOpen;
+      try{ await chatApi({op:'close', session:closeId}); }catch(e){}
+      STATE.chatOpen=null; loadChats();
+    };
+  }
+
   function renderTabs(){
     var host=document.getElementById('tabs');
     if(!host){ host=document.createElement('div'); host.id='tabs'; host.style.cssText='display:flex;gap:8px;margin:6px 0 10px';
       var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
     function tab(id,label,badge){ return '<button class="tabbtn'+(STATE.tab===id?' on':'')+'" data-tab="'+id+'">'+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
     var due=STATE.leads.filter(function(l){ return ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today; }).length;
-    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'');
-    Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){ STATE.tab=b.getAttribute('data-tab'); if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); } renderAll(); }; });
+    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chats.length?String(STATE.chats.length):'');
+    Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){
+      STATE.tab=b.getAttribute('data-tab');
+      if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); }
+      if(STATE.tab==='chats'&&!STATE.chatsLoaded){ loadChats(); }
+      renderAll();
+    }; });
   }
 
   // The Jobs sub-tab strip: All + one tab per city with work + a Done tab.
