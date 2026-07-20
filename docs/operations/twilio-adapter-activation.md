@@ -74,3 +74,12 @@ throughput. **All copy/paste fields + the A2P overview are in
 
 Keep the published Privacy/Terms in sync with actual practice — any change to what we
 text customers must be reflected there before it ships.
+
+## 7. Parked dev tasks (future session — not blocking registration)
+Low-risk code hardening, deferred 2026-07-20. None block A2P registration (Console work).
+1. **STOP/HELP/START inbound guard** — `twilio-sms.js` has no keyword handling; add a guard
+   that returns empty TwiML for opt-out/help/resubscribe keywords (no junk lead, no auto-reply).
+2. **Messaging Service support in `sendSms`** — env-gate `TWILIO_MESSAGING_SERVICE_SID`; send
+   via `MessagingServiceSid` when set, fall back to `From`. Paste the SID after approval.
+3. **(optional) Delivery status callback** — a `twilio-status` function logging failed sends
+   (30034/30007) for monitoring.
