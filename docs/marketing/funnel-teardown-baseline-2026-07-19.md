@@ -4,6 +4,17 @@
 > compare against this file and the most recent prior run, and report what changed.
 > Cadence: every 2 weeks (1st & 15th) for now → switch to monthly later.
 
+> **⚠ CORRECTION (2026-07-19, same day).** This baseline was first drafted from a
+> **static crawl (WebFetch, no JavaScript execution)**. The Find-Your-Exact-Tune funnel
+> is a **client-side-rendered app**, so the crawl missed dynamic elements. Verified against
+> source (`site/find-your-exact-tune.html`): the funnel **already has (a)** live event-slot
+> scarcity (`scarcityLine`: "Only N spots left" ≤4, else "N of M times open") and countdown
+> urgency (`urgencyLine`/`eventUrgency`: Today/Tomorrow/"N days left"), and **(b)** real 5★
+> make-matched reviews rendered at the recommendation and booking steps (`proofCard`,
+> `#proofResult`/`#proofBook`). The rows and weaknesses below are corrected accordingly.
+> **Future runs must read the funnel source and/or render with Playwright — see the crawler
+> spec — or they will keep false-flagging these as missing.**
+
 ## Metrics snapshot (for month-over-month diffing)
 
 | Signal | Baseline value (2026-07-19) |
@@ -17,8 +28,8 @@
 | Phone/text CTA | (612) 406-7117 (site-wide) |
 | Trust signals | Authorized OTT Installer, Authorized Magnuson Dealer, VFTuner PRO, 5-Gas Verified, EPA-Compliant, since 2008, 6 states |
 | External review stat | 94% recommend (Facebook) |
-| Reviews on conversion page | NONE (only on homepage) |
-| Scarcity on funnel | NONE surfaced ("no pressure to tune today") |
+| Reviews on conversion page | PRESENT (JS-rendered) — 4× 5★ make-matched testimonials at recommendation + booking steps. (Aggregate "94% recommend" stat NOT shown as a badge.) |
+| Scarcity on funnel | PRESENT (JS-rendered) — live slot scarcity ("Only N spots left" ≤4) + countdown urgency (Today/Tomorrow/"N days left"). |
 | Financing | NONE offered |
 | Regions | MN, IA, WI, ND, SD, NE |
 
@@ -92,24 +103,32 @@ Performance Packs = best margin-per-effort. 3) Superchargers = biggest ticket bu
 COGS; profit is install+cal labor. 4) AMSOIL PC = compounding recurring. Under-harvested:
 pack ladder, supercharger cal labor, AMSOIL recurring.
 
-## 11. Biggest weaknesses / missed opportunities
-1. No social proof on the conversion page; 94% FB stat not surfaced as a badge.
-2. No scarcity on an inherently scarce (event-slot) offer — copy even says "no pressure."
-3. No nurture path for not-ready SEO traffic (only demand-based Wait List).
-4. No financing on $1,500–$8,395 offers.
-5. AMSOIL recurring under-pushed at peak satisfaction (post-tune).
-6. No referral loop despite an active community.
+## 11. Biggest weaknesses / missed opportunities (CORRECTED)
+1. ~~No social proof on the conversion page~~ — **FALSE (crawler blind spot).** Reviews are
+   present and make-matched. Remaining micro-gap: the aggregate **"94% recommend"** stat is
+   not surfaced as an explicit badge.
+2. ~~No scarcity on the funnel~~ — **FALSE (crawler blind spot).** Live slot scarcity +
+   countdown urgency already implemented. No action needed.
+3. No nurture path for not-ready SEO traffic (only demand-based Wait List). **REAL.**
+4. No financing on $1,500–$8,395 offers. **REAL** (needs a financing partner — ops-gated).
+5. AMSOIL recurring under-pushed at peak satisfaction (post-tune / certificate moment).
+   **REAL** (verify against the certificate/account flow).
+6. No referral loop despite an active community. **REAL.**
 
-## 12. Highest-leverage moves (own funnel)
-1. Proof on the booking page (94% badge + model-tagged reviews next to CTA).
-2. Live event-slot scarcity ("3 of 12 left — Aug 29, Twin Cities") + next-date countdown.
-3. Researcher on-ramp (soft opt-in + short nurture) + one-tap AMSOIL PC enroll & referral
-   offer at certificate/close.
+## 12. Highest-leverage moves (own funnel) (CORRECTED)
+(Scarcity and funnel reviews already exist — dropped.)
+1. **AMSOIL Preferred-Customer one-tap enroll + referral ask at the certificate/close
+   moment** — monetize peak satisfaction into recurring revenue + cheap referrals.
+2. **Researcher on-ramp** — soft opt-in + short email nurture for not-ready SEO traffic.
+3. **Surface the "94% recommend" aggregate stat** as a trust badge (reviews already show;
+   the headline number does not).
+4. **Financing** on Performance Packs + superchargers (ops-gated: needs a partner).
+5. **Referral incentive** tied to the Midwest Tuning Group.
 
-## Prioritized shortlist
-1) Live event-slot scarcity · 2) Reviews + 94% badge on funnel · 3) One-tap AMSOIL PC at
-close · 4) Financing on packs/superchargers · 5) Researcher lead magnet + nurture ·
-6) Referral incentive via Midwest Tuning Group.
+## Prioritized shortlist (CORRECTED)
+1) Fix the crawler's JS blind spot so future runs are trustworthy · 2) AMSOIL PC + referral
+at certificate/close · 3) Researcher lead magnet + nurture · 4) "94% recommend" badge ·
+5) Financing on packs/superchargers · 6) Referral incentive via Midwest Tuning Group.
 
 ## Sources
 tunedyota.com; /find-your-exact-tune; /ott-tune-cost; /magnuson-supercharger-pricing;

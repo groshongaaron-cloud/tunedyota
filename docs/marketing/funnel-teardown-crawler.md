@@ -47,7 +47,25 @@ Write the report to docs/marketing/funnel-teardown-<today>.md and commit it
 ("chore(marketing): biweekly funnel teardown <date>").
 ```
 
+## ⚠ CRITICAL: the funnel is a client-side app — do NOT rely on raw HTML
+
+WebFetch returns raw HTML and does **not** execute JavaScript. The Find-Your-Exact-Tune
+funnel renders its offers, pricing, **slot scarcity, countdown urgency, and reviews**
+client-side after user interaction — so a static crawl will FALSELY report them as missing.
+The 2026-07-19 baseline made exactly this error. Every run MUST avoid it:
+
+1. **Read the funnel source in the repo** — `site/find-your-exact-tune.html` (and
+   `book.html`, model/state pages) — to describe the *actual* dynamic behavior: scarcity
+   (`scarcityLine`), urgency (`urgencyLine`/`eventUrgency`), reviews (`REVIEWS`/`proofCard`),
+   pricing (`vehicles.json`), and the booking flow. Source is ground truth, not rendered HTML.
+2. **Optionally render key pages with Playwright** (already a devDependency — `npm ci` then a
+   short script) to confirm what a real visitor sees after interacting.
+3. Use WebFetch/WebSearch for **external** signals only (socials, reviews, search presence)
+   and for static/SEO pages — never to judge the dynamic funnel's on-page elements.
+4. In the report, separate **"static/SEO surface"** findings from **"rendered funnel"**
+   findings so a false-negative can't recur.
+
 ## Notes
 - Keep the "Metrics snapshot" table format from the baseline so diffs are mechanical.
-- If run as a cloud routine, it clones/pulls the repo, reads the baseline + latest, crawls,
-  writes the dated report, and commits. Local runs: same, against the working tree.
+- If run as a cloud routine, it clones/pulls the repo, reads the baseline + latest + funnel
+  SOURCE, crawls external signals, writes the dated report, and commits. Local: same.
