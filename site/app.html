@@ -200,7 +200,7 @@
     if (l.ctas.indexOf("buy") !== -1 && l.items.length) {
       cta = l.items.map(function (it) { return '<button class="cta" data-buy="' + esc(it.sku) + '" style="margin:6px 0 0">Buy — ' + money(it.price) + " · " + esc(it.name.split(" ").slice(0, 3).join(" ")) + "</button>"; }).join("");
     } else if (l.ctas.indexOf("reserve") !== -1 && l.items.length) {
-      cta = '<button class="cta ghost" data-reserve="' + esc(JSON.stringify(l.items.map(function (i) { return i.sku; }))) + '" style="margin:6px 0 0">Reserve this kit — pay at pickup</button>';
+      cta = '<button class="cta ghost" data-reserve="' + esc(l.id) + '" style="margin:6px 0 0">Reserve this kit — pay at pickup</button>';
     }
     return '<div class="card"><h3>' + esc(l.icon) + " " + esc(l.label) + "</h3>" + rows + cta + "</div>";
   }
@@ -238,7 +238,10 @@
           .then(function (html) { window.open(URL.createObjectURL(new Blob([html], { type: "text/html" })), "_blank"); })
           .catch(function () { t.textContent = "unavailable — retry"; });
       } else if (t.dataset.buy) { startBuy(t.dataset.buy, t); }
-      else if (t.dataset.reserve) { openReserve(v, JSON.parse(t.dataset.reserve)); }
+      else if (t.dataset.reserve) {
+        var reserveLine = PL.linesFor(v, DATA).find(function (x) { return x.id === t.dataset.reserve; });
+        if (reserveLine && reserveLine.items.length) openReserve(v, reserveLine.items.map(function (it) { return it.sku; }));
+      }
       else if (t.id === "rmveh") { e.preventDefault(); setGarage(S.removeVehicle(garage(), i)); go("#garage"); }
     };
   }
@@ -348,7 +351,10 @@
         if (e.target.id === "fitme") return draw(true);
         if (e.target.id === "fitall") return draw(false);
         if (e.target.dataset.buy) return startBuy(e.target.dataset.buy, e.target);
-        if (e.target.dataset.reserve && v) return openReserve(v, JSON.parse(e.target.dataset.reserve));
+        if (e.target.dataset.reserve && v) {
+          var shopLine = PL.linesFor(v, DATA).find(function (x) { return x.id === e.target.dataset.reserve; });
+          if (shopLine && shopLine.items.length) return openReserve(v, shopLine.items.map(function (it) { return it.sku; }));
+        }
       };
     }
     draw(fitOnly);
