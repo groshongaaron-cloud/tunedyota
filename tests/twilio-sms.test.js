@@ -32,3 +32,28 @@ test("ingest failure still returns 200 TwiML (never break the texter)", async ()
   assert.equal(res.statusCode, 200);
   assert.match(res.body, /<Message>/);
 });
+
+// --- STOP/HELP/START guard: Twilio Advanced Opt-Out owns these replies; our
+// webhook must produce no lead and no auto-reply (an auto-reply to STOP would
+// itself violate the opt-out).
+for (const kw of ["STOP", "stop", " Stop ", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT", "HELP", "help", "INFO", "START", "YES", "UNSTOP", "Stop."]) {
+  test(`keyword "${kw}" -> empty TwiML, no lead, no relay`, async () => {
+    const ingested = [], relayed = [];
+    const res = await handler(evt({ body: `From=%2B16125551234&Body=${encodeURIComponent(kw)}` }), {
+      env: {}, verify: () => true,
+      ingest: async (b) => { ingested.push(b); },
+      relay: async (m) => { relayed.push(m); return { relayed: false }; } });
+    assert.equal(res.statusCode, 200);
+    assert.doesNotMatch(res.body, /<Message>/);
+    assert.equal(ingested.length, 0, "must not create a lead");
+    assert.equal(relayed.length, 0, "must not hit the relay path");
+  });
+}
+
+test("keyword embedded in a real message is NOT swallowed", async () => {
+  const ingested = [];
+  const res = await handler(evt({ body: "From=%2B16125551234&Body=" + encodeURIComponent("Please stop by Saturday, does 10am work?") }), {
+    env: {}, verify: () => true, ingest: async (b) => { ingested.push(b); } });
+  assert.equal(ingested.length, 1);
+  assert.match(res.body, /<Message>/);
+});

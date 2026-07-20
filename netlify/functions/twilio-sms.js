@@ -2,7 +2,7 @@
 // Inbound SMS webhook: validate Twilio signature, then either (a) relay an
 // installer's reply into their active escalated chat session — no lead, no
 // auto-reply — or (b) the original behavior: ingest a tracked lead + auto-reply.
-const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead } = require("./lib/twilio.js");
+const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType } = require("./lib/twilio.js");
 const { INSTALLERS, parseSmsOverrides } = require("./lib/routing.js");
 const { loadEscalatedForInstaller, saveSession } = require("./lib/chat-store.js");
 
@@ -51,6 +51,12 @@ async function handler(event, ctx = {}) {
   const url = webhookUrl(event, env, "twilio-sms");
   const sig = (event.headers && (event.headers["x-twilio-signature"] || event.headers["X-Twilio-Signature"])) || "";
   if (!verify(env.TWILIO_AUTH_TOKEN, url, params, sig)) return { statusCode: 403, body: "invalid signature" };
+  // Compliance keywords (STOP/HELP/START & co.): Twilio's Advanced Opt-Out sends
+  // the reply. No lead, no relay, and above all no auto-reply — auto-replying to
+  // a STOP would itself violate the opt-out.
+  if (smsKeywordType(params.Body)) {
+    return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body: EMPTY_TWIML };
+  }
   try {
     const r = await relay({ from: params.From || "", text: params.Body || "" });
     if (r && r.relayed) return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body: EMPTY_TWIML };

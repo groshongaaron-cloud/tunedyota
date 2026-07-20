@@ -83,6 +83,20 @@ function voicemailTwiml(opts = {}) {
 
 function hangupTwiml() { return `${XML}<Response><Hangup/></Response>`; }
 
+// Standalone compliance keywords (Twilio US defaults). Twilio's Advanced
+// Opt-Out sends the reply; our webhook must stay silent — no lead, no auto-reply.
+const SMS_KEYWORDS = {
+  optout: ["STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT", "OPTOUT", "REVOKE"],
+  help: ["HELP", "INFO"],
+  optin: ["START", "YES", "UNSTOP"],
+};
+// "Stop." counts; "Please stop by Saturday" does not — keyword must be the whole message.
+function smsKeywordType(body) {
+  const word = String(body || "").trim().replace(/[.!?,]+$/, "").toUpperCase();
+  for (const [type, words] of Object.entries(SMS_KEYWORDS)) if (words.includes(word)) return type;
+  return null;
+}
+
 function parseInboundSms(params) {
   const from = params.From || "";
   const body = String(params.Body || "").trim();
@@ -121,16 +135,23 @@ async function ingestLead(body, deps = {}) {
 
 // Outbound SMS via the Twilio REST API. Best-effort: returns {ok:false} on any
 // missing config or network error — callers must never break on notify failure.
+// A2P: when TWILIO_MESSAGING_SERVICE_SID is set, sends go through the Messaging
+// Service (campaign-linked sender pool) instead of a raw From number.
 async function sendSms({ to, body }, deps = {}) {
   const { env = process.env, fetchImpl = fetch, log = console } = deps;
-  const sid = env.TWILIO_ACCOUNT_SID, token = env.TWILIO_AUTH_TOKEN, from = env.TWILIO_FROM_NUMBER;
-  if (!sid || !token || !from || !to) return { ok: false, skipped: true };
+  const sid = env.TWILIO_ACCOUNT_SID, token = env.TWILIO_AUTH_TOKEN,
+    from = env.TWILIO_FROM_NUMBER, msid = env.TWILIO_MESSAGING_SERVICE_SID;
+  if (!sid || !token || !(msid || from) || !to) return { ok: false, skipped: true };
+  const params = { To: to, Body: String(body || "").slice(0, 1500) };
+  if (msid) params.MessagingServiceSid = msid; else params.From = from;
+  const base = env.TWILIO_PUBLIC_BASE || env.URL;
+  if (base) params.StatusCallback = `${String(base).replace(/\/$/, "")}/.netlify/functions/twilio-status`;
   try {
     const res = await fetchImpl(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
       method: "POST",
       headers: { Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
         "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ To: to, From: from, Body: String(body || "").slice(0, 1500) }).toString(),
+      body: new URLSearchParams(params).toString(),
     });
     if (!res.ok) { if (log.error) log.error("sendSms", res.status); return { ok: false }; }
     return { ok: true };
@@ -139,4 +160,4 @@ async function sendSms({ to, body }, deps = {}) {
 
 module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers,
   escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, GREETING,
-  parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms };
+  parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms, smsKeywordType };

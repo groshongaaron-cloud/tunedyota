@@ -75,11 +75,19 @@ throughput. **All copy/paste fields + the A2P overview are in
 Keep the published Privacy/Terms in sync with actual practice — any change to what we
 text customers must be reflected there before it ships.
 
-## 7. Parked dev tasks (future session — not blocking registration)
-Low-risk code hardening, deferred 2026-07-20. None block A2P registration (Console work).
-1. **STOP/HELP/START inbound guard** — `twilio-sms.js` has no keyword handling; add a guard
-   that returns empty TwiML for opt-out/help/resubscribe keywords (no junk lead, no auto-reply).
-2. **Messaging Service support in `sendSms`** — env-gate `TWILIO_MESSAGING_SERVICE_SID`; send
-   via `MessagingServiceSid` when set, fall back to `From`. Paste the SID after approval.
-3. **(optional) Delivery status callback** — a `twilio-status` function logging failed sends
-   (30034/30007) for monitoring.
+## 7. Parked dev tasks — ALL SHIPPED 2026-07-20
+1. **STOP/HELP/START inbound guard** ✅ — `smsKeywordType` in `lib/twilio.js`; the webhook
+   returns empty TwiML for standalone opt-out/help/resubscribe keywords (no junk lead, no
+   relay, no auto-reply — Twilio's Advanced Opt-Out owns those replies). Embedded phrases
+   ("please stop by Saturday") still flow through normally.
+2. **Messaging Service support in `sendSms`** ✅ — set `TWILIO_MESSAGING_SERVICE_SID` in
+   Netlify env after campaign approval (`MGec727e111aecde914cd2178a47c61830`) and sends go
+   through the campaign-linked service; unset, it falls back to raw `From`.
+3. **Delivery status callback** ✅ — `twilio-status` function: signature-validated, logs
+   failed/undelivered sends and Slack-alerts the owner (`SLACK_WEBHOOK_URL`) with the error
+   meaning (30034 unregistered-A2P, 30007 carrier-filtered, …). `sendSms` auto-attaches
+   `StatusCallback` whenever `TWILIO_PUBLIC_BASE`/`URL` is available.
+
+**On approval day:** paste the Messaging Service SID into `TWILIO_MESSAGING_SERVICE_SID`,
+set the branded opt-out/HELP responses in the Messaging Service's Opt-Out Management
+(copy in docs/operations/a2p-campaign-content.md), then run the §6 smoke tests.
