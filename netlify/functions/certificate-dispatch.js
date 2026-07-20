@@ -6,7 +6,7 @@ const { buildCertificate, certSerial } = require("./lib/certificate.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
 const { sendWebPush } = require("./lib/webpush.js");
-const { accountLink } = require("./lib/client-auth.js");
+const { accountLink, referralUrl } = require("./lib/client-auth.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -44,10 +44,11 @@ async function dispatchCertificates(deps) {
     const track = (to) => `https://tunedyota.com/.netlify/functions/amsoil-go?c=${encodeURIComponent(row.id)}&to=${to}`;
     const amsoil = { fluids, qrSvg: qrSvg(track("shop")), pcUrl: track("pc") };
     const certNo = certSerial(row.id, f["Calibration Date"], issueDate);
+    const referralLink = customerEmail ? referralUrl(customerEmail, now.getTime(), env) : "";
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin: f.VIN, calibration,
       installer: inst.name, installerRegion: inst.region,
-      calibrationDate: f["Calibration Date"], certNo, issueDate, amsoil,
+      calibrationDate: f["Calibration Date"], certNo, issueDate, amsoil, referralLink,
     });
     try {
       await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM,

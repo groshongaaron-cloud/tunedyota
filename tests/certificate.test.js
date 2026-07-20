@@ -134,3 +134,13 @@ test("certificate never embeds a login token", () => {
   assert.ok(!/account\?lt=/.test(html));
   assert.match(html, /tunedyota\.com\/account/);
 });
+
+test("referralLink renders a no-reward refer-a-friend card; omitted when absent", () => {
+  const base = { name: "Jane Doe", vehicle: "Tundra", calibration: "Medium", installer: "Aaron",
+    calibrationDate: "2026-07-01", certNo: "TY-1", issueDate: "2026-07-01" };
+  const withRef = buildCertificate({ ...base, referralLink: "https://tunedyota.com/find-your-exact-tune?ref=TESTTOKEN" }).html;
+  assert.match(withRef, /Do a friend a favor/);
+  assert.match(withRef, /ref=TESTTOKEN/);
+  assert.ok(!/reward|discount|\$\d/.test(withRef.split("Do a friend")[1].split("</div>")[0]), "no monetary reward promoted in the card");
+  assert.doesNotMatch(buildCertificate(base).html, /Do a friend a favor/);
+});

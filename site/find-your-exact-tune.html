@@ -631,7 +631,7 @@ const S={make:null,model:null,cfg:null,goals:new Set(),market:"",marketIndex:nul
 const ATTR=(function(){
   let store={}; try{ store=JSON.parse(sessionStorage.getItem("ty_attr")||"{}"); }catch(e){}
   const qs=new URLSearchParams(location.search); let changed=false;
-  ["utm_source","utm_medium","utm_campaign"].forEach(k=>{
+  ["utm_source","utm_medium","utm_campaign","ref"].forEach(k=>{
     const v=qs.get(k); if(v){ store[k]=v; changed=true; }
   });
   if(!store.referrer && document.referrer){ store.referrer=document.referrer; changed=true; }
@@ -1019,7 +1019,8 @@ $("#fSubmit").onclick=async()=>{
     goals: goalsStr + (msg?` · Note: ${msg}`:""),
     installer_key:S.installerKey||"", bot_field:"",
     source: S.intent==="update" ? "OTT Update" : "find-your-exact-tune",
-    utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||""
+    utm_source:ATTR.utm_source||"", utm_medium:ATTR.utm_medium||"", utm_campaign:ATTR.utm_campaign||"",
+    ref:ATTR.ref||""
   };
   try{
     const r=await fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});

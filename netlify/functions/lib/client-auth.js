@@ -63,4 +63,25 @@ function accountLink(email, now, env) {
   return lt ? `https://tunedyota.com/account?lt=${lt}` : "https://tunedyota.com/account";
 }
 
-module.exports = { signSession, verifySession, signLogin, verifyLogin, resolveClient, accountLink, SESSION_TTL_MS, RENEW_AFTER_MS };
+// Referral attribution: a signed, spoof-proof token that identifies the REFERRER by
+// email, embedded in a shareable funnel link. Long-lived (a referral can convert
+// months later). Human-usable on arrival (we store the referrer's email as
+// "Referred By" so the owner can personally thank them — no monetary reward).
+const REFERRAL_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+function signReferral(email, now, env) {
+  return makeToken({ e: String(email || "").trim().toLowerCase(), t: "ref", x: now + REFERRAL_TTL_MS }, env);
+}
+function verifyReferral(token, now, env) {
+  const p = readToken(token, env);
+  if (!p || p.t !== "ref" || !p.e || !(p.x > now)) return null;
+  return { email: p.e };
+}
+// A customer's personal "refer a friend" link — the main funnel with their signed
+// ref token attached. Plain funnel when the secret isn't configured (fail-soft).
+function referralUrl(email, now, env) {
+  const rt = signReferral(email, now, env);
+  return rt ? `https://tunedyota.com/find-your-exact-tune?ref=${rt}` : "https://tunedyota.com/find-your-exact-tune";
+}
+
+module.exports = { signSession, verifySession, signLogin, verifyLogin, resolveClient, accountLink,
+  signReferral, verifyReferral, referralUrl, SESSION_TTL_MS, RENEW_AFTER_MS, REFERRAL_TTL_MS };

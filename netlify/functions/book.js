@@ -6,6 +6,7 @@ const EVENTS = require("./lib/events-data.js");
 const { cfg, listRecords, createRecord, createTolerant } = require("./lib/airtable.js");
 const { isValidSlot, computeOpen } = require("./lib/slots.js");
 const { triggerBackground } = require("./lib/background.js");
+const { verifyReferral } = require("./lib/client-auth.js");
 
 // book.js is the SYNCHRONOUS critical path: validate -> check slots -> create the
 // Airtable record -> return a status the booking UI depends on (booked/conflict/
@@ -14,13 +15,18 @@ const { triggerBackground } = require("./lib/background.js");
 // timeout can never drop it or stall this response. See lib/background.js.
 async function processBooking(body, deps) {
   const { fetchImpl = fetch, env = process.env, now = icsStamp, log = console,
-          trigger = triggerBackground, nowDate } = deps;
+          trigger = triggerBackground, nowDate, nowMs = Date.now() } = deps;
   const d = body || {};
   if (d.bot_field) return { status: "ignored" };
   const market = getMarket(d.city);
   if (!market) return { status: "error", error: "unknown-city" };
   if (!d.name || (!d.phone && !d.email)) return { status: "error", error: "missing-contact" };
   const inst = keyToInstaller(market.inst);
+  // Referral attribution (no-reward, gratitude-based): a signed ref token in the
+  // funnel link identifies the referrer by email. Ignore a self-referral (same
+  // email) and any tampered/expired token. Stored so the owner can say thanks.
+  const rv = d.ref ? verifyReferral(d.ref, nowMs, env) : null;
+  const referredBy = (rv && rv.email && rv.email !== String(d.email || "").trim().toLowerCase()) ? rv.email : "";
   const c = cfg(env);
   const list = await getEventsForCity(market.city, { fetchImpl, env, sheetId: env.EVENTS_SHEET_ID, baked: EVENTS, log }, nowDate);
   const event = d.dateISO ? list.find((e) => e.dateISO === d.dateISO) : list[0];
@@ -38,11 +44,12 @@ async function processBooking(body, deps) {
       Vehicle: d.vehicle || "", "Model Year": d.modelYear || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
       Reason: reason === "full" ? "Event full" : "No event scheduled",
       "Event Date": event ? event.dateISO : "",
+      ...(referredBy ? { "Referred By": referredBy } : {}),
     };
     if (reason === "full" && isValidSlot(d.slot, market.inst)) pfields["Requested Slot"] = d.slot; // only set when a preference was picked
     let pid;
     try {
-      const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications", "Model Year"]);
+      const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications", "Model Year", "Referred By"]);
       pid = rec && rec.id;
     } catch (e) { if (log.error) log.error("priority create", e.message); return { status: "error", error: "store-unavailable" }; }
     await fire({ kind: "priority", d, inst, market, reason, recordId: pid });
@@ -70,11 +77,12 @@ async function processBooking(body, deps) {
       Vehicle: d.vehicle || "", "Model Year": d.modelYear || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
       Status: "Booked", Source: d.source || "find-your-exact-tune",
       "UTM Source": d.utm_source || "", "UTM Medium": d.utm_medium || "", "UTM Campaign": d.utm_campaign || "",
-    } }, ["Modifications", "Model Year"]);
+      ...(referredBy ? { "Referred By": referredBy } : {}),
+    } }, ["Modifications", "Model Year", "Referred By"]);
     bid = rec && rec.id;
   } catch (e) { if (log.error) log.error("create", e.message); return { status: "error", error: "store-unavailable" }; }
 
-  await fire({ kind: "booking", d, inst, market, event, recordId: bid, stamp: now() });
+  await fire({ kind: "booking", d, inst, market, event, recordId: bid, stamp: now(), referredBy });
 
   // emailFailed is intentionally omitted: emails are sent in the background after
   // this returns, so it's unknown here. The UI defaults to "check your email", and

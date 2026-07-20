@@ -9,7 +9,7 @@ const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate
 const { sendEmail } = require("./lib/resend.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
-const { accountLink } = require("./lib/client-auth.js");
+const { accountLink, referralUrl } = require("./lib/client-auth.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -115,9 +115,12 @@ async function processCloseout(body, deps) {
     const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
     const track = (to) => `https://tunedyota.com/.netlify/functions/amsoil-go?c=${encodeURIComponent(d.recordId)}&to=${to}`;
     const amsoil = { fluids, qrSvg: qrSvg(track("shop")), pcUrl: track("pc") };
+    // Personal "refer a friend" link (only when we have the customer's email — the
+    // referrer is the customer). No-reward, gratitude-based; see lib/certificate.js.
+    const referralLink = customerEmail ? referralUrl(customerEmail, now.getTime(), env) : "";
     const { subject, html } = buildCertificate({
       name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin, calibration, installer: inst.name,
-      installerRegion: inst.region, calibrationDate, certNo, issueDate, amsoil });
+      installerRegion: inst.region, calibrationDate, certNo, issueDate, amsoil, referralLink });
     await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to,
       replyTo: OWNER, subject,
       text: toCustomer

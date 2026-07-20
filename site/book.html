@@ -133,7 +133,7 @@ $("#bkSubmit").onclick=function(){
   var payload={ city:STATE.avail.city, dateISO:dateISO, slot:STATE.slot,
     name:$("#bkName").value.trim(), phone:$("#bkPhone").value.trim(), email:$("#bkEmail").value.trim(),
     vehicle:vehicle, modelYear:"", mods:"", goals:"Booked via event link", installer_key:"", bot_field:"",
-    source:"event-link", utm_source:UTM.get("utm_source")||"", utm_medium:UTM.get("utm_medium")||"", utm_campaign:UTM.get("utm_campaign")||"" };
+    source:"event-link", utm_source:UTM.get("utm_source")||"", utm_medium:UTM.get("utm_medium")||"", utm_campaign:UTM.get("utm_campaign")||"", ref:UTM.get("ref")||"" };
   fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
     .then(function(r){return r.json();}).then(function(out){
       if(out.status==="booked"){ track(6,"booked");

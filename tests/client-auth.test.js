@@ -69,3 +69,17 @@ test("resolveClient reads the header; renews only past the renewal window", () =
   assert.equal(resolveClient({}, NOW, ENV), null);
   assert.equal(resolveClient({ "x-client-token": "junk" }, NOW, ENV), null);
 });
+
+const { signReferral, verifyReferral, referralUrl, REFERRAL_TTL_MS } = require("../netlify/functions/lib/client-auth.js");
+
+test("referral token round-trips + lowercases; rejects tamper, expiry, wrong type", () => {
+  const t = signReferral("Ref@Example.com", NOW, ENV);
+  assert.equal(verifyReferral(t, NOW + 1000, ENV).email, "ref@example.com");
+  assert.equal(verifyReferral(t, NOW + REFERRAL_TTL_MS + 1, ENV), null);          // expired
+  assert.equal(verifyReferral("junk.sig", NOW, ENV), null);                        // malformed
+  assert.equal(verifyReferral(signSession("a@b.co", NOW, ENV), NOW, ENV), null);   // a session is not a ref
+});
+test("referralUrl embeds a ref token in the funnel link; plain funnel without a secret", () => {
+  assert.match(referralUrl("a@b.co", NOW, ENV), /^https:\/\/tunedyota\.com\/find-your-exact-tune\?ref=.+/);
+  assert.equal(referralUrl("a@b.co", NOW, {}), "https://tunedyota.com/find-your-exact-tune");
+});

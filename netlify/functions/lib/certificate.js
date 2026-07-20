@@ -108,7 +108,25 @@ function amsoilPage(amsoil, vehicleDisplay) {
   </div>`;
 }
 
-function buildCertificate({ name, vehicle, modelYear, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate, amsoil } = {}) {
+// "Do a friend a favor" — a gratitude-based, no-reward referral ask at the proud
+// moment (the certificate). Altruistic framing, not a bribe; the personal link
+// carries the customer's signed ref token so a friend's booking is attributed.
+function referralCard(referralLink, name) {
+  if (!referralLink) return "";
+  const first = esc(String(name || "").trim().split(/\s+/)[0] || "");
+  return `
+  <div class="cert ref">
+    <div class="pad" style="text-align:center">
+      <div class="ref-eyebrow">Know someone with a Toyota or Lexus?</div>
+      <h2 style="margin:.2em 0">Do a friend a favor.</h2>
+      <p class="lede" style="max-width:44em;margin:.4em auto .8em">${first ? first + ", if" : "If"} your tune impressed you, chances are a buddy is fighting the same gear hunting and throttle lag. Send them your link — you'll be doing them a real favor, and we're grateful for the introduction. Refer a friend and you're both first in line for the next event in your area.</p>
+      <a href="${esc(referralLink)}" style="display:inline-block;background:#1F3A2E;color:#fff;text-decoration:none;font-weight:800;font-size:13px;padding:11px 20px;border-radius:8px">Share your Tuned Yota link &#9658;</a>
+      <div class="url" style="margin-top:8px">${esc(referralLink.replace(/^https?:\/\//, "").replace(/\?ref=.*$/, " (your personal link)"))}</div>
+    </div>
+  </div>`;
+}
+
+function buildCertificate({ name, vehicle, modelYear, vin, calibration, installer, installerRegion, calibrationDate, certNo, issueDate, amsoil, referralLink } = {}) {
   const vehicleDisplay = formatVehicle(vehicle, modelYear);
   const subject = `Tuned Yota — Certificate of Calibration${name ? ` for ${name}` : ""}${vehicleDisplay ? ` · ${vehicleDisplay}` : ""}`;
   // Installer row shows the installer's NAME only — no cities/region.
@@ -465,6 +483,7 @@ function buildCertificate({ name, vehicle, modelYear, vin, calibration, installe
     </div>
   </div>
 ${amsoil ? amsoilPage(amsoil, vehicleDisplay) : ""}
+${referralLink ? referralCard(referralLink, name) : ""}
 </body>
 </html>`;
   return { subject, html };

@@ -246,3 +246,26 @@ test("Green Bay full after 10 generic slots -> priority waitlist", async () => {
   assert.equal(out.status, "priority");
   assert.equal(out.reason, "full");
 });
+
+const { signReferral } = require("../netlify/functions/lib/client-auth.js");
+
+test("a valid referral token is attributed as Referred By on the booking", async () => {
+  const d = slotDeps([]); d.env.CLIENT_SESSION_SECRET = "sekret"; d.nowMs = 1751000000000;
+  const ref = signReferral("friend@ref.com", d.nowMs, d.env);
+  const out = await processBooking({ city: "Green Bay", name: "N", phone: "1", email: "new@buyer.com", slot: "Slot 1", dateISO: "2026-09-12", ref }, d);
+  assert.equal(out.status, "booked");
+  assert.equal(d._created[0].fields["Referred By"], "friend@ref.com");
+});
+test("a self-referral (same email) is not attributed", async () => {
+  const d = slotDeps([]); d.env.CLIENT_SESSION_SECRET = "sekret"; d.nowMs = 1751000000000;
+  const ref = signReferral("self@buyer.com", d.nowMs, d.env);
+  const out = await processBooking({ city: "Green Bay", name: "N", phone: "1", email: "Self@Buyer.com", slot: "Slot 2", dateISO: "2026-09-12", ref }, d);
+  assert.equal(out.status, "booked");
+  assert.equal("Referred By" in d._created[0].fields, false);
+});
+test("a tampered referral token is ignored (no attribution)", async () => {
+  const d = slotDeps([]); d.env.CLIENT_SESSION_SECRET = "sekret"; d.nowMs = 1751000000000;
+  const out = await processBooking({ city: "Green Bay", name: "N", phone: "1", email: "x@y.com", slot: "Slot 3", dateISO: "2026-09-12", ref: "bogus.token" }, d);
+  assert.equal(out.status, "booked");
+  assert.equal("Referred By" in d._created[0].fields, false);
+});
