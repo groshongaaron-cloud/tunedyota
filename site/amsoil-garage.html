@@ -220,7 +220,8 @@
     });
     var total = AmsoilGarage.bundleTotal(gen, CAT.products);
     var kit = '<div class="bundle"><strong>&#128722; Full service kit — ' + resolved.make + ' ' + resolved.model + ' ' + gen.y + '</strong>' +
-      '<p style="margin:6px 0 0">Every fluid this build needs. Add each item to your AMSOIL cart (they stay for 30 days) — total about <strong>' + money(total) + '</strong> retail.</p></div>';
+      '<p style="margin:6px 0 0">Every fluid this build needs. Add each item to your AMSOIL cart (they stay for 30 days) — total about <strong>' + money(total) + '</strong> retail.</p></div>' +
+      '<p style="font-size:12px;color:var(--sage-d);margin:10px 2px 0">Capacities are for the standard configuration. Some variants differ — e.g. a TRD e-locker rear differential holds about a quart more than the standard axle — so check your owner\'s manual or ask us before you buy.</p>';
     g.innerHTML = '<h2 style="font-family:Spectral,serif;color:var(--ink);margin:18px 0 12px">' +
       resolved.make + ' ' + resolved.model + ' <span style="color:var(--sage-d);font-size:15px">' + gen.e + '</span></h2>' + rows + kit;
   }
