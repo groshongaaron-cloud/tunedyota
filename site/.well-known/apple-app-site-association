@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAMID.com.tunedyota.app",
+        "appID": "YR2H93A5X7.com.tunedyota.app",
         "paths": ["/app", "/account", "/book", "/book/*", "/magnuson-supercharger-pricing", "/supercharger", "/amsoil-garage"]
       }
     ]

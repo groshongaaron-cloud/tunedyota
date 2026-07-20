@@ -76,6 +76,6 @@ table: created · Codemagic: repo connected" — as each becomes true.
 
 ## 7. Universal links (deep links into the app)
 Two placeholder files ship on the site and must be completed before store submission:
-1. `site/.well-known/apple-app-site-association` — replace `TEAMID` with your Apple **Team ID** (step 1.4).
+1. ✅ DONE 2026-07-20 — `site/.well-known/apple-app-site-association` carries Team ID `YR2H93A5X7`.
 2. `site/.well-known/assetlinks.json` — replace the fingerprint with the **SHA-256 of the Play App Signing key** (Play Console → Setup → App signing) once step 2 is done.
-→ Tell Claude both values and I'll wire + deploy them.
+→ Tell Claude the fingerprint and I'll wire + deploy it.
