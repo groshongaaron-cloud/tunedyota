@@ -160,16 +160,19 @@ function page(model, models) {
   const genCards = gens.map((g) => {
     const rows = (g.bundle || []).map((sku) => {
       const p = prod(sku); if (!p) return "";
-      const detail = g.verified
-        ? (g.systems.find((s) => s.sku === sku && s.capacity)
-            ? `<span class="cap">${g.systems.find((s) => s.sku === sku).capacity} ${g.systems.find((s) => s.sku === sku).unit}</span>` : "")
-        : "";
+      // Per-SYSTEM gate: a capacity chip renders only for a system whose figure is
+      // cross-verified (engine oil this pass). Unverified fluids (gear lube, ATF,
+      // diffs) never present an unconfirmed number as fact.
+      const capSys = g.systems.find((s) => s.sku === sku && s.capacity);
+      const detail = (capSys && capSys.verified)
+        ? `<span class="cap">${capSys.capacity} ${capSys.unit}</span>` : "";
       const sys = (g.systems.find((s) => s.sku === sku) || {}).system || categoryOf(p.name);
       const price = priceOf(p);
       const priceHtml = price != null ? `<span class="price">$${price.toFixed(2)}</span>` : "";
       return `<div class="fl">${imgTag(p, 50)}<div class="pinfo"><span class="sys">${ESC(sys)}</span><span class="prd">${ESC(p.name)}</span>${detail}</div><div class="pbuy">${priceHtml}<a class="ord" target="_blank" rel="noopener" href="${amsoilUrl(p.productPath)}">Order &#9658;</a></div></div>`;
     }).join("");
-    const capNote = g.verified ? "" : `<p style="margin:8px 0 0;font-size:12px;color:var(--sage-d)">Exact fill capacities &amp; severe-service intervals for this configuration are in your <a href="amsoil-garage.html?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}" style="color:var(--sage-d);font-weight:700">AMSOIL Garage</a>.</p>`;
+    const hasPendingCap = (g.bundle || []).some((sku) => { const s = g.systems.find((x) => x.sku === sku && x.capacity); return s && !s.verified; });
+    const capNote = hasPendingCap ? `<p style="margin:8px 0 0;font-size:12px;color:var(--sage-d)">Gear-lube, ATF, and differential fill capacities for this configuration are being finalized — confirm against your owner's manual before service.</p>` : "";
     return `<div class="gen"><div class="eng">${ESC(g.y)}</div><h3>${ESC(name)} <span style="color:var(--sage-d);font-weight:600">${ESC(g.e)}</span></h3>${rows}${capNote}</div>`;
   }).join("\n");
 

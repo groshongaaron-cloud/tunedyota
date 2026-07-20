@@ -55,7 +55,7 @@ function resolveFluids(vehicle, modelYear) {
         const p = products[s.sku] || {};
         return {
           system: s.system, product: p.name || s.sku, stockNo: p.stockNo || "",
-          capacity: s.capacity, unit: s.unit || "",
+          capacity: s.capacity, unit: s.unit || "", verified: !!s.verified,
           factoryInterval: s.factoryInterval || "", tunedInterval: s.tunedInterval || "",
         };
       });

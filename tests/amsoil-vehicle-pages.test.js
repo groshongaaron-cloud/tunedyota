@@ -40,14 +40,38 @@ test("every page has valid JSON-LD (Store, FAQPage, BreadcrumbList) + canonical"
   }
 });
 
-test("INTEGRITY: no capacity/interval numbers leak while every generation is verified:false", async () => {
+test("INTEGRITY: a capacity chip renders iff that exact system is cross-verified", async () => {
   const { AMSOIL_PAGE_FILES } = await mod();
-  const allVerifiedFalse = Object.values(CAT.vehicles)
-    .flatMap((m) => Object.values(m)).flat().every((g) => !g.verified);
-  assert.ok(allVerifiedFalse, "test premise: catalog is currently all-unverified");
+  // Mirror the generator exactly: it renders one `class="cap"` chip per (gen, bundle-sku)
+  // pair whose matched system has a capacity AND is `verified:true`. Unverified fluids
+  // (gear lube, ATF, diffs, transfer) must NEVER surface a number as fact.
+  let expected = 0;
+  for (const mk of Object.keys(CAT.vehicles)) {
+    for (const md of Object.keys(CAT.vehicles[mk])) {
+      for (const gen of CAT.vehicles[mk][md]) {
+        for (const sku of gen.bundle || []) {
+          const s = (gen.systems || []).find((x) => x.sku === sku && x.capacity);
+          if (s && s.verified) expected++;
+        }
+      }
+    }
+  }
+  let actual = 0;
   for (const f of AMSOIL_PAGE_FILES) {
-    const html = fs.readFileSync(path.join(SITE, f), "utf8");
-    assert.equal(html.includes('class="cap"'), false, `${f} must not render a capacity chip while unverified`);
+    actual += (fs.readFileSync(path.join(SITE, f), "utf8").match(/class="cap"/g) || []).length;
+  }
+  assert.equal(actual, expected, "cap chips on pages must equal the count of verified-capacity systems");
+  assert.ok(expected > 0, "premise: some engine-oil capacities are now verified");
+
+  // Every verified system must be an Engine Oil system this pass (diff/trans stay unverified).
+  for (const mk of Object.keys(CAT.vehicles)) {
+    for (const md of Object.keys(CAT.vehicles[mk])) {
+      for (const gen of CAT.vehicles[mk][md]) {
+        for (const s of gen.systems || []) {
+          if (s.verified) assert.equal(s.system, "Engine Oil", `${mk} ${md} ${gen.y}: only Engine Oil is verified this pass, not ${s.system}`);
+        }
+      }
+    }
   }
 });
 

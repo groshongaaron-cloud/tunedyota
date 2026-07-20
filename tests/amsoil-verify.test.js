@@ -36,6 +36,7 @@ test("review() resolves SKUs to product names", async () => {
 test("setVerified flips all generations, is idempotent, and can unverify", async () => {
   const { setVerified, findModel } = await V();
   const cat = clone();
+  findModel(cat, "Toyota Tundra").gens.forEach((g) => { g.verified = false; });   // normalize: live catalog now has verified gens
   const r1 = setVerified(cat, "Toyota Tundra", { value: true });
   const gens = findModel(cat, "Toyota Tundra").gens;
   assert.equal(r1.changed.length, gens.length);
@@ -49,6 +50,7 @@ test("setVerified flips all generations, is idempotent, and can unverify", async
 test("setVerified with a year targets exactly one generation", async () => {
   const { setVerified, findModel } = await V();
   const cat = clone();
+  findModel(cat, "Toyota Tundra").gens.forEach((g) => { g.verified = false; });   // normalize: live catalog now has verified gens
   const someYear = findModel(cat, "Toyota Tundra").gens[0].y;
   const r = setVerified(cat, "Toyota Tundra", { year: someYear, value: true });
   assert.deepEqual(r.changed, [someYear]);

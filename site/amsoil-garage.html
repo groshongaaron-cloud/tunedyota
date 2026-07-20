@@ -212,7 +212,7 @@
       var price = p.salePrice != null ? p.salePrice : p.retailPrice;
       rows += '<div class="fluid"><div class="bottle"></div><div class="meta">' +
         '<div class="nm">' + s.system + '</div>' +
-        '<div class="sub">' + p.name + ' · ' + s.capacity + ' ' + s.unit + ' · service ' + s.tunedInterval + '</div>' +
+        '<div class="sub">' + p.name + ' · ' + (s.verified ? s.capacity + ' ' + s.unit + ' · ' : '') + 'service ' + s.tunedInterval + '</div>' +
         '</div><span class="price">' + money(price) + '</span>' +
         '<a class="order" target="_blank" rel="noopener" href="' + amsoilUrl(p.productPath) + '">Order &#9658;</a></div>';
     });

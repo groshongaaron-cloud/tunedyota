@@ -58,7 +58,7 @@ function fluidsRows(fluids) {
         <tr>
           <td><span class="sys">${esc(s.system)}</span></td>
           <td><div class="prod">${esc(s.product)}</div>${s.stockNo ? `<div class="stockno">Stock No. <b>${esc(s.stockNo)}</b></div>` : ""}</td>
-          <td class="num"><span class="cap">${esc(s.capacity)}</span> ${esc(s.unit)}</td>
+          <td class="num">${s.verified ? `<span class="cap">${esc(s.capacity)}</span> ${esc(s.unit)}` : `<span class="cap-pending" title="Confirm against your owner's manual">&mdash;</span>`}</td>
           <td class="num intv"><span class="t">${esc(s.tunedInterval)}</span>${s.factoryInterval ? `<span class="f">${esc(s.factoryInterval)}</span>` : ""}</td>
         </tr>`).join("");
   return `
