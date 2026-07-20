@@ -66,7 +66,8 @@ throughput or reduced fees but need extra approvals.
    > out, HELP for help.
 2. *(appointment confirmation)*
    > Tuned Yota: You're confirmed for your OTT calibration install on Sat 8/16 at our
-   > Rochester, MN event at 10:00 AM. Reply here with any questions. Reply STOP to opt out.
+   > Rochester, MN event at 10:00 AM. Details: https://tunedyota.com. Reply here with any
+   > questions. Reply STOP to opt out.
 3. *(scheduling follow-up)*
    > Hi from Tuned Yota — following up on your Tundra tune. We have two openings at the
    > Sioux Falls event next weekend; want me to hold one for you? Reply STOP to opt out.
