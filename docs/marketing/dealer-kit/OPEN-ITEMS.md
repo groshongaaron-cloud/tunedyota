@@ -26,9 +26,9 @@
 - ⏸ **COI attachment**: the "Insured" bullet was removed from the cover rather
   than claim an unattached certificate; revisit with the warranty concept.
 
-## Review gate (replaces outside counsel)
-Aaron has a legal background and signs off himself. Review package =
-`assets-source/dealer-kit-exports/*.pdf` (5 artifacts; 01-compliance and
-02-warranty carry the DRAFT watermark). **On Aaron's approval:** remove the
-`.draft` class from artifacts 01/02, re-render, and the kit is
-distribution-ready — outreach can begin per `tier-a-outreach-filled.md`.
+## ✅ SIGNED OFF — DISTRIBUTION-READY (Aaron, 2026-07-20)
+Aaron reviewed and approved (his own legal sign-off). DRAFT watermarks removed
+from artifacts 01/02; final PDFs in `assets-source/dealer-kit-exports/`.
+**Outreach may begin** per `tier-a-outreach-filled.md` — start with Noah's
+Wisconsin territory (7 A-tier dealers). Any future edit to kit copy: re-render
+and get Aaron's re-approval before sending externally.
