@@ -38,6 +38,7 @@ Installer regions (server source of truth — `netlify/functions/lib/routing.js`
 | 8 | [Monitoring & Incident Response](sop-monitoring-incident-response.md) | Owner |
 | 9 | [Monthly OTT Calibration Report](sop-monthly-ott-report.md) | Owner |
 | 10 | [Data Security & Secrets](sop-data-security-secrets.md) | Owner |
+| 11 | [Install-Day AMSOIL Pitch](sop-install-day-amsoil-pitch.md) | Installer (+ Owner tallies) |
 
 **Field manual:** [Installer Dashboard Playbook](installer-dashboard-playbook.md) — the complete
 everyday guide to the Installer Console (`/installer.html`): smart feed, all-history search, everyday

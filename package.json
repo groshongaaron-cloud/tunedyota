@@ -15,7 +15,8 @@
     "render:dealer-kit": "node docs/marketing/dealer-kit/render.js",
     "sync:amsoil-prices": "node scripts/amsoil/price-sync.mjs",
     "refresh:amsoil-catalog": "node scripts/amsoil-catalog.mjs && node scripts/amsoil-recategorize.mjs && node scripts/amsoil-images.mjs",
-    "indexnow": "node scripts/indexnow-submit.mjs"
+    "indexnow": "node scripts/indexnow-submit.mjs",
+    "stock:event": "node scripts/amsoil-event-stock.mjs"
   },
   "dependencies": {
     "google-auth-library": "^10.9.0",
