@@ -31,6 +31,43 @@ host), so no extra config.
   the lead's activity log shows `voicemail: <transcript> — <recording url>`.
 - Confirm a bad/unsigned POST to either endpoint returns HTTP 403.
 
-## 4. Cutover (later, at port time)
+## 4. Cutover (at port time)
 Once 612-406-7117 is ported into the Twilio account, move the two webhooks onto the
 ported number and release the temp number. No code change.
+**Status: port COMPLETE (2026-07-20).** Webhooks already point at the ported number
+(SmsUrl → `/twilio-sms`, VoiceUrl → `/twilio-voice`); `TWILIO_FROM_NUMBER=+16124067117`.
+
+## 5. A2P 10DLC registration — REQUIRED before outbound SMS works
+US carriers block un-registered application-to-person SMS (error **30034**). Register
+in Twilio Console → Messaging → Regulatory Compliance / A2P 10DLC:
+1. **Brand** — register the Tuned Yota business (legal name, EIN, address, website
+   `https://tunedyota.com`, contact email).
+2. **Campaign** — use case "Customer Care" / "Mixed" (conversational + transactional).
+   The campaign form requires the disclosures we now publish:
+   - **Privacy Policy URL:** `https://tunedyota.com/privacy` (contains the SMS section,
+     STOP/HELP, "message & data rates may apply", and the mandatory *"we do not share
+     mobile opt-in/consent with third parties for marketing"* language — the #1 rejection
+     reason).
+   - **Terms URL:** `https://tunedyota.com/terms` (SMS program terms).
+   - **Opt-in description + screenshot:** the booking form at
+     `https://tunedyota.com/find-your-exact-tune` shows the consent line under "Send My
+     Request" (contact-by-text disclosure, frequency/rates, STOP/HELP, consent-not-a-
+     condition-of-purchase). Provide 2–3 sample messages.
+3. **Attach the ported number** to the approved campaign (Messaging Service or number
+   assignment).
+
+## 6. Go-live compliance checklist (do NOT skip)
+- [ ] Privacy Policy live at `/privacy` with the SMS section — **published**.
+- [ ] Terms live at `/terms` with the SMS program terms — **published**.
+- [ ] Booking-form consent line references Privacy + Terms — **published**.
+- [ ] A2P brand + campaign **approved** (check Console status; can take hours–days).
+- [ ] Ported number attached to the approved campaign.
+- [ ] **STOP/HELP** honored: Twilio Advanced Opt-Out handles STOP/START/HELP by default
+      — confirm it is **enabled** on the number/Messaging Service (do not disable).
+- [ ] Live smoke test (see §3) against 612-406-7117: inbound text → auto-reply + lead;
+      chat-escalation SMS → installer cell; installer reply → relay into chat; missed
+      call → greeting + forward + voicemail transcript.
+- [ ] Send a real test text and confirm no 30034; verify a STOP reply stops further texts.
+
+Keep the published Privacy/Terms in sync with actual practice — any change to what we
+text customers must be reflected there before it ships.

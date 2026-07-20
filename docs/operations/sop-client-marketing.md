@@ -7,6 +7,13 @@ Marketing exists to drive traffic to `tunedyota.com`, where the *Find Your Exact
 turns a visitor into a **booking** or a **Priority List lead**. Every tuned truck then becomes
 proof (dyno, testimonial, review) that feeds the top of the funnel — the flywheel.
 
+> **SMS marketing = separate consent.** Our A2P registration and customer texting cover
+> **conversational/transactional** messages only (see [Twilio runbook §5–6](twilio-adapter-activation.md)).
+> Promotional/marketing SMS blasts are a **different A2P use case** requiring their own campaign and
+> explicit marketing opt-in — do **not** send marketing texts to numbers collected for booking without
+> setting that up first. All public forms link the [Privacy Policy](https://tunedyota.com/privacy) and
+> [Terms](https://tunedyota.com/terms).
+
 ---
 
 ## 1. Channels & where they live

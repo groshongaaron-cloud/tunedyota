@@ -108,7 +108,7 @@ document.querySelectorAll('.lp-fqq').forEach(q=>q.addEventListener('click',()=>{
 </script>`;
 
 const FOOTER = `<footer class="sfoot"><div class="fmark">Tuned Yota</div><div class="ftag">Undeniable Performance</div>
-  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></div>
+  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
   <div class="fcon">Call or text <a href="tel:+16124067117">(612) 406-7117</a> &nbsp;·&nbsp; <a href="mailto:info@tunedyota.com">info@tunedyota.com</a><br>
   Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>

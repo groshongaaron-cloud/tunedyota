@@ -36,6 +36,7 @@ export const HEAD_PAGES = [
   "amsoil-texas.html","amsoil-florida.html","amsoil-colorado.html","amsoil-arizona.html","amsoil-michigan.html","amsoil-california.html",
   "amsoil-georgia.html","amsoil-ohio.html","amsoil-pennsylvania.html","amsoil-illinois.html","amsoil-washington.html","amsoil-tennessee.html",
   "amsoil-north-carolina.html","amsoil-missouri.html","amsoil-montana.html","amsoil-idaho.html","amsoil-oklahoma.html","amsoil-indiana.html",
+  "privacy.html","terms.html",
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 
@@ -49,6 +50,7 @@ export const PRIORITY = {
   "amsoil-severe-gear-guide.html": "0.8", "amsoil-ea-oil-filter-guide.html": "0.8", "is-amsoil-worth-it.html": "0.8",
   "amsoil-vs-oem-toyota-lexus-fluids.html": "0.9",
   "amsoil-0w20-guide.html": "0.8", "amsoil-5w30-guide.html": "0.8", "amsoil-5w20-guide.html": "0.8",
+  "privacy.html": "0.3", "terms.html": "0.3",
 };
 // loc path for a filename (index -> "/", others -> "/name" without .html).
 export function locFor(file) {

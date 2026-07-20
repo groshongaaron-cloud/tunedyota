@@ -9,6 +9,14 @@ the Airtable **Priority List** (the waitlist). A "booking" is a confirmed slot a
 event and lives in **Bookings**. This SOP covers capture and routing; conversion of the
 waitlist is [SOP 5](sop-priority-waitlist.md).
 
+> **SMS & privacy compliance (required).** Any customer-facing form that collects a phone
+> number must show the text-consent line linking the [Privacy Policy](https://tunedyota.com/privacy)
+> and [Terms](https://tunedyota.com/terms) — as the booking form does. We text customers only for
+> conversational/transactional purposes (confirmations, scheduling, replies, installer relay);
+> honor **STOP/HELP**; and never share mobile opt-in data. See the
+> [Twilio activation runbook §5–6](twilio-adapter-activation.md) for the A2P 10DLC rules. Do not
+> add a new phone-capture surface without the consent line.
+
 ---
 
 ## 1. Where leads come from
