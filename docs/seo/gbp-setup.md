@@ -1,7 +1,12 @@
-# Google Business Profile — setup (service-area business)
+# Google Business Profile — setup (storefront + service-area hybrid)
 
-This is the single biggest lever for "...in <state>" geo queries. Tuned Yota has no
-storefront, so set it up as a **service-area business** (no address shown publicly).
+This is the single biggest lever for "...in <state>" geo queries AND the
+"amsoil dealer minnesota" local pack (currently five generalist dealers, zero
+Toyota specialists). **Updated 2026-07-20:** Tuned Yota now operates a physical
+location holding AMSOIL/product stock for pickup — so set this up as a
+**storefront WITH service areas** (address VISIBLE), not a hidden-address
+service business. A visible-address profile is eligible for the local pack in
+its city and ranks better than a hidden one.
 
 > **Brand rules (locked — apply everywhere below):** no Kevin Whitman anywhere;
 > no Stage 2 / Stage 3 or MAF terminology in any customer-facing copy; the turbo
@@ -12,12 +17,16 @@ storefront, so set it up as a **service-area business** (no address shown public
 
 ## Create / claim
 1. google.com/business → **Add your business** → name **Tuned Yota**.
-2. Business type: **Service business** (no storefront). When asked for an address,
-   enter the operating address but **check "I deliver goods/services to customers"**
-   and set it to **hide the address**.
-3. **Service areas:** add your event cities — Duluth, Twin Cities, Mankato, Rochester,
-   Eau Claire, Green Bay, Madison, Milwaukee, Des Moines, Cedar Rapids, Davenport,
-   Fargo, Rapid City, Sioux Falls, Omaha.
+2. Business type: select BOTH **"Local store"** (customers can visit) AND
+   **"Service business"** (you also serve customers at their locations/events).
+   Enter the physical location's address and keep it **VISIBLE** — the address is
+   what qualifies you for the local pack and in-store-pickup attributes.
+3. **Service areas** (on top of the address): add your event cities — Duluth,
+   Twin Cities, Mankato, Rochester, Eau Claire, Green Bay, Madison, Milwaukee,
+   Des Moines, Cedar Rapids, Davenport, Fargo, Rapid City, Sioux Falls, Omaha.
+4. **Hours:** set real pickup/visit hours for the location (even limited ones —
+   e.g. "by appointment" + specific pickup windows). A storefront with hours
+   outranks "hours unavailable."
 
 ---
 
@@ -47,6 +56,12 @@ open tunedyota.com and confirm the phone renders in the **exact** format below.
 - Magnuson supercharger — calibration
 - Custom calibration
 - Turbo Performance Calibration
+- AMSOIL synthetic fluids — kits reserved online, local pickup (Authorized AMSOIL Dealer)
+
+### Attributes (set every one that's offered)
+- **In-store pickup** · **In-store shopping** (AMSOIL stock)
+- Onsite services / service at customer location (event installs)
+- Appointment required (if that's how the location runs)
 
 > Each service can take a short description. Keep wording aligned with the site —
 > do **not** introduce Stage 2/3 or MAF language. The turbo offering is named
@@ -63,10 +78,11 @@ Tuned Yota delivers in-person Toyota & Lexus performance calibration across the
 Upper Midwest. As an authorized Overland Tailor Tune (OTT) installer and VFTuner
 PRO Tuner, we flash-tune your Toyota and Lexus in person at events near you —
 sharpening throttle, ending gear hunting, and unlocking usable power while keeping
-your factory emissions equipment fully intact. We also sell, install, and calibrate
-Magnuson superchargers for bigger gains. No storefront and no shipping your ECU off:
-real tuning done in person by your local installer. Find your exact tune and book at
-tunedyota.com.
+your factory emissions equipment fully intact. We sell, install, and calibrate
+Magnuson superchargers for bigger gains, and as an Authorized AMSOIL Dealer we
+stock the exact synthetic fluids your build needs — reserve your kit online and
+pick it up locally or at your install. No shipping your ECU off: real tuning done
+in person. Find your exact tune and book at tunedyota.com.
 ```
 
 - **Hours:** set to **"By appointment"** / event-based (no fixed daily hours).
@@ -83,6 +99,10 @@ because product cards surface in the profile and in some local searches.
   price "Contact for quote" or a from-price if you want to anchor.
 - **OTT Tune Calibration** — link to the tune-finder funnel.
 - **Turbo Performance Calibration** — link to the turbo platform page.
+- **AMSOIL oil-change kit (your exact vehicle)** — link to
+  https://tunedyota.com/amsoil-garage; description: "Reserve online, pick up
+  locally or at your install — Authorized AMSOIL Dealer." (Anchor MSRP pricing is
+  fine per Aaron's pricing stance; kits are vehicle-specific so "from $X" works.)
 
 Each product card → set the button/link to the matching page on tunedyota.com so the
 profile drives traffic into your booking funnel.
@@ -116,9 +136,15 @@ profile drives traffic into your booking funnel.
 You can post questions to your own profile and answer them. Seed the common ones so
 the answers are controlled and on-brand before a customer asks. Suggested seeds:
 
-- **Q:** Do you have a shop I can drop my truck off at?
-  **A:** No storefront — we're a service-area business and tune in person at events
-  across MN, IA, WI, ND, SD, and NE. Find your nearest event and book at tunedyota.com.
+- **Q:** Do you have a physical location?
+  **A:** Yes — our location stocks AMSOIL products for local pickup (reserve your
+  kit at tunedyota.com/amsoil-garage), and we tune in person at events across MN,
+  IA, WI, ND, SD, and NE. Find your nearest event and book at tunedyota.com.
+
+- **Q:** Can I buy AMSOIL from you locally?
+  **A:** Yes — we're an Authorized AMSOIL Dealer. Build your vehicle's exact fluid
+  kit at tunedyota.com/amsoil-garage and reserve it for pickup or your install day,
+  or order online and AMSOIL ships it direct to your door.
 
 - **Q:** Will an OTT tune affect my emissions equipment or warranty-related hardware?
   **A:** Our calibrations keep your factory emissions equipment fully intact.
@@ -199,8 +225,9 @@ tune-finder) and stay within brand-rule wording.
 ---
 
 ## Pre-publish checklist
-- [ ] Business set as service-area; address hidden
+- [ ] Business set as storefront + service-area hybrid; address VISIBLE; hours set
 - [ ] All event cities added as service areas
+- [ ] In-store pickup / in-store shopping attributes set
 - [ ] Phone/email/site match the live site exactly (format included)
 - [ ] Primary category = Auto tuning service (or fallback); secondaries added
 - [ ] Services listed; turbo tier named "Turbo Performance Calibration"
