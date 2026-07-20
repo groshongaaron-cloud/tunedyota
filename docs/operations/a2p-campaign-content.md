@@ -58,13 +58,31 @@ with what we actually text and with `/privacy` + `/terms`.
 > Tuned Yota: for help, call or text (612) 406-7117 or email info@tunedyota.com. Msg &
 > data rates may apply. Reply STOP to unsubscribe.
 
+## Opt-in / resubscribe keywords + confirmation
+Twilio US defaults (leave enabled) — these resubscribe a user who previously texted STOP.
+We do **not** run a text-to-join keyword campaign; primary opt-in is the web form, an
+inbound text, or a verbal in-person request.
+- **Keywords:** START · YES · UNSTOP
+- **Opt-in confirmation message (paste):**
+  > Tuned Yota: You're re-subscribed and will receive text updates about your requests
+  > again. Msg & data rates may apply. Reply STOP to opt out, HELP for help.
+- **Tight-limit alternative:**
+  > Tuned Yota: You're subscribed. Msg & data rates may apply. Reply STOP to opt out, HELP for help.
+
 ## Message frequency
 > Message frequency varies based on the customer's conversation with us (conversational).
 
 ---
-**Note — recommended code tweak for consistency:** our live auto-reply
-(`netlify/functions/twilio-sms.js`, `REPLY`) does not yet include the "Reply STOP to opt
-out, HELP for help. Msg & data rates may apply." footer shown in sample #1. Twilio
-Advanced Opt-Out still honors STOP/HELP, but adding the footer to the *first* message to a
-new contact is best practice and makes the sample match production. Low-risk one-line
-change — do before or right after approval.
+## Where the disclosures live (all shipped 2026-07-20)
+Consent + opt-out language is consistent across every customer touchpoint carriers may
+cross-check:
+- **Privacy Policy** https://tunedyota.com/privacy · **Terms** https://tunedyota.com/terms
+- **Booking form** (`find-your-exact-tune`) — consent line at the submit button.
+- **Chat widget** (`site/chat.js`) — fine-print disclosure under the input.
+- **Inbound auto-reply** (`netlify/functions/twilio-sms.js`) — now carries the
+  "Msg & data rates may apply. Reply STOP to opt out, HELP for help." footer.
+- **Customer emails** (`lib/templates.js`) — booking, lead, waitlist, and reminder each
+  carry the SMS opt-out line + Privacy link.
+
+Guarded by `tests/legal-compliance.test.js`. Keep this doc in sync with the live copy —
+any change to what we text customers must be reflected in `/privacy` + `/terms` first.
