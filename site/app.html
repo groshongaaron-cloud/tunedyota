@@ -68,6 +68,7 @@
   var DATA = { magnuson: window.MAGNUSON_CATALOG, amsoil: null };
   var CERTS = null; // null = not loaded; [] = loaded, none
   var VIEW = document.getElementById("view");
+  var renderGen = 0; // stale-render guard: incremented each render(); async callbacks check this
 
   function tok() { return localStorage.getItem(S.TOKEN_KEY) || ""; }
   function api(path, opts) { // account.html pattern incl. sliding renewal
@@ -120,12 +121,13 @@
   document.getElementById("gear").onclick = openSettings;
 
   function render() {
+    var gen = ++renderGen;
     var r = S.parseRoute(location.hash);
     Array.prototype.forEach.call(document.querySelectorAll("#tabbar button"), function (b) {
       b.classList.toggle("on", b.getAttribute("data-tab") === S.tabFor(r.view));
     });
-    if (r.view === "garage") return garage().length ? renderGarage() : renderFirstRun();
-    if (r.view === "vehicle") return renderVehicle(r.arg);
+    if (r.view === "garage") return garage().length ? renderGarage(gen) : renderFirstRun();
+    if (r.view === "vehicle") return renderVehicle(r.arg, gen);
     if (r.view === "shop") return renderShop(r.arg);
     if (r.view === "book") return renderBook();
     if (r.view === "chat") return renderChat();
@@ -158,12 +160,13 @@
   }
 
   // ---- garage list ----
-  function renderGarage() {
+  function renderGarage(gen) {
     loadCerts().then(function () {
+      if (gen !== renderGen) return; // stale: a newer render() has run
       var g = garage();
       VIEW.innerHTML =
         g.map(function (v, i) {
-          return '<div class="card" data-veh="' + i + '" style="cursor:pointer"><h3>' + esc(v.year.split("|")[0] + " " + v.make + " " + v.model) + "</h3><p>" +
+          return '<div class="card" data-veh="' + i + '" style="cursor:pointer"><h3>' + esc(String(v.year || "").split("|")[0] + " " + v.make + " " + v.model) + "</h3><p>" +
             (certsFor(v).length ? "Certificate ✓ · " : "") + "Tap for fluids, upgrades & more →</p></div>";
         }).join("") +
         '<button class="cta ghost" id="addveh">+ Add another vehicle</button>' +
@@ -185,9 +188,172 @@
     });
   }
 
-  // renderVehicle / renderShop / renderBook / renderChat arrive in Tasks 5–6.
-  function renderVehicle(i) { VIEW.innerHTML = '<p class="muted">Vehicle view (Task 5)</p>'; }
-  function renderShop(lineId) { VIEW.innerHTML = '<p class="muted">Shop view (Task 5)</p>'; }
+  // ---- helpers ----
+  function money(n) { return "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 0 }); }
+
+  function lineSectionHtml(l) {
+    if (!l.items.length && l.id !== "more") return "";
+    var rows = l.items.map(function (it) {
+      return '<p>' + esc(it.name) + (it.price != null ? ' — <b>' + money(it.price) + "</b>" : "") + (it.blurb ? ' <span class="muted">(' + esc(it.blurb) + ")</span>" : "") + "</p>";
+    }).join("");
+    var cta = "";
+    if (l.ctas.indexOf("buy") !== -1 && l.items.length) {
+      cta = l.items.map(function (it) { return '<button class="cta" data-buy="' + esc(it.sku) + '" style="margin:6px 0 0">Buy — ' + money(it.price) + " · " + esc(it.name.split(" ").slice(0, 3).join(" ")) + "</button>"; }).join("");
+    } else if (l.ctas.indexOf("reserve") !== -1 && l.items.length) {
+      cta = '<button class="cta ghost" data-reserve="' + esc(JSON.stringify(l.items.map(function (i) { return i.sku; }))) + '" style="margin:6px 0 0">Reserve this kit — pay at pickup</button>';
+    }
+    return '<div class="card"><h3>' + esc(l.icon) + " " + esc(l.label) + "</h3>" + rows + cta + "</div>";
+  }
+
+  // ---- vehicle page ----
+  function renderVehicle(i, gen) {
+    var g = garage(), v = g[i];
+    if (!v) return go("#garage");
+    loadCerts().then(function () {
+      if (gen !== renderGen) return; // stale: a newer render() has run
+      var lines = PL.linesFor(v, DATA);
+      var certs = certsFor(v);
+      var yearLabel = String(v.year || "").split("|")[0];
+      VIEW.innerHTML =
+        '<p><a href="#garage" style="color:var(--sage-d);text-decoration:none">‹ Garage</a></p>' +
+        '<div class="hero"><h2>' + esc(yearLabel + " " + v.make + " " + v.model) + "</h2><p>" + (tok() ? "Garage synced to your account ✓" : "Saved on this device") + "</p></div>" +
+        '<div class="card"><h3>📜 Certificate of Calibration</h3>' +
+          (certs.length ? certs.map(function (c) { return '<p>' + esc(c.calibration || "OTT Calibration") + " · " + esc(c.calibrationDate || "") + ' — <a href="#" data-cert="' + esc(c.recordId) + '">view</a></p>'; }).join("")
+            : tok() ? '<p class="muted">No certificate on this vehicle yet — it appears here after your install.</p>'
+                    : '<p class="muted">Sign in (⚙︎) to see certificates tied to your email.</p>') + "</div>" +
+        lines.map(function (l) { return lineSectionHtml(l); }).join("") +
+        '<div class="card"><h3>🔧 More for this truck</h3><p class="muted">Tires · wheels &amp; offsets · lighting · suspension — lines appear here as suppliers onboard.</p></div>' +
+        '<p style="text-align:center"><a href="#" id="rmveh" class="muted">Remove this vehicle</a></p>';
+      VIEW.onclick = vehicleClicks(v, i);
+    });
+  }
+
+  function vehicleClicks(v, i) {
+    return function (e) {
+      var t = e.target;
+      if (t.dataset.cert) {
+        e.preventDefault();
+        api("client-certs?recordId=" + encodeURIComponent(t.dataset.cert))
+          .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+          .then(function (html) { window.open(URL.createObjectURL(new Blob([html], { type: "text/html" })), "_blank"); })
+          .catch(function () { t.textContent = "unavailable — retry"; });
+      } else if (t.dataset.buy) { startBuy(t.dataset.buy, t); }
+      else if (t.dataset.reserve) { openReserve(v, JSON.parse(t.dataset.reserve)); }
+      else if (t.id === "rmveh") { e.preventDefault(); setGarage(S.removeVehicle(garage(), i)); go("#garage"); }
+    };
+  }
+
+  // Converge checkout — dormant until CONVERGE_* env vars exist (spec §6).
+  function startBuy(sku, btn) {
+    var orig = btn.textContent; btn.disabled = true; btn.textContent = "Opening secure checkout…";
+    window.TYPayment.startCheckout(sku, {
+      onUnavailable: function () { btn.disabled = false; btn.textContent = orig; note(btn, "Online checkout opens soon — chat with us (💬) or call to reserve yours today."); },
+      onApproval: function () { btn.textContent = "Paid ✓ — we'll be in touch to schedule"; },
+      onDeclined: function () { btn.disabled = false; btn.textContent = orig; note(btn, "Card declined — no charge was made."); },
+      onCancelled: function () { btn.disabled = false; btn.textContent = orig; },
+      onError: function () { btn.disabled = false; btn.textContent = orig; note(btn, "Checkout hit a snag — try again or chat with us."); },
+    });
+  }
+
+  function note(after, text) {
+    var p = after.nextElementSibling;
+    if (!p || !p.classList || !p.classList.contains("muted")) { p = document.createElement("p"); p.className = "muted"; after.parentNode.insertBefore(p, after.nextSibling); }
+    p.textContent = text;
+  }
+
+  // AMSOIL reserve — the compliant flow: no online payment (G-4000 §7.6).
+  function openReserve(v, kit) {
+    var yearLabel = String(v.year || "").split("|")[0];
+    sheetBody.innerHTML =
+      '<h3 style="margin-top:0">Reserve your AMSOIL kit</h3>' +
+      '<p class="muted">' + esc(yearLabel + " " + v.make + " " + v.model) + " — we'll confirm personally; pay at pickup or install.</p>" +
+      '<input class="field" id="rname" placeholder="Name" style="margin-bottom:8px">' +
+      '<input class="field" id="remail" type="email" placeholder="Email" style="margin-bottom:8px">' +
+      '<input class="field" id="rphone" type="tel" placeholder="Phone (optional)">' +
+      '<input class="field" id="rco" style="display:none" tabindex="-1" autocomplete="off">' +
+      '<button class="cta" id="rgo">Reserve kit</button><p id="rmsg" class="muted"></p>';
+    sheet.classList.add("open");
+    sheetBody.onclick = function (e) {
+      if (e.target.id !== "rgo") return;
+      var msg = document.getElementById("rmsg");
+      var body = {
+        name: document.getElementById("rname").value.trim(),
+        email: document.getElementById("remail").value.trim(),
+        phone: document.getElementById("rphone").value.trim(),
+        company: document.getElementById("rco").value,
+        vehicle: (yearLabel + " " + v.make + " " + v.model).slice(0, 120),
+        fulfillment: "pickup",
+        kit: kit
+      };
+      if (!body.name || (!body.email && !body.phone)) { msg.className = "err"; msg.textContent = "Name plus an email or phone, please."; return; }
+      fetch("/.netlify/functions/amsoil-reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j.status === "ok") { msg.className = "muted"; msg.textContent = "Reserved ✓ — we'll confirm shortly."; document.getElementById("rgo").disabled = true; }
+          else { msg.className = "err"; msg.textContent = "Couldn't reserve just now — try chat (💬) instead."; }
+        })
+        .catch(function () { msg.className = "err"; msg.textContent = "Couldn't reserve just now — try chat (💬) instead."; });
+    };
+  }
+
+  // ---- shop ----
+  function renderShop(lineId) {
+    var g = garage(), v = g[0] || null, fitOnly = !!v;
+    function draw(fit) {
+      var lines = PL.linesFor(fit ? v : null, DATA);
+      var catalog = window.MAGNUSON_CATALOG;
+
+      // Build section HTML for each line
+      var sectionsHtml = PL.LINES.map(function (base) {
+        var l = lines.find(function (x) { return x.id === base.id; });
+        var open = lineId ? lineId === l.id : true;
+        if (!open) return "";
+
+        // "Everything" mode special-cases
+        if (!fit) {
+          if (l.id === "magnuson") {
+            // Full Magnuson catalog: every application → group header + kit rows
+            if (!catalog || !Array.isArray(catalog.applications) || !catalog.applications.length) {
+              return '<div class="card"><h3>' + esc(l.icon) + " " + esc(l.label) + '</h3><p class="muted">Browse the full catalog on the web.</p></div>';
+            }
+            var magHtml = '<div class="card"><h3>' + esc(l.icon) + " " + esc(l.label) + "</h3>";
+            catalog.applications.forEach(function (app) {
+              magHtml += '<p class="tag">' + esc(app.vehicle || "") + (app.years ? " · " + esc(app.years) : "") + (app.engine ? " · " + esc(app.engine) : "") + "</p>";
+              (app.kits || []).forEach(function (k) {
+                magHtml += '<p>' + esc(k.name) + (k.retail != null ? ' — <b>' + money(k.retail) + "</b>" : "") + (k.note ? ' <span class="muted">(' + esc(k.note) + ")</span>" : "") + ' <button class="cta" data-buy="' + esc(k.sku) + '" style="display:inline;width:auto;padding:4px 10px;font-size:12px;margin:0 0 0 6px">Buy</button></p>';
+              });
+            });
+            magHtml += "</div>";
+            return magHtml;
+          }
+          if (l.id === "amsoil") {
+            // AMSOIL: no per-vehicle kit without a vehicle — browse card only
+            return '<div class="card"><h3>' + esc(l.icon) + " " + esc(l.label) + '</h3><p class="muted">Select a vehicle in your garage to see your custom fluid kit and reserve it — or <a href="/amsoil-garage">browse the full garage</a>.</p></div>';
+          }
+        }
+
+        // Fitted mode (or unknown line type)
+        if (!l.items.length && fit) {
+          return '<div class="card"><h3>' + esc(l.icon) + " " + esc(l.label) + '</h3><p class="muted">Nothing for this vehicle — try "Everything".</p></div>';
+        }
+        return lineSectionHtml(l) || ('<div class="card"><h3>' + esc(l.icon) + " " + esc(l.label) + '</h3><p class="muted">Browse on the web catalog for all fitments.</p></div>');
+      }).join("");
+
+      VIEW.innerHTML =
+        '<div class="hero"><h2>Shop</h2><p>Performance &amp; overland upgrades for Toyota + Lexus</p></div>' +
+        (v ? '<p class="muted" style="text-align:center"><span class="chip' + (fit ? " sel" : "") + '" id="fitme">Fits my ' + esc(v.model) + '</span><span class="chip' + (fit ? "" : " sel") + '" id="fitall">Everything</span></p>' : "") +
+        sectionsHtml +
+        '<div class="card"><h3>🔧 Coming soon</h3><p class="muted">Suspension · tires · wheels &amp; offsets · lighting — new supplier lines land right here.</p></div>';
+      VIEW.onclick = function (e) {
+        if (e.target.id === "fitme") return draw(true);
+        if (e.target.id === "fitall") return draw(false);
+        if (e.target.dataset.buy) return startBuy(e.target.dataset.buy, e.target);
+        if (e.target.dataset.reserve && v) return openReserve(v, JSON.parse(e.target.dataset.reserve));
+      };
+    }
+    draw(fitOnly);
+  }
+
   function renderBook() { VIEW.innerHTML = '<p class="muted">Book view (Task 6)</p>'; }
   function renderChat() { VIEW.innerHTML = '<p class="muted">Chat view (Task 6)</p>'; }
 
