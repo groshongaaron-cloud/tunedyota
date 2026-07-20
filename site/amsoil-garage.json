@@ -430,9 +430,10 @@
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.1,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -658,8 +659,8 @@
     },
     {
      "y": "2005-2009",
-     "e": "4.0L V6 / 4.7L V8",
-     "verified": false,
+     "e": "4.0L V6",
+     "verified": true,
      "systems": [
       {
        "system": "Engine Oil",
@@ -667,7 +668,8 @@
        "unit": "qt",
        "capacity": 5.5,
        "factoryInterval": "5,000 mi",
-       "tunedInterval": "5,000 mi"
+       "tunedInterval": "5,000 mi",
+       "verified": true
       },
       {
        "system": "Engine Oil Filter",
@@ -681,25 +683,93 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 2.9,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Transmission",
+       "sku": "ATL-QT",
+       "unit": "qt",
+       "capacity": 8.5,
+       "factoryInterval": "severe service",
+       "tunedInterval": "60,000 mi"
+      }
+     ],
+     "bundle": [
+      "SS-5W30-QT",
+      "EA15K51",
+      "SVL-QT",
+      "ATL-QT"
+     ]
+    },
+    {
+     "y": "2005-2009",
+     "e": "4.7L V8",
+     "verified": true,
+     "systems": [
+      {
+       "system": "Engine Oil",
+       "sku": "SS-5W30-QT",
+       "unit": "qt",
+       "capacity": 6.6,
+       "factoryInterval": "5,000 mi",
+       "tunedInterval": "5,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Engine Oil Filter",
+       "sku": "EA15K51",
+       "unit": "ea",
+       "capacity": 1,
+       "factoryInterval": "5,000 mi",
+       "tunedInterval": "5,000 mi"
+      },
+      {
+       "system": "Front Differential",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 1.6,
+       "factoryInterval": "30,000 mi",
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Rear Differential",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 3.2,
+       "factoryInterval": "30,000 mi",
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Transfer Case",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 1.1,
+       "factoryInterval": "30,000 mi",
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1038,7 +1108,7 @@
      ]
     },
     {
-     "y": "2010-2017",
+     "y": "2010-2012",
      "e": "5.7L V8",
      "verified": true,
      "systems": [
@@ -1064,6 +1134,71 @@
        "sku": "SVL-QT",
        "unit": "qt",
        "capacity": 2,
+       "factoryInterval": "30,000 mi",
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Rear Differential",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 3.9,
+       "factoryInterval": "30,000 mi",
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Transfer Case",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 1.2,
+       "factoryInterval": "severe: inspect",
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Transmission",
+       "sku": "ATL-QT",
+       "unit": "qt",
+       "capacity": 9.8,
+       "factoryInterval": "severe service",
+       "tunedInterval": "60,000 mi"
+      }
+     ],
+     "bundle": [
+      "SS-0W20-QT",
+      "EA15K04",
+      "SVL-QT",
+      "ATL-QT"
+     ]
+    },
+    {
+     "y": "2013-2017",
+     "e": "5.7L V8",
+     "verified": true,
+     "systems": [
+      {
+       "system": "Engine Oil",
+       "sku": "SS-0W20-QT",
+       "unit": "qt",
+       "capacity": 7.9,
+       "factoryInterval": "5,000 mi",
+       "tunedInterval": "5,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Engine Oil Filter",
+       "sku": "EA15K04",
+       "unit": "ea",
+       "capacity": 1,
+       "factoryInterval": "5,000 mi",
+       "tunedInterval": "5,000 mi"
+      },
+      {
+       "system": "Front Differential",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 2.2,
        "factoryInterval": "30,000 mi",
        "tunedInterval": "30,000 mi",
        "verified": true
@@ -1262,17 +1397,18 @@
      ]
     },
     {
-     "y": "2005-2009",
+     "y": "2005-2006",
      "e": "4.0L V6",
-     "verified": false,
+     "verified": true,
      "systems": [
       {
        "system": "Engine Oil",
        "sku": "SS-5W30-QT",
        "unit": "qt",
-       "capacity": 5.5,
+       "capacity": 4.8,
        "factoryInterval": "5,000 mi",
-       "tunedInterval": "5,000 mi"
+       "tunedInterval": "5,000 mi",
+       "verified": true
       },
       {
        "system": "Engine Oil Filter",
@@ -1286,17 +1422,92 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 1.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 3.7,
        "factoryInterval": "30,000 mi",
        "tunedInterval": "30,000 mi"
+      },
+      {
+       "system": "Transfer Case",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "factoryInterval": "severe: inspect",
+       "tunedInterval": "30,000 mi",
+       "capacity": 1.1,
+       "verified": true
+      },
+      {
+       "system": "Transmission",
+       "sku": "ATL-QT",
+       "unit": "qt",
+       "capacity": 9.8,
+       "factoryInterval": "severe service",
+       "tunedInterval": "60,000 mi"
+      }
+     ],
+     "bundle": [
+      "SS-5W30-QT",
+      "EA15K51",
+      "SVL-QT",
+      "ATL-QT"
+     ]
+    },
+    {
+     "y": "2007-2009",
+     "e": "4.0L V6",
+     "verified": true,
+     "systems": [
+      {
+       "system": "Engine Oil",
+       "sku": "SS-5W30-QT",
+       "unit": "qt",
+       "capacity": 4.8,
+       "factoryInterval": "5,000 mi",
+       "tunedInterval": "5,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Engine Oil Filter",
+       "sku": "EA15K51",
+       "unit": "ea",
+       "capacity": 1,
+       "factoryInterval": "5,000 mi",
+       "tunedInterval": "5,000 mi"
+      },
+      {
+       "system": "Front Differential",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 2,
+       "factoryInterval": "30,000 mi",
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Rear Differential",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "capacity": 4.8,
+       "factoryInterval": "30,000 mi",
+       "tunedInterval": "30,000 mi",
+       "verified": true
+      },
+      {
+       "system": "Transfer Case",
+       "sku": "SVL-QT",
+       "unit": "qt",
+       "factoryInterval": "severe: inspect",
+       "tunedInterval": "30,000 mi",
+       "capacity": 1.2,
+       "verified": true
       },
       {
        "system": "Transmission",

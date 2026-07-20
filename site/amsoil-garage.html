@@ -225,21 +225,23 @@
 
   var makes = Object.keys(CAT.vehicles);
   function opt(v, t) { var o = document.createElement("option"); o.value = v; o.textContent = t || v; return o; }
-  function fill(sel, items, ph) { sel.innerHTML = ""; sel.appendChild(opt("", ph)); items.forEach(function (i) { sel.appendChild(opt(i)); }); }
+  function fill(sel, items, ph) { sel.innerHTML = ""; sel.appendChild(opt("", ph)); items.forEach(function (i) { sel.appendChild(i && i.value !== undefined ? opt(i.value, i.label) : opt(i)); }); }
   fill(el("sel-make"), makes, "Make");
 
   function modelsFor(mk) { return mk ? Object.keys(CAT.vehicles[mk]) : []; }
+  function gensFor(mk, md) { return (mk && md && CAT.vehicles[mk] && CAT.vehicles[mk][md]) || []; }
   function yearsFor(mk, md) {
-    if (!mk || !md) return [];
     // Show every generation (the cert prints fluids for all; the landing matches).
-    return CAT.vehicles[mk][md].map(function (g) { return g.y; });
+    // Duplicate year ranges (same years, two engines) get engine-qualified options.
+    return AmsoilGarage.yearOptions(gensFor(mk, md));
   }
   function sync() {
     var mk = el("sel-make").value, md = el("sel-model").value;
     var resolved = null;
     if (mk && md) {
-      var gens = (CAT.vehicles[mk] && CAT.vehicles[mk][md] || []).filter(function (g) { return (!el("sel-year").value || g.y === el("sel-year").value); });
-      if (gens.length) resolved = { make: mk, model: md, gen: gens[0] };
+      var gens = gensFor(mk, md);
+      var gen = AmsoilGarage.genForOption(gens, el("sel-year").value) || (el("sel-year").value ? null : gens[0]);
+      if (gen) resolved = { make: mk, model: md, gen: gen };
     }
     renderGarage(resolved);
   }
@@ -270,10 +272,12 @@
       fill(el("sel-year"), yearsFor(matchedMake, matchedModel), "Year");
       if (params.year && matchedModel) {
         // Range-aware: the QR sends an exact year (e.g. 2024); options are range
-        // labels ("2024+", "2016-2023"). Reuse the resolver's inRange to match.
-        var yrNum = parseInt(params.year, 10);
-        var matchedYear = yearsFor(matchedMake, matchedModel).find(function (y) { return AmsoilGarage.inRange(y, yrNum, CUR); }) || "";
-        el("sel-year").value = matchedYear;
+        // values ("2024+", "2005-2009|4.7L V8"). Resolve through the picker so an
+        // e= engine param lands on the right row when two share the range.
+        var resolvedPre = AmsoilGarage.resolveVehicle(
+          { make: matchedMake, model: matchedModel, year: parseInt(params.year, 10), engine: params.engine || null },
+          CAT, CUR, true);
+        el("sel-year").value = resolvedPre ? AmsoilGarage.optionForGen(gensFor(matchedMake, matchedModel), resolvedPre.gen) : "";
       }
     }
   }
@@ -319,7 +323,7 @@
     if (saved.length === 0 && !cur) { container.innerHTML = ""; return; }
     var chipsHtml = "";
     saved.forEach(function (v, i) {
-      var label = v.make + " " + v.model + (v.year ? " " + v.year : "");
+      var label = v.make + " " + v.model + (v.year ? " " + String(v.year).replace("|", " · ") : "");
       chipsHtml += '<button class="ag-chip" type="button" data-idx="' + i + '" aria-label="Select ' + label + '">' + label + '</button>';
     });
     var addBtn = "";
@@ -337,7 +341,8 @@
       chip.addEventListener("click", function () {
         var v = saved[parseInt(chip.getAttribute("data-idx"), 10)];
         if (!v) return;
-        applyPrefill({ make: v.make, model: v.model, year: v.year ? parseInt(v.year, 10) : null });
+        var yparts = String(v.year || "").split("|");
+        applyPrefill({ make: v.make, model: v.model, year: yparts[0] ? parseInt(yparts[0], 10) : null, engine: yparts[1] || null });
         sync();
         renderMyGarage();
       });

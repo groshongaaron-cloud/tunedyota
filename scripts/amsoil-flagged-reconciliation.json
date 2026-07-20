@@ -1,0 +1,190 @@
+{
+ "generated": "2026-07-20",
+ "system": "flagged-row resolution (engine splits + driveline)",
+ "shipped": [
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.0L V6",
+   "sys": "Engine Oil",
+   "old": 5.5,
+   "new": 5.5,
+   "verified": true
+  },
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6,
+   "verified": true
+  },
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 2.9,
+   "verified": true
+  },
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1,
+   "verified": true
+  },
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.7L V8",
+   "sys": "Engine Oil",
+   "old": 5.5,
+   "new": 6.6,
+   "verified": true
+  },
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.7L V8",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6,
+   "verified": true
+  },
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.7L V8",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.2,
+   "verified": true
+  },
+  {
+   "v": "Toyota 4Runner | 2005-2009 | 4.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2005-2006 | 4.0L V6",
+   "sys": "Engine Oil",
+   "old": 5.5,
+   "new": 4.8,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2005-2006 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 1.2,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2005-2006 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 3.7,
+   "verified": false
+  },
+  {
+   "v": "Toyota Tundra | 2007-2009 | 4.0L V6",
+   "sys": "Engine Oil",
+   "old": 5.5,
+   "new": 4.8,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2007-2009 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2007-2009 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 4.8,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2005-2006 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": null,
+   "new": 1.1,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2007-2009 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": null,
+   "new": 1.2,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tacoma | 2005-2015 | 2.7L I4",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.1,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2010-2012 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 2,
+   "new": 2,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2013-2017 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 2,
+   "new": 2.2,
+   "verified": true
+  },
+  {
+   "v": "Toyota Tundra | 2010-2012 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": null,
+   "new": 1.2,
+   "verified": true
+  }
+ ],
+ "notes": [
+  "4Runner 2005-2009 split into 4.0L V6 + 4.7L V8 rows (engine-aware picker). Both fully verified; V8 full-time 4WD shares front/transfer with V6 per Blauparts.",
+  "Tundra 2005-2009 4.0L split at the 2006/07 platform break. Oil corrected 5.5 -> 4.8 qt BOTH gens (0.7 qt overfill shipped until now). Transfer Case added (was missing).",
+  "Tacoma 2005-2015 2.7L rear diff 2.0 -> 3.1 qt (4WD config, shares the 4.0L axle). 2WD/PreRunner variants not modeled (row lists front diff + transfer = 4WD).",
+  "Tundra 2010-2017 5.7L split at 2012/13 (WF0AM -> WF1AM transfer). 2010-2012 transfer 1.2 qt w/ SVL. 2013-2017: transfer omitted on purpose — Toyota 75W spec, no suitable AMSOIL product (capacity would be 1.6 qt)."
+ ],
+ "sources": {
+  "4runner-oil-v8-6.6": [
+   "https://engineoildb.com/oil-info/2007-toyota-4-runner/ (4.7L 2UZ-FE 6.6 qt w/filter)",
+   "https://enginehungry.com/oil-capacity-type/toyota/4runner/2007-toyota-4runner/ (6.6 qt)",
+   "https://oiltype.net/car-toyota-4-runner-2007-engine-oil-type-engine-code-2uz-fe-9 (6.6 qt w/filter)"
+  ],
+  "4runner-oil-v6-5.5": [
+   "https://engineoildb.com/oil-info/2007-toyota-4-runner/ (4.0L 1GR-FE 5.5 qt w/filter)",
+   "parity: verified Tacoma 2005-2015 4.0L row (same 1GR-FE spec era)"
+  ],
+  "4runner-driveline": [
+   "https://www.blauparts.com/blog/what-type-of-differential-fluid-does-my-toyota-4runner-take.html (2003-2009 engine-specific: front 1.5L/1.58qt both, rear 2.7L/2.85qt V6 vs 3.0L/3.17qt V8, transfer 1.1L/1.16qt both)",
+   "parity: verified 4Runner 2010-2019/2020-2024 rows (carried-over driveline: 1.6/2.9/1.1)"
+  ],
+  "tundra-40l-oil-4.8": [
+   "https://engineoildb.com/oil-info/2006-toyota-tundra/ (4.0L 4.8 qt w/filter)",
+   "https://engineoildb.com/oil-info/2008-toyota-tundra/ (4.0L 4.8 qt w/filter)",
+   "https://enginehungry.com/oil-capacity-type/toyota/tundra/2006-toyota-tundra/ + /2008-toyota-tundra/ (4.8 qt both gens)",
+   "https://costaoils.com/2008-toyota-tundra-40l-oil-change-guide/ (4.8 qt w/filter)"
+  ],
+  "tundra-2nd-gen-driveline": [
+   "https://www.blauparts.com/blog/toyota-tundra-differential-fluid-types-specs-fill-capacities.html (front 1.9L/2.0qt 2007-2012, 2.0L/2.2qt 2013-2021; rear 4.0L V6/4.6L V8 4.0-4.6L / 4.2-4.8 qt)",
+   "https://www.amsoil.com/lookup/ 2015 Tundra 4.6L (front diff 4.2 pt = 2.1 qt, rear 9.7 pt = 4.85 qt — tie-breaker)",
+   "parity: verified Tundra 2007-2009 5.7L row (front 2.0, transfer 1.2) and 2010-2019 4.6L row (front 2.2, rear 4.9)"
+  ],
+  "tundra-transfer-split": [
+   "https://www.blauparts.com/blog/how-to-replace-toyota-tundra-transfer-case-fluid-2007-2021-xk50.html (2007-2012: 1.12L/1.2qt; 2013-2021: 1.5L/1.6qt, cites owner's + factory service manuals)",
+   "https://www.tundratalk.net/threads/final-fluid-capacities-off-for-diff-transfer-case-on-2010-tundra-5-7l.773316/ (2010 owner's manual: transfer 1.2 qt)",
+   "https://autoreviewnest.com/toyota-tundra-transfer-case-service-interval-guide/ (WF1AM 2013-2021 service info 1.4-1.5 L)",
+   "https://www.tundras.com/threads/transfer-case-lubrication-requirements-2014-and-above.10129/ (2013/14 supplier change to Toyota 75W; AMSOIL: no recommendation)",
+   "parity: verified Tundra 2018-2021 row (transfer 1.6) and 2007-2009 row (transfer 1.2)"
+  ],
+  "tacoma-27-rear-3.1": [
+   "https://www.blauparts.com/blog/what-type-of-differential-fluid-does-my-toyota-tacoma-take.html (2009-2015 2.7L 4WD rear identical to 4.0L: 2.95-3.5 L / 3.11-3.69 qt)",
+   "https://www.blauparts.com/blog/how-to-change-toyota-tacoma-rear-differential-gear-oil-2009-2023.html (2.7L models same range)",
+   "parity: verified Tacoma 2005-2015 4.0L row rear 3.1 (shared 8\" axle, 4WD config)"
+  ]
+ }
+}

@@ -7,7 +7,8 @@
     return {
       make: (parts[0] || "").trim() || null,
       model: (parts[1] || "").trim() || null,
-      year: p.get("y") ? parseInt(p.get("y"), 10) : null
+      year: p.get("y") ? parseInt(p.get("y"), 10) : null,
+      engine: (p.get("e") || "").trim() || null
     };
   }
 
@@ -37,9 +38,44 @@
     });
     if (!md) return null;
     var gens = catalog.vehicles[mk][md].filter(function (g) { return includeUnverified || g.verified; });
-    var gen = gens.find(function (g) { return inRange(g.y, params.year, currentYear); });
-    if (!gen && params.year == null) gen = gens[0];
-    return gen ? { make: mk, model: md, gen: gen } : null;
+    var matches = gens.filter(function (g) { return inRange(g.y, params.year, currentYear); });
+    if (!matches.length && params.year == null) matches = gens.slice(0, 1);
+    // Same year range can cover two engines (e.g. 4Runner 05-09 V6 vs V8): an e=
+    // param picks the row; without it the first row wins but every candidate is
+    // returned so the caller can offer the engine choice.
+    var gen = matches[0] || null;
+    if (params.engine && matches.length > 1) {
+      var elow = String(params.engine).toLowerCase();
+      gen = matches.find(function (g) {
+        var ge = String(g.e || "").toLowerCase();
+        return ge.indexOf(elow) >= 0 || elow.indexOf(ge) >= 0;
+      }) || gen;
+    }
+    return gen ? { make: mk, model: md, gen: gen, matches: matches } : null;
+  }
+
+  // Year-dropdown options, one per generation row. When two rows share a year
+  // range the option value/label carries the engine so both stay selectable.
+  function yearOptions(gens) {
+    return gens.map(function (g) {
+      var dup = gens.some(function (o) { return o !== g && o.y === g.y; });
+      return dup
+        ? { value: g.y + "|" + g.e, label: g.y + " · " + g.e }
+        : { value: g.y, label: g.y };
+    });
+  }
+
+  function genForOption(gens, value) {
+    if (!value) return null;
+    var parts = String(value).split("|");
+    return gens.find(function (g) {
+      return g.y === parts[0] && (parts.length < 2 || g.e === parts[1]);
+    }) || null;
+  }
+
+  function optionForGen(gens, gen) {
+    var dup = gens.some(function (o) { return o !== gen && o.y === gen.y; });
+    return dup ? gen.y + "|" + gen.e : gen.y;
   }
 
   function bundleTotal(gen, products) {
@@ -50,7 +86,7 @@
     }, 0);
   }
 
-  var api = { parseVehicleParams: parseVehicleParams, inRange: inRange, resolveVehicle: resolveVehicle, bundleTotal: bundleTotal };
+  var api = { parseVehicleParams: parseVehicleParams, inRange: inRange, resolveVehicle: resolveVehicle, bundleTotal: bundleTotal, yearOptions: yearOptions, genForOption: genForOption, optionForGen: optionForGen };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window !== "undefined") window.AmsoilGarage = api;
 })(typeof globalThis !== "undefined" ? globalThis : this);

@@ -20,8 +20,8 @@ const CATALOG = {
 
 test("parseVehicleParams reads v=Make:Model and y=YYYY", () => {
   assert.deepEqual(G.parseVehicleParams("?v=Toyota:Tundra&y=2024"),
-    { make: "Toyota", model: "Tundra", year: 2024 });
-  assert.deepEqual(G.parseVehicleParams(""), { make: null, model: null, year: null });
+    { make: "Toyota", model: "Tundra", year: 2024, engine: null });
+  assert.deepEqual(G.parseVehicleParams(""), { make: null, model: null, year: null, engine: null });
 });
 
 test("inRange handles ranges, open-ended, and null year", () => {
@@ -56,4 +56,67 @@ test("resolveVehicle returns null for unknown make/model", () => {
 test("bundleTotal sums sale price where present, else retail", () => {
   const gen = CATALOG.vehicles.Toyota.Tundra[0];
   assert.equal(G.bundleTotal(gen, CATALOG.products), 25); // A retail 10 + B sale 15
+});
+
+// --- Engine disambiguation (rows sharing a year range, e.g. 4Runner 05-09 V6 vs V8) ---
+
+const SPLIT_CATALOG = {
+  products: {},
+  vehicles: {
+    Toyota: {
+      "4Runner": [
+        { y: "2005-2009", e: "4.0L V6", verified: true, systems: [], bundle: [] },
+        { y: "2005-2009", e: "4.7L V8", verified: true, systems: [], bundle: [] }
+      ],
+      Tacoma: [
+        { y: "2016-2023", e: "3.5L V6", verified: true, systems: [], bundle: [] }
+      ]
+    }
+  }
+};
+
+test("parseVehicleParams reads the e= engine param", () => {
+  assert.deepEqual(G.parseVehicleParams("?v=Toyota:4Runner&y=2007&e=4.7L%20V8"),
+    { make: "Toyota", model: "4Runner", year: 2007, engine: "4.7L V8" });
+  assert.equal(G.parseVehicleParams("").engine, null);
+});
+
+test("resolveVehicle picks the row matching the engine param", () => {
+  const r = G.resolveVehicle({ make: "Toyota", model: "4Runner", year: 2007, engine: "4.7" }, SPLIT_CATALOG, 2026);
+  assert.equal(r.gen.e, "4.7L V8");
+});
+
+test("resolveVehicle without engine returns first match plus all candidates", () => {
+  const r = G.resolveVehicle({ make: "Toyota", model: "4Runner", year: 2007 }, SPLIT_CATALOG, 2026);
+  assert.equal(r.gen.e, "4.0L V6");
+  assert.equal(r.matches.length, 2);
+});
+
+test("resolveVehicle matches list is singular when the year is unambiguous", () => {
+  const r = G.resolveVehicle({ make: "Toyota", model: "Tacoma", year: 2020 }, SPLIT_CATALOG, 2026);
+  assert.equal(r.matches.length, 1);
+});
+
+test("yearOptions qualifies duplicate year ranges with the engine", () => {
+  const opts = G.yearOptions(SPLIT_CATALOG.vehicles.Toyota["4Runner"]);
+  assert.deepEqual(opts, [
+    { value: "2005-2009|4.0L V6", label: "2005-2009 · 4.0L V6" },
+    { value: "2005-2009|4.7L V8", label: "2005-2009 · 4.7L V8" }
+  ]);
+  const single = G.yearOptions(SPLIT_CATALOG.vehicles.Toyota.Tacoma);
+  assert.deepEqual(single, [{ value: "2016-2023", label: "2016-2023" }]);
+});
+
+test("genForOption resolves plain and engine-qualified option values", () => {
+  const gens = SPLIT_CATALOG.vehicles.Toyota["4Runner"];
+  assert.equal(G.genForOption(gens, "2005-2009|4.7L V8").e, "4.7L V8");
+  assert.equal(G.genForOption(gens, "2005-2009").e, "4.0L V6");
+  assert.equal(G.genForOption(gens, ""), null);
+});
+
+test("optionForGen round-trips with yearOptions values", () => {
+  const gens = SPLIT_CATALOG.vehicles.Toyota["4Runner"];
+  assert.equal(G.optionForGen(gens, gens[1]), "2005-2009|4.7L V8");
+  const tac = SPLIT_CATALOG.vehicles.Toyota.Tacoma;
+  assert.equal(G.optionForGen(tac, tac[0]), "2016-2023");
 });
