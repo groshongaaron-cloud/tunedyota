@@ -10,6 +10,8 @@ const { keyToInstaller, FALLBACK_KEY, smsNumberFor } = require("./lib/routing.js
 const { ingestLead, sendSms } = require("./lib/twilio.js");
 const { sendWebPush } = require("./lib/webpush.js");
 const { cfg, createRecord } = require("./lib/airtable.js");
+const { resolveInstaller } = require("./lib/installer-auth.js");
+const chatAdmin = require("./lib/chat-admin.js");
 
 const MAX_MESSAGES = 40;
 const MAX_CHARS = 1000;
@@ -59,7 +61,8 @@ async function processChat(body, deps) {
     load = (id) => loadSession(id, { env }),
     save = (s) => saveSession(s, { env }),
     ai = (s) => runChat(s, { env }),
-    doEscalate = (a) => escalate(a, { env, log }) } = deps || {};
+    doEscalate = (a) => escalate(a, { env, log }),
+    notify = (sess, text) => sendWebPush(sess.installer, { title: "Chat: " + (sess.customerName || "customer"), body: String(text).slice(0, 90), url: "/installer.html#chats" }, { env, log }) } = deps || {};
   const id = String(body.session || "").slice(0, 64);
   if (!id) return { status: 400, body: { error: "missing session" } };
 
@@ -84,6 +87,11 @@ async function processChat(body, deps) {
     return { status: 200, body: { reply: "We've covered a lot! For the fastest next step, grab a spot at https://tunedyota.com/find-your-exact-tune or text (612) 406-7117.", capped: true } };
   }
   sess.turns.push({ role: "user", text: message, at: Date.now() });
+
+  // Notify the assigned installer when a customer sends a message on an escalated session.
+  if (sess.status === "escalated" && sess.installer) {
+    try { await notify(sess, message); } catch (e) { /* best-effort — never break the customer path */ }
+  }
 
   let out;
   try { out = await ai({ turns: sess.turns, pageContext: sess.pageContext }); }
@@ -111,12 +119,38 @@ async function processChat(body, deps) {
   return { status: 200, body: { reply, escalated, turnCount: sess.turns.length } };
 }
 
+// Installer-authed inbox operations (console Chats panel).
+async function installerOp(body, installerKey, deps = {}) {
+  const { list = chatAdmin.listSessions, transcript = chatAdmin.getTranscript,
+          reply = chatAdmin.installerReply, close = chatAdmin.closeSession } = deps;
+  if (body.op === "list") return { status: 200, body: { sessions: await list(installerKey, deps) } };
+  if (body.op === "transcript") {
+    const t = await transcript(String(body.session || ""), deps);
+    return t ? { status: 200, body: t } : { status: 404, body: { error: "not-found" } };
+  }
+  if (body.op === "reply") {
+    const r = await reply(String(body.session || ""), installerKey, body.text, deps);
+    return { status: r.status === "ok" ? 200 : 400, body: r };
+  }
+  if (body.op === "close") {
+    const r = await close(String(body.session || ""), deps);
+    return { status: r.status === "ok" ? 200 : 404, body: r };
+  }
+  return { status: 400, body: { error: "bad-op" } };
+}
+
 async function handler(event) {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "method not allowed" };
   let body = {};
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, body: "bad json" }; }
+  if (body && body.installer) {
+    const key = resolveInstaller(event.headers || {}, process.env);
+    if (!key) return { statusCode: 401, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ error: "unauthorized" }) };
+    const out = await installerOp(body, key, {});
+    return { statusCode: out.status, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out.body) };
+  }
   const out = await processChat(body, {});
   return { statusCode: out.status, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out.body) };
 }
 
-module.exports = { handler, processChat, escalate, MAX_MESSAGES, MAX_CHARS };
+module.exports = { handler, processChat, escalate, installerOp, MAX_MESSAGES, MAX_CHARS };
