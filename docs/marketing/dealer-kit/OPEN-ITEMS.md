@@ -1,36 +1,34 @@
-# Dealer Kit — Open Items (owner input)
+# Dealer Kit — Open Items
 
-What's left before the Dealer Partner Kit can be sent to a dealer. Everything else
-(templates, contacts, pre-filled outreach drafts) is done. Update this as data arrives,
-then fill the token and run `npm run render:dealer-kit` to regenerate the PDFs.
+**Status 2026-07-20: ALL owner tokens FILLED — kit awaits Aaron's review sign-off.**
+(Answers supplied by Aaron 2026-07-20; regenerate PDFs after any edit with
+`npm run render:dealer-kit` → `assets-source/dealer-kit-exports/`.)
 
-Status: **opened 2026-07-09** — waiting on owner data.
+## Decided & filled 2026-07-20
+- ✅ **Contact block**: Tuned Yota · (612) 406-7117 · info@tunedyota.com (site-wide).
+- ✅ **Turnaround**: OTT calibrations 20–30 minutes, no drop-off/waiting;
+  supercharger builds = three-day install-and-calibration.
+- ✅ **Where**: OTT at regional tuning events; superchargers installed on location
+  at an authorized Magnuson installer headquarters.
+- ✅ **Partnership model (major decision)**: **mutual benefit — NO referral fees,
+  no rev-share, nothing to reconcile.** Tuned Yota brings its enthusiast audience
+  and social reach to the store; clients build a relationship with the dealer's
+  sales/service staff — the store becomes their source for accessories,
+  maintenance, and their next vehicle. All artifacts + outreach templates now
+  frame the partnership this way; never promise payments to a dealer.
 
-## A. Proposed fills — awaiting owner OK (low-risk, grounded)
-Claude proposed values; confirm or edit, then Claude writes them in.
-- [ ] **Contact / rep sign-off** (`00-cover.html`, `03-process-logistics.html`) — proposed: `Tuned Yota · (612) 406-7117 · info@tunedyota.com`. Owner: confirm, or give a specific person + direct line.
-- [ ] **Typical turnaround** (`03-process-logistics.html`) — proposed: "Most OTT calibrations completed same day at your regional event; custom/supercharger builds dialed in over several sessions." Owner: confirm/edit.
-- [ ] **Where work happens** (`03-process-logistics.html`) — proposed: "at scheduled Tuned Yota tuning events across your region (supercharger kits drop-ship and are installed by our team)." Owner: confirm/edit the service model.
+## Parked (Aaron, 2026-07-20 — do not work without his go)
+- ⏸ **Limited-warranty concept**: no written OTT calibration warranty exists.
+  Aaron is *considering* a Tuned Yota limited warranty covering ECU damage during
+  installation (TY replaces the ECU + reinstalls the OTT calibration; warranty
+  ends when the install/repair completes). Concept only — parked; the warranty
+  artifact currently makes no written-warranty claim.
+- ⏸ **COI attachment**: the "Insured" bullet was removed from the cover rather
+  than claim an unattached certificate; revisit with the warranty concept.
 
-## B. Owner decisions — Claude cannot supply (economics)
-No basis to propose; these are business calls only the owner can make.
-- [ ] **Tier-1 referral fee / revenue share** (`03-process-logistics.html`) — $ per referred tune, % , or tiers?
-- [ ] **Tier-2 F&I menu rev-share** (`03-process-logistics.html`) — the split when placed on the dealer's F&I menu.
-- [ ] **Payment flow** (`03-process-logistics.html`) — how & when the dealer is paid (per job / monthly check / net-30 / etc.).
-
-## C. Legal / documents — owner supplies the real thing, counsel gates it
-Must not be drafted or paraphrased.
-- [ ] **OTT warranty/support terms** (`02-warranty-magnuson-moss.html`) — reproduce OTT's **actual written** calibration-warranty language *verbatim*. Owner pastes real text / points to OTT's doc.
-- [ ] **COI** (`00-cover.html`) — owner's certificate of insurance; owner provides/attaches the file.
-
-## D. Counsel review (blocks distribution regardless of tokens)
-- [ ] **`01-compliance-statement.html`** — counsel sign-off (currently DRAFT watermark).
-- [ ] **`02-warranty-magnuson-moss.html`** — counsel sign-off (currently DRAFT watermark; also needs item C-OTT text first).
-
----
-
-**Close-out per item:** fill the token in the named file → `npm run render:dealer-kit` → PDFs land in
-`assets-source/dealer-kit-exports/`. When A–C are filled and D is signed off, remove the `.draft`
-class from artifacts 01/02 and the kit is distribution-ready.
-
-Related: `outreach-templates.md` · `tier-a-contacts.md` · `tier-a-outreach-filled.md` (all done).
+## Review gate (replaces outside counsel)
+Aaron has a legal background and signs off himself. Review package =
+`assets-source/dealer-kit-exports/*.pdf` (5 artifacts; 01-compliance and
+02-warranty carry the DRAFT watermark). **On Aaron's approval:** remove the
+`.draft` class from artifacts 01/02, re-render, and the kit is
+distribution-ready — outreach can begin per `tier-a-outreach-filled.md`.
