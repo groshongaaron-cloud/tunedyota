@@ -36,32 +36,13 @@ API [Haiku 4.5], **fails open to manual** on any error/missing key), (3) install
 close-out cards), (5) loud "not closed out — no cert yet" flag on past-dated open rows. Tests via
 `node --test`, inject `fetchImpl`. **Task 7 (OPTIONAL end-of-day open-jobs push) DEFERRED** — not built.
 
-**Owner setup:**
-1. ~~`ANTHROPIC_API_KEY`~~ — DONE 2026-07-16 (set via clipboard→netlify env:set, deployed,
-   verified live: `/vin-ocr` with a 1px test image returned `{ok:false,reason:"no-vin"}`,
-   i.e. a real Claude Haiku vision round-trip — live VIN OCR is ACTIVE).
-2. STILL OWED: recover Shannon (record `reciytsQ4mMdJxBWy`, still `Booked`) — needs Aaron's
-   VIN/calibration/ECU/gear/mileage; close her out through the console so her cert emails.
-   Don't fabricate.
-3. ~~Rotate secrets~~ — NOTHING PENDING: per [[pending-secret-rotation]] all four incidents are
-   CLOSED (Airtable PAT + Slack webhook 2026-06-29, n8n key 2026-06-30, Resend 2026-07-16; the
-   n8n-embedded Slack webhook was additionally rotated 2026-07-16). A stale "pending Airtable
-   rotation" claim briefly propagated on 2026-07-16 from misreading the memo's for-reference
-   section — corrected same night.
+**Owner setup STILL OWED (feature degrades gracefully until done):**
+1. `ANTHROPIC_API_KEY` in Netlify → activates live VIN OCR (until set, `/vin-ocr` returns
+   `{ok:false,reason:"unconfigured"}` and the console falls back to manual VIN entry — no dead UI).
+   Capture via clipboard, never chat.
+2. Recover Shannon (record `reciytsQ4mMdJxBWy`, still `Booked`) — needs Aaron's VIN/calibration/ECU/
+   gear/mileage; close her out through the console so her cert emails. Don't fabricate.
+3. Rotate `RESEND_API_KEY` (see [[pending-secret-rotation]]).
 
-**Search/city-tab follow-up RESOLVED 2026-07-16 (master @ aeabda2, owner chose scope-to-tab):**
-Jobs search now honors the active city sub-tab with a "search all markets ›" escape hatch that
-jumps to All; Playwright regression tests in `tests/installer-search-scope.test.mjs`.
-Remaining program item: **Task 7 EOD open-jobs push — owner re-confirmed DEFER 2026-07-16.**
-
-**CONSOLE ACCESS + AUTH (shipped 2026-07-17):** (1) Subtle "Console" link in the homepage
-footer at tunedyota.com (opacity .4, rel="nofollow"); installer.html is noindex — obscurity is
-NOT the control, the token gate is. (2) Login now persists + supports password managers: the
-gate is a `<form id="gate">` with an offscreen username field + `autocomplete="current-password"`
-(was `off`, which suppressed managers) and Unlock is a submit — iOS Keychain / Google Password
-Manager now save + autofill the passcode, on top of the existing localStorage persistence
-(`ty_installer_token`, one-time entry, auto-login on return). App adds biometric `nativeLock()`.
-Kept form id="gate" so showApp()'s hide logic is unchanged (a rename broke 7 browser tests
-mid-build — the browser suite caught it). Access model going forward: installers live in the
-Tuned Yota app 100% once live; footer link + bookmark are web fallbacks. Lost-device response =
-rotate that one installer's token in INSTALLER_TOKENS (they re-enter once). See SOP 10.
+**Known product follow-up (non-blocking):** global search still ignores the active city sub-tab
+(searches all cities while a city tab is highlighted) — reviewer-flagged as a UX decision to make.
