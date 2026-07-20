@@ -39,21 +39,35 @@ Set as Netlify env vars — never in the repo:
 Ask Elavon for **demo/sandbox credentials** too — build and test against
 `api.demo.convergepay.com` before switching the URL to production.
 
-## Build plan (when credentials arrive)
+## Pre-built (2026-07-20) — ready, dormant until credentials
 
-1. `netlify/functions/create-payment-session.js` — validates the SKU against
-   `magnuson-catalog.js` server-side, POSTs Converge for the session token, returns it.
-   **Never trust a price sent from the browser** — the amount comes from the server-side
-   catalog only; add a parity test between the function's price source and
-   `magnuson-catalog.js`.
-2. Pricing page: load `PayWithConverge.js`, wire the checkout button →
-   fetch session token → `PayWithConverge.open` with approval/declined/cancelled/error
-   callbacks; on approval, record the transaction (Airtable Bookings/Orders) + Slack
-   notify via `lib/alert.js`.
-3. Tests: session-function unit tests (mocked fetch), price-parity test, callback
-   handling in a pure page module (same pattern as `amsoil-garage-render.js`).
-4. Go-live: swap demo URL → `api.convergepay.com`, real card test, then point the
-   pricing page's reservation CTA at the checkout.
+Shipped ahead of the account so go-live is a config change, not a build:
 
-**Waiting on:** Aaron to open the Elavon/Converge merchant account and provide the
-four credentials above (+ demo creds). Everything else is buildable the same day.
+- **`netlify/functions/create-payment-session.js`** — mints the Converge session
+  token. Amount comes ONLY from `lib/magnuson-prices.js`, which loads
+  `site/magnuson-catalog.js` itself (no second price table to drift; a parity
+  test walks every kit). Client-sent amounts are ignored by design. Without the
+  Converge env vars it returns **503 payments-not-configured**, so nothing
+  changes on the site until the credentials exist. `CONVERGE_DEMO=true` targets
+  `api.demo.convergepay.com`.
+- **`site/payment-checkout.js`** — `TYPayment.startCheckout(sku, handlers)`:
+  requests the session, loads the right `PayWithConverge.js` (demo/prod), opens
+  the Lightbox with approval/declined/cancelled/error callbacks;
+  `onUnavailable` fires while payments are unconfigured so the pricing page
+  keeps its reservation flow.
+- Tests: `tests/create-payment-session.test.js` (incl. the price-parity sweep),
+  `tests/payment-checkout.test.js`.
+
+## Go-live (when credentials arrive)
+
+1. Set the four `CONVERGE_*` env vars in Netlify **plus `CONVERGE_DEMO=true`**,
+   redeploy, and sandbox-test the token mint + Lightbox end-to-end.
+2. Wire the pricing page CTA to `TYPayment.startCheckout` (activation map:
+   `window.MAGNUSON_CHECKOUT` in `site/magnuson-catalog.js`); on approval,
+   record the transaction (Airtable) + Slack notify via `lib/alert.js` — this
+   approval-handling piece is deliberately NOT pre-built (needs the real
+   approval payload shape from sandbox).
+3. Flip `CONVERGE_DEMO` off, run one real card test, done.
+
+**Waiting on:** Aaron to open the Elavon/Converge merchant account and provide
+the four credentials above (+ demo creds).

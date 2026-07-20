@@ -163,14 +163,12 @@ window.MAGNUSON_CATALOG = {
   ]
 };
 
-/* ═══ OPEN ITEM · STRIPE CHECKOUT ═══
-   When the Stripe account exists, create a Payment Link per SKU in the
-   Stripe dashboard and map them here. Any SKU with a link automatically
-   turns "Reserve this kit" into "Checkout securely" on the pricing page.
-   Example:
-     window.MAGNUSON_CHECKOUT = {
-       "01-19-35-005-BL": "https://buy.stripe.com/xxxx",
-       "01-26-57-107-BL": "https://buy.stripe.com/yyyy"
-     };
-*/
+/* ═══ ONLINE CHECKOUT · ELAVON CONVERGE (decided 2026-07-20, not yet live) ═══
+   Checkout runs through Elavon's Converge Lightbox, not Stripe. The pre-built
+   pieces (netlify/functions/create-payment-session.js + site/payment-checkout.js)
+   read prices from THIS catalog server-side — never from the browser. The
+   pricing page keeps its reservation flow until the Converge credentials exist;
+   go-live steps: docs/operations/online-payments-go-live.md.
+   MAGNUSON_CHECKOUT stays as the page's activation map: any SKU set truthy here
+   turns "Reserve this kit" into checkout once payments are configured. */
 window.MAGNUSON_CHECKOUT = {};
