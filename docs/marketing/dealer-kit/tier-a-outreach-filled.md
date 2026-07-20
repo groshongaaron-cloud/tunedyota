@@ -5,7 +5,7 @@ dealer's decision-maker + personalized hook. Grouped by owning rep.
 
 **What's already filled:** contact name, dealership, hook, sending rep's first name.
 **What YOU fill before sending** (2 things): `[REP PHONE · EMAIL]` and the two `[day]` slots.
-**Do NOT send the kit or quote rev-share yet** — counsel DRAFTs + `{{OWNER:…}}` economics still pending; these first touches only ask for a meeting.
+**Kit clears after Aaron's review** (he signs off himself — legal background). Partnership model is mutual-benefit, NO fees: we bring the enthusiast audience, the store keeps the customer. First touches only ask for a meeting.
 **Verify the name on the call** — medium-confidence contacts flagged ⚠ (see `tier-a-contacts.md`).
 For follow-up (§3) and post-visit (§4), reuse the templates file and swap in the same name.
 
@@ -337,7 +337,7 @@ follow up by email. [REP PHONE]. Thanks."
 > factory emissions fully intact, never touches a defeat device, verifies every job on a
 > 5-gas analyzer, and hands back a serialized certificate you can pull up years later. With
 > the truck volume you move in Green Bay, even a few referred tunes a month is real
-> F&I-adjacent revenue — fully documented, emissions intact.
+> customer traffic from our enthusiast audience — fully documented, emissions intact.
 >
 > I'd like 15 minutes to leave you a folder — our compliance statement, warranty explainer,
 > insurance certificate, and a sample certificate — so you can see how it keeps this *off*

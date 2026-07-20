@@ -6,16 +6,16 @@ the least interesting thing you say. Goal of the whole sequence = book a 15-minu
 and start ONE low-commitment referral.
 
 > **Before you send anything:** the kit's Compliance Statement + Magnuson-Moss pages are
-> still counsel-review DRAFTs, and the `{{OWNER:…}}` economics tokens are unfilled. Don't
-> attach the kit or quote rev-share until both are done. These templates ask for a meeting —
+> awaiting Aaron's own sign-off (legal background — no outside counsel loop). Don't
+> attach the kit until it clears Aaron's review. These templates ask for a meeting —
 > they don't make claims that need counsel — so they're safe to use to open the door while
 > the kit is finalized.
 
 ## Fill-before-send legend
 Reused verbatim from the kit so nothing drifts:
-- `{{OWNER: rep name + phone + email}}` — the dealer's **owning rep** (Aaron = MN/IA/ND · Noah = WI · Cody = SD/NE).
-- `{{OWNER: typical turnaround}}` · `{{OWNER: where — mobile at dealer / at customer / at event}}`
-- `{{OWNER: T1 referral economics}}` · `{{OWNER: how/when the dealer is paid}}` — **do not put in a cold email**; save for the meeting.
+- Rep contact per territory: sign as the owning rep (Aaron = MN/IA/ND · Noah = WI · Cody = SD/NE), phone/email from installer contact list; default block: Tuned Yota · (612) 406-7117 · info@tunedyota.com.
+- Turnaround/where (FILLED 2026-07-20): OTT calibrations 20–30 min at regional tuning events, no drop-off; supercharger builds = 3-day install+calibration at an authorized Magnuson installer headquarters.
+- **Partnership model (decided 2026-07-20): mutual benefit, NO referral fees** — Tuned Yota brings its enthusiast audience + social reach to the store; the store keeps the customer for accessories, maintenance, and the next purchase. Frame every conversation this way; never promise payments.
 - `{{HOOK}}` — the one dealer-specific line from the table at the bottom.
 - `{{DEALER}}` · `{{DECISION-MAKER}}` (GM / GSM / F&I director — never the sales floor).
 
@@ -40,7 +40,7 @@ Reused verbatim from the kit so nothing drifts:
 >
 > Are you around {{DAY}} or {{DAY}}? Happy to come to you.
 >
-> {{OWNER: rep name + phone + email}}
+> [Rep name] · Tuned Yota · (612) 406-7117 · info@tunedyota.com
 > Tuned Yota · Authorized OTT Installer · Authorized Magnuson Supercharger Dealer
 
 *Keep it under ~120 words. The COI/certificate references do the credibility work — don't oversell.*
@@ -64,7 +64,7 @@ Reused verbatim from the kit so nothing drifts:
 > "Hi {{DECISION-MAKER}}, {{REP FIRST NAME}} with Tuned Yota — we're the emissions-intact,
 > fully-documented calibration shop for Toyota trucks. I've got a one-folder partner kit I'd
 > like to leave with you; it's a referral relationship, zero cost or training on your end.
-> I'll follow up by email. {{OWNER: rep name + phone + email}}. Thanks."
+> I'll follow up by email. [Rep name], Tuned Yota, (612) 406-7117. Thanks."
 
 **If they push back — quick objection map** (full versions in `walkthrough.md`):
 - *"Corporate wouldn't like it."* → "Fair — that's exactly why we start at referral only, and
@@ -89,7 +89,7 @@ Reused verbatim from the kit so nothing drifts:
 >
 > Fifteen minutes and a folder is all I'm after. What's a good day next week?
 >
-> {{OWNER: rep name + phone + email}}
+> [Rep name] · Tuned Yota · (612) 406-7117 · info@tunedyota.com
 
 ---
 
@@ -107,12 +107,12 @@ Reused verbatim from the kit so nothing drifts:
 > every job, keep emissions factory, and bring you back a one-page recap — jobs done, referral
 > revenue, and zero comebacks. That recap is what decides whether we do more.
 >
-> Turnaround is {{OWNER: typical turnaround}}, and the work happens {{OWNER: where — mobile at dealer / at customer / at event}}.
+> Most OTT calibrations take 20–30 minutes at one of our regional tuning events — no drop-off, no waiting around — and supercharger builds are a three-day install-and-calibration at an authorized Magnuson installer headquarters.
 > I'll check in {{DAY}}.
 >
-> {{OWNER: rep name + phone + email}}
+> [Rep name] · Tuned Yota · (612) 406-7117 · info@tunedyota.com
 
-*Rev-share / payment mechanics (`{{OWNER: T1 referral economics}}`, `{{OWNER: how/when the dealer is paid}}`)
+*The mutual-benefit partnership framing (no fees to negotiate)
 are discussed live or in the kit's Process sheet — not blasted in email.*
 
 ---
@@ -135,7 +135,7 @@ your homework; keep the rest of the template identical.
 | Zeigler Toyota of Racine | Noah | "Your featured TRD builds and 4Runner focus tell me you know this buyer — we'd add the documented tune, complementary to your accessories, never competing." |
 | Serra Toyota | Noah | "You already sell OEM TRD lift kits online — a documented, emissions-intact calibration is the same customer, one step further, fully certificated." |
 | Toyota of Brookfield | Noah | "Given your metro truck volume and accessories desk, a compliant referral tune is found money — zero cost or training, and it stays off your compliance radar." |
-| Le Mieux & Son Toyota | Noah | "With the truck volume you move in Green Bay, even a few referred tunes a month is real F&I-adjacent revenue — fully documented, emissions intact." |
+| Le Mieux & Son Toyota | Noah | "With the truck volume you move in Green Bay, our enthusiast audience is your buyer pool — we send brand champions to your store, fully documented, emissions intact." |
 | Village Pointe Toyota | Cody | "As the largest Toyota store in Nebraska, you've got the truck-buyer flow — we're the documented, emissions-legal calibration path that risks nothing on your end." |
 
 ---
