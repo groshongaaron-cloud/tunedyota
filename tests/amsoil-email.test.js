@@ -64,3 +64,14 @@ test("accountUrl falls back to plain /account when not provided", () => {
   assert.match(html, /tunedyota\.com\/account/);
   assert.ok(!/account\?lt=/.test(html), "no token in fallback");
 });
+
+test("review ask renders only when a reviewUrl is provided (GBP_REVIEW_URL gate)", () => {
+  const { buildAmsoilEmail } = require("../netlify/functions/lib/amsoil-email.js");
+  const withUrl = buildAmsoilEmail({ name: "Ana", reviewUrl: "https://g.page/r/tunedyota-review" });
+  assert.match(withUrl.html, /Leave a Google review/);
+  assert.match(withUrl.html, /g\.page\/r\/tunedyota-review/);
+  assert.match(withUrl.text, /Google review helps other Toyota/);
+  const without = buildAmsoilEmail({ name: "Ana" });
+  assert.doesNotMatch(without.html, /Google review/);
+  assert.doesNotMatch(without.text, /Google review/);
+});
