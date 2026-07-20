@@ -63,6 +63,27 @@ test("INTEGRITY: a capacity chip renders iff that exact system is cross-verified
   assert.equal(actual, expected, "cap chips on pages must equal the count of verified-capacity systems");
   assert.ok(expected > 0, "premise: some engine-oil capacities are now verified");
 
+  // The capacity TABLE (Play 1) renders one `class="capv"` cell per (gen, system)
+  // pair among the four verifiable systems — verified only; unverified cells are
+  // an em dash. Same invariant, counted by system rather than bundle SKU.
+  const TABLE_SYS = new Set(["Engine Oil", "Front Differential", "Rear Differential", "Transfer Case"]);
+  let expectedCells = 0;
+  for (const mk of Object.keys(CAT.vehicles)) {
+    for (const md of Object.keys(CAT.vehicles[mk])) {
+      for (const gen of CAT.vehicles[mk][md]) {
+        for (const s of gen.systems || []) {
+          if (TABLE_SYS.has(s.system) && s.capacity && s.verified) expectedCells++;
+        }
+      }
+    }
+  }
+  let actualCells = 0;
+  for (const f of AMSOIL_PAGE_FILES) {
+    actualCells += (fs.readFileSync(path.join(SITE, f), "utf8").match(/class="capv"/g) || []).length;
+  }
+  assert.equal(actualCells, expectedCells, "capacity-table cells must equal the count of verified table systems");
+  assert.ok(actualCells > 0, "premise: the capacity table renders verified figures");
+
   // Verified systems are limited to the cross-verified set (engine oil + fill-to-plug
   // driveline). Transmission (sealed/overflow) and the filter count are NEVER verified.
   const VERIFIABLE = new Set(["Engine Oil", "Front Differential", "Rear Differential", "Transfer Case"]);

@@ -3,7 +3,10 @@
 Fresh SERP sweep building on the 2026-07-13 six-competitor analysis
 (`amsoil-national-sales-strategy.md`). Goal per Aaron: outrank and outperform the
 prominent AMSOIL dealers as **the Midwest Toyota & Lexus experts** with the
-AMSOIL + Magnuson niche. Model unchanged: referral (`?zo=30713116`) + in-person
+AMSOIL + Magnuson niche. **Revenue targets (Aaron, reaffirmed 2026-07-20):
+Tier 1 = $15,000/mo gross AMSOIL sales; Tier 2 = $30,000/mo.** At ~$75 AOV
+that's ~200 orders/mo (~7/day) for Tier 1 — every play below feeds it, and the
+PC-enrollment layer is what compounds Tier 1 into Tier 2. Model unchanged: referral (`?zo=30713116`) + in-person
 sales + personal communications + the Reserve flow.
 
 ## What today's SERPs actually show (checked 2026-07-20)

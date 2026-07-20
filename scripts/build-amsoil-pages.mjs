@@ -117,6 +117,13 @@ ul.lp-bul li::before{content:"";position:absolute;left:0;top:5px;width:11px;heig
 .lp-veh a{font-size:13.5px;font-weight:700;color:var(--brown);background:var(--white);border:1.5px solid var(--line);border-radius:99px;padding:8px 14px;text-decoration:none;box-shadow:var(--shadow-sm);transition:.15s}
 .lp-veh a:hover{background:var(--ink);color:#F3EFEA;border-color:var(--ink)}
 .lp-links{margin-top:30px;font-size:14px;line-height:2}.lp-links a{color:var(--brown);font-weight:700;text-decoration:none;margin-right:16px}.lp-links a:hover{text-decoration:underline}
+.captbl-wrap{overflow-x:auto;background:var(--white);border:1.5px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);margin:0 0 10px}
+.captbl{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+.captbl th{text-align:left;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--sage-d);padding:12px 12px 8px;border-bottom:1.5px solid var(--ink)}
+.captbl th span{font-weight:400;letter-spacing:0;text-transform:none}
+.captbl td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--brown2)}
+.captbl tbody tr:last-child td{border-bottom:none}
+.captbl .capv{font-weight:900;color:var(--ink);white-space:nowrap}
 .lp-final{text-align:center;margin-top:30px}
 .lp-disc{font-size:11.5px;opacity:.55;text-align:center;margin-top:22px;line-height:1.55}
 </style>`;
@@ -135,6 +142,41 @@ function vehHub(models, currentSlug) {
     .join("");
   return `  <h2>AMSOIL for other Toyota &amp; Lexus platforms</h2>
   <div class="lp-veh">${links}</div>`;
+}
+
+// ---- Play 1 (outrank strategy 2026-07-20): the verified capacity table ----
+// The "[model] oil capacity" SERP is forum confusion (7.4 vs 7.9 vs 9.8 qt
+// threads); our cross-verified year-split data is the authoritative answer no
+// dealer or forum has. Cells render ONLY for verified systems (class="capv" —
+// guarded by tests/amsoil-vehicle-pages.test.js alongside the "cap" chips);
+// unverified cells show an em dash, never a number.
+const CAP_SYS = ["Engine Oil", "Front Differential", "Rear Differential", "Transfer Case"];
+function capacitySection(name, gens) {
+  const sysOf = (g, sys) => (g.systems || []).find((x) => x.system === sys);
+  const anyVerified = gens.some((g) => CAP_SYS.some((sys) => { const s = sysOf(g, sys); return s && s.capacity && s.verified; }));
+  if (!anyVerified) return { html: "", faq: null };
+  const cell = (g, sys) => {
+    const s = sysOf(g, sys);
+    return (s && s.capacity && s.verified) ? `<span class="capv">${s.capacity} ${ESC(s.unit)}</span>` : "&mdash;";
+  };
+  const rows = gens.map((g) =>
+    `<tr><td>${ESC(g.y)}</td><td>${ESC(g.e)}</td><td>${cell(g, "Engine Oil")}</td><td>${cell(g, "Front Differential")}</td><td>${cell(g, "Rear Differential")}</td><td>${cell(g, "Transfer Case")}</td></tr>`).join("\n");
+  const html = `
+  <h2>${ESC(name)} fluid capacities — verified by year</h2>
+  <p>Capacity is <strong>year- and engine-specific</strong> — the same engine can take different amounts in different years and models. Every figure below is cross-verified against factory service specifications by Tuned Yota; a dash means we haven't verified that configuration yet (check your owner's manual or ask us).</p>
+  <div class="captbl-wrap"><table class="captbl">
+    <thead><tr><th>Model years</th><th>Engine</th><th>Engine oil<br><span>w/ filter</span></th><th>Front diff</th><th>Rear diff</th><th>Transfer case</th></tr></thead>
+    <tbody>
+${rows}
+    </tbody>
+  </table></div>
+  <p style="font-size:12.5px;color:var(--sage-d)">Seeing bigger numbers on forums? Toyota's "Product Info" sheets list the <strong>total fill</strong> (dry engine, cooler and lines included) — the <strong>service fill</strong> you use at an oil change is the figure above. Capacities are for the standard configuration; variants like a TRD e-locker rear differential can hold about a quart more. Automatic transmissions are excluded on purpose: they use a sealed, temperature-controlled overflow fill with no honest single number.</p>`;
+  const oilRows = gens.filter((g) => { const s = sysOf(g, "Engine Oil"); return s && s.capacity && s.verified; });
+  const faq = oilRows.length ? [
+    `What is the oil capacity of a ${name}?`,
+    `It depends on the year and engine. With a filter change: ${oilRows.map((g) => { const s = sysOf(g, "Engine Oil"); return `${g.y} ${g.e} — ${s.capacity} ${s.unit}`; }).join("; ")}. These figures are cross-verified against factory service specifications. If you've seen larger numbers quoted on forums, those are usually Toyota's "total fill" (dry engine including the cooler), not the service fill you use at an oil change.`,
+  ] : null;
+  return { html, faq };
 }
 
 function page(model, models) {
@@ -189,8 +231,10 @@ function page(model, models) {
     return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
   }).filter(Boolean).join(",");
 
+  const capSec = capacitySection(name, gens);
   const faqs = [
     [`Where can I buy AMSOIL for my ${name}?`, `From Tuned Yota, an Authorized AMSOIL Dealer. Use the AMSOIL Garage to see the exact oil, filter, and gear lube for your ${name} and order online — products ship direct from AMSOIL anywhere in the U.S.`],
+    ...(capSec.faq ? [capSec.faq] : []),
     [`Is AMSOIL safe for my ${name}, or should I stick with ${make} OEM fluid?`, `AMSOIL is a safe choice for your ${name}. It's formulated to meet and exceed the performance standards ${make} requires, and using it does not void your factory warranty — under the federal Magnuson-Moss Warranty Act a manufacturer can't void your warranty just for using a different brand of oil, and AMSOIL backs every product with the AMSOIL Limited Warranty. Where OEM fluids are built to meet the minimum standard, AMSOIL Signature Series exceeds it: 75% more wear protection and drain intervals up to 25,000 miles — so you get more protection and fewer oil changes, not less.`],
     [`What AMSOIL oil does a ${name} take?`, `AMSOIL recommends ${oilPhrase} for the ${name}; the exact grade depends on your engine and model year. Pick your vehicle in the AMSOIL Garage to confirm the right oil, filter, and capacity for your build.`],
     [`How often should I change the oil on a tuned ${name}?`, `AMSOIL's full-synthetic motor oils are built for extended and severe-service drain intervals. For a tuned or towing ${name} we recommend a severe-service schedule; your AMSOIL Garage shows the interval for your exact configuration.`],
@@ -200,7 +244,7 @@ function page(model, models) {
   const faqVisible = faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
 
   const title = `AMSOIL Synthetic Oil &amp; Filter for the ${ESC(name)} — Best for Tuned &amp; Towing | Tuned Yota`;
-  const desc = `The exact AMSOIL synthetic oil, filter, gear lube, and ATF for your ${ESC(name)} — recommended grades and severe-service intervals for tuned and towing builds. Order online from Tuned Yota, an Authorized AMSOIL Dealer shipping direct nationwide.`;
+  const desc = `The exact AMSOIL synthetic oil, filter, gear lube, and ATF for your ${ESC(name)} — with verified year-by-year oil capacities and severe-service intervals for tuned and towing builds. Order online from Tuned Yota, an Authorized AMSOIL Dealer shipping direct nationwide.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -242,7 +286,7 @@ ${primaryOil ? `
   <h2>AMSOIL fluids for the ${ESC(name)}</h2>
   <p>AMSOIL's recommended product, viscosity, and filter for each ${ESC(name)} engine and model year (from AMSOIL's official vehicle guide). Tap <strong>Order</strong> to add any item to your AMSOIL cart with Tuned Yota's dealer referral attached.</p>
 ${genCards}
-
+${capSec.html}
   <h2>Why AMSOIL for a tuned ${ESC(name)}</h2>
   <ul class="lp-bul">
     <li>Full-synthetic protection built for the extra heat, load, and rpm that a tune, supercharger, or heavy towing adds.</li>
