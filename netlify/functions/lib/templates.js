@@ -102,12 +102,14 @@ function buildBookingCustomerEmail(d, inst, market, event) {
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
   return { subject, html, text };
 }
-function buildBookingInstallerEmail(d, inst, market, event) {
+function buildBookingInstallerEmail(d, inst, market, event, referredBy) {
   const rows = [
     ...(d.source === "OTT Update" ? [row("Request type", "Free OTT Update (existing customer re-flash)")] : []),
     row("Name", d.name), row("Phone", d.phone), row("Email", d.email),
     row("City", `${market.city}, ${market.state}`), row("Date", event.label || event.dateISO),
     row("Time", d.slot), row("Vehicle", d.vehicle), row("Model year", d.modelYear), row("Goals", d.goals), row("Attribution", attribution(d)),
+    // No-reward referral loop: prompt the installer/owner to personally thank the referrer.
+    ...(referredBy ? [row("Referred by", `${referredBy} — send a thank-you 🙏`)] : []),
   ];
   const subject = `New booking — ${market.city} ${event.label || event.dateISO} @ ${d.slot}`;
   const text = `New booking routed to ${inst.name}.\n\n` + rows.map((r) => r.text).join("") + `\nReply to reach the customer.\n`;

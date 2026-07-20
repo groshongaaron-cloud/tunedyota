@@ -61,7 +61,7 @@ async function processNotifications(job, deps) {
   // booking
   const event = job.event;
   let instOk = true, custOk = true, why = "";
-  try { const m = tpl.buildBookingInstallerEmail(d, inst, market, event); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { instOk = false; why = e.message; if (log.error) log.error("inst email", e.message); }
+  try { const m = tpl.buildBookingInstallerEmail(d, inst, market, event, job.referredBy); await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to: inst.email, cc: inst.email === OWNER ? undefined : OWNER, replyTo: d.email || undefined, subject: m.subject, html: m.html, text: m.text }); } catch (e) { instOk = false; why = e.message; if (log.error) log.error("inst email", e.message); }
   try {
     if (inst && inst.key) await push(inst.key, { title: "New booking", body: `${d.name || "A customer"} — ${market.city}`, data: { recordId: job.recordId || "" } });
   } catch (e) { if (log.error) log.error("booking push", e.message); }
@@ -90,6 +90,7 @@ async function processNotifications(job, deps) {
     installer: { key: inst.key, name: inst.name, email: inst.email, phone: inst.phone },
     source: d.source || "find-your-exact-tune",
     utm: { source: d.utm_source || "", medium: d.utm_medium || "", campaign: d.utm_campaign || "" },
+    referredBy: job.referredBy || "",
     emailFailed,
   } });
 

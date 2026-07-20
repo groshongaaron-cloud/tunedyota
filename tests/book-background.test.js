@@ -145,3 +145,20 @@ test("handler accepts the correct x-ty-task secret", () =>
     const r = await handler({ headers: { "x-ty-task": "s3cret" }, body: "{}" });
     assert.equal(r.statusCode, 200);
   }));
+
+test("a referred booking surfaces a thank-you prompt in the installer email + n8n ping", async () => {
+  const h = harness();
+  await processNotifications(bookingJob({ referredBy: "friend@ref.com" }), h.deps);
+  const i = h.emails.find((e) => e.to === "cody@tunedyota.com");
+  assert.match(i.text, /Referred by: friend@ref\.com/);
+  assert.match(i.text, /thank-you/i);
+  assert.match(i.html, /Referred by/);
+  assert.equal(h.pings[0].payload.referredBy, "friend@ref.com");
+});
+test("a non-referred booking shows no referral line", async () => {
+  const h = harness();
+  await processNotifications(bookingJob(), h.deps);
+  const i = h.emails.find((e) => e.to === "cody@tunedyota.com");
+  assert.doesNotMatch(i.text, /Referred by/);
+  assert.equal(h.pings[0].payload.referredBy, "");
+});
