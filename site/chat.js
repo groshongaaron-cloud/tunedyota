@@ -49,7 +49,7 @@
         if (j.reply) { addMsg("ai", j.reply); seen += 1; }
         if (j.escalated) { escalated = true; startPolling(); }
       })
-      .catch(function () { typing.remove(); addMsg("ai", "Connection hiccup — text us at 612-406-7117 and we'll take care of you."); })
+      .catch(function () { typing.remove(); addMsg("ai", "Connection hiccup — text us at (612) 406-7117 and we'll take care of you."); })
       .then(function () { sending = false; if (sendBtn) sendBtn.disabled = false; if (input) input.focus(); });
   }
 

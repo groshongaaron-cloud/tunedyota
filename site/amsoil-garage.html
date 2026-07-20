@@ -266,9 +266,9 @@
         .then(function (j) {
           if (j.status === "ok") {
             form.innerHTML = '<p style="font-weight:800;color:#1d7a3d;margin:6px 0">&#10003; Kit reserved — we\'ll confirm personally and have it ready.</p>';
-          } else { m.textContent = "Couldn't reserve just now — call or text 612-406-7117 and we'll set it aside."; m.style.color = "#b3261e"; }
+          } else { m.textContent = "Couldn't reserve just now — call or text (612) 406-7117 and we'll set it aside."; m.style.color = "#b3261e"; }
         })
-        .catch(function () { m.textContent = "Couldn't reserve just now — call or text 612-406-7117 and we'll set it aside."; m.style.color = "#b3261e"; });
+        .catch(function () { m.textContent = "Couldn't reserve just now — call or text (612) 406-7117 and we'll set it aside."; m.style.color = "#b3261e"; });
     };
   }
 
