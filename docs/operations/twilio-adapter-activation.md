@@ -39,7 +39,10 @@ ported number and release the temp number. No code change.
 
 ## 5. A2P 10DLC registration — REQUIRED before outbound SMS works
 US carriers block un-registered application-to-person SMS (error **30034**). Register
-in Twilio Console → Messaging → Regulatory Compliance / A2P 10DLC:
+in Twilio Console → Messaging → Regulatory Compliance / A2P 10DLC. A Campaign is vetted
+by The Campaign Registry (**1–7 business days**), which assigns a trust score affecting
+throughput. **All copy/paste fields + the A2P overview are in
+[a2p-campaign-content.md](a2p-campaign-content.md)** — use it alongside these steps.
 1. **Brand** — register the Tuned Yota business (legal name, EIN, address, website
    `https://tunedyota.com`, contact email).
 2. **Campaign** — use case "Customer Care" / "Mixed" (conversational + transactional).

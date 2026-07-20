@@ -4,6 +4,30 @@ Everything to paste into the Twilio/TCR campaign form. Use with
 [twilio-adapter-activation.md §5–6](twilio-adapter-activation.md). Keep this in sync
 with what we actually text and with `/privacy` + `/terms`.
 
+## A2P 10DLC — overview & vetting (reference)
+A **Campaign** defines the type of messages we send (for us: customer care —
+conversational + transactional). It is tied to our registered A2P **Brand** and linked
+through a **Messaging Service**, where our 10DLC number(s) are assigned for higher
+deliverability and to avoid carrier penalties on unregistered traffic.
+
+Every Campaign is **vetted by The Campaign Registry (TCR)** — typically **1–7 business
+days** for standard use cases. TCR assigns a **trust score** that affects throughput and
+eligibility, based on Brand verification, messaging history, campaign type, volume/
+throughput patterns, and risk indicators. Some special use cases qualify for higher
+throughput or reduced fees but need extra approvals.
+
+**Required information to complete registration → where ours lives:**
+| Required item | Our content |
+| --- | --- |
+| Use case type | Customer Care (below) |
+| Campaign description | § Campaign description |
+| Sample messages | § Sample messages |
+| Message contents: embedded links, privacy-policy link, terms link | https://tunedyota.com/privacy · https://tunedyota.com/terms (referenced in samples + CTA) |
+| End-user consent details | § Opt-in / Call-to-Action |
+| Opt-in / opt-out / help keywords + messages | § Opt-in keywords + confirmation · § Opt-out (STOP) · § HELP |
+
+---
+
 - **Business / Brand:** Tuned Yota — Toyota & Lexus performance tuning (Authorized OTT
   installer, Magnuson dealer, Authorized AMSOIL dealer). Website: https://tunedyota.com
 - **Number:** +1 612-406-7117

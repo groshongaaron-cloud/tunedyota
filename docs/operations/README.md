@@ -45,6 +45,13 @@ walk-ins, close-out + OTT fields, VIN scan + mismatch guard, customer sign-off, 
 push notifications, offline/pending-sync, the admin view + AMSOIL funnel dashboard, and
 troubleshooting. Backs SOP 4 + SOP 6.
 
+**Messaging (SMS / phone):** [Twilio Adapter Activation](twilio-adapter-activation.md) — go-live
+runbook, **A2P 10DLC registration**, and compliance checklist · [A2P Campaign Content](a2p-campaign-content.md)
+— the A2P overview + vetting, and the copy/paste registration fields (description, opt-in CTA, samples,
+keywords, STOP/HELP). Consent + opt-out disclosures live on `/privacy`, `/terms`, the booking form, the
+chat widget, the SMS auto-reply, and the customer emails — see [SOP 1](sop-client-marketing.md) (marketing
+SMS = separate consent) and [SOP 2](sop-lead-tracking.md) (consent at phone capture).
+
 ## The business at a glance
 
 ```
