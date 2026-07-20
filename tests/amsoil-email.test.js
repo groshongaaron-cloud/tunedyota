@@ -75,3 +75,15 @@ test("review ask renders only when a reviewUrl is provided (GBP_REVIEW_URL gate)
   assert.doesNotMatch(without.html, /Google review/);
   assert.doesNotMatch(without.text, /Google review/);
 });
+
+test("email capacity gate: unverified systems show an em dash, never a draft number", () => {
+  const { buildAmsoilEmail } = require("../netlify/functions/lib/amsoil-email.js");
+  const fluids = { make: "Toyota", model: "Tundra", engine: "5.7L V8", systems: [
+    { system: "Engine Oil", product: "Signature Series 0W-20", stockNo: "ASM", capacity: 7.9, unit: "qt", verified: true, tunedInterval: "7,500 mi" },
+    { system: "Transmission", product: "Signature Series ATF", stockNo: "ATL", capacity: 9.8, unit: "qt", verified: false, tunedInterval: "60,000 mi" },
+  ] };
+  const { html } = buildAmsoilEmail({ name: "Ana", fluids });
+  assert.match(html, /7\.9 qt/);
+  assert.doesNotMatch(html, /9\.8 qt/, "unverified transmission draft must not reach a customer");
+  assert.match(html, /owner's manual/);
+});

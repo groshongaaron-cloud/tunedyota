@@ -29,17 +29,23 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids, bookingId, account
   const subject = `Keep your ${fluids && fluids.model ? esc(fluids.model) : "tuned Toyota"} running strong - your AMSOIL fluids`;
   const th = 'padding:6px 10px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8f94;';
   const td = 'padding:8px 10px;border-bottom:1px solid #e7e3da;';
+  // Capacity gate (same contract as the certificate): only cross-verified figures
+  // render as fact; unverified (transmission's sealed/overflow fill above all)
+  // show an em dash so a draft number never reaches a customer inbox.
+  let gated = false;
   const rows = hasFluids ? fluids.systems.map(function (s) {
+    const capOk = s.capacity && (s.verified || /filter/i.test(s.system));
+    if (!capOk) gated = true;
     return `<tr>
       <td style="${td}font-weight:700;color:#191c1e;">${esc(s.system)}</td>
       <td style="${td}color:#5b6066;">${esc(s.product)}${s.stockNo ? ` <span style="color:#ed1c24;font-weight:700;">(${esc(s.stockNo)})</span>` : ""}</td>
-      <td style="${td}color:#191c1e;white-space:nowrap;">${esc(s.capacity)} ${esc(s.unit)}</td>
+      <td style="${td}color:#191c1e;white-space:nowrap;">${capOk ? `${esc(s.capacity)} ${esc(s.unit)}` : "&mdash;"}</td>
       <td style="${td}color:#b3141b;font-weight:700;white-space:nowrap;">${esc(s.tunedInterval)}</td>
     </tr>`;
   }).join("") : "";
   const table = hasFluids ? `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0;">
     <tr><th align="left" style="${th}">System</th><th align="left" style="${th}">AMSOIL product</th><th align="left" style="${th}">Capacity</th><th align="left" style="${th}">Interval</th></tr>
-    ${rows}</table>` : "";
+    ${rows}</table>${gated ? `<p style="font-size:12px;color:#8a8f94;margin:0 0 8px;">&mdash; = fill amount is configuration-specific (e.g. sealed transmissions) &mdash; check your owner's manual or ask us.</p>` : ""}` : "";
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#f4f2ed;">
   <div style="max-width:600px;margin:0 auto;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#191c1e;">
     <div style="padding:24px 28px;border-bottom:3px solid #ed1c24;text-align:center;">
