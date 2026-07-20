@@ -360,8 +360,16 @@
     draw(fitOnly);
   }
 
-  function renderBook() { VIEW.innerHTML = '<p class="muted">Book view (Task 6)</p>'; }
-  function renderChat() { VIEW.innerHTML = '<p class="muted">Chat view (Task 6)</p>'; }
+  function renderBook() {
+    VIEW.innerHTML = '<iframe id="bookframe" src="/book.html" title="Book your install"></iframe>';
+  }
+
+  function renderChat() {
+    VIEW.innerHTML = '<div id="chathost"></div>';
+    var host = document.getElementById("chathost");
+    if (window.TYChat && window.TYChat.mount) { window.TYChat.mount(host); }
+    else { host.innerHTML = '<p class="muted" style="margin:auto">Chat is loading…</p>'; setTimeout(renderChat, 300); }
+  }
 
   // ---- settings sheet: sign in/out, installer entrance, legal ----
   var sheet = document.getElementById("sheet"), sheetBody = document.getElementById("sheetbody");

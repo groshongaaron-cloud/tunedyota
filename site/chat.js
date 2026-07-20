@@ -14,7 +14,8 @@
   var seen = 0, escalated = false, pollTimer = null, open = false, sending = false;
 
   var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "/chat.css"; document.head.appendChild(css);
-  var btn = document.createElement("button"); btn.id = "ty-chat-btn"; btn.textContent = LABEL; document.body.appendChild(btn);
+  var btn = document.createElement("button"); btn.id = "ty-chat-btn"; btn.textContent = LABEL;
+  if (!window.TY_CHAT_DOCKED) document.body.appendChild(btn); // app shell docks the panel instead
   var panel = null, log = null, input = null, sendBtn = null;
 
   function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; return e; }
@@ -53,8 +54,14 @@
       .then(function () { sending = false; if (sendBtn) sendBtn.disabled = false; if (input) input.focus(); });
   }
 
-  function openPanel() {
-    if (open) return; open = true; btn.style.display = "none";
+  function openPanel(container) {
+    if (open) {
+      // Second mount (e.g. tab switch destroys host then calls again): reattach existing panel
+      if (panel && container) { panel.classList.add("ty-chat-docked"); container.appendChild(panel); }
+      return;
+    }
+    open = true;
+    if (!window.TY_CHAT_DOCKED) btn.style.display = "none";
     panel = el("div", { id: "ty-chat-panel" });
     var head = el("div", { id: "ty-chat-head" }, "Tuned Yota");
     var close = el("button", { type: "button", "aria-label": "Close" }, "—"); head.appendChild(close);
@@ -66,12 +73,14 @@
     var fine = el("div", { id: "ty-chat-fine", style: "font-size:10px;line-height:1.45;color:#9aa08f;padding:2px 12px 9px;text-align:center" });
     fine.innerHTML = 'By sharing your contact info here, you agree we may reply by text. Msg &amp; data rates may apply; reply STOP to opt out, HELP for help. <a href="/privacy" target="_blank" rel="noopener" style="color:#9aa08f;text-decoration:underline">Privacy</a> &middot; <a href="/terms" target="_blank" rel="noopener" style="color:#9aa08f;text-decoration:underline">Terms</a>.';
     panel.appendChild(head); panel.appendChild(log); panel.appendChild(form); panel.appendChild(fine);
-    document.body.appendChild(panel);
+    if (container) { panel.classList.add("ty-chat-docked"); container.appendChild(panel); }
+    else document.body.appendChild(panel);
     addMsg("ai", "Thank you for using Tuned Yota's chat agent. What can I help you with — your truck, a tune, or an upcoming event?");
-    close.addEventListener("click", function () { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } panel.remove(); open = false; btn.style.display = ""; });
+    close.addEventListener("click", function () { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } panel.remove(); open = false; if (!window.TY_CHAT_DOCKED) btn.style.display = ""; });
     form.addEventListener("submit", function (ev) { ev.preventDefault(); var t = input.value.trim(); if (t) { input.value = ""; send(t); } });
     if (escalated) startPolling();
     input.focus();
   }
-  btn.addEventListener("click", openPanel);
+  btn.addEventListener("click", function () { openPanel(); });
+  window.TYChat = { mount: function (container) { openPanel(container); } };
 })();
