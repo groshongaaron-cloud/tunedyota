@@ -13,6 +13,11 @@ Do them in this order (roughly slowest-to-verify first).
 ---
 
 ## 1. Apple Developer Program  ⏳ (days — start FIRST)
+> **STATUS 2026-07-20:** Enrollment started as **Organization** ("Tuned Yota LLC"); Team ID
+> `YR2H93A5X7` already wired into the live AASA. **Blocked on the D-U-N-S / Dun & Bradstreet
+> report** Apple requested — the rest of this runbook resumes when it arrives. If D&B stalls
+> past ~2 weeks, apple.com/DUNS has an expedite path, or the Individual account type remains
+> the fast fallback (listing shows a personal name; can migrate to Organization later).
 1. Go to **developer.apple.com/programs** → Enroll. Sign in with the Apple ID you want to own the app.
 2. Choose account type:
    - **Individual** — fastest (published as your personal name). Recommended to start.
