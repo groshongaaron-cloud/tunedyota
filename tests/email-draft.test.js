@@ -124,3 +124,20 @@ test("buildDraftPrompt states the model-year engine guard as a non-negotiable", 
     grounding: { market: null, installerName: "", pricing: "", nextEvent: "" }, threadContext: "" });
   assert.match(p, /ONLY engines valid for/i);
 });
+
+test("checkDraftShape: calling the calibration a 'package' is banned", () => {
+  const r = checkDraftShape("Our tune package is great. What year is your Tundra?\n— Aaron @ Tuned Yota · (612) 406-7117");
+  assert.equal(r.ok, false, "'tune package' should be banned");
+  assert.ok(r.problems.some((p) => /banned phrase/i.test(p)));
+  assert.equal(checkDraftShape("The calibration package fixes it. What year?\n— Aaron @ Tuned Yota · (612) 406-7117").ok, false, "'calibration package' banned");
+});
+test("checkDraftShape: a legit Magnuson 'supercharger package' is NOT falsely banned", () => {
+  const r = checkDraftShape("The Magnuson supercharger package is a separate build. What year is your Tundra?\n— Aaron @ Tuned Yota · (612) 406-7117");
+  assert.equal(r.ok, true, `should not ban 'supercharger package': ${JSON.stringify(r.problems)}`);
+});
+test("buildDraftPrompt encodes the calibration-not-package and in-person-only rules", () => {
+  const p = buildDraftPrompt({ message: { headers: { from: "x@y.com", subject: "hi" }, textBody: "hi" },
+    classification: { bucket: "b", stage: "s", summary: "z" }, grounding: {}, threadContext: "" });
+  assert.match(p, /NEVER a 'package'/i);
+  assert.match(p, /NEVER offer remote or mail-in tuning/i);
+});

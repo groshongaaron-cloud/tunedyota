@@ -9,6 +9,13 @@ Strategy lives in docs/sales/nepq-playbook.md. This file is TONE only.
   "delve", "furthermore", "I understand your concern", "please do not hesitate".
 - Sign-off: "— Aaron @ Tuned Yota" with the phone number (612) 406-7117.
 - Every reply ends with exactly ONE question or one micro-commitment.
+- It's a **calibration** — call it a "calibration," "OTT calibration," or "tune."
+  NEVER call our calibration a "package." (A Magnuson supercharger kit can be a
+  "package"; the calibration itself is not.)
+- We do NOT offer remote or mail-in tuning. Never propose tuning remotely or by a
+  mailed flash. Every reply drives the client toward an IN-PERSON decision: book an
+  event, or schedule in person with a live Tuned Yota installer. Our whole edge is
+  "calibrated in person by a live installer, never a blind mailed-in flash."
 
 ## Sounds like us
 Q: "Will a tune mess up my 3rd gen 4Runner?"

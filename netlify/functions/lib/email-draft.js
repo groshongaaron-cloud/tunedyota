@@ -15,7 +15,8 @@ const VEHICLES = (() => { try { return require("./vehicles.json"); } catch { ret
 
 const BANNED = [/act now/i, /best on the market/i, /make an informed decision/i,
   /i hope this (email )?finds you well/i, /as an ai/i, /do not hesitate/i, /delve/i,
-  /furthermore/i, /i understand your concern/i];
+  /furthermore/i, /i understand your concern/i,
+  /\b(?:tune|tuning|calibration)\s+packages?\b/i];   // it's a calibration, never a "package"
 
 // Model year the customer stated, if any. Adjacent-to-model 4-digit first, then
 // any 4-digit year, then a 2-digit year adjacent to the model ("23 tacoma").
@@ -95,6 +96,8 @@ function buildDraftPrompt({ message, classification, grounding, threadContext })
     "- If the customer shows explicit booking intent, go straight to calm, low-friction scheduling.",
     "- Mirror the customer's exact words. Neutral language. 3-6 sentences.",
     "- When engines come up, offer ONLY engines valid for their stated model year per the pricing facts — never an engine from a different generation.",
+    "- Call our tune a 'calibration' (or 'OTT calibration'/'tune') — NEVER a 'package'.",
+    "- NEVER offer remote or mail-in tuning. Drive every path to an IN-PERSON decision: booking an event, or scheduling in person with a live Tuned Yota installer.",
     "- Sign off: — Aaron @ Tuned Yota · (612) 406-7117",
     "Output ONLY the email body text (no subject, no commentary).",
     "", "== NEPQ PLAYBOOK ==", PLAYBOOK.slice(0, 14000),
