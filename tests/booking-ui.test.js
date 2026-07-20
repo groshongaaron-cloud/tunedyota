@@ -109,3 +109,9 @@ test("slugify expression is identical across the four event-link copies (drift g
     assert.ok(t.includes(SLUG), `slugify drifted in ${rel}`);
   }
 });
+
+test("94% recommend trust badge is present on the funnel proof card", () => {
+  assert.ok(HTML.includes("94%"), "missing 94% stat");
+  assert.match(HTML, /94% of owners recommend Tuned Yota/);
+  assert.match(HTML, /\.tf-recstat\{/);   // badge style shipped
+});

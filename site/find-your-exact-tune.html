@@ -228,6 +228,12 @@ html,body{background:var(--bg);-webkit-font-smoothing:antialiased}
 .tf-proof figcaption{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--brown)}
 .tf-proof .av{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--sage);color:#fff;font-size:12px;font-weight:900}
 .tf-proof .vf{margin-left:auto;font-family:'Lato';font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--sage-d)}
+.tf-recstat{display:inline-block;font-family:'Lato';font-weight:800;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--sage-d);background:#eef3ec;border:1px solid var(--line);border-radius:999px;padding:4px 11px;margin-bottom:9px}
+.tf-optin{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow-sm);margin:16px 0}
+.tf-optin h3{font-family:'Spectral',serif;margin:0 0 6px;color:#5B4B42;font-size:18px}
+.tf-optin p{margin:0;font-size:14px;color:#4a4038}
+.tf-optinrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tf-optinrow input[type=email]{flex:1;min-width:180px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:15px}
 .tf-scarcity{text-align:center;font-family:'Lato';font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--sage-d);margin:0 0 10px}
 .tf-scarcity.low{color:#9b4a3a}
 .tf-scarcity.low::before{content:"●";margin-right:7px;color:#c2603f;font-size:10px;vertical-align:middle}
@@ -482,6 +488,39 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
     <p class="tf-foot">Questions? <a class="tf-link" href="mailto:info@tunedyota.com">info@tunedyota.com</a></p>
     <div class="tf-nav"><button class="tf-back" data-goto="4">← Back</button></div>
   </section>
+
+  <section class="tf-optin" id="tfOptin" aria-label="Get the free guide">
+    <h3>Not ready to book yet?</h3>
+    <p>Get the free rundown of what the OTT Tune actually fixes on your Toyota — plus a couple of no-pressure follow-ups. Unsubscribe any time.</p>
+    <form id="optinForm" class="tf-optinrow" novalidate>
+      <input type="email" id="optinEmail" placeholder="Your email" autocomplete="email" required>
+      <input type="text" id="optinHp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+      <button type="submit" class="btn primary" id="optinBtn">Send me the guide</button>
+    </form>
+    <p class="tf-foot" id="optinMsg" style="display:none;margin-top:8px"></p>
+  </section>
+  <script>
+  (function(){
+    var f=document.getElementById('optinForm'); if(!f) return;
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var email=(document.getElementById('optinEmail').value||'').trim();
+      var hp=(document.getElementById('optinHp').value||'').trim();
+      var msg=document.getElementById('optinMsg'), btn=document.getElementById('optinBtn');
+      if(!email){ return; }
+      btn.disabled=true; btn.textContent='Sending…';
+      var veh=''; try{ var v=document.getElementById('fVeh'); veh=(v&&v.value)||''; }catch(_){}
+      fetch('/.netlify/functions/nurture-optin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,vehicle:veh,bot_field:hp})})
+        .then(function(r){return r.json().catch(function(){return{};});})
+        .then(function(o){
+          msg.style.display='';
+          if(o&&o.status==='ok'){ msg.textContent='✓ Check your inbox — your guide is on the way.'; f.style.display='none'; }
+          else { msg.textContent='Hmm, that didn’t go through — double-check your email and try again.'; btn.disabled=false; btn.textContent='Send me the guide'; }
+        })
+        .catch(function(){ msg.style.display=''; msg.textContent='Network error — please try again.'; btn.disabled=false; btn.textContent='Send me the guide'; });
+    });
+  })();
+  </script>
 
 </div>
 
@@ -884,7 +923,7 @@ function pickReview(make,used){
 }
 function proofCard(r){
   const init=r.name.replace(/[^A-Za-z]/g,"").slice(0,1).toUpperCase();
-  return `<figure class="tf-proof"><div class="stars" aria-hidden="true">★★★★★</div>`+
+  return `<figure class="tf-proof"><div class="tf-recstat">★ 94% of owners recommend Tuned Yota</div><div class="stars" aria-hidden="true">★★★★★</div>`+
     `<blockquote>"${r.text}"</blockquote>`+
     `<figcaption><span class="av">${init}</span>${r.name}<span class="vf">5.0 ★ verified</span></figcaption></figure>`;
 }
