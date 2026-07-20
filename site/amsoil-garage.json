@@ -161,25 +161,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.4,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 4.8,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.2,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -223,25 +226,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.2,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -285,25 +291,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.2,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -347,25 +356,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.1,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -409,9 +421,10 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
@@ -425,9 +438,10 @@
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -473,25 +487,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.4,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 5.9,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.2,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -535,25 +552,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 2.9,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -597,25 +617,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 2.9,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -722,25 +745,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.2,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -784,25 +810,28 @@
        "system": "Front Differential",
        "sku": "AGLPK-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "AGLPK-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "AGLPK-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -846,25 +875,28 @@
        "system": "Front Differential",
        "sku": "AGLPK-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "AGLPK-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "AGLPK-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.1,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -910,25 +942,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 1.4,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 5.7,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "ATL-QT",
        "unit": "qt",
-       "capacity": 1.8,
+       "capacity": 2.2,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -972,17 +1007,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.8,
+       "capacity": 3.9,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1026,17 +1063,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.8,
+       "capacity": 3.9,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1080,17 +1119,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.8,
+       "capacity": 3.9,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1134,17 +1175,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.8,
+       "capacity": 4.9,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1188,17 +1231,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 1.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.8,
+       "capacity": 3.7,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1297,25 +1342,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 3.4,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1359,25 +1407,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 3.4,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1421,25 +1472,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 3.4,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1483,17 +1537,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 1.2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 3.4,
+       "capacity": 4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -1501,7 +1557,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1547,17 +1604,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 1.3,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 5.9,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -1565,7 +1624,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1609,17 +1669,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 4.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -1627,7 +1689,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1671,17 +1734,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 4.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -1689,7 +1754,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1733,17 +1799,19 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 4.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -1751,7 +1819,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -1795,25 +1864,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 1.7,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 3.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -2054,15 +2126,17 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 2.9,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -2070,7 +2144,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -2116,15 +2191,17 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 2.9,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -2132,7 +2209,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -2178,15 +2256,17 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "AGLPK-QT",
        "unit": "qt",
-       "capacity": 2,
+       "capacity": 3.3,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
@@ -2194,7 +2274,8 @@
        "unit": "qt",
        "capacity": 1.5,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -2316,9 +2397,10 @@
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 1.4,
        "factoryInterval": "severe: inspect",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -2364,25 +2446,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 4.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",
@@ -2426,25 +2511,28 @@
        "system": "Front Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.9,
+       "capacity": 2,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Rear Differential",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 2.4,
+       "capacity": 4.4,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transfer Case",
        "sku": "SVL-QT",
        "unit": "qt",
-       "capacity": 1.5,
+       "capacity": 1.6,
        "factoryInterval": "30,000 mi",
-       "tunedInterval": "30,000 mi"
+       "tunedInterval": "30,000 mi",
+       "verified": true
       },
       {
        "system": "Transmission",

@@ -172,7 +172,7 @@ function page(model, models) {
       return `<div class="fl">${imgTag(p, 50)}<div class="pinfo"><span class="sys">${ESC(sys)}</span><span class="prd">${ESC(p.name)}</span>${detail}</div><div class="pbuy">${priceHtml}<a class="ord" target="_blank" rel="noopener" href="${amsoilUrl(p.productPath)}">Order &#9658;</a></div></div>`;
     }).join("");
     const hasPendingCap = (g.bundle || []).some((sku) => { const s = g.systems.find((x) => x.sku === sku && x.capacity); return s && !s.verified; });
-    const capNote = hasPendingCap ? `<p style="margin:8px 0 0;font-size:12px;color:var(--sage-d)">Gear-lube, ATF, and differential fill capacities for this configuration are being finalized — confirm against your owner's manual before service.</p>` : "";
+    const capNote = hasPendingCap ? `<p style="margin:8px 0 0;font-size:12px;color:var(--sage-d)">Automatic-transmission fill is set by a sealed, temperature-controlled overflow procedure — check your owner's manual or contact us for the exact amount.</p>` : "";
     return `<div class="gen"><div class="eng">${ESC(g.y)}</div><h3>${ESC(name)} <span style="color:var(--sage-d);font-weight:600">${ESC(g.e)}</span></h3>${rows}${capNote}</div>`;
   }).join("\n");
 

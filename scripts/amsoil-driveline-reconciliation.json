@@ -1,0 +1,562 @@
+{
+ "generated": "2026-07-20",
+ "system": "driveline (diff + transfer)",
+ "shipped": [
+  {
+   "v": "Toyota Tacoma | 2024+ | 2.4L-T I4",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.4
+  },
+  {
+   "v": "Toyota Tacoma | 2024+ | 2.4L-T I4",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 4.8
+  },
+  {
+   "v": "Toyota Tacoma | 2024+ | 2.4L-T I4",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.2
+  },
+  {
+   "v": "Toyota Tacoma | 2016-2023 | 3.5L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota Tacoma | 2016-2023 | 3.5L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.2
+  },
+  {
+   "v": "Toyota Tacoma | 2016-2023 | 3.5L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota Tacoma | 2016-2023 | 2.7L I4",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota Tacoma | 2016-2023 | 2.7L I4",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.2
+  },
+  {
+   "v": "Toyota Tacoma | 2016-2023 | 2.7L I4",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota Tacoma | 2005-2015 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota Tacoma | 2005-2015 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.1
+  },
+  {
+   "v": "Toyota Tacoma | 2005-2015 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota Tacoma | 2005-2015 | 2.7L I4",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota Tacoma | 2005-2015 | 2.7L I4",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota 4Runner | 2025+ | 2.4L-T I4",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.4
+  },
+  {
+   "v": "Toyota 4Runner | 2025+ | 2.4L-T I4",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 5.9
+  },
+  {
+   "v": "Toyota 4Runner | 2025+ | 2.4L-T I4",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.2
+  },
+  {
+   "v": "Toyota 4Runner | 2020-2024 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota 4Runner | 2020-2024 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 2.9
+  },
+  {
+   "v": "Toyota 4Runner | 2020-2024 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota 4Runner | 2010-2019 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota 4Runner | 2010-2019 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 2.9
+  },
+  {
+   "v": "Toyota 4Runner | 2010-2019 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2010-2014 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2010-2014 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.2
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2010-2014 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2007-2009 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2007-2009 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.2
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2007-2009 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2007-2008 | 4.0L V6",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2007-2008 | 4.0L V6",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.2
+  },
+  {
+   "v": "Toyota FJ Cruiser | 2007-2008 | 4.0L V6",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.1
+  },
+  {
+   "v": "Toyota Tundra | 2022+ | 3.4L i-FORCE twin-turbo V6",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 1.4
+  },
+  {
+   "v": "Toyota Tundra | 2022+ | 3.4L i-FORCE twin-turbo V6",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 5.7
+  },
+  {
+   "v": "Toyota Tundra | 2022+ | 3.4L i-FORCE twin-turbo V6",
+   "sys": "Transfer Case",
+   "old": 1.8,
+   "new": 2.2
+  },
+  {
+   "v": "Toyota Tundra | 2007-2009 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Toyota Tundra | 2007-2009 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.8,
+   "new": 3.9
+  },
+  {
+   "v": "Toyota Tundra | 2010-2017 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Toyota Tundra | 2010-2017 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.8,
+   "new": 3.9
+  },
+  {
+   "v": "Toyota Tundra | 2018-2021 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Toyota Tundra | 2018-2021 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.8,
+   "new": 3.9
+  },
+  {
+   "v": "Toyota Tundra | 2010-2019 | 4.6L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2.2
+  },
+  {
+   "v": "Toyota Tundra | 2010-2019 | 4.6L V8",
+   "sys": "Rear Differential",
+   "old": 2.8,
+   "new": 4.9
+  },
+  {
+   "v": "Toyota Tundra | 2000-2009 | 4.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 1.2
+  },
+  {
+   "v": "Toyota Tundra | 2000-2009 | 4.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.8,
+   "new": 3.7
+  },
+  {
+   "v": "Toyota Sequoia | 2008-2009 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2.2
+  },
+  {
+   "v": "Toyota Sequoia | 2008-2009 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 3.4,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota Sequoia | 2008-2009 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.4
+  },
+  {
+   "v": "Toyota Sequoia | 2010-2022 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2.2
+  },
+  {
+   "v": "Toyota Sequoia | 2010-2022 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 3.4,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota Sequoia | 2010-2022 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.4
+  },
+  {
+   "v": "Toyota Sequoia | 2010-2019 | 4.6L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2.2
+  },
+  {
+   "v": "Toyota Sequoia | 2010-2019 | 4.6L V8",
+   "sys": "Rear Differential",
+   "old": 3.4,
+   "new": 1.6
+  },
+  {
+   "v": "Toyota Sequoia | 2010-2019 | 4.6L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.4
+  },
+  {
+   "v": "Toyota Sequoia | 2001-2009 | 4.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 1.2
+  },
+  {
+   "v": "Toyota Sequoia | 2001-2009 | 4.7L V8",
+   "sys": "Rear Differential",
+   "old": 3.4,
+   "new": 4
+  },
+  {
+   "v": "Toyota Sequoia | 2001-2009 | 4.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Toyota Land Cruiser | 2025+ | 2.4L-T I4",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 1.3
+  },
+  {
+   "v": "Toyota Land Cruiser | 2025+ | 2.4L-T I4",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 5.9
+  },
+  {
+   "v": "Toyota Land Cruiser | 2025+ | 2.4L-T I4",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Toyota Land Cruiser | 2016-2021 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Toyota Land Cruiser | 2016-2021 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 4.4
+  },
+  {
+   "v": "Toyota Land Cruiser | 2016-2021 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Toyota Land Cruiser | 2008-2010 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Toyota Land Cruiser | 2008-2010 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 4.4
+  },
+  {
+   "v": "Toyota Land Cruiser | 2008-2010 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Toyota Land Cruiser | 2011-2015 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Toyota Land Cruiser | 2011-2015 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 4.4
+  },
+  {
+   "v": "Toyota Land Cruiser | 2011-2015 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Toyota Land Cruiser | 2006-2007 | 4.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 1.7
+  },
+  {
+   "v": "Toyota Land Cruiser | 2006-2007 | 4.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 3.5
+  },
+  {
+   "v": "Toyota Land Cruiser | 2006-2007 | 4.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.4
+  },
+  {
+   "v": "Lexus GX | 2019+ | 4.6L V8",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Lexus GX | 2019+ | 4.6L V8",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 2.9
+  },
+  {
+   "v": "Lexus GX | 2019+ | 4.6L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Lexus GX | 2010-2018 | 4.6L V8",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Lexus GX | 2010-2018 | 4.6L V8",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 2.9
+  },
+  {
+   "v": "Lexus GX | 2010-2018 | 4.6L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Lexus GX | 2005-2009 | 4.7L V8",
+   "sys": "Front Differential",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Lexus GX | 2005-2009 | 4.7L V8",
+   "sys": "Rear Differential",
+   "old": 2,
+   "new": 3.3
+  },
+  {
+   "v": "Lexus GX | 2005-2009 | 4.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.5
+  },
+  {
+   "v": "Lexus LX570 | 2008-2009 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Lexus LX570 | 2008-2009 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 4.4
+  },
+  {
+   "v": "Lexus LX570 | 2008-2009 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Lexus LX570 | 2010-2021 | 5.7L V8",
+   "sys": "Front Differential",
+   "old": 1.9,
+   "new": 2
+  },
+  {
+   "v": "Lexus LX570 | 2010-2021 | 5.7L V8",
+   "sys": "Rear Differential",
+   "old": 2.4,
+   "new": 4.4
+  },
+  {
+   "v": "Lexus LX570 | 2010-2021 | 5.7L V8",
+   "sys": "Transfer Case",
+   "old": 1.5,
+   "new": 1.6
+  },
+  {
+   "v": "Lexus LS460 | 2007-2017 | 4.6L V8",
+   "sys": "Rear Differential",
+   "old": 1.9,
+   "new": 1.4
+  }
+ ],
+ "flagged": [
+  {
+   "v": "Toyota Tacoma | 2005-2015 | 2.7L I4",
+   "sys": "Rear Differential",
+   "note": "left unverified (ambiguous/split/N-A)"
+  },
+  {
+   "v": "Toyota Tundra | 2010-2017 | 5.7L V8",
+   "sys": "Transfer Case",
+   "note": "left unverified (ambiguous/split/N-A)"
+  },
+  {
+   "v": "Lexus LS460 | 2007-2017 | 4.6L V8",
+   "sys": "Front Differential",
+   "note": "left unverified (ambiguous/split/N-A)"
+  },
+  {
+   "v": "Lexus LS460 | 2007-2017 | 4.6L V8",
+   "sys": "Transfer Case",
+   "note": "left unverified (ambiguous/split/N-A)"
+  }
+ ],
+ "skipped": [
+  "Toyota Tundra | 2007-2009 | 5.7L V8: no \"Transfer Case\" system",
+  "Toyota Tundra | 2018-2021 | 5.7L V8: no \"Transfer Case\" system",
+  "Toyota Tundra | 2010-2019 | 4.6L V8: no \"Transfer Case\" system",
+  "Toyota Tundra | 2000-2009 | 4.7L V8: no \"Transfer Case\" system"
+ ]
+}

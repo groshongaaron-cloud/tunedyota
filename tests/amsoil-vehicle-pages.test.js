@@ -63,12 +63,15 @@ test("INTEGRITY: a capacity chip renders iff that exact system is cross-verified
   assert.equal(actual, expected, "cap chips on pages must equal the count of verified-capacity systems");
   assert.ok(expected > 0, "premise: some engine-oil capacities are now verified");
 
-  // Every verified system must be an Engine Oil system this pass (diff/trans stay unverified).
+  // Verified systems are limited to the cross-verified set (engine oil + fill-to-plug
+  // driveline). Transmission (sealed/overflow) and the filter count are NEVER verified.
+  const VERIFIABLE = new Set(["Engine Oil", "Front Differential", "Rear Differential", "Transfer Case"]);
   for (const mk of Object.keys(CAT.vehicles)) {
     for (const md of Object.keys(CAT.vehicles[mk])) {
       for (const gen of CAT.vehicles[mk][md]) {
         for (const s of gen.systems || []) {
-          if (s.verified) assert.equal(s.system, "Engine Oil", `${mk} ${md} ${gen.y}: only Engine Oil is verified this pass, not ${s.system}`);
+          if (s.verified) assert.ok(VERIFIABLE.has(s.system), `${mk} ${md} ${gen.y}: ${s.system} must not be marked verified`);
+          if (s.system === "Transmission") assert.ok(!s.verified, `${mk} ${md} ${gen.y}: Transmission must stay unverified (sealed/overflow-fill)`);
         }
       }
     }
