@@ -26,3 +26,11 @@ test("is registered for SEO (HEAD_PAGES)", async () => {
   const SD = await import("../scripts/lib/seo-data.mjs");
   assert.ok(SD.HEAD_PAGES.includes("amsoil-garage.html"), "add amsoil-garage.html to HEAD_PAGES");
 });
+
+test("has the prominent Shop All AMSOIL on-site store", () => {
+  assert.match(html, /Shop All AMSOIL/);
+  assert.match(html, /id="store"/);
+  assert.match(html, /amsoil-store\.js/);
+  assert.match(html, /id="asx-grid"/);
+  assert.match(html, /href="#store"/);   // prominent button + catalog link target the on-site store
+});

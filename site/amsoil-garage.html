@@ -94,6 +94,7 @@
   <div class="ag-eyebrow">Tuned Yota · Authorized AMSOIL Dealer</div>
   <h1>Your AMSOIL Garage</h1>
   <p>The AMSOIL synthetic fluids for your vehicle — capacities and service intervals dialed for tuned trucks. You order here; checkout completes securely on AMSOIL.com.</p>
+  <p class="ag-shopall"><a class="btn primary" href="#store">&#128722; Shop All AMSOIL Products &rarr;</a></p>
 
   <div class="ag-picker" id="picker" aria-label="Choose your vehicle">
     <select id="sel-make" aria-label="Make"></select>
@@ -105,13 +106,42 @@
 
   <section id="garage" aria-live="polite"></section>
 
-  <p style="margin-top:18px"><a id="full-catalog" class="btn outline" href="#">Browse the full AMSOIL catalog →</a></p>
+  <p style="margin-top:18px"><a id="full-catalog" class="btn outline" href="#store">Browse the full AMSOIL catalog →</a></p>
 
   <div class="ag-search-row" role="search" aria-label="Search AMSOIL catalog">
     <label for="ag-search">Search all AMSOIL products</label>
     <input type="search" id="ag-search" placeholder="e.g. 5W-30 motor oil…" aria-label="Search query">
     <button class="ag-search-btn" id="ag-search-btn" type="button">Search →</button>
   </div>
+
+  <style>
+  .ag-shopall{margin:14px 0 4px}
+  .ag-shopall .btn{font-size:17px;padding:15px 30px}
+  #store{margin:26px 0 10px;scroll-margin-top:70px}
+  #store h2{font-family:'Spectral',serif;color:var(--ink);margin:0 0 4px}
+  .asx-sub{color:var(--sage-d);margin:0 0 12px;font-size:14px}
+  .asx-count{font-size:13px;font-weight:800;color:var(--sage-d);margin:6px 0 10px}
+  .asx-cats{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px}
+  .asx-chip{font-family:'Lato',sans-serif;font-weight:800;font-size:12.5px;background:var(--white);color:var(--ink);border:1.5px solid var(--line);border-radius:99px;padding:7px 13px;cursor:pointer;transition:.15s}
+  .asx-chip span{opacity:.55;font-weight:900;margin-left:3px}
+  .asx-chip:hover{border-color:var(--sage-d)}
+  .asx-chip.on{background:var(--ink);color:#F3EFEA;border-color:var(--ink)}
+  .asx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+  .asx-card{border:1.5px solid var(--line);border-radius:14px;padding:14px;background:var(--white);display:flex;flex-direction:column}
+  .asx-cat{font-family:'Lato',sans-serif;font-size:10.5px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--sage-d)}
+  .asx-name{font-weight:700;color:var(--ink);margin:5px 0 4px;line-height:1.3;flex:1}
+  .asx-code{font-size:12px;color:var(--sage-d);margin-bottom:10px}
+  .asx-buy{font-family:'Lato',sans-serif;font-weight:900;font-size:13px;text-align:center;background:var(--sage-d);color:#fff;border-radius:99px;padding:9px 14px;text-decoration:none}
+  .asx-buy:hover{background:var(--brown)}
+  .asx-more{grid-column:1/-1;color:var(--sage-d);font-size:13px;margin:8px 0 0}
+  </style>
+  <section id="store" aria-labelledby="store-h">
+    <h2 id="store-h">Shop All AMSOIL</h2>
+    <p class="asx-sub">Every AMSOIL product, shipped direct — checkout completes on AMSOIL.com under Tuned Yota. Search above, or filter by category.</p>
+    <div id="asx-count" class="asx-count"></div>
+    <div id="asx-cats" class="asx-cats" aria-label="Categories"></div>
+    <div id="asx-grid" class="asx-grid"></div>
+  </section>
 
   <section class="ag-prose" aria-labelledby="why-amsoil">
     <h2 id="why-amsoil">Why AMSOIL for a tuned Toyota or Lexus</h2>
@@ -147,12 +177,12 @@
 <script src="amsoil-referral.js"></script>
 <script src="/amsoil-track.js" defer></script>
 <script src="amsoil-garage-render.js"></script>
+<script src="amsoil-store.js" defer></script>
 <script>
 (async function () {
   var el = function (id) { return document.getElementById(id); };
   var CUR = new Date().getFullYear();
 
-  el("full-catalog").href = amsoilUrl("/shop/");
   el("cta-pc").href = amsoilUrl("/offers/pc/");
   el("cta-dealer").href = amsoilUrl("/lander/join/");
 
@@ -328,15 +358,7 @@
   sync = function () { origSync(); renderMyGarage(); };
   renderMyGarage();
 
-  // --- Full-catalog search ---
-  var searchBtn = el("ag-search-btn");
-  searchBtn.addEventListener("click", function () {
-    var q = document.getElementById("ag-search").value.trim();
-    if (q) window.open(window.amsoilUrl("/search?q=" + encodeURIComponent(q)), "_blank");
-  });
-  document.getElementById("ag-search").addEventListener("keydown", function (e) {
-    if (e.key === "Enter") { searchBtn.click(); }
-  });
+  // The full-catalog search box + the Shop-All store are wired in amsoil-store.js.
 })();
 </script>
 <script src="/chat.js" defer></script>
