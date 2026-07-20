@@ -4,7 +4,7 @@
 // certificate HTML, re-rendered deterministically (never stored). Ownership =
 // the booking's Email equals the session email. 401 without a valid session.
 const { cfg, escapeFormula, listRecords, getRecord } = require("./lib/airtable.js");
-const { resolveClient } = require("./lib/client-auth.js");
+const { resolveClient, referralUrl } = require("./lib/client-auth.js");
 const { certHtmlForRecord } = require("./lib/cert-render.js");
 
 async function listCerts(email, deps = {}) {
@@ -53,7 +53,10 @@ async function handler(event) {
   }
   const out = await listCerts(session.email, {});
   if (out.status !== "ok") return { statusCode: 502, headers: { "Content-Type": "application/json", ...renewHeaders }, body: JSON.stringify(out) };
-  const body = { ...out, ...(session.renewedToken ? { renewedToken: session.renewedToken } : {}) };
+  // The signed-in customer's personal referral link — the account page renders
+  // the same "do a friend a favor" ask that lives on the certificate.
+  const body = { ...out, referralLink: referralUrl(session.email, Date.now(), process.env),
+    ...(session.renewedToken ? { renewedToken: session.renewedToken } : {}) };
   return { statusCode: 200, headers: { "Content-Type": "application/json", ...renewHeaders }, body: JSON.stringify(body) };
 }
 

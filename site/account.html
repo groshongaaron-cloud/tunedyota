@@ -57,6 +57,19 @@
       <select id="v-year" class="field" disabled><option value="">Year…</option></select>
     </div>
     <button class="btn" id="v-add">＋ Add vehicle</button>
+
+    <div class="card" style="margin-top:28px">
+      <div class="veh">Save up to 25% for life on AMSOIL</div>
+      <div class="meta">Enroll once as a Preferred Customer under Tuned Yota and keep Preferred-Customer pricing on every future AMSOIL order — the exact fluids in your garage above, at up to 25% off.</div>
+      <a class="link" href="https://www.amsoil.com/p/preferred-customer-registration-preg/?zo=30713116" target="_blank" rel="noopener">Become a Preferred Customer ►</a>
+    </div>
+
+    <div class="card" id="refer-card" hidden>
+      <div class="veh">Do a friend a favor</div>
+      <div class="meta">If your tune impressed you, a buddy is probably fighting the same gear hunting and throttle lag. Send them your personal link — refer a friend and you're both first in line for the next event in your area.</div>
+      <a class="link" href="#" id="refer-share">Share your Tuned Yota link ►</a>
+      <span class="meta" id="refer-copied" hidden> Copied!</span>
+    </div>
   </div>
 </div>
 <script>
@@ -121,6 +134,21 @@
       .catch(function () { show("login"); msg("Sign-in failed — please try again.", "err"); });
   }
 
+  // --- referral ("do a friend a favor") ---
+  function initReferral(link) {
+    if (!link) return;
+    var card = el("refer-card");
+    card.hidden = false;
+    el("refer-share").onclick = function (e) {
+      e.preventDefault();
+      var payload = { title: "Tuned Yota", text: "Worth it for your Toyota/Lexus — find your exact tune:", url: link };
+      if (navigator.share) { navigator.share(payload).catch(function () {}); return; }
+      (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject())
+        .then(function () { el("refer-copied").hidden = false; setTimeout(function () { el("refer-copied").hidden = true; }, 2500); })
+        .catch(function () { window.prompt("Copy your personal link:", link); });
+    };
+  }
+
   // --- certificates ---
   function loadCerts() {
     api("client-certs").then(function (res) {
@@ -128,6 +156,7 @@
       return res.json();
     }).then(function (j) {
       if (!j) return;
+      initReferral(j.referralLink);
       var box = el("certs");
       if (j.status !== "ok") { box.innerHTML = '<p class="meta">Couldn’t load certificates — refresh to retry.</p>'; return; }
       if (!j.certs.length) { box.innerHTML = '<p class="meta">No certificates yet — they appear here after your tune.</p>'; return; }
@@ -249,5 +278,6 @@
   else show("login");
 })();
 </script>
+<script src="/amsoil-track.js" defer></script>
 </body>
 </html>

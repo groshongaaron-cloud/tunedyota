@@ -42,3 +42,27 @@ test("renderClientCert reports store failures as retryable", async () => {
     { env: ENV, get: async () => { throw new Error("airtable get 503"); } });
   assert.deepEqual(out, { status: "error", error: "store-unavailable" });
 });
+
+test("handler list response carries the signed-in customer's referral link", async () => {
+  const { handler } = require("../netlify/functions/client-certs.js");
+  const { signSession, verifyReferral } = require("../netlify/functions/lib/client-auth.js");
+  const saved = { CLIENT_SESSION_SECRET: process.env.CLIENT_SESSION_SECRET,
+    AIRTABLE_TOKEN: process.env.AIRTABLE_TOKEN, AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID };
+  const savedFetch = global.fetch;
+  process.env.CLIENT_SESSION_SECRET = "s";
+  process.env.AIRTABLE_TOKEN = "at";
+  process.env.AIRTABLE_BASE_ID = "app1";
+  global.fetch = async () => ({ ok: true, json: async () => ({ records: [REC] }) });
+  try {
+    const token = signSession("marcus@example.com", Date.now(), { CLIENT_SESSION_SECRET: "s" });
+    const res = await handler({ headers: { "x-client-token": token }, queryStringParameters: {} });
+    assert.equal(res.statusCode, 200);
+    const body = JSON.parse(res.body);
+    assert.match(body.referralLink, /^https:\/\/tunedyota\.com\/find-your-exact-tune\?ref=/);
+    const rt = new URL(body.referralLink).searchParams.get("ref");
+    assert.deepEqual(verifyReferral(rt, Date.now(), { CLIENT_SESSION_SECRET: "s" }), { email: "marcus@example.com" });
+  } finally {
+    global.fetch = savedFetch;
+    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  }
+});
