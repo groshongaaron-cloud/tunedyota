@@ -63,6 +63,7 @@ function buildCustomerEmail(d, inst) {
     `${d.vehicle || "vehicle"} is in, and ${inst.name} — your installer for ` +
     `${d.market || "your area"} — will reach out to confirm your event date and calibration.\n\n` +
     `Want it sooner? Call or text ${inst.name} at ${inst.phone}.\n\n` +
+    `We may text you at the number you provided. Msg & data rates may apply; reply STOP to opt out, HELP for help. Privacy: https://tunedyota.com/privacy\n\n` +
     `— Tuned Yota · Undeniable Performance\n`;
   const html =
     `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px">` +
@@ -71,6 +72,7 @@ function buildCustomerEmail(d, inst) {
     `<strong>${esc(inst.name)}</strong>, your installer for ${esc(d.market || "your area")}, ` +
     `will reach out to confirm your event date and calibration.</p>` +
     `<p>Want it sooner? Call or text ${esc(inst.name)} at <strong>${esc(inst.phone)}</strong>.</p>` +
+    `<p style="font-size:12px;color:#9aa08f;margin-top:16px">We may text you at the number you provided. Msg &amp; data rates may apply; reply <strong>STOP</strong> to opt out, <strong>HELP</strong> for help. See our <a href="https://tunedyota.com/privacy" style="color:#9aa08f">Privacy Policy</a>.</p>` +
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p>` +
     `</div>`;
   return { subject, html, text };
@@ -127,10 +129,11 @@ function buildPriorityCustomerEmail(d, inst, market, reason) {
   const pref = (reason === "full" && d.slot) ? ` We noted your preferred time of ${d.slot}, and you'll be first in line if it opens.` : "";
   const subject = `You're on the Tuned Yota Priority Wait List, ${market.city}`;
   const text = `Hi ${first},\n\nYou're on the Priority Wait List for ${market.city} (${priorityWord(reason)}).${pref} ` +
-    `You'll be first to know when a slot opens. Questions? Call or text ${inst.name} at ${inst.phone}.\n\n— Tuned Yota · Undeniable Performance\n`;
+    `You'll be first to know when a slot opens. Questions? Call or text ${inst.name} at ${inst.phone}.\n\nWe may text you at the number you provided. Msg & data rates may apply; reply STOP to opt out, HELP for help. Privacy: https://tunedyota.com/privacy\n\n— Tuned Yota · Undeniable Performance\n`;
   const html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px"><h2 style="color:#5B4B42">You're on the Priority Wait List.</h2>` +
     `<p>Thanks, ${esc(first)} — ${esc(priorityWord(reason))} in <strong>${esc(market.city)}</strong>.${esc(pref)} You'll be first to know when a slot opens.</p>` +
     `<p>Questions? Call or text ${esc(inst.name)} at <strong>${esc(inst.phone)}</strong>.</p>` +
+    `<p style="font-size:12px;color:#9aa08f;margin-top:16px">We may text you at the number you provided. Msg &amp; data rates may apply; reply <strong>STOP</strong> to opt out, <strong>HELP</strong> for help. See our <a href="https://tunedyota.com/privacy" style="color:#9aa08f">Privacy Policy</a>.</p>` +
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
   return { subject, html, text };
 }
@@ -159,7 +162,7 @@ function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
     `Hi ${first},\n\nYour Tuned Yota tuning event is ${phrase}.\n\n` +
     `When: ${when}\nWhere: ${where}${addr}\n\n` +
     closer +
-    `Questions? Call or text ${inst.name} at ${inst.phone}.\n\n— Tuned Yota · Undeniable Performance\n`;
+    `Questions? Call or text ${inst.name} at ${inst.phone}.\n\nWe may text you at the number you provided. Msg & data rates may apply; reply STOP to opt out, HELP for help. Privacy: https://tunedyota.com/privacy\n\n— Tuned Yota · Undeniable Performance\n`;
   const addrHtml = realAddr
     ? `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Address</td><td style="padding:4px 0;color:#3A2E26"><strong>${esc(realAddr)}</strong></td></tr>`
     : "";
@@ -172,6 +175,7 @@ function buildEventReminderCustomerEmail(booking, event, inst, daysUntil) {
     `<tr><td style="padding:4px 12px 4px 0;color:#7c8472;font-weight:700">Where</td><td style="padding:4px 0;color:#3A2E26">${esc(where)}</td></tr>` +
     addrHtml + `</table>` +
     `<p style="margin-top:12px">${realAddr ? "Please save the address so you know exactly where to go." : "We'll email you the exact address before your event."} Questions? Call or text <strong>${esc(inst.phone)}</strong>.</p>` +
+    `<p style="font-size:12px;color:#9aa08f;margin-top:16px">We may text you at the number you provided. Msg &amp; data rates may apply; reply <strong>STOP</strong> to opt out, <strong>HELP</strong> for help. See our <a href="https://tunedyota.com/privacy" style="color:#9aa08f">Privacy Policy</a>.</p>` +
     `<p style="color:#7c8472;font-weight:700;letter-spacing:.04em">— Tuned Yota · Undeniable Performance</p></div>`;
   return { subject, html, text };
 }
