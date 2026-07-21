@@ -5,6 +5,7 @@
 const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType } = require("./lib/twilio.js");
 const { INSTALLERS, parseSmsOverrides } = require("./lib/routing.js");
 const { loadEscalatedForInstaller, saveSession } = require("./lib/chat-store.js");
+const { deliverInstallerTurn } = require("./lib/meta-deliver.js");
 
 const REPLY = "Thanks for texting Tuned Yota! We got your message and a team member will reach out shortly. " +
   "For the fastest help, reply with your vehicle + what you're after (OTT tune, supercharger, build, or a question). " +
@@ -30,7 +31,7 @@ async function relayInstallerReply({ from, text }, deps = {}) {
   const { env = process.env, log = console,
     findSession = (k) => loadEscalatedForInstaller(k, { env }),
     save = (s) => saveSession(s, { env }),
-    onInstallerTurn = require("./lib/meta-deliver.js").deliverInstallerTurn } = deps;
+    onInstallerTurn = deliverInstallerTurn } = deps;
   const inst = installerForNumber(from, env);
   if (!inst) return { relayed: false };
   let sess = null;

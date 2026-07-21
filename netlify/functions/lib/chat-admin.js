@@ -4,6 +4,7 @@
 // writes (twilio-sms.js relayInstallerReply) — one conversation, two channels.
 const { cfg, escapeFormula, listRecords } = require("./airtable.js");
 const { loadSession, saveSession, parseTranscript, TABLE } = require("./chat-store.js");
+const { deliverInstallerTurn } = require("./meta-deliver.js");
 
 async function listSessions(installerKey, { env = process.env, fetchImpl = fetch } = {}) {
   const c = cfg(env);
@@ -35,7 +36,7 @@ async function getTranscript(sessionId, deps = {}) {
 
 async function installerReply(sessionId, installerKey, text, deps = {}) {
   const { loadFn = loadSession, saveFn = saveSession, now = Date.now,
-    onInstallerTurn = require("./meta-deliver.js").deliverInstallerTurn } = deps;
+    onInstallerTurn = deliverInstallerTurn } = deps;
   const clean = String(text || "").trim().slice(0, 1000);
   if (!clean) return { status: "error", error: "empty" };
   const sess = await loadFn(sessionId, deps);
