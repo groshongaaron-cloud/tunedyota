@@ -43,6 +43,59 @@ fails closed until the env vars below exist. Owner does the Meta clicks; each
    give contact/vehicle/city → escalation SMS/push → session in the console
    Chats tab → reply from the console → reply appears in Messenger.
 
+## Phase A→Public — App Review for `pages_messaging` (real customers can DM)
+
+Dev mode only delivers DMs from app-role accounts. Going public = Business
+Verification + Advanced Access on `pages_messaging` + Live mode. Checked against
+Meta's process 2026-07-21; expect a few business days to ~2 weeks of review.
+Submit **Messenger only** — Instagram gets its own submission after its dev-mode
+smoke (an undemonstrable permission risks the whole review).
+
+1. **Business Verification (start FIRST — it gates Advanced Access):**
+   business.facebook.com → Settings → **Security Centre → Start Verification**.
+   Verify "Tuned Yota LLC" (legal name + address as on formation docs; a
+   utility bill / bank statement / EIN letter matching them works). Independent
+   of Apple's D-U-N-S wait.
+2. **Switch the app Live:** App Dashboard top bar → toggle **App Mode: Live**.
+   (Reviewers must be able to test during review. Public DMs still won't flow
+   until the permission is granted — expected.)
+3. **Record the screencast** (phone screen-record is fine, 1–3 min, no cuts):
+   a. Open facebook.com/&lt;TunedYotaPage&gt; → tap **Message**.
+   b. Send "Do you tune 4Runners?" → show the AI answer arriving.
+   c. Send "Can I talk to a real person?" → answer the bot's questions
+      (name/phone/city/vehicle) → show the handoff confirmation message.
+   d. Show the installer console Chats tab (tunedyota.com console) with the
+      conversation, type a reply → show it arriving in the Messenger thread.
+4. **Submit:** App Dashboard → **App Review → Permissions and Features** →
+   `pages_messaging` → **Request Advanced Access** → attach the screencast +
+   paste the two texts below.
+5. **After approval:** re-run the §7 smoke from a NON-role account (borrow a
+   friend's) — that's the real proof customers can reach the bot.
+
+**Use-case description (paste):**
+> Tuned Yota (tunedyota.com) is a Toyota/Lexus vehicle-calibration business.
+> Our app connects our Facebook Page's Messenger to our website's existing
+> customer-service assistant. When a customer messages our Page, the app
+> receives the message via webhook and replies in Messenger with answers about
+> our services (supported vehicles, pricing, appointment questions). If the
+> customer asks for a human, the assistant collects their contact details and
+> hands the conversation to one of our installers, who replies from our staff
+> console; the app delivers that reply back into the same Messenger thread.
+> pages_messaging is required to receive customers' messages to our Page and
+> send these replies. We message only users who message our Page first, within
+> the standard messaging window. Data handling: conversation transcripts are
+> stored in our CRM; users can request deletion via our registered data
+> deletion callback. Privacy policy: https://tunedyota.com/privacy
+
+**Reviewer test instructions (paste):**
+> 1. Go to our Facebook Page ("Tuned Yota") and send it a message, e.g.
+>    "Do you tune 4Runners?" — the assistant replies in Messenger within
+>    seconds with a vehicle-specific answer.
+> 2. Reply "Can I talk to a real person?" — the assistant asks for name,
+>    phone, city, and vehicle, then confirms it has notified the nearest
+>    installer. This demonstrates receive + send on pages_messaging.
+> 3. No login or test account is needed; the flow is live on our public Page.
+
 ## Phase B — Instagram DMs (Meta-gated, days-to-weeks)
 
 Prereq (already true per owner): IG account is Business/Creator AND linked to the
