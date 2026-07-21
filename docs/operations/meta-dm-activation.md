@@ -6,6 +6,15 @@ fails closed until the env vars below exist. Owner does the Meta clicks; each
 
 ## Phase A — Facebook Messenger (works in Development Mode, ~1 sitting)
 
+> **STATUS 2026-07-21: COMPLETE — full smoke passed with real traffic** (DM → AI reply →
+> escalation → CRM lead channel=facebook → console reply back into Messenger). Gotchas
+> hit, for the record: the Page must be POST-subscribed to the `messages` field
+> (`/me/subscribed_apps` — the dashboard checkbox alone had never been set); dev mode
+> only delivers DMs from app-role accounts; installer-turn delivery had to be awaited
+> (Lambda freezes fire-and-forget work — commit 252428c). **Still dev-mode: real
+> customers can't reach the bot until App Review (pages_messaging Advanced Access) +
+> Live mode.**
+
 1. **Create the app:** developers.facebook.com → My Apps → Create App → type
    **Business** → name "Tuned Yota DM". (Log in with the account that admins the
    Tuned Yota Facebook Page.)
