@@ -98,6 +98,32 @@ test("processDm: new sender -> new session id, chat called, reply delivered, own
   assert.match(refs.notified[0], /Pat K/);
 });
 
+test("handler logs one summary line per request: sig result, object, event kinds", () => withEnv(async () => {
+  const lines = [];
+  const log = (s) => lines.push(s);
+  await handler({ httpMethod: "POST", headers: { "x-hub-signature-256": sign(PAGE_EVENT) }, body: PAGE_EVENT },
+    { processDm: async () => ({}), notify: async () => {}, log });
+  assert.equal(lines.length, 1);
+  assert.match(lines[0], /sig=ok/);
+  assert.match(lines[0], /object=page/);
+  assert.match(lines[0], /events=1/);
+
+  await handler({ httpMethod: "POST", headers: { "x-hub-signature-256": "sha256=bad" }, body: PAGE_EVENT },
+    { processDm: async () => ({}), notify: async () => {}, log });
+  assert.match(lines[1], /sig=FAIL/);
+
+  // Zero processable events (read receipt): the kinds breakdown names the culprit.
+  const readOnly = JSON.stringify({ object: "page", entry: [{ messaging: [{ sender: { id: "P" }, read: { watermark: 1 } }] }] });
+  await handler({ httpMethod: "POST", headers: { "x-hub-signature-256": sign(readOnly) }, body: readOnly },
+    { processDm: async () => ({}), notify: async () => {}, log });
+  assert.match(lines[2], /events=0/);
+  assert.match(lines[2], /read/);
+
+  const g = [];
+  await handler({ httpMethod: "GET", queryStringParameters: { "hub.verify_token": "vt-1", "hub.challenge": "c" } }, { log: (s) => g.push(s) });
+  assert.match(g[0], /handshake ok/);
+}));
+
 test("processDm: existing active session reuses its id and does NOT re-notify", async () => {
   const { deps, refs } = bridgeDeps({ findActive: async () => ({ id: "fb:PSID9:1752800000000", turns: [{ role: "user", text: "hi", at: 1, mid: "m_0" }] }) });
   const chatCalls = [];

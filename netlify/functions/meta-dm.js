@@ -28,17 +28,36 @@ function normalizeEvents(payload) {
   return out;
 }
 
+// Compact per-request visibility: what kinds of messaging items the payload
+// held ("message:2,read:1"), so a webhook that arrives but yields zero events
+// is diagnosable from the function log alone (echo? read receipt? delivery?).
+function eventKinds(payload) {
+  const counts = {};
+  for (const entry of (payload && payload.entry) || []) {
+    for (const ev of entry.messaging || []) {
+      const kind = ev.message ? (ev.message.is_echo ? "echo" : "message") : Object.keys(ev).find((k) => !["sender", "recipient", "timestamp"].includes(k)) || "unknown";
+      counts[kind] = (counts[kind] || 0) + 1;
+    }
+  }
+  return Object.entries(counts).map(([k, n]) => `${k}:${n}`).join(",") || "none";
+}
+
 async function handler(event, deps = {}) {
   const env = process.env;
+  const log = deps.log || console.log;
   if (event.httpMethod === "GET") {
     const q = event.queryStringParameters || {};
     const tokenOk = !!env.META_VERIFY_TOKEN && secretEquals(String(q["hub.verify_token"] || ""), env.META_VERIFY_TOKEN);
+    log(`meta-dm GET handshake ${tokenOk ? "ok" : "FAIL"}`);
     return tokenOk ? { statusCode: 200, body: String(q["hub.challenge"] || "") } : { statusCode: 403, body: "forbidden" };
   }
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "method not allowed" };
   const headers = event.headers || {};
   const sig = headers["x-hub-signature-256"] || headers["X-Hub-Signature-256"] || "";
-  if (!verifySignature(event.body || "", sig, env.META_APP_SECRET)) return { statusCode: 403, body: "bad signature" };
+  if (!verifySignature(event.body || "", sig, env.META_APP_SECRET)) {
+    log("meta-dm POST sig=FAIL");
+    return { statusCode: 403, body: "bad signature" };
+  }
 
   const { processDm: processImpl = processDm, notify = (text) => notifyOwner({ webhookUrl: env.SLACK_WEBHOOK_URL, text }) } = deps;
   let payload = {};
@@ -48,6 +67,7 @@ async function handler(event, deps = {}) {
   // escape and break the always-200 guarantee.
   let events = [];
   try { events = normalizeEvents(payload); } catch (e) { console.error("meta-dm normalize", e.message); }
+  log(`meta-dm POST sig=ok object=${(payload && payload.object) || "?"} events=${events.length} kinds=${eventKinds(payload)}`);
   for (const evt of events) {
     try { await processImpl(evt, {}); }
     catch (e) {
