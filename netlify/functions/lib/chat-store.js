@@ -70,12 +70,12 @@ async function loadActiveByPrefix(prefix, { env = process.env, fetchImpl = fetch
   try {
     const recs = await listRecords({
       fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
-      filterByFormula: `AND(FIND("${p}", {Session ID}) = 1, {Status} != "closed")`,
+      filterByFormula: `AND(OR({Session ID}="${p}",FIND("${p}:", {Session ID})=1), {Status}!="closed")`,
       fields: ["Session ID", "Status", "Transcript", "Page Context", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Last Activity"],
     });
     if (!recs.length) return null;
-    const sessions = recs.map(fromRecord).sort((a, b) => (a.lastActivity < b.lastActivity ? 1 : -1));
-    return sessions[0];
+    const sessions = recs.map(fromRecord).filter((s) => s.status !== "closed").sort((a, b) => (a.lastActivity < b.lastActivity ? 1 : -1));
+    return sessions[0] || null;
   } catch (e) { return null; }
 }
 
