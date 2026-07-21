@@ -126,6 +126,54 @@ test("escalate: notify failures never throw; customer still gets installer info"
   assert.equal(r.installer.key, "aaron"); // unknown city → fallback installer
 });
 
+test("escalate: facebook pageContext → lead gets channel 'facebook' and source 'chat:facebook'", async () => {
+  let capturedLead;
+  await escalate({ transfer: { customerName: "Ty", contactMethod: "phone", contactValue: "5075550101",
+      vehicleMake: "Toyota", vehicleModel: "Tacoma", modelYear: "2019", city: "Rochester", state: "MN",
+      questionSummary: "fitment", reason: "no-answer" },
+    sess: { id: "s1", turns: [], pageContext: "facebook" } }, {
+    env: ENV, log: { error: () => {} },
+    ingest: async (b) => { capturedLead = b; return { ok: true }; },
+    sms: async () => ({}),
+    push: async () => ({}),
+    logEscalation: async () => {},
+  });
+  assert.equal(capturedLead.channel, "facebook");
+  assert.equal(capturedLead.source, "chat:facebook");
+});
+
+test("escalate: instagram pageContext → lead gets channel 'instagram' and source 'chat:instagram'", async () => {
+  let capturedLead;
+  await escalate({ transfer: { customerName: "Ty", contactMethod: "phone", contactValue: "5075550101",
+      vehicleMake: "Toyota", vehicleModel: "Tacoma", modelYear: "2019", city: "Rochester", state: "MN",
+      questionSummary: "fitment", reason: "no-answer" },
+    sess: { id: "s1", turns: [], pageContext: "instagram" } }, {
+    env: ENV, log: { error: () => {} },
+    ingest: async (b) => { capturedLead = b; return { ok: true }; },
+    sms: async () => ({}),
+    push: async () => ({}),
+    logEscalation: async () => {},
+  });
+  assert.equal(capturedLead.channel, "instagram");
+  assert.equal(capturedLead.source, "chat:instagram");
+});
+
+test("escalate: default pageContext → lead channel stays 'chat', source stays 'chat:widget'", async () => {
+  let capturedLead;
+  await escalate({ transfer: { customerName: "Ty", contactMethod: "phone", contactValue: "5075550101",
+      vehicleMake: "Toyota", vehicleModel: "Tacoma", modelYear: "2019", city: "Rochester", state: "MN",
+      questionSummary: "fitment", reason: "no-answer" },
+    sess: { id: "s1", turns: [], pageContext: "default" } }, {
+    env: ENV, log: { error: () => {} },
+    ingest: async (b) => { capturedLead = b; return { ok: true }; },
+    sms: async () => ({}),
+    push: async () => ({}),
+    logEscalation: async () => {},
+  });
+  assert.equal(capturedLead.channel, "chat");
+  assert.equal(capturedLead.source, "chat:widget");
+});
+
 test("escalate uses INSTALLER_SMS_NUMBERS override for the SMS destination", async () => {
   let smsTo;
   await escalate({ transfer: { customerName: "T", contactMethod: "phone", contactValue: "1", vehicleMake: "T",

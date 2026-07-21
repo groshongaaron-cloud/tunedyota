@@ -35,10 +35,13 @@ async function escalate({ transfer, sess }, deps) {
   const vehicle = `${transfer.modelYear} ${transfer.vehicleMake} ${transfer.vehicleModel}`;
   const contact = `${transfer.contactMethod}: ${transfer.contactValue}`;
   const transcriptTail = (sess.turns || []).slice(-12).map((t) => `${t.role}: ${t.text}`).join("\n");
+  const ctx = String(sess.pageContext || "");
+  const channel = ctx === "facebook" || ctx === "instagram" ? ctx : "chat";
+  const source = channel === "chat" ? "chat:widget" : "chat:" + channel;
   try {
     await ingest({ name: transfer.customerName, phone: transfer.contactMethod === "phone" ? transfer.contactValue : "",
       email: transfer.contactMethod === "email" ? transfer.contactValue : "",
-      channel: "chat", source: "chat:widget", city: transfer.city,
+      channel, source, city: transfer.city,
       vehicle, goals: transfer.questionSummary,
       message: `Chat escalation (${transfer.reason}). ${contact}\n--- transcript ---\n${transcriptTail}` });
   } catch (e) { if (log.error) log.error("chat lead", e.message); }
