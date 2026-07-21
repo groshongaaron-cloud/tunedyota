@@ -29,7 +29,8 @@ function installerForNumber(from, env) {
 async function relayInstallerReply({ from, text }, deps = {}) {
   const { env = process.env, log = console,
     findSession = (k) => loadEscalatedForInstaller(k, { env }),
-    save = (s) => saveSession(s, { env }) } = deps;
+    save = (s) => saveSession(s, { env }),
+    onInstallerTurn = require("./lib/meta-deliver.js").deliverInstallerTurn } = deps;
   const inst = installerForNumber(from, env);
   if (!inst) return { relayed: false };
   let sess = null;
@@ -39,6 +40,8 @@ async function relayInstallerReply({ from, text }, deps = {}) {
   if (!clean) return { relayed: false }; // blank/media-only texts fall through to normal handling
   sess.turns.push({ role: "installer", text: clean, at: Date.now() });
   try { await save(sess); } catch (e) { if (log.error) log.error("relay save", e.message); return { relayed: false }; }
+  const turn = sess.turns[sess.turns.length - 1];
+  try { Promise.resolve(onInstallerTurn(sess, turn, deps)).catch(() => {}); } catch (e) {}
   return { relayed: true };
 }
 

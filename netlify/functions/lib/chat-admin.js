@@ -34,7 +34,8 @@ async function getTranscript(sessionId, deps = {}) {
 }
 
 async function installerReply(sessionId, installerKey, text, deps = {}) {
-  const { loadFn = loadSession, saveFn = saveSession, now = Date.now } = deps;
+  const { loadFn = loadSession, saveFn = saveSession, now = Date.now,
+    onInstallerTurn = require("./meta-deliver.js").deliverInstallerTurn } = deps;
   const clean = String(text || "").trim().slice(0, 1000);
   if (!clean) return { status: "error", error: "empty" };
   const sess = await loadFn(sessionId, deps);
@@ -43,6 +44,8 @@ async function installerReply(sessionId, installerKey, text, deps = {}) {
   if (!sess.installer) sess.installer = installerKey; // claim unassigned
   sess.turns.push({ role: "installer", text: clean, at: now() });
   await saveFn(sess, deps);
+  const turn = sess.turns[sess.turns.length - 1];
+  try { Promise.resolve(onInstallerTurn(sess, turn, deps)).catch(() => {}); } catch (e) {}
   return { status: "ok", turnCount: sess.turns.length };
 }
 
