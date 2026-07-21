@@ -62,4 +62,21 @@ async function saveSession(sess, { env = process.env, fetchImpl = fetch, now = D
   return sess;
 }
 
-module.exports = { loadSession, loadEscalatedForInstaller, saveSession, parseTranscript, isStale, STALE_AI_MS, STALE_ESCALATED_MS, TABLE };
+// DM feeder: latest non-closed session for a sender (ids "fb:<PSID>" or
+// "fb:<PSID>:<ts>"). Best-effort: null on store failure — caller starts fresh.
+async function loadActiveByPrefix(prefix, { env = process.env, fetchImpl = fetch } = {}) {
+  const c = cfg(env);
+  const p = escapeFormula(String(prefix || ""));
+  try {
+    const recs = await listRecords({
+      fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
+      filterByFormula: `AND(FIND("${p}", {Session ID}) = 1, {Status} != "closed")`,
+      fields: ["Session ID", "Status", "Transcript", "Page Context", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Last Activity"],
+    });
+    if (!recs.length) return null;
+    const sessions = recs.map(fromRecord).sort((a, b) => (a.lastActivity < b.lastActivity ? 1 : -1));
+    return sessions[0];
+  } catch (e) { return null; }
+}
+
+module.exports = { loadSession, loadEscalatedForInstaller, loadActiveByPrefix, saveSession, parseTranscript, isStale, STALE_AI_MS, STALE_ESCALATED_MS, TABLE };
