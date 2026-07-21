@@ -21,7 +21,15 @@ fails closed until the env vars below exist. Owner does the Meta clicks; each
    Callback URL `https://tunedyota.com/.netlify/functions/meta-dm`, Verify token =
    the string from step 3 → Verify and save (the GET handshake must pass — env
    must be set FIRST). Subscribe the Page to the **messages** field.
-7. **Smoke test:** from a personal account, PM the Page. Expect: AI answer in
+7. **Data deletion callback (Meta requires it):** App Settings → Basic → **User
+   data deletion** → choose "Data deletion callback URL" and paste
+   `https://tunedyota.com/.netlify/functions/meta-data-deletion`
+   The endpoint (shipped 2026-07-21, `tests/meta-data-deletion.test.js`) verifies
+   Meta's `signed_request` against `META_APP_SECRET`, deletes every `fb:`/`ig:`
+   Chat Sessions row for that user, and returns the `{ url, confirmation_code }`
+   JSON the spec requires; the same URL doubles as the user-facing status page.
+   A store failure answers 500 and Slack-notifies, so Meta retries.
+8. **Smoke test:** from a personal account, PM the Page. Expect: AI answer in
    Messenger within seconds · Slack "New facebook DM" ping · ask for a human +
    give contact/vehicle/city → escalation SMS/push → session in the console
    Chats tab → reply from the console → reply appears in Messenger.
