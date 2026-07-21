@@ -97,7 +97,17 @@ async function processDm(evt, deps = {}) {
   }
 
   const reply = out.body && out.body.reply;
-  if (reply) { try { await send({ platform: evt.platform, recipientId: evt.senderId, text: reply }); } catch (e) {} }
+  if (reply) {
+    let sendOut;
+    try {
+      sendOut = await send({ platform: evt.platform, recipientId: evt.senderId, text: reply });
+    } catch (e) {
+      notify(`⚠ Meta DM reply send threw (${evt.platform} ${evt.senderId}): ${e.message}`).catch(() => {});
+    }
+    if (sendOut && !sendOut.ok && !sendOut.skipped) {
+      notify(`⚠ Meta DM reply send failed (${evt.platform} ${evt.senderId}): ${sendOut.error || "unknown"}`).catch(() => {});
+    }
+  }
 
   // Notify owner only on the first message of a new conversation.
   if (isNew) {

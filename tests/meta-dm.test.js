@@ -140,3 +140,21 @@ test("processDm: capped reply still gets delivered; empty reply sends nothing", 
   await processDm({ platform: "facebook", senderId: "P", mid: "m5", text: "x" }, d2.deps);
   assert.equal(d2.refs.sent.length, 0);
 });
+
+test("processDm: send returns {ok:false} -> send-failure alert fires AND new-DM notify fires", async () => {
+  const { deps, refs } = bridgeDeps();
+  deps.send = async () => ({ ok: false, error: "graph 500" });
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_alert1", text: "hi" }, deps);
+  const sendFail = refs.notified.filter((t) => /send.fail/i.test(t) || /reply.*fail/i.test(t) || /graph 500/.test(t));
+  assert.ok(sendFail.length >= 1, `expected a send-failure alert; notified=${JSON.stringify(refs.notified)}`);
+  const newDm = refs.notified.filter((t) => /New facebook DM/i.test(t));
+  assert.ok(newDm.length >= 1, `expected a new-DM notify; notified=${JSON.stringify(refs.notified)}`);
+});
+
+test("processDm: send returns {ok:false, skipped:true} -> NO send-failure alert", async () => {
+  const { deps, refs } = bridgeDeps();
+  deps.send = async () => ({ ok: false, skipped: true });
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_alert2", text: "hi" }, deps);
+  const sendFail = refs.notified.filter((t) => /send.fail/i.test(t) || /reply.*fail/i.test(t));
+  assert.equal(sendFail.length, 0, `should NOT alert on skipped; notified=${JSON.stringify(refs.notified)}`);
+});
