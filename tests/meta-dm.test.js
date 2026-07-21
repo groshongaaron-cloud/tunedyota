@@ -67,3 +67,76 @@ test("POST with valid signature always returns 200 even when processing throws",
     { processDm: async () => { throw new Error("boom"); }, notify: async () => {} });
   assert.equal(res.statusCode, 200);
 }));
+
+const { processDm } = require("../netlify/functions/meta-dm.js");
+
+function bridgeDeps(over = {}) {
+  const sent = [], notified = [], saved = [];
+  return {
+    refs: { sent, notified, saved },
+    deps: Object.assign({
+      env: { META_PAGE_TOKEN: "tok", SLACK_WEBHOOK_URL: "https://hooks.example" },
+      findActive: async () => null,
+      chat: async (body) => ({ status: 200, body: { reply: "Happy to help!", escalated: false } }),
+      send: async (args) => { sent.push(args); return { ok: true }; },
+      notify: async (text) => { notified.push(text); },
+      profile: async () => "Pat K",
+      now: () => 1752900000000,
+    }, over),
+  };
+}
+
+test("processDm: new sender -> new session id, chat called, reply delivered, owner notified once", async () => {
+  const { deps, refs } = bridgeDeps();
+  const chatCalls = [];
+  deps.chat = async (body) => { chatCalls.push(body); return { status: 200, body: { reply: "Yes we tune those!", escalated: false } }; };
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_1", text: "do you tune 4runners?" }, deps);
+  assert.deepEqual(chatCalls[0], { session: "fb:PSID9", message: "do you tune 4runners?", page: "facebook" });
+  assert.deepEqual(refs.sent[0], { platform: "facebook", recipientId: "PSID9", text: "Yes we tune those!" });
+  assert.equal(refs.notified.length, 1);
+  assert.match(refs.notified[0], /New facebook DM/i);
+  assert.match(refs.notified[0], /Pat K/);
+});
+
+test("processDm: existing active session reuses its id and does NOT re-notify", async () => {
+  const { deps, refs } = bridgeDeps({ findActive: async () => ({ id: "fb:PSID9:1752800000000", turns: [{ role: "user", text: "hi", at: 1, mid: "m_0" }] }) });
+  const chatCalls = [];
+  deps.chat = async (body) => { chatCalls.push(body); return { status: 200, body: { reply: "ok", escalated: true } }; };
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_2", text: "still there?" }, deps);
+  assert.equal(chatCalls[0].session, "fb:PSID9:1752800000000");
+  assert.equal(refs.notified.length, 0);
+});
+
+test("processDm: duplicate mid is skipped entirely", async () => {
+  const { deps, refs } = bridgeDeps({ findActive: async () => ({ id: "fb:PSID9", turns: [{ role: "user", text: "hi", at: 1, mid: "m_dup" }] }) });
+  let chatCalled = false;
+  deps.chat = async () => { chatCalled = true; return { status: 200, body: { reply: "x" } }; };
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_dup", text: "hi" }, deps);
+  assert.equal(chatCalled, false);
+  assert.equal(refs.sent.length, 0);
+});
+
+test("processDm: expired session re-mints a suffixed id and retries once", async () => {
+  const { deps, refs } = bridgeDeps();
+  const sessions = [];
+  deps.chat = async (body) => {
+    sessions.push(body.session);
+    return sessions.length === 1
+      ? { status: 200, body: { expired: true, reply: "" } }
+      : { status: 200, body: { reply: "fresh start", escalated: false } };
+  };
+  await processDm({ platform: "instagram", senderId: "IG7", mid: "m_3", text: "hey" }, deps);
+  assert.equal(sessions[0], "ig:IG7");
+  assert.equal(sessions[1], "ig:IG7:1752900000000");
+  assert.deepEqual(refs.sent[0], { platform: "instagram", recipientId: "IG7", text: "fresh start" });
+});
+
+test("processDm: capped reply still gets delivered; empty reply sends nothing", async () => {
+  const { deps, refs } = bridgeDeps();
+  deps.chat = async () => ({ status: 200, body: { reply: "We've covered a lot!", capped: true } });
+  await processDm({ platform: "facebook", senderId: "P", mid: "m4", text: "x" }, deps);
+  assert.equal(refs.sent.length, 1);
+  const d2 = bridgeDeps(); d2.deps.chat = async () => ({ status: 200, body: { reply: "", degraded: true } });
+  await processDm({ platform: "facebook", senderId: "P", mid: "m5", text: "x" }, d2.deps);
+  assert.equal(d2.refs.sent.length, 0);
+});
