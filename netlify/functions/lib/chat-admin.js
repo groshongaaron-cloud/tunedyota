@@ -46,7 +46,10 @@ async function installerReply(sessionId, installerKey, text, deps = {}) {
   sess.turns.push({ role: "installer", text: clean, at: now() });
   await saveFn(sess, deps);
   const turn = sess.turns[sess.turns.length - 1];
-  try { Promise.resolve(onInstallerTurn(sess, turn, deps)).catch(() => {}); } catch (e) {}
+  // MUST be awaited: Lambda freezes the container when the handler returns, so a
+  // fire-and-forget Graph send never completes. Failures stay non-fatal — the
+  // turn is already saved and meta-deliver Slack-notifies on its own.
+  try { await onInstallerTurn(sess, turn, deps); } catch (e) {}
   return { status: "ok", turnCount: sess.turns.length };
 }
 

@@ -13,6 +13,25 @@ test("relayInstallerReply appends installer turn to active escalated session", a
   assert.match(saved.turns[0].text, /yes it fits/);
 });
 
+test("relayInstallerReply awaits Meta delivery before returning (Lambda freezes un-awaited work)", async () => {
+  let delivered = false;
+  const r = await relayInstallerReply({ from: "+16124067117", text: "yes it fits" }, {
+    findSession: async () => ({ id: "fb:P1", recordId: "r", status: "escalated", turns: [], lastActivity: new Date().toISOString() }),
+    save: async (s) => s,
+    onInstallerTurn: async () => { await new Promise((res) => setTimeout(res, 20)); delivered = true; },
+  });
+  assert.equal(r.relayed, true);
+  assert.equal(delivered, true); // frozen mid-air if the relay returned first
+
+  // Delivery failure must not break the relay (turn already saved).
+  const r2 = await relayInstallerReply({ from: "+16124067117", text: "still on" }, {
+    findSession: async () => ({ id: "fb:P1", recordId: "r", status: "escalated", turns: [], lastActivity: new Date().toISOString() }),
+    save: async (s) => s,
+    onInstallerTurn: async () => { throw new Error("graph down"); },
+  });
+  assert.equal(r2.relayed, true);
+});
+
 test("relayInstallerReply passes through non-installer numbers and installers with no session", async () => {
   const r1 = await relayInstallerReply({ from: "+15079999999", text: "hi" }, { findSession: async () => null, save: async () => {} });
   assert.equal(r1.relayed, false);

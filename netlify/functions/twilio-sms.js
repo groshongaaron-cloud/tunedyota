@@ -42,7 +42,10 @@ async function relayInstallerReply({ from, text }, deps = {}) {
   sess.turns.push({ role: "installer", text: clean, at: Date.now() });
   try { await save(sess); } catch (e) { if (log.error) log.error("relay save", e.message); return { relayed: false }; }
   const turn = sess.turns[sess.turns.length - 1];
-  try { Promise.resolve(onInstallerTurn(sess, turn, deps)).catch(() => {}); } catch (e) {}
+  // MUST be awaited: Lambda freezes the container when the handler returns, so a
+  // fire-and-forget Graph send never completes. Failures stay non-fatal — the
+  // turn is already saved and meta-deliver Slack-notifies on its own.
+  try { await onInstallerTurn(sess, turn, deps); } catch (e) {}
   return { relayed: true };
 }
 

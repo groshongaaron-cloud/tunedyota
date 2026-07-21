@@ -47,6 +47,28 @@ test("installerReply refuses non-escalated and missing sessions", async () => {
   assert.deepEqual((await admin.installerReply("s1", "aaron", "   ", { env: ENV, loadFn: async () => SESS(), saveFn: async (s) => s })).error, "empty");
 });
 
+test("installerReply awaits Meta delivery before returning (Lambda freezes un-awaited work)", async () => {
+  let delivered = false;
+  const out = await admin.installerReply("fb:P1", "cody", "on it", {
+    env: ENV,
+    loadFn: async () => SESS({ id: "fb:P1" }),
+    saveFn: async (s) => s,
+    onInstallerTurn: async () => { await new Promise((r) => setTimeout(r, 20)); delivered = true; },
+  });
+  assert.equal(out.status, "ok");
+  assert.equal(delivered, true); // frozen mid-air if the reply returned first
+});
+
+test("installerReply still succeeds when delivery throws (turn is already saved)", async () => {
+  const out = await admin.installerReply("fb:P1", "cody", "on it", {
+    env: ENV,
+    loadFn: async () => SESS({ id: "fb:P1" }),
+    saveFn: async (s) => s,
+    onInstallerTurn: async () => { throw new Error("graph down"); },
+  });
+  assert.equal(out.status, "ok");
+});
+
 test("closeSession sets status closed", async () => {
   const saved = [];
   const out = await admin.closeSession("s1", { env: ENV, loadFn: async () => SESS(), saveFn: async (s) => { saved.push(s); return s; } });
