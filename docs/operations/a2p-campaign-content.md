@@ -33,6 +33,37 @@ throughput or reduced fees but need extra approvals.
 - **Number:** +1 612-406-7117
 - **Use case:** Customer Care (conversational + transactional). **Not** marketing.
 
+## STATUS 2026-07-20: v3 REJECTED (attempt 3, still 30886 only — confirmed via API).
+## Per the 3-attempt rule: escalate to Twilio SUPPORT TICKET (draft below), do NOT
+## blind-edit a 4th time. Suspected cause: "prospective customers" + sample 3's
+## proactive sales follow-up read as MARKETING inside a CUSTOMER_CARE campaign.
+
+## Twilio support ticket draft (file at help.twilio.com → Messaging → A2P 10DLC)
+> Subject: A2P 10DLC campaign rejected 3x with error 30886 only — request specific
+> guidance on USE_CASE_DESCRIPTION
+>
+> Account SID: AC470…3f6 (paste the full SID from the rejection email / Twilio Console — GitHub push protection bars committing it verbatim)
+> Messaging Service: MGec727e111aecde914cd2178a47c61830
+> Campaign: QE2c6890da8086d771620e9b13fadeba0b (TCR CMd54223c92466ff7e01967f327d3bb495)
+> Brand: BNc255951cb13aee286ebf5194c0b87e53 (approved/verified) · Use case: CUSTOMER_CARE
+>
+> Our campaign has been rejected three times. After fixing all other errors from the
+> first review (30893/30907/30909 resolved — website, CTA, and samples now pass), the
+> last two rejections cite ONLY error 30886 (invalid campaign description), most
+> recently on 2026-07-20 at 07:01 UTC. The current description states mechanically who
+> sends (Tuned Yota staff/installers from our registered business number), who receives
+> (customers who opted in via our web form with consent disclosure, by texting us
+> first, or by in-person request), and why (appointment confirmations/reminders,
+> scheduling and service follow-ups, replies to questions, installer-customer relay),
+> plus frequency, STOP/HELP, and a no-marketing statement.
+>
+> Could you tell us specifically which part of the USE_CASE_DESCRIPTION is failing
+> vetting? In particular: does the phrase "existing and prospective customers," or a
+> sample message offering appointment openings, conflict with the CUSTOMER_CARE use
+> case? We are happy to edit the description and samples to whatever the reviewer
+> needs — we would just like reviewer-level specifics rather than a fourth guess, and
+> a manual re-review once corrected.
+
 ## Campaign description (v3, filed 2026-07-20 — v2 was rejected w/ 30886; TCR wants
 ## WHO SENDS / WHO RECEIVES / WHY stated mechanically, not implied)
 > Tuned Yota (tunedyota.com) is a Toyota and Lexus vehicle-calibration business located
