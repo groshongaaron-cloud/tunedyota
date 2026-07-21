@@ -69,6 +69,20 @@ smoke (an undemonstrable permission risks the whole review).
 4. **Submit:** App Dashboard → **App Review → Permissions and Features** →
    `pages_messaging` → **Request Advanced Access** → attach the screencast +
    paste the two texts below.
+   Form gotchas learned 2026-07-21:
+   - **Trim the request cart to `pages_messaging` ONLY.** The dashboard flow
+     had auto-collected 7 extra permissions (oEmbed ×2, Marketing API tier,
+     pages_show_list, pages_manage_metadata, pages_utility_messaging,
+     business_management, pages_read_engagement) — each demands its own
+     screencast/test-call/justification and none is needed: we admin our own
+     Page, standard access covers everything except public messaging.
+   - **"0 of 1 API calls":** the form requires ≥1 successful Send API call,
+     registering with up to 24h lag. Any live bot reply counts; a manual
+     `POST /me/messages` into an open thread also works.
+   - **Tester account for the reviewer:** add a REAL Facebook account (not a
+     generated test user) as Tester in App Roles and put its login in the
+     form's test-credentials field, so the reviewer can DM the Page while the
+     app is in dev mode.
 5. **After approval:** re-run the §7 smoke from a NON-role account (borrow a
    friend's) — that's the real proof customers can reach the bot.
 
