@@ -53,6 +53,8 @@ keywords, STOP/HELP). Consent + opt-out disclosures live on `/privacy`, `/terms`
 chat widget, the SMS auto-reply, and the customer emails — see [SOP 1](sop-client-marketing.md) (marketing
 SMS = separate consent) and [SOP 2](sop-lead-tracking.md) (consent at phone capture).
 
+**Social DMs (Messenger / Instagram):** [Meta DM feeder activation](meta-dm-activation.md) — Messenger/IG webhook + AI chat go-live, phased (Phase A: Messenger in Dev Mode; Phase B: IG after Meta App Review), env registry, smoke-test checklist.
+
 ## The business at a glance
 
 ```
