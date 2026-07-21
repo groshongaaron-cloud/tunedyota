@@ -38,6 +38,15 @@ throughput or reduced fees but need extra approvals.
 ## blind-edit a 4th time. Suspected cause: "prospective customers" + sample 3's
 ## proactive sales follow-up read as MARKETING inside a CUSTOMER_CARE campaign.
 
+## STATUS 2026-07-21: v4 PREPARED, NOT FILED — waiting on the support ticket reply.
+## Pre-approved edits (only two changes vs v3, everything else byte-identical):
+##   1. Description WHO RECEIVES: drop "and prospective" → "existing Tuned Yota customers".
+##   2. Sample 3: proactive openings offer → follow-up to a customer-REQUESTED reschedule
+##      (see § Sample messages, v4 alternative under sample 3).
+## Submit: `netlify dev:exec node scripts/a2p-resubmit-v4.mjs` (dry run), then `--go`.
+## The script refuses to touch a campaign that is under review or already VERIFIED.
+## If support's reply asks for different wording, edit the script + this doc first.
+
 ## Twilio support ticket draft (file at help.twilio.com → Messaging → A2P 10DLC)
 > Subject: A2P 10DLC campaign rejected 3x with error 30886 only — request specific
 > guidance on USE_CASE_DESCRIPTION
@@ -107,9 +116,14 @@ throughput or reduced fees but need extra approvals.
    > Tuned Yota: You're confirmed for your OTT calibration install on Sat 8/16 at our
    > Rochester, MN event at 10:00 AM. Details: https://tunedyota.com. Reply here with any
    > questions. Reply STOP to opt out.
-3. *(scheduling follow-up)*
+3. *(scheduling follow-up — v3, REJECTED wording; kept for the support-ticket reference)*
    > Hi from Tuned Yota — following up on your Tundra tune. We have two openings at the
    > Sioux Falls event next weekend; want me to hold one for you? Reply STOP to opt out.
+
+   *(v4 alternative — responds to a reschedule the CUSTOMER requested; use this on resubmit)*
+   > Tuned Yota: Following up on the reschedule you requested — your Tundra calibration
+   > install is now Sat 8/23 at our Sioux Falls event at 10:00 AM. Reply here with any
+   > questions. Reply STOP to opt out.
 4. *(installer relay to the customer)*
    > Tuned Yota (Noah, your installer): Good question — the Med-Spicy tow calibration is a
    > great fit for your setup. Happy to walk you through it. Reply STOP to opt out.
