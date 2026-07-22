@@ -23,6 +23,16 @@ test("privacy + terms pages exist with the required SMS disclosures", () => {
   }
 });
 
+test("privacy + terms disclose the legal entity behind the Tuned Yota DBA", () => {
+  // Entity-matched filings (merchant boarding, app-store review) cross-check the
+  // public legal pages against the legal entity: 1st Minnesota Lending, LLC.
+  for (const f of ["privacy.html", "terms.html"]) {
+    const t = text(f);
+    assert.match(t, /Tuned Yota[\s\S]{0,60}(assumed name|DBA)[\s\S]{0,60}1st Minnesota Lending, LLC/i, `${f}: DBA disclosure`);
+    assert.match(t, /Minnesota limited liability company/i, `${f}: entity designation`);
+  }
+});
+
 test("privacy policy carries the mandatory no-sharing (opt-in) language", () => {
   const t = text("privacy.html");
   // The #1 A2P rejection reason: must state SMS opt-in data is not shared with third parties.
