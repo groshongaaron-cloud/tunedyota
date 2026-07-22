@@ -72,11 +72,18 @@ if (cur.json.campaign_status !== "FAILED") {
   process.exit(1);
 }
 
+// The edit endpoint demands the full content payload (HTTP 20001 otherwise).
+// These mirror the live v4 campaign byte-for-byte — the ONLY change is the URLs.
 const form = new URLSearchParams();
 form.append("TermsAndConditionsUrl", TERMS_URL);
 form.append("PrivacyPolicyUrl", PRIVACY_URL);
 form.append("AgeGated", "false");
 form.append("DirectLending", "false");
+form.append("Description", cur.json.description);
+form.append("MessageFlow", cur.json.message_flow);
+for (const s of cur.json.message_samples || []) form.append("MessageSamples", s);
+form.append("HasEmbeddedLinks", String(cur.json.has_embedded_links));
+form.append("HasEmbeddedPhone", String(cur.json.has_embedded_phone));
 
 const upd = await api(`${BASE}/${CAMPAIGN_SID}`, {
   method: "POST",
