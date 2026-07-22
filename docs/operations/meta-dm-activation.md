@@ -53,9 +53,9 @@ smoke (an undemonstrable permission risks the whole review).
 
 1. **Business Verification (start FIRST — it gates Advanced Access):**
    business.facebook.com → Settings → **Security Centre → Start Verification**.
-   Verify "Tuned Yota LLC" (legal name + address as on formation docs; a
-   utility bill / bank statement / EIN letter matching them works). Independent
-   of Apple's D-U-N-S wait.
+   Verify the business (legal entity: **1st Minnesota Lending, LLC** — "Tuned
+   Yota" is its DBA; use legal name + address as on formation docs; a utility
+   bill / bank statement / EIN letter matching them works). COMPLETED 2026-07-21.
 2. **Switch the app Live:** App Dashboard top bar → toggle **App Mode: Live**.
    (Reviewers must be able to test during review. Public DMs still won't flow
    until the permission is granted — expected.)

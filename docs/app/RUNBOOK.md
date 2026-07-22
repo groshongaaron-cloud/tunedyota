@@ -13,11 +13,15 @@ Do them in this order (roughly slowest-to-verify first).
 ---
 
 ## 1. Apple Developer Program  ⏳ (days — start FIRST)
-> **STATUS 2026-07-20:** Enrollment started as **Organization** ("Tuned Yota LLC"); Team ID
-> `YR2H93A5X7` already wired into the live AASA. **Blocked on the D-U-N-S / Dun & Bradstreet
-> report** Apple requested — the rest of this runbook resumes when it arrives. If D&B stalls
-> past ~2 weeks, apple.com/DUNS has an expedite path, or the Individual account type remains
-> the fast fallback (listing shows a personal name; can migrate to Organization later).
+> **STATUS 2026-07-21:** LEGAL ENTITY CORRECTED — the business's legal entity is
+> **1st Minnesota Lending, LLC** ("Tuned Yota" is its DBA; a separate "Tuned Yota LLC"
+> does not exist). D-U-N-S **03-502-7760** arrived 2026-07-21 for 1st Minnesota Lending.
+> The enrollment (Team ID `YR2H93A5X7`, already wired into the live AASA) was started
+> under the incorrect name "Tuned Yota LLC" → **contact Apple Developer Support to update
+> the pending enrollment's legal entity to "1st Minnesota Lending, LLC" + this D-U-N-S.**
+> Note: the App Store *seller* line will show the LLC name (Apple displays the D&B legal
+> name for Organizations); the app itself still displays as "Tuned Yota". If seller-line
+> branding matters, D&B can add "Tuned Yota" as a tradestyle on the D-U-N-S record.
 1. Go to **developer.apple.com/programs** → Enroll. Sign in with the Apple ID you want to own the app.
 2. Choose account type:
    - **Individual** — fastest (published as your personal name). Recommended to start.
