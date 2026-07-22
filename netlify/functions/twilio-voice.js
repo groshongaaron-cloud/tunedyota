@@ -3,7 +3,7 @@
 // Initial leg: log the call as a lead, ring all installer cells at once. Action leg:
 // answered -> note + hang up; unanswered -> greeting + record voicemail (transcribed).
 const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundCall, parseForwardNumbers,
-        dialTwiml, voicemailTwiml, hangupTwiml, GREETING, ingestLead } = require("./lib/twilio.js");
+        dialTwiml, voicemailTwiml, hangupTwiml, GREETING, ingestLead, getDialedCallTo } = require("./lib/twilio.js");
 
 async function handler(event, ctx = {}) {
   const env = ctx.env || process.env;
@@ -19,11 +19,29 @@ async function handler(event, ctx = {}) {
 
   // Dial-action leg: Twilio re-POSTs the action URL with DialCallStatus once the dial ends.
   if (params.DialCallStatus) {
-    if (params.DialCallStatus === "completed") {
+    // "completed" alone is NOT a real answer: a carrier voicemail that picks up
+    // and fails the press-1 screen still reports completed, with DialBridged=false.
+    const bridged = params.DialBridged !== "false";
+    if (params.DialCallStatus === "completed" && bridged) {
       try { await ingest(parseInboundCall(params, "call answered by installer")); } catch (e) { console.error("twilio-voice ingest failed (answered)", e && e.message); /* best-effort */ }
       return xml(hangupTwiml());
     }
-    return voicemail(); // no-answer / busy / failed / canceled
+    if (params.DialCallStatus === "completed" && !bridged && !/[?&]attempt=2\b/.test(event.rawUrl || "")) {
+      // An instant pickup ate the simultaneous ring (canceling everyone else's
+      // legs after ~2s) and failed screening. Give the OTHER lines a full ring.
+      const numbers = parseForwardNumbers(env);
+      const lookupTo = ctx.lookupTo || ((s) => getDialedCallTo(s, { env }));
+      let eater = "";
+      try { eater = await lookupTo(params.DialCallSid); } catch { /* best-effort */ }
+      const remaining = numbers.filter((n) => n !== eater);
+      if (remaining.length) {
+        try { await ingest(parseInboundCall(params, "instant pickup failed the press-1 screen (voicemail box?) — ringing remaining lines")); } catch (e) { console.error("twilio-voice ingest failed (redial)", e && e.message); /* best-effort */ }
+        const retryAction = url + (url.includes("?") ? "&" : "?") + "attempt=2";
+        return xml(dialTwiml(remaining, { timeout: 20, action: retryAction, callerId: params.To || "",
+          screenUrl: webhookUrl(event, env, "twilio-voice-screen") }));
+      }
+    }
+    return voicemail(); // no-answer / busy / failed / canceled / screen-rejected with nobody left
   }
 
   // Initial inbound leg:

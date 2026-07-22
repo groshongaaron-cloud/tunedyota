@@ -161,3 +161,10 @@ test("webhookUrl rewrites last path segment to fnName", () => {
     "https://x/.netlify/functions/twilio-voice-transcription"
   );
 });
+
+test("webhookUrl preserves the query string (Twilio signs the full URL)", () => {
+  assert.equal(T.webhookUrl({ rawUrl: "https://x/.netlify/functions/twilio-voice?attempt=2" }, {}, "twilio-voice"),
+    "https://x/.netlify/functions/twilio-voice?attempt=2");
+  assert.equal(T.webhookUrl({ rawUrl: "https://x/.netlify/functions/twilio-voice?attempt=2" }, { TWILIO_PUBLIC_BASE: "https://p" }, "twilio-voice"),
+    "https://p/.netlify/functions/twilio-voice?attempt=2");
+});

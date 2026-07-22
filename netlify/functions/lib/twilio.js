@@ -22,12 +22,17 @@ function decodeBody(event) {
   return params;
 }
 
+// Twilio signs the FULL request URL including the query string, so the query
+// must survive into the rebuilt URL or signature validation fails.
 function webhookUrl(event, env, fnName) {
-  const base = env && env.TWILIO_PUBLIC_BASE;
-  if (base) return `${String(base).replace(/\/$/, "")}/.netlify/functions/${fnName}`;
   const raw = (event && event.rawUrl) || "";
+  const qi = raw.indexOf("?");
+  const query = qi >= 0 ? raw.slice(qi) : "";
+  const base = env && env.TWILIO_PUBLIC_BASE;
+  if (base) return `${String(base).replace(/\/$/, "")}/.netlify/functions/${fnName}${query}`;
   if (!raw) return "";
-  return raw.replace(/([^/]+)$/, fnName);
+  const path = qi >= 0 ? raw.slice(0, qi) : raw;
+  return path.replace(/([^/]+)$/, fnName) + query;
 }
 
 // Formats US 10-digit numbers only; non-US or short input is passed through as-is.
@@ -149,6 +154,21 @@ async function ingestLead(body, deps = {}) {
   } catch (e) { return { ok: false, error: e.message }; }
 }
 
+// Which number did a <Dial> child leg ring? Used after a press-1 screen
+// rejection to exclude the instant-pickup line (a voicemail box) from the
+// redial. Best-effort: "" on any failure means "exclude nothing".
+async function getDialedCallTo(callSid, deps = {}) {
+  const { env = process.env, fetchImpl = fetch } = deps;
+  const sid = env.TWILIO_ACCOUNT_SID, token = env.TWILIO_AUTH_TOKEN;
+  if (!sid || !token || !callSid) return "";
+  try {
+    const res = await fetchImpl(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Calls/${encodeURIComponent(callSid)}.json`,
+      { headers: { Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64") } });
+    if (!res.ok) return "";
+    return (await res.json()).to || "";
+  } catch { return ""; }
+}
+
 // Outbound SMS via the Twilio REST API. Best-effort: returns {ok:false} on any
 // missing config or network error — callers must never break on notify failure.
 // A2P: when TWILIO_MESSAGING_SERVICE_SID is set, sends go through the Messaging
@@ -176,4 +196,4 @@ async function sendSms({ to, body }, deps = {}) {
 
 module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers,
   escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, screenTwiml, acceptTwiml, GREETING, SCREEN_PROMPT,
-  parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms, smsKeywordType };
+  parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms, smsKeywordType, getDialedCallTo };
