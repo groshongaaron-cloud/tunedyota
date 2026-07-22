@@ -104,3 +104,43 @@ test("completed with DialBridged=true -> real answer, notes + hangs up", async (
   assert.match(res.body, /<Hangup\/>/);
   assert.equal(ingested[0].message, "call answered by installer");
 });
+
+// --- assigned-installer call routing (CRM Installer field drives the ring) ---
+
+test("caller with an assigned installer -> rings only that installer, action tagged routed=1", async () => {
+  const ingested = [];
+  const res = await handler(evt("From=%2B12185551234&To=%2B16124067117"),
+    { env: { TWILIO_FORWARD_NUMBERS: "+16126557611" }, verify: () => true,
+      ingest: async (b) => { ingested.push(b); return { ok: true }; },
+      lookupInstaller: async (p) => (p === "+12185551234" ? "noah" : "") });
+  assert.match(res.body, /<Number [^>]*>\+19208607050<\/Number>/);
+  assert.doesNotMatch(res.body, /\+16126557611</);
+  assert.match(res.body, /action="[^"]*twilio-voice\?routed=1"/);
+  assert.match(ingested[0].message, /routed to assigned installer noah/);
+});
+
+test("installer lookup failing/empty -> default forward numbers, plain action URL", async () => {
+  const res = await handler(evt("From=%2B12185551234&To=%2B16124067117"),
+    { env: { TWILIO_FORWARD_NUMBERS: "+16126557611" }, verify: () => true,
+      ingest: async () => ({ ok: true }), lookupInstaller: async () => { throw new Error("airtable down"); } });
+  assert.match(res.body, /<Number [^>]*>\+16126557611<\/Number>/);
+  assert.match(res.body, /action="https:\/\/tunedyota\.com\/\.netlify\/functions\/twilio-voice"/);
+});
+
+test("routed call not answered -> falls back to the default lines as attempt 2", async () => {
+  const ingested = [];
+  const res = await handler(evt("From=%2B12185551234&DialCallStatus=no-answer",
+    { rawUrl: "https://tunedyota.com/.netlify/functions/twilio-voice?routed=1" }),
+    { env: { TWILIO_FORWARD_NUMBERS: "+16126557611" }, verify: () => true,
+      ingest: async (b) => { ingested.push(b); return { ok: true }; } });
+  assert.match(res.body, /<Number [^>]*>\+16126557611<\/Number>/);
+  assert.match(res.body, /action="[^"]*twilio-voice\?routed=1&amp;attempt=2"/);
+  assert.match(ingested[0].message, /assigned installer did not answer/);
+});
+
+test("routed fallback also unanswered (attempt 2) -> business voicemail", async () => {
+  const res = await handler(evt("From=%2B12185551234&DialCallStatus=no-answer",
+    { rawUrl: "https://tunedyota.com/.netlify/functions/twilio-voice?routed=1&attempt=2" }),
+    { env: { TWILIO_FORWARD_NUMBERS: "+16126557611" }, verify: () => true, ingest: async () => ({ ok: true }) });
+  assert.match(res.body, /<Record transcribe="true"/);
+});

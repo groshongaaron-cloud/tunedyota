@@ -2,7 +2,7 @@
 // Pure logic for the multi-channel lead tracker. No I/O — dependencies are injected
 // so this unit-tests in Node and runs in Netlify functions unchanged.
 const { getMarket } = require("./markets.js");
-const { keyToInstaller } = require("./routing.js");
+const { keyToInstaller, normalizeInstallerKey } = require("./routing.js");
 const { cfg, createRecord, updateRecord, createTolerant, updateTolerant, listAllRecords } = require("./airtable.js");
 
 const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "chat", "other", "ott-national"];
@@ -173,11 +173,33 @@ function dueLeads(leads, todayISO) {
   return out;
 }
 
+// Which installer owns the ACTIVE lead for this phone number? Powers inbound
+// call routing: assigned clients ring their installer directly. Fail-open ("")
+// on any miss/error — the caller must never be dropped because Airtable was slow.
+async function installerKeyForPhone(phone, deps = {}) {
+  const { env = process.env, fetchImpl = fetch,
+          list = (a) => listAllRecords({ fetchImpl, ...a }) } = deps;
+  const pKey = normalizePhone(phone);
+  const c = cfg(env);
+  if (!pKey || !c.token || !c.baseId) return "";
+  let rows = [];
+  try { rows = await list({ token: c.token, baseId: c.baseId, table: c.priority }); }
+  catch { return ""; }
+  const matches = rows.filter((r) => {
+    const f = r.fields || {};
+    if (!ACTIVE_STAGES.includes(f.Stage || "New")) return false;
+    return f.Installer && normalizePhone(f.Phone) === pKey;
+  });
+  matches.sort((a, b) => String((b.fields || {})["Last Modified"] || b.createdTime || "")
+    .localeCompare(String((a.fields || {})["Last Modified"] || a.createdTime || "")));
+  return matches.length ? normalizeInstallerKey(matches[0].fields.Installer) : "";
+}
+
 module.exports = {
   CHANNELS, STAGES, ACTIVE_STAGES,
   validChannel, validStage,
   normalizeChannel, normalizePhone, normalizeEmail,
   toLeadView, scopeLeads,
   logLine, appendActivity, processLeadIngest,
-  applyLeadUpdate, dueLeads,
+  applyLeadUpdate, dueLeads, installerKeyForPhone,
 };
