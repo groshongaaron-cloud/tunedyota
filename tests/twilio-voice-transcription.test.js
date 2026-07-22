@@ -27,3 +27,24 @@ test("empty transcription still returns 200 (best-effort)", async () => {
     { env: {}, verify: () => true, ingest: async () => { throw new Error("down"); } });
   assert.equal(res.statusCode, 200);
 });
+
+test("voicemail Slack-pings the owner with caller, transcript, and recording link", async () => {
+  const pings = [];
+  const res = await handler(evt("From=%2B16125551234&TranscriptionText=Call+me+about+my+Tacoma&RecordingUrl=https%3A%2F%2Frec%2F1"),
+    { env: { SLACK_WEBHOOK_URL: "https://hooks/x" }, verify: () => true,
+      ingest: async () => ({ ok: true }),
+      notify: async (o) => { pings.push(o); return { ok: true }; } });
+  assert.equal(res.statusCode, 200);
+  assert.equal(pings.length, 1);
+  assert.match(pings[0].text, /voicemail/i);
+  assert.match(pings[0].text, /\(612\)/);
+  assert.match(pings[0].text, /Call me about my Tacoma/);
+  assert.match(pings[0].text, /https:\/\/rec\/1/);
+});
+
+test("Slack failure never breaks the 200 response", async () => {
+  const res = await handler(evt("From=%2B16125551234&TranscriptionText=hi"),
+    { env: { SLACK_WEBHOOK_URL: "https://hooks/x" }, verify: () => true,
+      ingest: async () => ({ ok: true }), notify: async () => { throw new Error("slack down"); } });
+  assert.equal(res.statusCode, 200);
+});
