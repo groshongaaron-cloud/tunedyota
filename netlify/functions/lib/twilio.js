@@ -63,16 +63,32 @@ function smsReplyTwiml(text) {
 }
 
 function dialTwiml(numbers, opts = {}) {
-  const { timeout = 20, action = "", callerId = "" } = opts;
+  const { timeout = 20, action = "", callerId = "", screenUrl = "" } = opts;
   const attrs = [
     `timeout="${Number.isFinite(+timeout) ? timeout : 20}"`,
     `answerOnBridge="true"`,
     action ? `action="${escapeXml(action)}"` : "",
     callerId ? `callerId="${escapeXml(callerId)}"` : "",
   ].filter(Boolean).join(" ");
-  const nums = (numbers || []).map((n) => `<Number>${escapeXml(n)}</Number>`).join("");
+  const numAttr = screenUrl ? ` url="${escapeXml(screenUrl)}"` : "";
+  const nums = (numbers || []).map((n) => `<Number${numAttr}>${escapeXml(n)}</Number>`).join("");
   return `${XML}<Response><Dial ${attrs}>${nums}</Dial></Response>`;
 }
+
+// Whisper played to whoever (or whatever) answers a forwarded leg. A human
+// presses 1 and bridges; a carrier voicemail can't press, so the Gather times
+// out into <Hangup/> and the leg counts as unanswered — the Dial action then
+// falls through to OUR voicemail instead of the installer's personal mailbox.
+const SCREEN_PROMPT = "Tuned Yota customer call. Press 1 to accept.";
+function screenTwiml(opts = {}) {
+  const { action = "", voice = "Polly.Matthew-Neural" } = opts;
+  const act = action ? ` action="${escapeXml(action)}" method="POST"` : "";
+  return `${XML}<Response><Gather${act} numDigits="1" timeout="5">` +
+    `<Say voice="${escapeXml(voice)}">${escapeXml(SCREEN_PROMPT)}</Say></Gather><Hangup/></Response>`;
+}
+
+// Empty response from a <Number url> flow = proceed and bridge the call.
+function acceptTwiml() { return `${XML}<Response/>`; }
 
 function voicemailTwiml(opts = {}) {
   const { greeting = GREETING, voice = "Polly.Matthew-Neural", transcribeCallback = "", maxLength = 120 } = opts;
@@ -159,5 +175,5 @@ async function sendSms({ to, body }, deps = {}) {
 }
 
 module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers,
-  escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, GREETING,
+  escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, screenTwiml, acceptTwiml, GREETING, SCREEN_PROMPT,
   parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms, smsKeywordType };

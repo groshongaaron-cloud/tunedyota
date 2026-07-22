@@ -14,7 +14,8 @@ test("inbound call (no DialCallStatus) -> ingests + dials all forward numbers", 
   assert.equal(res.statusCode, 200);
   assert.match(res.body, /<Dial [^>]*timeout="20"/);
   assert.match(res.body, /callerId="\+16124067117"/);
-  assert.match(res.body, /<Number>\+1611<\/Number><Number>\+1622<\/Number><Number>\+1633<\/Number>/);
+  const screen = 'url="https://tunedyota\\.com/\\.netlify/functions/twilio-voice-screen"';
+  assert.match(res.body, new RegExp(`<Number ${screen}>\\+1611</Number><Number ${screen}>\\+1622</Number><Number ${screen}>\\+1633</Number>`));
   assert.equal(ingested[0].channel, "phone");
   assert.equal(ingested[0].message, "inbound call");
 });

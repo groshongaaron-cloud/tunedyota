@@ -30,7 +30,8 @@ async function handler(event, ctx = {}) {
   try { await ingest(parseInboundCall(params, "inbound call")); } catch (e) { console.error("twilio-voice ingest failed (inbound)", e && e.message); /* best-effort */ }
   const numbers = parseForwardNumbers(env);
   if (!numbers.length) return voicemail();
-  return xml(dialTwiml(numbers, { timeout: 20, action: url, callerId: params.To || "" }));
+  return xml(dialTwiml(numbers, { timeout: 20, action: url, callerId: params.To || "",
+    screenUrl: webhookUrl(event, env, "twilio-voice-screen") }));
 }
 
 module.exports = { handler };
