@@ -37,7 +37,7 @@ test("voicemail Slack-pings the owner with caller, transcript, and recording lin
   assert.equal(res.statusCode, 200);
   assert.equal(pings.length, 1);
   assert.match(pings[0].text, /voicemail/i);
-  assert.match(pings[0].text, /\(612\)/);
+  assert.match(pings[0].text, /612-555-1234/);
   assert.match(pings[0].text, /Call me about my Tacoma/);
   assert.match(pings[0].text, /https:\/\/rec\/1/);
 });
