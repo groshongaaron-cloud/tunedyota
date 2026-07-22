@@ -1309,7 +1309,21 @@
     var body=document.createElement('div'); body.className='ebody';
     var row=document.createElement('div'); row.className='walkmini';
     function act(label,fn){ var b=document.createElement('button'); b.className='btn'; b.textContent=label; b.onclick=fn; return b; }
-    if(l.phone){ row.appendChild(linkBtn('Call','tel:'+l.phone)); row.appendChild(linkBtn('Text','sms:'+l.phone)); }
+    if(l.phone){
+      row.appendChild(linkBtn('Call','tel:'+l.phone)); row.appendChild(linkBtn('Text','sms:'+l.phone));
+      // Click-to-call through the business line: rings YOUR cell first (shows the
+      // TY number), press 1, then it dials the client showing the TY number.
+      row.appendChild(act('Call as TY',async function(ev){
+        var b=ev.target; b.disabled=true; b.textContent='Calling…';
+        try{
+          var r=await fetch('/.netlify/functions/twilio-call-out',{method:'POST',
+            headers:{'Content-Type':'application/json','x-installer-token':tok()},
+            body:JSON.stringify({to:l.phone,name:l.name})});
+          b.textContent=r.ok?'☎ Ringing you — press 1':'Call failed';
+        }catch(e){ b.textContent='Call failed'; }
+        setTimeout(function(){ b.textContent='Call as TY'; b.disabled=false; },8000);
+      }));
+    }
     if(l.email){ row.appendChild(linkBtn('Email','mailto:'+l.email)); }
     body.appendChild(row);
     var stagesRow=document.createElement('div'); stagesRow.className='walkmini';
