@@ -256,7 +256,7 @@ test("site/installer.html LEAD_STAGES literal includes Qualified between Contact
 
 test("installerKeyForPhone matches active leads across phone formats, newest first", async () => {
   const rows = [
-    { createdTime: "2026-07-01T00:00:00Z", fields: { Phone: "218-555-1234", Installer: "cody", Stage: "Booked" } },
+    { createdTime: "2026-07-01T00:00:00Z", fields: { Phone: "218-555-1234", Installer: "cody", Stage: "Not now" } },
     { createdTime: "2026-07-10T00:00:00Z", fields: { Phone: "+12185551234", Installer: "noah", Stage: "Qualified" } },
     { createdTime: "2026-07-05T00:00:00Z", fields: { Phone: "2185551234", Installer: ["Noah - Milwaukee, Green Bay, Kohler, "], Stage: "New" } },
   ];
@@ -267,10 +267,16 @@ test("installerKeyForPhone matches active leads across phone formats, newest fir
 
 test("installerKeyForPhone: no active assigned match or no Airtable config -> empty string", async () => {
   assert.equal(await L.installerKeyForPhone("+12185551234", { env: {}, list: async () => { throw new Error("no"); } }), "");
-  const inactive = [{ fields: { Phone: "+12185551234", Installer: "cody", Stage: "Booked" } }];
+  const inactive = [{ fields: { Phone: "+12185551234", Installer: "cody", Stage: "Not now" } }];
   assert.equal(await L.installerKeyForPhone("+12185551234",
     { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, list: async () => inactive }), "");
   const unassigned = [{ fields: { Phone: "+12185551234", Stage: "New" } }];
   assert.equal(await L.installerKeyForPhone("+12185551234",
     { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, list: async () => unassigned }), "");
+});
+
+test("installerKeyForPhone routes Booked clients to their installer", async () => {
+  const rows = [{ fields: { Phone: "+12185551234", Installer: "cody", Stage: "Booked" } }];
+  assert.equal(await L.installerKeyForPhone("+12185551234",
+    { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, list: async () => rows }), "cody");
 });

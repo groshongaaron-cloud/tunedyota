@@ -185,9 +185,12 @@ async function installerKeyForPhone(phone, deps = {}) {
   let rows = [];
   try { rows = await list({ token: c.token, baseId: c.baseId, table: c.priority }); }
   catch { return ""; }
+  // Booked counts here (unlike lead-dedupe): a booked client calling in should
+  // reach their installer. Only "Not now" leads fall back to the default ring.
+  const routable = [...ACTIVE_STAGES, "Booked"];
   const matches = rows.filter((r) => {
     const f = r.fields || {};
-    if (!ACTIVE_STAGES.includes(f.Stage || "New")) return false;
+    if (!routable.includes(f.Stage || "New")) return false;
     return f.Installer && normalizePhone(f.Phone) === pKey;
   });
   matches.sort((a, b) => String((b.fields || {})["Last Modified"] || b.createdTime || "")
