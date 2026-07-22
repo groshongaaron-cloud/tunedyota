@@ -91,3 +91,39 @@ text customers must be reflected there before it ships.
 **On approval day:** paste the Messaging Service SID into `TWILIO_MESSAGING_SERVICE_SID`,
 set the branded opt-out/HELP responses in the Messaging Service's Opt-Out Management
 (copy in docs/operations/a2p-campaign-content.md), then run the §6 smoke tests.
+
+---
+
+## 8. Voice call flow — as shipped 2026-07-22
+
+**Inbound (`twilio-voice` + `twilio-voice-screen`):**
+1. Caller is matched against Priority List by phone (last-10 digits, any format).
+   Newest routable lead (active stages **+ Booked**; "Not now" excluded) with an
+   `Installer` set → rings **that installer's cell** (`?routed=1`). No match →
+   rings `TWILIO_FORWARD_NUMBERS` (currently Aaron only — dispatch model). The
+   Airtable lookup fails OPEN to the default ring; a slow CRM never drops a call.
+2. Whoever answers hears **"Tuned Yota customer call. Press 1 to accept."**
+   Press 1 → bridged. A carrier voicemail can't press, so that leg hangs up —
+   this is what keeps personal mailboxes from eating business calls.
+3. A routed miss or a screen-rejected instant pickup gets ONE retry on the
+   default lines (`?attempt=2`, instant-pickup number excluded via
+   `getDialedCallTo`). `DialCallStatus=completed` counts as answered **only**
+   with `DialBridged=true` — that's what the CRM "call answered by installer"
+   note means.
+4. Exhausted → business voicemail: greeting → recording → **async transcription
+   (~1–2 min lag)** → folded into the caller's lead + 📞 Slack ping
+   (caller, transcript, recording link) to the Tunedyota Alerts DM.
+
+**Outbound — click-to-call (`twilio-call-out` + `twilio-call-bridge`):**
+"Call as TY" on a console lead card → the installer's OWN cell rings first
+(showing the business number) → press 1 → the client is dialed showing
+**612-406-7117**. Attempt is logged on the lead. Auth = installer token; the
+client number rides the Twilio-signed `?to=` callback URL. Plain `tel:` links
+remain for personal-number calls.
+
+**Caller reputation:** SHAKEN/STIR A-attestation enabled 2026-07-22 (number
+attached to the Trust Hub Customer Profile + SHAKEN product — profile FIRST,
+then product, and use the BU… product SID not the RN… policy SID). Free Caller
+Registry remediation submitted 2026-07-22 for the "Scam Likely" tag. If it
+persists past ~2026-07-30, escalate via First Orion's calltransparency portal.
+CNAM ("TUNED YOTA" display name) is the remaining optional trust product.

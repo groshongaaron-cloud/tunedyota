@@ -272,3 +272,20 @@ Regular installers never see the admin dropdown or the AMSOIL panel.
 
 **Related:** [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 6 Field Guide](sop-installer-field-guide.md) ·
 [SOP 5 Priority Waitlist](sop-priority-waitlist.md) · [SOP 9 Monthly OTT Report](sop-monthly-ott-report.md)
+
+---
+
+## 10. Phones — answering and calling as Tuned Yota (live 2026-07-22)
+
+**Answering:** business calls ring your cell showing **612-406-7117** and start
+with *"Tuned Yota customer call. Press 1 to accept."* Press 1 and you're live
+with the caller — so answer speaking-ready. If you can't take it, just don't
+press 1: the caller falls to the Tuned Yota voicemail, and the transcript lands
+on their lead plus a Slack ping. Your clients ring YOU directly once their lead
+is assigned to you.
+
+**Calling out:** on any lead card, use **Call as TY** — your cell rings first
+(from the business number), press 1, then the client's phone rings showing the
+business number, never your personal one. The call is logged on the lead
+automatically. The plain **Call** link still dials from your personal number if
+you ever need that.

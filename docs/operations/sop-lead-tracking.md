@@ -154,3 +154,16 @@ outstanding Priority List backlog, grouped by location + installer. Work that li
 - [ ] No `ty-flagged` thread goes unread past the day it was flagged.
 
 **Related:** [SOP 1 Marketing](sop-client-marketing.md) · [SOP 3 Booking](sop-event-booking.md) · [SOP 5 Priority Waitlist](sop-priority-waitlist.md)
+
+---
+
+## 9. Phone routing follows lead assignment (live 2026-07-22)
+
+Setting the **Installer** field on a lead does more than dispatch: from that
+moment, **inbound calls from that client's number ring that installer's cell
+directly** (Booked clients included; "Not now" leads go back to the default
+ring). The dispatch loop: call/voicemail arrives → lead lands Unassigned →
+Aaron assigns Installer in the console → the installer works it with
+**Call as TY** (client sees the business number, attempt auto-logged) → all
+future inbound calls from that client route straight to them. Keep phone
+numbers on leads accurate — the match is by phone number only.
