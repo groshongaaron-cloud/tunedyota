@@ -17,8 +17,9 @@ Do them in this order (roughly slowest-to-verify first).
 > **1st Minnesota Lending, LLC** ("Tuned Yota" is its DBA; a separate "Tuned Yota LLC"
 > does not exist). D-U-N-S **03-502-7760** arrived 2026-07-21 for 1st Minnesota Lending.
 > The enrollment (Team ID `YR2H93A5X7`, already wired into the live AASA) was started
-> under the incorrect name "Tuned Yota LLC" → **contact Apple Developer Support to update
-> the pending enrollment's legal entity to "1st Minnesota Lending, LLC" + this D-U-N-S.**
+> under the incorrect name "Tuned Yota LLC" → entity-correction request FILED with Apple
+> Developer Support 2026-07-21, **case ID 102948524602**; on Apple's confirmation,
+> complete the enrollment with this D-U-N-S.
 > Note: the App Store *seller* line will show the LLC name (Apple displays the D&B legal
 > name for Organizations); the app itself still displays as "Tuned Yota". If seller-line
 > branding matters, D&B can add "Tuned Yota" as a tradestyle on the D-U-N-S record.
