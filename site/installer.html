@@ -1636,7 +1636,8 @@
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+(b.scheduledTime?esc(b.scheduledTime)+' · ':'')+esc(b.name)+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
-      (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'');
+      (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'')+
+      (b.pcm?'<div class="ffnote" style="color:#1f4e79;border-color:#b7cfe8;background:#eef4fb">🔧 PCM '+esc(b.pcm.pcm)+(b.pcm.fid?' · '+esc(b.pcm.fid):'')+(b.pcm.throttle?' · start: '+esc(b.pcm.throttle):'')+(b.pcm.note?' — '+esc(b.pcm.note):'')+'</div>':'');
     var overdue = isOpen(b) && b.dateISO < STATE.today;
     if(overdue){ head += '<div class="ffnote">⚠ Not closed out — this customer has no certificate yet. Close it out (VIN + calibration) to send it.</div>'; }
     if(b.status==='Completed'){

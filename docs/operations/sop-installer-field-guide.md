@@ -123,3 +123,58 @@ into the right day/OTT month. Full detail: [Playbook §3](installer-dashboard-pl
 - [ ] **Needs close-out** section is empty and **⏳ pending sync** shows nothing (all uploaded).
 
 **Related:** [Installer Dashboard Playbook](installer-dashboard-playbook.md) · [SOP 4 Close-Out](sop-event-closeout.md) · [SOP 3 Booking](sop-event-booking.md)
+
+---
+
+## 7. PCM flash protocol selection (OTT Protocol Selection Guide, transcribed 2026-07-22)
+
+Source of truth: `Dropbox/Overland Tailor 3rd Party Calibrators/Instructions/Protocol
+Selection Guide.pdf`. The console day view and the roster email show each booking's
+protocol automatically (the 🔧 PCM line / PCM Flash column) — this table is the
+reference behind that, and the fallback if you're working off paper.
+
+| Vehicle | Years | PCM Flash | Bitbox | Software | Max throttle to start |
+|---|---|---|---|---|---|
+| Tacoma 2.7L | 2005–2015 | **[35]** | FID 24 | PCM Flash (Tactrix) | medium |
+| Tacoma 4.0L | 2005–2015 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild |
+| Tacoma 3.5L | 2016–2023 | **[46]** | FID 27 | PCM Flash (Tactrix) | lite/medium AT · mild MT |
+| Tacoma 2.7L | 2016–2023 | **[46]** | FID 28 | PCM Flash (Tactrix) | medium |
+| Tacoma 2.4L-T | 2024+ | **[95]** | — | VFTuner (WiFlash) | enhanced |
+| 4Runner | 2003–2004 | **[35] K-Line** | — | PCM Flash (Tactrix), K-Line | medium |
+| 4Runner | 2005–2009 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild |
+| 4Runner 4.0L/4.7L | 2010–2019 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild |
+| 4Runner 4.0L | 2020–2024 | **[46]** | FID 28 | PCM Flash (Tactrix) | mild |
+| 4Runner 2.4L-T | 2025+ | **[95]** | — | VFTuner (WiFlash) | enhanced |
+| FJ Cruiser 4.0L | 2007–2014 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild |
+| Tundra 4.0L | 2007–2013 | **[35]** | FID 24 | PCM Flash (Tactrix) | medium |
+| Tundra 4.7L | 2005–2009 | **[35]** | FID 24 | PCM Flash (Tactrix) | medium |
+| Tundra 5.7L | 2007–2017 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild/medium |
+| Tundra 4.6L | 2018–2019 | **[35]** | FID 24 | PCM Flash (Tactrix) | medium |
+| Tundra 5.7L | 2018–2021 | **[46]** | FID 28 | PCM Flash (Tactrix) | mild/medium |
+| Tundra 3.5T HV (V35A) | 2022+ | **[95]** | — | VFTuner (WiFlash) | TBD |
+| Sequoia 4.7L | 2006–2009 | **[35]** | FID 24 | PCM Flash (Tactrix) | medium |
+| Sequoia 5.7L | 2008–2017 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild/medium |
+| Sequoia 4.6L | (4.6 years) | **[35]** | FID 24 | PCM Flash (Tactrix) | mild/medium |
+| Sequoia 5.7L | 2018–2022 | **[46]** | FID 28 | PCM Flash (Tactrix) | mild/medium |
+| Sequoia 3.5T HV | 2023+ | **[95]** | — | VFTuner (WiFlash) | TBD |
+| Land Cruiser / LX470 4.7L | 2006–2007 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild/medium |
+| Land Cruiser / LX570 5.7L | 2008–2015 | **[35]** | FID 24 | PCM Flash (Tactrix) | mild/medium |
+| Land Cruiser / LX570 5.7L | 2016–2021 | **[46]** | FID 28 | PCM Flash (Tactrix) | mild/medium |
+| LC 250 2.4L-T | 2024+ | **[95]** | — | VFTuner (WiFlash) | enhanced |
+| GX470 | 2003–2004 | **[35] K-Line** | — | PCM Flash (Tactrix), K-Line | medium |
+| GX470 | 2005–2009 | **[35]** | FID 24 | PCM Flash (Tactrix) | medium |
+| GX460 | 2010–2024 | **[35]** | FID 24 | PCM Flash (Tactrix) | medium |
+| GX550 | 2022+ | **[95]** | — | VFTuner (WiFlash) | TBD |
+
+**Handling notes (these surface automatically on the itinerary when they apply):**
+
+- **2013–2019 4Runner:** the TCM must be flashed **separately** from the PCM.
+- **[95] Gen-4 turbo platforms** (2022+ Tundra/Sequoia/GX550, 2024+ Tacoma/LC 250,
+  2025+ 4Runner): **ECU direct-connect cable required.** If the VFT file isn't
+  available, read the ECU with PCM Flash (Tactrix) and place the file into Dropbox.
+- **2003–2004 4Runner/GX470 (K-Line):** CUW takes ~45 minutes; TCU flashed separately.
+- VFT module names: [35] = Toyota Gen 1 496k/736k/992k CAN · [46] = Toyota Gen 2
+  1.5/2.0 MB CAN ([46] FID 27 = P5-CAN, FID 28 = CAN-bus) · [95] = Toyota Gen 4
+  3.5L/2.4L Turbo (P5-UDS).
+- If the console shows "confirm engine" (booking didn't capture displacement), check
+  the engine on-site before choosing between the listed protocols.

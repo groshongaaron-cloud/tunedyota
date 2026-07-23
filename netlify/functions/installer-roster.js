@@ -7,6 +7,7 @@ const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { formatSlot } = require("./lib/slots.js");
 const { flexFuelNote } = require("./lib/flex-fuel.js");
+const { pcmProtocol } = require("./lib/pcm-protocol.js");
 const { getAllActiveEvents } = require("./lib/events.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
@@ -61,6 +62,7 @@ async function buildRoster(deps) {
       name: f.Name || "", vehicle: f.Vehicle || "", phone: f.Phone || "", email: f.Email || "",
       mods: f.Modifications || "", modelYear: f["Model Year"] || "", status: f.Status || "Booked",
       flexFuelNote: flexFuelNote(f.Vehicle),   // Policy 0011 day-of reminder for Tundras
+      pcm: pcmProtocol(f.Vehicle, f["Model Year"]),  // OTT Protocol Selection Guide flash protocol
       isWalkin: /^(intake|installer):walk-in/i.test(src),
       ott: /(^|[:\s])ott-/i.test(src),
       calibration: f["OTT Calibration"] || "", vin: f.VIN || "",
