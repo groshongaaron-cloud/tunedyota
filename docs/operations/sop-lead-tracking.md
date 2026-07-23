@@ -168,3 +168,21 @@ Aaron assigns Installer in the console → the installer works it with
 everything auto-logged on the lead; SMS live as of the 2026-07-22 A2P approval) →
 all future inbound calls from that client route straight to them. Keep phone
 numbers on leads accurate — the match is by phone number only.
+
+---
+
+## 10. The Priority List in the console + deleting leads (2026-07-22)
+
+**Where installers see the waitlist:** the console's **Leads tab** IS the Priority
+List — same Airtable table, scoped to your own market (admin sees all, with an
+installer filter). Search matches name, vehicle, phone, **city**, and channel —
+so "omaha" pulls that market's waitlist, per SOP 4's reach-out-first step. Leads
+group by stage with overdue follow-ups (⏰) sorted first; every card carries
+Message / Call as TY / stage moves / follow-up dates / contact log / convert.
+
+**Deleting a lead (permanent):** the 🗑 Delete button on a lead card removes the
+record from Airtable — no undo. Policy: **delete is for spam, duplicates, and
+test records only.** A real person who isn't interested goes to **"Not now"**,
+which keeps the contact history and keeps them matchable if they call back
+(phone routing and SMS threads match on the lead's phone number). Installers can
+delete their own market's leads; admin can delete any.

@@ -301,3 +301,20 @@ only by the small badge (📱💬📘📸). The AI answers customers who text in
 it stays out of conversations YOU start. Etiquette: text between 8 AM and 9 PM
 in the client's time zone; after hours, draft it (the compose box keeps your
 draft) and send in the morning.
+
+---
+
+## 11. The Leads tab = your Priority List (2026-07-22)
+
+The Leads tab is the priority waitlist, live: your market's leads grouped by
+stage (New → Contacted → Qualified → Following up → Booked → Not now), overdue
+follow-ups sorted to the top with ⏰. The search box matches name, vehicle,
+phone, **city**, and channel — type a city (e.g. "omaha") to pull that event's
+waitlist for outreach. Each card is the full toolkit: **Message** (business-line
+text), **Call as TY**, stage buttons, follow-up quick-picks, a contact-note log,
+and **convert to booking** with a date picker that suggests your market's
+upcoming events.
+
+**🗑 Delete** permanently removes a lead — spam, duplicates, and test records
+only. Real people who aren't interested go to **"→ Not now"** instead: it keeps
+their history, and their number still routes to you if they ever call back.
