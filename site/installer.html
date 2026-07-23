@@ -1415,7 +1415,14 @@
     [['Today',0],['Tomorrow',1],['+3d',3],['+1wk',7]].forEach(function(p){ fu.appendChild(act('Follow-up '+p[0],function(){ leadUpdate(l.id,{action:'setFollowup',date:addDays(STATE.today,p[1])}); })); });
     body.appendChild(fu);
     var note=mkInput('Log a contact note'); var logb=act('Log contact',function(){ leadUpdate(l.id,{action:'logContact',note:note.value}); });
-    var mini=document.createElement('div'); mini.className='walkmini'; mini.appendChild(note); mini.appendChild(logb); body.appendChild(mini);
+    // Permanent delete — spam/dupes/test records only; real "not interested"
+    // people go to Not now so the history survives.
+    var delBtn=act('🗑 Delete',function(){
+      if(!confirm('Permanently delete this lead ('+(l.name||'unnamed')+')? This cannot be undone.\n\nUse "→ Not now" instead for real people who are not interested.')) return;
+      leadUpdate(l.id,{action:'delete'});
+    });
+    delBtn.style.color='#8a2a2a';
+    var mini=document.createElement('div'); mini.className='walkmini'; mini.appendChild(note); mini.appendChild(logb); mini.appendChild(delBtn); body.appendChild(mini);
     // Convert with a real schedule: date + optional exact time, with a quick-pick of
     // this market's upcoming events (choosing one sets the date → the booking lands
     // on that event's roster). Available to every installer on their own leads.
@@ -1442,7 +1449,7 @@
     try{
       var res=await fetch('/.netlify/functions/lead-update',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(Object.assign({id:id},payload))});
       var out=await res.json().catch(function(){return{};});
-      if(res.ok && out.status==='ok'){ succeed(payload.action==='convert'?'✓ Converted to a booking.':'✓ Updated.'); loadLeads(); }
+      if(res.ok && out.status==='ok'){ succeed(payload.action==='convert'?'✓ Converted to a booking.':(payload.action==='delete'?'✓ Lead deleted.':'✓ Updated.')); loadLeads(); }
       else { fail('Could not update: '+(out.error||res.status)); }
     }catch(e){ fail('Network error — try again.'); }
   }

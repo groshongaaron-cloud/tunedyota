@@ -1,9 +1,9 @@
 // netlify/functions/lead-update.js
-// Mutate one lead: setStage / logContact / setFollowup / reassign (admin) / convert.
+// Mutate one lead: setStage / logContact / setFollowup / reassign (admin) / convert / delete.
 // Ownership is enforced by the lead's Installer (a regular installer may only touch
 // their own; admin may touch any + reassign). `convert` creates a Bookings record
 // (walk-in-style, any date) and links it back to the lead.
-const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant } = require("./lib/airtable.js");
+const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant, deleteRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { toLeadView, applyLeadUpdate, logLine, appendActivity } = require("./lib/leads.js");
 const { getMarket } = require("./lib/markets.js");
@@ -31,6 +31,15 @@ async function handler(event, ctx = {}) {
   const lead = toLeadView(rec);
   if (!admin && (lead.installer || "") !== key) return { statusCode: 400, body: JSON.stringify({ error: "not-your-market" }) };
   if (action === "reassign" && !admin) return { statusCode: 400, body: JSON.stringify({ error: "admin-only" }) };
+
+  // Permanent removal — for spam, duplicates, and test records. Real people who
+  // aren't interested belong in "Not now" (history preserved), not deleted.
+  if (action === "delete") {
+    const deleteImpl = ctx.deleteImpl || ((a) => deleteRecord({ ...a }));
+    try { await deleteImpl({ token: c.token, baseId: c.baseId, table: c.priority, id }); }
+    catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
+    return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", deleted: true }) };
+  }
 
   if (action === "convert") {
     const dateISO = String(body.dateISO || "").trim() || new Date(now).toISOString().slice(0, 10);

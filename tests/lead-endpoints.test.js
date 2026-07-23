@@ -166,3 +166,24 @@ test("convert without a time leaves Scheduled Time unset", async () => {
       updateImpl: async (a) => ({ id: a.id }) });
   assert.equal("Scheduled Time" in booking, false);
 });
+
+test("lead-update delete: removes the record; non-owner blocked; admin allowed", async () => {
+  const { handler } = require("../netlify/functions/lead-update.js");
+  const ENV = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b",
+    INSTALLER_TOKENS: JSON.stringify({ cody: "tok-cody", aaron: "tok-aaron" }), INSTALLER_ADMINS: "aaron" };
+  const rec = { id: "recX", fields: { Name: "Spam Bot", Installer: "cody", Stage: "New" } };
+  const deleted = [];
+  const deps = { env: ENV, getImpl: async () => rec, deleteImpl: async (a) => { deleted.push(a.id); } };
+  // owner deletes own lead
+  const ok = await handler({ headers: { "x-installer-token": "tok-cody" }, body: JSON.stringify({ id: "recX", action: "delete" }) }, deps);
+  assert.equal(ok.statusCode, 200);
+  assert.deepEqual(deleted, ["recX"]);
+  // non-owner (another non-admin) blocked
+  const ENV2 = { ...ENV, INSTALLER_TOKENS: JSON.stringify({ noah: "tok-noah" }) };
+  const no = await handler({ headers: { "x-installer-token": "tok-noah" }, body: JSON.stringify({ id: "recX", action: "delete" }) },
+    { env: ENV2, getImpl: async () => rec, deleteImpl: async () => { throw new Error("should not delete"); } });
+  assert.equal(no.statusCode, 400);
+  // admin deletes anyone's
+  const adm = await handler({ headers: { "x-installer-token": "tok-aaron" }, body: JSON.stringify({ id: "recX", action: "delete" }) }, deps);
+  assert.equal(adm.statusCode, 200);
+});
