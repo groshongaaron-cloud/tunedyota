@@ -8,6 +8,9 @@ function bySlot(a, b) { return String(a.Slot || "").localeCompare(String(b.Slot 
 
 function renderRosterEmail(event, bookings, waitlist) {
   const evLabel = `${event.city}, ${event.state || ""} · ${event.label || event.dateISO}`;
+  // Event-aware start time: derive from the event's slot window when it has one
+  // (e.g. a 10-to-noon event), else the historical 9:00 AM default.
+  const startLabel = `${event.firstSlot ? formatSlot(event.firstSlot) : "9:00 AM"} start`;
   const subject = `Tuned Yota — ${event.city} Roster · ${event.label || event.dateISO}`;
   const sorted = (bookings || []).slice().sort(bySlot);
 
@@ -58,12 +61,12 @@ function renderRosterEmail(event, bookings, waitlist) {
   const html =
     `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:680px">` +
     `<h2 style="color:#5B4B42;margin:0 0 2px">${esc(evLabel)}</h2>` +
-    `<p style="color:#7c8472;margin:0 0 12px">9:00 AM start${event.address ? ` · ${esc(event.address)}` : ""} · ${sorted.length} booked</p>` +
+    `<p style="color:#7c8472;margin:0 0 12px">${esc(startLabel)}${event.address ? ` · ${esc(event.address)}` : ""} · ${sorted.length} booked</p>` +
     `<table style="border-collapse:collapse;font-size:14px"><tr>${th}</tr>${trs}</table>` +
     flexHtml + pcmHtml + wlHtml + (hasWaitlist ? reasonKeyHtml() : "") + `</div>`;
 
   const text =
-    `${evLabel}\n9:00 AM start${event.address ? ` · ${event.address}` : ""}\n\n` +
+    `${evLabel}\n${startLabel}${event.address ? ` · ${event.address}` : ""}\n\n` +
     (bodyRows.length ? bodyRows.map((r) => r.join("  |  ")).join("\n") : "No bookings yet.") +
     flexText + pcmText +
     `\n\nPriority waitlist:\n` + ((waitlist || []).map((w) => `- ${w.Name || ""} ${w.Phone || w.Email || ""}${w.Reason ? ` (${w.Reason})` : ""}`).join("\n") || "None.") +

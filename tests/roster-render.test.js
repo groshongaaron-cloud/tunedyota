@@ -60,3 +60,14 @@ test("roster shows the Reason key legend only when there is a waitlist", () => {
   assert.doesNotMatch(noWl.html, /Reason key/);   // no legend when nothing to decode
   assert.doesNotMatch(noWl.text, /REASON KEY:/);
 });
+
+test("roster header derives the start time from the event's slot window", () => {
+  const { renderRosterEmail } = require("../netlify/functions/lib/roster-render.js");
+  const windowed = renderRosterEmail({ city: "Omaha", state: "NE", dateISO: "2026-07-26", label: "July 26, 2026", firstSlot: "10:00" }, [], []);
+  assert.match(windowed.html, /10:00 AM start/);
+  assert.doesNotMatch(windowed.html, /9:00 AM start/);
+  assert.match(windowed.text, /10:00 AM start/);
+  assert.doesNotMatch(windowed.text, /9:00 AM start/);
+  const plain = renderRosterEmail({ city: "Omaha", state: "NE", dateISO: "2026-10-31", label: "October 31, 2026" }, [], []);
+  assert.match(plain.html, /9:00 AM start/);
+});
