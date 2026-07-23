@@ -14,7 +14,7 @@ test("inbound call (no DialCallStatus) -> ingests + dials all forward numbers", 
   assert.equal(res.statusCode, 200);
   assert.match(res.body, /<Dial [^>]*timeout="20"/);
   assert.match(res.body, /callerId="\+16124067117"/);
-  const screen = 'url="https://tunedyota\\.com/\\.netlify/functions/twilio-voice-screen"';
+  const screen = 'url="https://tunedyota\\.com/\\.netlify/functions/twilio-voice-screen\\?caller=%2B16125551234"';
   assert.match(res.body, new RegExp(`<Number ${screen}>\\+1611</Number><Number ${screen}>\\+1622</Number><Number ${screen}>\\+1633</Number>`));
   assert.equal(ingested[0].channel, "phone");
   assert.equal(ingested[0].message, "inbound call");
@@ -71,6 +71,7 @@ test("completed but DialBridged=false (attempt 1) -> redials others, excluding t
   assert.match(res.body, /action="[^"]*twilio-voice\?attempt=2"/);
   assert.match(res.body, /<Number [^>]*>\+1611<\/Number><Number [^>]*>\+1633<\/Number>/);
   assert.doesNotMatch(res.body, /\+1622</);
+  assert.match(res.body, /twilio-voice-screen\?caller=%2B16125551234/);
   assert.match(ingested[0].message, /voicemail box/);
 });
 

@@ -21,6 +21,12 @@ async function handler(event, ctx = {}) {
 
   const xml = (body) => ({ statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body });
   const voicemail = () => xml(voicemailTwiml({ greeting: GREETING, transcribeCallback: webhookUrl(event, env, "twilio-voice-transcription") }));
+  // The screen leg's From is our callerId, so the customer's number rides along
+  // as ?caller= for the whisper. webhookUrl may already carry ?routed/?attempt.
+  const screenUrl = (() => {
+    const base = webhookUrl(event, env, "twilio-voice-screen");
+    return base + (base.includes("?") ? "&" : "?") + "caller=" + encodeURIComponent(params.From || "");
+  })();
 
   // Dial-action leg: Twilio re-POSTs the action URL with DialCallStatus once the dial ends.
   if (params.DialCallStatus) {
@@ -52,7 +58,7 @@ async function handler(event, ctx = {}) {
         try { await ingest(parseInboundCall(params, note)); } catch (e) { console.error("twilio-voice ingest failed (redial)", e && e.message); /* best-effort */ }
         const retryAction = url + (url.includes("?") ? "&" : "?") + "attempt=2";
         return xml(dialTwiml(remaining, { timeout: 20, action: retryAction, callerId: params.To || "",
-          screenUrl: webhookUrl(event, env, "twilio-voice-screen") }));
+          screenUrl }));
       }
     }
     return voicemail(); // no-answer / busy / failed / canceled / screen-rejected with nobody left
@@ -70,7 +76,7 @@ async function handler(event, ctx = {}) {
   const targets = assigned ? [assigned] : numbers;
   const action = assigned ? `${url}?routed=1` : url;
   return xml(dialTwiml(targets, { timeout: 20, action, callerId: params.To || "",
-    screenUrl: webhookUrl(event, env, "twilio-voice-screen") }));
+    screenUrl }));
 }
 
 module.exports = { handler };

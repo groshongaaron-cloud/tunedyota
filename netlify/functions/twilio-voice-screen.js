@@ -18,7 +18,12 @@ async function handler(event, ctx = {}) {
   if (params.Digits !== undefined) {
     return xml(params.Digits === "1" ? acceptTwiml() : hangupTwiml());
   }
-  return xml(screenTwiml({ action: url }));
+  // The original caller's number rides in as ?caller= (this leg's From is the
+  // business callerId, not the customer). webhookUrl keeps the query, so the
+  // Gather action round-trips it and signatures stay valid.
+  let caller = "";
+  try { caller = new URL(event.rawUrl || "").searchParams.get("caller") || ""; } catch { /* no query */ }
+  return xml(screenTwiml({ action: url, caller }));
 }
 
 module.exports = { handler };

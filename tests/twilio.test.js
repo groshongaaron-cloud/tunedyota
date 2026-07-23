@@ -75,6 +75,20 @@ test("dialTwiml rings every number with timeout + action + callerId", () => {
   assert.match(x, /<Number>\+1612<\/Number><Number>\+1651<\/Number>/);
 });
 
+test("screenTwiml with a caller number speaks the digits before press-1", () => {
+  const x = T.screenTwiml({ action: "https://a/x", caller: "+16125551234" });
+  assert.match(x, /Tuned Yota customer call from 6 1 2\. 5 5 5\. 1 2 3 4\. Press 1 to accept\./);
+});
+
+test("screenTwiml with a non-US caller falls back to plain spaced digits", () => {
+  const x = T.screenTwiml({ action: "https://a/x", caller: "+4420719460" });
+  assert.match(x, /from 4 4 2 0 7 1 9 4 6 0\. Press 1 to accept\./);
+});
+
+test("screenTwiml without a caller keeps the generic prompt", () => {
+  assert.match(T.screenTwiml({ action: "https://a/x" }), /Tuned Yota customer call\. Press 1 to accept\./);
+});
+
 test("voicemailTwiml says the greeting in a Polly voice then records with transcription", () => {
   const x = T.voicemailTwiml({ greeting: T.GREETING, transcribeCallback: "https://a/t" });
   assert.match(x, /<Say voice="Polly\.Matthew-Neural">/);

@@ -14,6 +14,14 @@ test("answered leg (no Digits) -> gather with press-1 whisper, hangup fallback",
   assert.match(res.body, /<\/Gather><Hangup\/>/);
 });
 
+test("answered leg with ?caller= -> whisper announces the caller's number", async () => {
+  const res = await handler(evt("CallSid=CA123&From=%2B16124067117",
+    { rawUrl: "https://tunedyota.com/.netlify/functions/twilio-voice-screen?caller=%2B16125551234" }),
+    { env: {}, verify: () => true });
+  assert.match(res.body, /from 6 1 2\. 5 5 5\. 1 2 3 4\. Press 1 to accept/);
+  assert.match(res.body, /<Gather action="[^"]*twilio-voice-screen\?caller=%2B16125551234" method="POST"/);
+});
+
 test("pressed 1 -> empty response bridges the call", async () => {
   const res = await handler(evt("CallSid=CA123&Digits=1"), { env: {}, verify: () => true });
   assert.match(res.body, /<Response\/>/);

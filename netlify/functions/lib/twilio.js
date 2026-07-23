@@ -85,11 +85,27 @@ function dialTwiml(numbers, opts = {}) {
 // out into <Hangup/> and the leg counts as unanswered — the Dial action then
 // falls through to OUR voicemail instead of the installer's personal mailbox.
 const SCREEN_PROMPT = "Tuned Yota customer call. Press 1 to accept.";
+
+// Digit-by-digit rendering so Polly reads a phone number, not a large integer.
+// US numbers get 3-3-4 groups with sentence pauses between them.
+function spokenPhone(e164) {
+  const raw = String(e164 == null ? "" : e164).trim();
+  const d = raw.replace(/\D/g, "");
+  if (!d) return "";
+  const spaced = (s) => s.split("").join(" ");
+  const nanp = /^(\+?1)?\d{10}$/.test(raw.replace(/[\s().-]/g, ""));
+  if (!nanp) return spaced(d);
+  const us = d.slice(-10);
+  return `${spaced(us.slice(0, 3))}. ${spaced(us.slice(3, 6))}. ${spaced(us.slice(6))}`;
+}
+
 function screenTwiml(opts = {}) {
-  const { action = "", voice = "Polly.Matthew-Neural" } = opts;
+  const { action = "", voice = "Polly.Matthew-Neural", caller = "" } = opts;
   const act = action ? ` action="${escapeXml(action)}" method="POST"` : "";
+  const spoken = spokenPhone(caller);
+  const prompt = spoken ? `Tuned Yota customer call from ${spoken}. Press 1 to accept.` : SCREEN_PROMPT;
   return `${XML}<Response><Gather${act} numDigits="1" timeout="5">` +
-    `<Say voice="${escapeXml(voice)}">${escapeXml(SCREEN_PROMPT)}</Say></Gather><Hangup/></Response>`;
+    `<Say voice="${escapeXml(voice)}">${escapeXml(prompt)}</Say></Gather><Hangup/></Response>`;
 }
 
 // Empty response from a <Number url> flow = proceed and bridge the call.
