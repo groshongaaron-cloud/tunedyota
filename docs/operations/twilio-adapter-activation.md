@@ -88,9 +88,14 @@ text customers must be reflected there before it ships.
    meaning (30034 unregistered-A2P, 30007 carrier-filtered, …). `sendSms` auto-attaches
    `StatusCallback` whenever `TWILIO_PUBLIC_BASE`/`URL` is available.
 
-**On approval day:** paste the Messaging Service SID into `TWILIO_MESSAGING_SERVICE_SID`,
-set the branded opt-out/HELP responses in the Messaging Service's Opt-Out Management
-(copy in docs/operations/a2p-campaign-content.md), then run the §6 smoke tests.
+**A2P APPROVED 2026-07-22 (attempt 6).** Root cause of five prior 30886 rejections: the
+TCR brand's business_name is the legal entity "1st Minnesota Lending, LLC" and no
+description mentioned Tuned Yota's DBA relationship — the winning description opens by
+declaring it. Approval-day steps DONE same night: `TWILIO_MESSAGING_SERVICE_SID` set +
+deployed (all sends route through the campaign), first campaign SMS delivered, hourly
+status watcher disabled, its scoped API key revoked. STILL OPEN: branded opt-out/HELP
+responses in the Messaging Service's Opt-Out Management (Console; copy in
+docs/operations/a2p-campaign-content.md) and the §6 smoke tests.
 
 ---
 
@@ -127,3 +132,25 @@ then product, and use the BU… product SID not the RN… policy SID). Free Call
 Registry remediation submitted 2026-07-22 for the "Scam Likely" tag. If it
 persists past ~2026-07-30, escalate via First Orion's calltransparency portal.
 CNAM ("TUNED YOTA" display name) is the remaining optional trust product.
+
+---
+
+## 9. SMS chat threads — as shipped 2026-07-22 (spec: docs/superpowers/specs/2026-07-22-sms-chat-threads-design.md)
+
+SMS is a first-class chat channel (`sms:+1…` sessions beside `fb:`/`ig:`/web):
+
+- **Inbound customer text** → STOP/HELP keyword guard (Twilio Advanced Opt-Out
+  replies; our webhook stays silent) → installer-cell relay check → the text
+  routes into the client's chat session and **the AI answers with full
+  Messenger parity**. The old canned auto-reply survives only as the degraded/
+  failure fallback. Lead ingest unchanged.
+- **Installer-initiated threads** (console lead card → **Message**) are
+  human-only (`pageContext: "sms-direct"`) — the AI never speaks in them. New
+  threads prefill a self-identifying first message.
+- **Outbound turns** deliver via `sendSms` through the Messaging Service; a
+  send failure appends a visible system note in the thread + Slack ping.
+- **Console Chats tab** renders every channel as iMessage-style bubble threads
+  (channel badges 💬📘📸📱, needs-reply dots, Enter-to-send).
+- **Quiet hours:** business texting window is 8 AM–9 PM recipient local time —
+  draft after hours if you must (drafts persist in the compose box), send in
+  the window.

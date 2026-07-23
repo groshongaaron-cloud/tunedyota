@@ -45,7 +45,9 @@ Every Monday, when the rebook report arrives:
 
 1. Schedule the event (SOP 7) so the city becomes bookable.
 2. Pull that city's Priority List rows and reach out **first**, before public marketing — they
-   asked first and fill slots fastest.
+   asked first and fill slots fastest. Use the console lead card's **Message** (business-line
+   text thread, prefilled intro, auto-logged) or **Call as TY** (both sides see the business
+   number) — see the Installer Dashboard Playbook §10. Text within 8 AM–9 PM client-local time.
 3. Convert them via `/intake.html` (Book) or by sending them to `/find-your-exact-tune`.
 
 ---

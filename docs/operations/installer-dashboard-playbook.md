@@ -289,3 +289,15 @@ is assigned to you.
 business number, never your personal one. The call is logged on the lead
 automatically. The plain **Call** link still dials from your personal number if
 you ever need that.
+
+**Texting (live 2026-07-22, A2P-approved):** on any lead card, use **Message** —
+it opens that client's conversation in the **Chats tab**, prefilled with a
+self-identifying first line ("Hi Alec, it's Cody with Tuned Yota about your
+Tacoma — "). Finish it, hit Enter; the client gets a normal text from the
+business number and their replies come back into the same bubble thread with a
+push notification. Every exchange logs to the lead on its own. The Chats tab is
+one inbox for every channel — text, web chat, Messenger, Instagram — told apart
+only by the small badge (📱💬📘📸). The AI answers customers who text in first;
+it stays out of conversations YOU start. Etiquette: text between 8 AM and 9 PM
+in the client's time zone; after hours, draft it (the compose box keeps your
+draft) and send in the morning.

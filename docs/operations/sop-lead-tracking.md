@@ -164,6 +164,7 @@ moment, **inbound calls from that client's number ring that installer's cell
 directly** (Booked clients included; "Not now" leads go back to the default
 ring). The dispatch loop: call/voicemail arrives → lead lands Unassigned →
 Aaron assigns Installer in the console → the installer works it with
-**Call as TY** (client sees the business number, attempt auto-logged) → all
-future inbound calls from that client route straight to them. Keep phone
+**Call as TY** and **Message** (client sees only the business number on both;
+everything auto-logged on the lead; SMS live as of the 2026-07-22 A2P approval) →
+all future inbound calls from that client route straight to them. Keep phone
 numbers on leads accurate — the match is by phone number only.
