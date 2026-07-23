@@ -86,6 +86,8 @@ function eventFromAirtableFields(f = {}) {
     event: s(f.Event),
     details: s(f.Details),
     address: s(f.Address),
+    firstSlot: s(f["First Slot"]),
+    lastSlot: s(f["Last Slot"]),
   };
 }
 

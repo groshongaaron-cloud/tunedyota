@@ -24,7 +24,7 @@ module.exports = {
   ],
   "omaha": [
     { dateISO: "2026-06-28", label: "June 28, 2026", active: false, event: "Omaha, Nebraska Summer 2026 OTT Event", details: "", address: "7337 L St., Omaha, NE 68127" },
-    { dateISO: "2026-07-26", label: "July 26, 2026", active: true, event: "Omaha, Nebraska July 2026 OTT Event", details: "10:00 AM – 12:00 PM", address: "7337 L St., Omaha, NE 68127" },
+    { dateISO: "2026-07-26", label: "July 26, 2026", active: true, event: "Omaha, Nebraska July 2026 OTT Event", details: "10:00 AM – 12:00 PM", address: "7337 L St., Omaha, NE 68127", firstSlot: "10:00", lastSlot: "11:40" },
     { dateISO: "2026-10-31", label: "October 31, 2026", active: true, event: "Omaha, Nebraska Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-03-27", label: "March 27, 2027", active: true, event: "Omaha, Nebraska Spring 2027 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-06-26", label: "June 26, 2027", active: true, event: "Omaha, Nebraska Summer 2027 OTT Event", details: "", address: "To Be Released" },

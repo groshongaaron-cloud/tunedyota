@@ -4,7 +4,7 @@ const { keyToInstaller } = require("./lib/routing.js");
 const { getEventsForCity } = require("./lib/events.js");
 const EVENTS = require("./lib/events-data.js");
 const { cfg, listRecords, createRecord, createTolerant } = require("./lib/airtable.js");
-const { isValidSlot, computeOpen } = require("./lib/slots.js");
+const { isValidSlot, computeOpen, windowSlots, slotsFor } = require("./lib/slots.js");
 const { triggerBackground } = require("./lib/background.js");
 const { verifyReferral } = require("./lib/client-auth.js");
 
@@ -65,7 +65,8 @@ async function processBooking(body, deps) {
     taken = recs.map((r) => r.fields.Slot).filter(Boolean);
   } catch (e) { if (log.error) log.error("list", e.message); return { status: "error", error: "store-unavailable" }; }
 
-  const open = computeOpen(taken, market.inst);
+  const eventSlots = windowSlots(slotsFor(market.inst), event);
+  const open = computeOpen(taken, market.inst).filter((s) => eventSlots.includes(s));
   if (open.length === 0) return priority("full");
   if (!d.slot || !isValidSlot(d.slot, market.inst) || !open.includes(d.slot)) return { status: "conflict", openSlots: open };
 

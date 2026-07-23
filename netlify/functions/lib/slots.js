@@ -16,6 +16,17 @@ function computeOpen(takenSlots, instKey) {
   return slotsFor(instKey).filter((s) => !taken.has(s));
 }
 function isValidSlot(slot, instKey) { return slotsFor(instKey).includes(slot); }
+// Optional per-event slot window (event.firstSlot / event.lastSlot, "H:MM").
+// Events with hours narrower than the default grid (e.g. a 10-to-noon event)
+// only offer slots inside the window. Non-time labels (generic slot mode) and
+// events without a window pass through untouched.
+function windowSlots(all, ev) {
+  const first = ev && ev.firstSlot, last = ev && ev.lastSlot;
+  if (!first && !last) return all;
+  const mins = (t) => { const [h, m] = String(t).split(":").map(Number); return h * 60 + (m || 0); };
+  return (all || []).filter((s) => !/^\d{1,2}:\d{2}$/.test(String(s)) ||
+    ((!first || mins(s) >= mins(first)) && (!last || mins(s) <= mins(last))));
+}
 function formatSlot(slot) {
   const s = String(slot);
   if (!/^\d{1,2}:\d{2}$/.test(s)) return s;   // generic labels pass through
@@ -24,4 +35,4 @@ function formatSlot(slot) {
   const h12 = h > 12 ? h - 12 : h;
   return `${h12}:${String(m).padStart(2, "0")} ${ampm}`;
 }
-module.exports = { SLOT_TIMES, GENERIC_SLOTS, CAPACITY, SLOT_MINUTES, slotMode, slotsFor, capacityFor, computeOpen, isValidSlot, formatSlot };
+module.exports = { SLOT_TIMES, GENERIC_SLOTS, CAPACITY, SLOT_MINUTES, slotMode, slotsFor, capacityFor, computeOpen, isValidSlot, windowSlots, formatSlot };

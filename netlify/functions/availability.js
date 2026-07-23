@@ -2,7 +2,7 @@
 const { getMarket } = require("./lib/markets.js");
 const { getEventsForCity } = require("./lib/events.js");
 const { cfg, listRecords } = require("./lib/airtable.js");
-const { slotsFor, capacityFor, slotMode, computeOpen, formatSlot } = require("./lib/slots.js");
+const { slotsFor, capacityFor, slotMode, computeOpen, windowSlots, formatSlot } = require("./lib/slots.js");
 const EVENTS = require("./lib/events-data.js");
 
 async function getAvailability(city, deps) {
@@ -25,10 +25,11 @@ async function getAvailability(city, deps) {
       if (log.error) log.error("availability list failed", e.message);
       return { city: market.city, hasEvent: true, error: "store-unavailable", events: [] };
     }
-    const openSlots = computeOpen(taken, market.inst);
+    const eventSlots = windowSlots(allSlots, event);
+    const openSlots = computeOpen(taken, market.inst).filter((s) => eventSlots.includes(s));
     events.push({
       dateISO: event.dateISO, eventLabel: event.label, details: event.details || "", address: event.address || "",
-      openSlots, takenSlots: allSlots.filter((s) => !openSlots.includes(s)),
+      openSlots, takenSlots: eventSlots.filter((s) => !openSlots.includes(s)),
       full: openSlots.length === 0, slotLabels,
     });
   }
