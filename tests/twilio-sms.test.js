@@ -57,3 +57,45 @@ test("keyword embedded in a real message is NOT swallowed", async () => {
   assert.equal(ingested.length, 1);
   assert.match(res.body, /<Message>/);
 });
+
+// --- sms: chat sessions (AI parity on inbound texts) ---
+
+test("customer text routes into an sms: session and the AI reply goes back as TwiML", async () => {
+  const chats = [];
+  const res = await handler(evt(), { env: { TWILIO_AUTH_TOKEN: "t" }, verify: () => true,
+    ingest: async () => ({ ok: true }), relay: async () => ({ relayed: false }),
+    loadActive: async () => null,
+    chat: async (b) => { chats.push(b); return { status: 200, body: { reply: "Yes — we tune 4Runners! What year is yours?" } }; } });
+  assert.equal(chats[0].session, "sms:+16125551234");
+  assert.equal(chats[0].page, "sms");
+  assert.match(res.body, /<Message>Yes — we tune 4Runners! What year is yours\?<\/Message>/);
+});
+
+test("human-only thread (installer-initiated): customer text saved, NO auto-reply", async () => {
+  const res = await handler(evt(), { env: { TWILIO_AUTH_TOKEN: "t" }, verify: () => true,
+    ingest: async () => ({ ok: true }), relay: async () => ({ relayed: false }),
+    loadActive: async () => ({ id: "sms:+16125551234" }),
+    chat: async () => ({ status: 200, body: { reply: "", escalated: true } }) });
+  assert.match(res.body, /<Response><\/Response>/);
+});
+
+test("expired session re-mints with a timestamp suffix and retries once", async () => {
+  const sessions = [];
+  const res = await handler(evt(), { env: { TWILIO_AUTH_TOKEN: "t" }, verify: () => true,
+    ingest: async () => ({ ok: true }), relay: async () => ({ relayed: false }),
+    loadActive: async () => ({ id: "sms:+16125551234" }),
+    chat: async (b) => { sessions.push(b.session);
+      return sessions.length === 1 ? { status: 200, body: { expired: true, reply: "" } }
+        : { status: 200, body: { reply: "Fresh thread reply" } }; } });
+  assert.equal(sessions.length, 2);
+  assert.match(sessions[1], /^sms:\+16125551234:\d+$/);
+  assert.match(res.body, /Fresh thread reply/);
+});
+
+test("degraded AI falls back to the canned SMS reply, not the web fallback text", async () => {
+  const res = await handler(evt(), { env: { TWILIO_AUTH_TOKEN: "t" }, verify: () => true,
+    ingest: async () => ({ ok: true }), relay: async () => ({ relayed: false }),
+    loadActive: async () => null,
+    chat: async () => ({ status: 200, body: { reply: "Sorry — I'm having trouble right now.", degraded: true } }) });
+  assert.match(res.body, /Thanks for texting Tuned Yota!/);
+});

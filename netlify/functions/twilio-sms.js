@@ -1,11 +1,14 @@
 // netlify/functions/twilio-sms.js
-// Inbound SMS webhook: validate Twilio signature, then either (a) relay an
-// installer's reply into their active escalated chat session — no lead, no
-// auto-reply — or (b) the original behavior: ingest a tracked lead + auto-reply.
+// Inbound SMS webhook: validate Twilio signature, then (a) relay an installer's
+// reply into their active escalated chat session — no lead, no auto-reply — or
+// (b) route the customer's text into their sms: chat session where the AI
+// answers exactly as it does in Messenger (human-only threads excepted), or
+// (c) if the session path fails, the original behavior: lead + canned reply.
 const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType } = require("./lib/twilio.js");
 const { INSTALLERS, parseSmsOverrides } = require("./lib/routing.js");
-const { loadEscalatedForInstaller, saveSession } = require("./lib/chat-store.js");
+const { loadEscalatedForInstaller, saveSession, loadActiveByPrefix } = require("./lib/chat-store.js");
 const { deliverInstallerTurn } = require("./lib/meta-deliver.js");
+const { processChat } = require("./chat.js");
 
 const REPLY = "Thanks for texting Tuned Yota! We got your message and a team member will reach out shortly. " +
   "For the fastest help, reply with your vehicle + what you're after (OTT tune, supercharger, build, or a question). " +
@@ -68,7 +71,30 @@ async function handler(event, ctx = {}) {
     const r = await relay({ from: params.From || "", text: params.Body || "" });
     if (r && r.relayed) return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body: EMPTY_TWIML };
   } catch (e) { console.error("twilio-sms relay failed", e && e.message); /* fall through to lead path */ }
+
+  // Customer text -> their sms: chat session, AI answering like any other
+  // channel (silent on human-only installer-initiated threads). Lead ingest
+  // stays either way. Any session/AI failure falls back to the canned reply —
+  // a texter is never dropped.
   try { await ingest(parseInboundSms(params)); } catch (e) { console.error("twilio-sms ingest failed", e && e.message); /* best-effort; never break the texter */ }
+  try {
+    const chat = ctx.chat || ((b) => processChat(b, { env }));
+    const loadActive = ctx.loadActive || ((p) => loadActiveByPrefix(p, { env }));
+    const base = "sms:" + String(params.From || "");
+    let active = null;
+    try { active = await loadActive(base); } catch (e) { /* fresh session */ }
+    let sessionId = active ? active.id : base;
+    let out = await chat({ session: sessionId, message: params.Body || "", page: "sms" });
+    if (out && out.body && out.body.expired) {
+      sessionId = base + ":" + Date.now();
+      out = await chat({ session: sessionId, message: params.Body || "", page: "sms" });
+    }
+    const reply = out && out.body && out.body.reply;
+    if (out && out.status === 200 && !(out.body && out.body.degraded)) {
+      return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" },
+        body: reply ? smsReplyTwiml(reply) : EMPTY_TWIML };
+    }
+  } catch (e) { console.error("twilio-sms session path failed", e && e.message); /* fall through to canned reply */ }
   return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body: smsReplyTwiml(REPLY) };
 }
 

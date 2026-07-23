@@ -3,8 +3,28 @@
 // like every lib here. Replies write the IDENTICAL turn shape the SMS relay
 // writes (twilio-sms.js relayInstallerReply) — one conversation, two channels.
 const { cfg, escapeFormula, listRecords } = require("./airtable.js");
-const { loadSession, saveSession, parseTranscript, TABLE } = require("./chat-store.js");
+const { loadSession, saveSession, parseTranscript, loadActiveByPrefix, TABLE } = require("./chat-store.js");
 const { deliverInstallerTurn } = require("./meta-deliver.js");
+
+// Installer-initiated SMS thread for a Priority List client. Find-or-create by
+// phone; new sessions are marked human-only via pageContext "sms-direct" — the
+// AI never speaks in a conversation an installer started.
+async function openSmsThread(body, installerKey, deps = {}) {
+  const { env = process.env, loadActive = (p) => loadActiveByPrefix(p, { env, ...deps }),
+          saveFn = saveSession } = deps;
+  const digits = String((body && body.phone) || "").replace(/\D/g, "").slice(-10);
+  if (digits.length !== 10) return { status: "error", error: "bad-phone" };
+  const id = `sms:+1${digits}`;
+  let active = null;
+  try { active = await loadActive(id); } catch (e) { /* store hiccup -> create fresh */ }
+  if (active) return { status: "ok", session: active.id, isNew: false };
+  const sess = { id, status: "escalated", pageContext: "sms-direct", installer: installerKey,
+    customerName: String((body && body.name) || "").slice(0, 80),
+    vehicle: String((body && body.vehicle) || "").slice(0, 80),
+    phone: `+1${digits}`, turns: [] };
+  await saveFn(sess, deps);
+  return { status: "ok", session: id, isNew: true };
+}
 
 async function listSessions(installerKey, { env = process.env, fetchImpl = fetch } = {}) {
   const c = cfg(env);
@@ -62,4 +82,4 @@ async function closeSession(sessionId, deps = {}) {
   return { status: "ok" };
 }
 
-module.exports = { listSessions, getTranscript, installerReply, closeSession };
+module.exports = { listSessions, getTranscript, installerReply, closeSession, openSmsThread };

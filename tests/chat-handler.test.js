@@ -185,3 +185,24 @@ test("escalate uses INSTALLER_SMS_NUMBERS override for the SMS destination", asy
   });
   assert.equal(smsTo, "+16125550999");
 });
+
+// --- human-only (installer-initiated sms) threads ---
+
+test("sms-direct session: customer turn saved, installer notified, AI never called", async () => {
+  const saved = [], notified = [];
+  let aiCalled = false;
+  const out = await processChat({ session: "sms:+16125551234", message: "Sounds good, see you Saturday" },
+    baseDeps({
+      load: async () => ({ id: "sms:+16125551234", status: "escalated", installer: "cody",
+        pageContext: "sms-direct", customerName: "Pat", lastActivity: new Date().toISOString(),
+        turns: [{ role: "installer", text: "Hi Pat", at: 1 }] }),
+      save: async (s) => { saved.push(s); return s; },
+      ai: async () => { aiCalled = true; return { reply: "nope" }; },
+      notify: async (s, t) => { notified.push(t); },
+    }));
+  assert.equal(out.status, 200);
+  assert.equal(out.body.reply, "");
+  assert.equal(aiCalled, false);
+  assert.equal(saved[0].turns[saved[0].turns.length - 1].role, "user");
+  assert.equal(notified.length, 1);
+});

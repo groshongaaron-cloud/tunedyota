@@ -225,6 +225,30 @@
   .theme-opt.sel .check{opacity:1;}
   .toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%) translateY(8px);z-index:70;background:#16130e;color:#fff;font-size:12.5px;font-weight:700;padding:9px 16px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* ── iMessage-style chat threads ─────────────────────────────── */
+.crow{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(91,75,66,.12);cursor:pointer;background:var(--card,#fff)}
+.crow:hover{background:rgba(91,75,66,.05)}
+.cava{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#8a8a8e,#b9b9be);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex:none}
+.cmeta{flex:1;min-width:0}
+.cname{font-weight:700;display:flex;align-items:center;gap:6px}
+.csnip{color:var(--muted,#8a8a8e);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.cwhen{color:var(--muted,#8a8a8e);font-size:12px;flex:none}
+.cdot{width:10px;height:10px;border-radius:50%;background:#0b93f6;flex:none}
+.cbadge{font-size:12px;font-weight:400}
+.cthread{display:flex;flex-direction:column;height:62vh}
+.clog{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;background:var(--card,#fff);border-radius:12px}
+.cbub{max-width:78%;padding:8px 12px;border-radius:18px;margin:1px 0;line-height:1.35;font-size:15px;word-wrap:break-word;white-space:pre-wrap}
+.cbub+.cbub{margin-top:2px}
+.cthem{background:#e5e5ea;color:#000;align-self:flex-start;border-bottom-left-radius:5px}
+.cme{background:#0b93f6;color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
+.cai{background:#eaf3fd;color:#1a2b3c;border:1px solid #c4dcf3;align-self:flex-end;border-bottom-right-radius:5px}
+.caitag{display:block;font-size:10px;font-weight:700;letter-spacing:.06em;color:#5b8ab8;margin-bottom:2px}
+.csys{align-self:center;text-align:center;color:#8a8a8e;font-size:12px;background:none;max-width:90%;margin:8px 0}
+.ctime{align-self:center;text-align:center;color:#8a8a8e;font-size:11px;font-weight:600;margin:12px 0 4px}
+.ccompose{display:flex;gap:8px;align-items:flex-end;padding:10px 0 0}
+.ccompose textarea{flex:1;resize:none;border:1px solid rgba(91,75,66,.25);border-radius:18px;padding:9px 14px;font:inherit;font-size:15px;line-height:1.3;max-height:110px;background:var(--card,#fff)}
+.csend{border:none;border-radius:50%;width:36px;height:36px;background:#0b93f6;color:#fff;font-size:17px;cursor:pointer;flex:none}
+.csend:disabled{opacity:.4}
 </style>
 </head>
 <body>
@@ -849,16 +873,34 @@
     catch(e){ STATE.chats = []; STATE.chatsLoaded = true; }
     renderAll();
   }
+  function chanBadge(id){
+    if(/^fb:/.test(id)) return '📘'; if(/^ig:/.test(id)) return '📸';
+    if(/^sms:/.test(id)) return '📱'; return '💬';
+  }
+  function relTime(iso){
+    if(!iso) return '';
+    var d = new Date(iso), now = new Date(), diff = (now - d)/60000;
+    if(diff < 1) return 'now';
+    if(diff < 60) return Math.floor(diff)+'m';
+    if(d.toDateString() === now.toDateString()) return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+    if(diff < 7*24*60) return d.toLocaleDateString([],{weekday:'short'});
+    return d.toLocaleDateString([],{month:'numeric',day:'numeric'});
+  }
   function renderChats(){
     var host = document.getElementById('feed');
     if(STATE.chatOpen) return renderChatThread(host);
     if(!CHAT_POLL) CHAT_POLL = setInterval(loadChats, 15000);
-    host.innerHTML = STATE.chats.length ? STATE.chats.map(function(s){
-      return '<div class="card" data-chat="'+esc(s.id)+'" style="cursor:pointer"><b>'+esc(s.customerName||'Customer')+'</b>'+
-        (s.lastRole==='user'?' <span style="color:var(--sand,#c8a44e);font-weight:700">● new</span>':'')+
-        '<div class="muted">'+esc(s.vehicle||'')+(s.city?' · '+esc(s.city):'')+'</div>'+
-        '<div class="muted">'+esc(s.lastText||'')+'</div></div>';
-    }).join('') : '<p class="muted" style="padding:14px">No active chats. Escalations land here (and still SMS you).</p>';
+    host.innerHTML = STATE.chats.length ? '<div class="card" style="padding:0;overflow:hidden">'+STATE.chats.map(function(s){
+      var initial = (s.customerName||'?').trim().charAt(0).toUpperCase() || '?';
+      return '<div class="crow" data-chat="'+esc(s.id)+'">'+
+        '<div class="cava">'+esc(initial)+'</div>'+
+        '<div class="cmeta"><div class="cname">'+esc(s.customerName||'Customer')+
+          ' <span class="cbadge">'+chanBadge(s.id)+'</span></div>'+
+        '<div class="csnip">'+(s.lastRole==='installer'?'You: ':'')+esc(s.lastText||(s.vehicle||''))+'</div></div>'+
+        '<div class="cwhen">'+esc(relTime(s.lastActivity))+'</div>'+
+        (s.lastRole==='user'?'<div class="cdot" title="needs reply"></div>':'')+
+        '</div>';
+    }).join('')+'</div>' : '<p class="muted" style="padding:14px">No active chats. Escalations land here, and you can start one from any lead’s <b>Message</b> button.</p>';
     host.onclick = function(e){ var c=e.target.closest('[data-chat]'); if(c){ STATE.chatOpen=c.getAttribute('data-chat'); renderAll(); } };
   }
   async function renderChatThread(host){
@@ -868,19 +910,40 @@
     catch(e){ STATE.chatOpen=null; renderAll(); return; }
     // Guard: user may have navigated away while the fetch was in-flight
     if(STATE.tab!=='chats' || STATE.chatOpen!==openId) return;
+    // Preserve an in-progress draft (and focus) across the 5s poll re-render.
+    var prevTa = document.getElementById('chattext');
+    var draft = prevTa ? prevTa.value : '', hadFocus = prevTa && document.activeElement === prevTa;
+    var bubbles = [], prevAt = 0;
+    (j.turns||[]).forEach(function(t){
+      var at = t.at || 0;
+      if(at && (at - prevAt) > 15*60*1000){
+        var d = new Date(at), now = new Date();
+        var day = d.toDateString()===now.toDateString() ? 'Today'
+          : ((now - d) < 7*24*3600*1000 ? d.toLocaleDateString([],{weekday:'long'}) : d.toLocaleDateString([],{month:'short',day:'numeric'}));
+        bubbles.push('<div class="ctime">'+esc(day)+' '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'</div>');
+      }
+      prevAt = at || prevAt;
+      if(t.role==='system'){ bubbles.push('<div class="cbub csys">'+esc(t.text)+'</div>'); }
+      else if(t.role==='user'){ bubbles.push('<div class="cbub cthem">'+esc(t.text)+'</div>'); }
+      else if(t.role==='installer'){ bubbles.push('<div class="cbub cme">'+esc(t.text)+'</div>'); }
+      else { bubbles.push('<div class="cbub cai"><span class="caitag">AI</span>'+esc(t.text)+'</div>'); }
+    });
     host.innerHTML =
-      '<p><a href="#" id="chatback">‹ Chats</a> · <b>'+esc(j.customerName||'Customer')+'</b> '+esc(j.vehicle||'')+
-      (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+'</p>'+
-      '<div id="chatlog" style="max-height:50vh;overflow:auto">'+
-        (j.turns||[]).map(function(t){
-          var who = t.role==='user'?'Customer':(t.role==='installer'?'You':'AI');
-          return '<p><b>'+esc(who)+':</b> '+esc(t.text)+'</p>';
-        }).join('')+
-      '</div>'+
-      '<form id="chatreply"><input id="chattext" placeholder="Reply…" style="width:70%"> '+
-        '<button type="submit">Send</button> '+
-        '<button type="button" id="chatclose">Close chat</button></form>';
+      '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <b>'+esc(j.customerName||'Customer')+'</b> '+chanBadge(j.id||'')+' '+esc(j.vehicle||'')+
+      (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+
+      ' · <a href="#" id="chatclose" style="color:var(--muted,#8a8a8e)">close chat</a></p>'+
+      '<div class="cthread"><div id="chatlog" class="clog">'+bubbles.join('')+'</div>'+
+      '<form id="chatreply" class="ccompose"><textarea id="chattext" rows="1" placeholder="Text message…"></textarea>'+
+        '<button type="submit" class="csend" title="Send">↑</button></form></div>';
     var log = document.getElementById('chatlog'); if(log) log.scrollTop = log.scrollHeight;
+    var ta = document.getElementById('chattext');
+    if(ta){
+      if(STATE.chatPrefill){ ta.value = STATE.chatPrefill; STATE.chatPrefill=''; ta.focus(); }
+      else if(draft){ ta.value = draft; if(hadFocus){ ta.focus(); ta.selectionStart = ta.selectionEnd = draft.length; } }
+      ta.oninput = function(){ ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,110)+'px'; };
+      if(ta.value) ta.oninput();
+      ta.onkeydown = function(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); var f=document.getElementById('chatreply'); if(f) f.dispatchEvent(new Event('submit',{cancelable:true})); } };
+    }
     if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; }
     if(!CHAT_POLL) CHAT_POLL = setInterval(function(){ if(STATE.tab==='chats' && STATE.chatOpen) renderChatThread(host); }, 5000);
     var back = document.getElementById('chatback');
@@ -899,9 +962,11 @@
       finally{ tin.disabled = false; if(btn) btn.disabled = false; }
     };
     var closeBtn = document.getElementById('chatclose');
-    if(closeBtn) closeBtn.onclick = async function(){
+    if(closeBtn) closeBtn.onclick = async function(e){
+      e.preventDefault();
+      if(!confirm('Close this conversation?')) return;
       var closeId = STATE.chatOpen;
-      try{ await chatApi({op:'close', session:closeId}); }catch(e){}
+      try{ await chatApi({op:'close', session:closeId}); }catch(e2){}
       STATE.chatOpen=null; loadChats();
     };
   }
@@ -1322,6 +1387,23 @@
           b.textContent=r.ok?'☎ Ringing you — press 1':'Call failed';
         }catch(e){ b.textContent='Call failed'; }
         setTimeout(function(){ b.textContent='Call as TY'; b.disabled=false; },8000);
+      }));
+      // Text through the business line: opens (or creates) this client's thread
+      // in Chats. New threads prefill a personal, self-identifying first message.
+      row.appendChild(act('Message',async function(ev){
+        var b=ev.target; b.disabled=true;
+        try{
+          var r=await chatApi({op:'openSms', phone:l.phone, name:l.name, vehicle:l.vehicle});
+          if(r && r.session){
+            if(r.isNew){
+              var first=(l.name||'').trim().split(/\s+/)[0]||'there';
+              var me=STATE.me ? STATE.me.charAt(0).toUpperCase()+STATE.me.slice(1) : 'Tuned Yota';
+              STATE.chatPrefill='Hi '+first+", it's "+me+' with Tuned Yota'+(l.vehicle?' about your '+l.vehicle:'')+' — ';
+            }
+            STATE.tab='chats'; STATE.chatOpen=r.session; renderAll();
+          } else { b.textContent='Failed'; }
+        }catch(e){ b.textContent='Failed'; }
+        finally{ setTimeout(function(){ b.textContent='Message'; b.disabled=false; },4000); }
       }));
     }
     if(l.email){ row.appendChild(linkBtn('Email','mailto:'+l.email)); }

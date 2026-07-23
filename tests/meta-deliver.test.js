@@ -63,3 +63,33 @@ test("installerReply survives a sync-throwing onInstallerTurn", async () => {
   });
   assert.equal(out.status, "ok");
 });
+
+// --- sms: session delivery ---
+
+test("sms: session turn goes out via sendSms", async () => {
+  const sent = [];
+  const out = await deliverInstallerTurn(SESS("sms:+16125551234"), { role: "installer", text: "On my way", at: 2 },
+    { env: ENV, sendText: async (a) => { sent.push(a); return { ok: true }; },
+      saveFn: async () => {}, notify: async () => {} });
+  assert.equal(out.ok, true);
+  assert.equal(sent[0].to, "+16125551234");
+  assert.equal(sent[0].body, "On my way");
+});
+
+test("sms send failure appends the pending-approval system note and Slacks", async () => {
+  const notes = [], pings = [];
+  const sess = SESS("sms:+16125551234");
+  await deliverInstallerTurn(sess, { role: "installer", text: "On my way", at: 2 },
+    { env: ENV, sendText: async () => ({ ok: false }),
+      saveFn: async (s) => { notes.push(s.turns[s.turns.length - 1]); },
+      notify: async (t) => { pings.push(t); return { ok: true }; } });
+  assert.equal(notes[0].role, "system");
+  assert.match(notes[0].text, /not delivered — SMS sending is pending carrier approval/);
+  assert.equal(pings.length, 1);
+});
+
+test("web sessions are still skipped", async () => {
+  const out = await deliverInstallerTurn(SESS("web-abc123"), { role: "installer", text: "x", at: 2 },
+    { env: ENV, sendText: async () => ({ ok: true }), send: async () => ({ ok: true }) });
+  assert.equal(out.skipped, true);
+});

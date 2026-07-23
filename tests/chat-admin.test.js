@@ -125,3 +125,32 @@ test("sync-throwing notify does not prevent customer from receiving a 200 reply"
   assert.equal(out.status, 200);
   assert.ok(out.body.reply);
 });
+
+// --- openSmsThread (installer-initiated client texting) ---
+
+const { openSmsThread } = require("../netlify/functions/lib/chat-admin.js");
+
+test("openSmsThread creates a human-only escalated session bound to the installer", async () => {
+  const saved = [];
+  const r = await openSmsThread({ phone: "(218) 555-1234", name: "Pat Client", vehicle: "2019 4Runner" }, "cody",
+    { loadActive: async () => null, saveFn: async (s) => { saved.push(s); return s; } });
+  assert.equal(r.status, "ok");
+  assert.equal(r.session, "sms:+12185551234");
+  assert.equal(r.isNew, true);
+  assert.equal(saved[0].status, "escalated");
+  assert.equal(saved[0].pageContext, "sms-direct");
+  assert.equal(saved[0].installer, "cody");
+  assert.equal(saved[0].phone, "+12185551234");
+});
+
+test("openSmsThread reuses an existing active thread", async () => {
+  const r = await openSmsThread({ phone: "2185551234" }, "cody",
+    { loadActive: async () => ({ id: "sms:+12185551234:99" }), saveFn: async () => { throw new Error("should not save"); } });
+  assert.equal(r.isNew, false);
+  assert.equal(r.session, "sms:+12185551234:99");
+});
+
+test("openSmsThread rejects a bad phone", async () => {
+  const r = await openSmsThread({ phone: "911" }, "cody", { loadActive: async () => null, saveFn: async () => {} });
+  assert.equal(r.status, "error");
+});

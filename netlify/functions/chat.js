@@ -97,6 +97,14 @@ async function processChat(body, deps) {
     try { notify(sess, message).catch(function () {}); } catch (e) {}
   }
 
+  // Human-only threads (installer-initiated SMS, pageContext "sms-direct"): the
+  // AI never speaks in a conversation an installer started. Save the customer
+  // turn, let the notify above do its job, and return no reply.
+  if (sess.pageContext === "sms-direct") {
+    try { await save(sess); } catch (e) { if (log.error) log.error("chat save", e.message); }
+    return { status: 200, body: { reply: "", escalated: sess.status === "escalated", turnCount: sess.turns.length } };
+  }
+
   let out;
   try { out = await ai({ turns: sess.turns, pageContext: sess.pageContext }); }
   catch (e) {
@@ -126,8 +134,13 @@ async function processChat(body, deps) {
 // Installer-authed inbox operations (console Chats panel).
 async function installerOp(body, installerKey, deps = {}) {
   const { list = chatAdmin.listSessions, transcript = chatAdmin.getTranscript,
-          reply = chatAdmin.installerReply, close = chatAdmin.closeSession } = deps;
+          reply = chatAdmin.installerReply, close = chatAdmin.closeSession,
+          openSms = chatAdmin.openSmsThread } = deps;
   if (body.op === "list") return { status: 200, body: { sessions: await list(installerKey, deps) } };
+  if (body.op === "openSms") {
+    const r = await openSms(body, installerKey, deps);
+    return { status: r.status === "ok" ? 200 : 400, body: r };
+  }
   if (body.op === "transcript") {
     const t = await transcript(String(body.session || ""), deps);
     return t ? { status: 200, body: t } : { status: 404, body: { error: "not-found" } };
