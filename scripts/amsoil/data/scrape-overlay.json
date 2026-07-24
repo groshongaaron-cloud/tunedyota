@@ -1,11 +1,60 @@
 {
  "updated": "2026-07-25",
  "files": [
+  "compressor-oil.json",
   "gasoline-motor-oil.json",
   "hydraulic-oil.json"
  ],
- "count": 54,
+ "count": 60,
  "products": {
+  "PCH05-EA": {
+   "path": "/p/amsoil-iso-32-100-synthetic-compressor-oil-pch/",
+   "price": 384.5,
+   "rating": 5,
+   "reviews": 57,
+   "name": "AMSOIL ISO 32 100% Synthetic Compressor Oil",
+   "source": "compressor-oil.json"
+  },
+  "PCJQT-EA": {
+   "path": "/p/amsoil-iso-68-100-synthetic-compressor-oil-pcj/",
+   "price": 19.89,
+   "rating": 5,
+   "reviews": 57,
+   "name": "AMSOIL ISO 68 100% Synthetic Compressor Oil",
+   "source": "compressor-oil.json"
+  },
+  "PCKQT-EA": {
+   "path": "/p/amsoil-iso-100-100-synthetic-compressor-oil-pck/",
+   "price": 20.89,
+   "rating": 5,
+   "reviews": 57,
+   "name": "AMSOIL ISO 100 100% Synthetic Compressor Oil",
+   "source": "compressor-oil.json"
+  },
+  "SEI05-EA": {
+   "path": "/p/amsoil-sirocco-iso-32-46-compressor-oil-sei/",
+   "price": 543.65,
+   "rating": 5,
+   "reviews": 2,
+   "name": "AMSOIL SIROCCO® ISO-32/46 Compressor Oil",
+   "source": "compressor-oil.json"
+  },
+  "PCIQT-EA": {
+   "path": "/p/amsoil-iso-46-100-synthetic-compressor-oil-pci/",
+   "price": 19.69,
+   "rating": null,
+   "reviews": 57,
+   "name": "AMSOIL ISO 46 100% Synthetic Compressor Oil",
+   "source": "compressor-oil.json"
+  },
+  "AIRBA-EA": {
+   "path": "/p/amsoil-100-synthetic-air-tool-oil-airba/",
+   "price": 5.59,
+   "rating": null,
+   "reviews": 8,
+   "name": "AMSOIL 100% Synthetic Air Tool Oil",
+   "source": "compressor-oil.json"
+  },
   "AZSQT-EA": {
    "path": "/p/amsoil-signature-series-0w-16-100-synthetic-motor-oil-azs/",
    "price": 17.99,
