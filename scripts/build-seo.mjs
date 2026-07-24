@@ -67,8 +67,11 @@ function processHead(file) {
   let html = fs.readFileSync(p, "utf8");
   const meta = SD.extractMeta(html);
   if (!definesBusiness(html)) {
+    // returns.html doubles as the shipping-policy page → its business node
+    // carries the org-level ShippingService markup (Google reads it site-wide).
+    const stub = file === "returns.html" ? SD.BUSINESS_STUB_SHIPPING : SD.BUSINESS_STUB;
     html = injectMarked(html, "BUSINESS",
-      `<script type="application/ld+json">\n${SD.BUSINESS_STUB}\n</script>`);
+      `<script type="application/ld+json">\n${stub}\n</script>`);
   }
   html = injectMarked(html, "OG", SD.buildOgTags(meta));
   fs.writeFileSync(p, html);

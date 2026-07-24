@@ -92,7 +92,7 @@ export function buildOgTags({ title, description, canonical }) {
 
 // Compact business node embedded on every page so cross-page provider @id
 // resolves per-page. Full reviews/aggregateRating stay only on index.html.
-export const BUSINESS_STUB = JSON.stringify({
+const BUSINESS = {
   "@context": "https://schema.org", "@type": "AutomotiveBusiness", "@id": BIZ_ID,
   name: "Tuned Yota", url: `${SITE}/`, telephone: "+1-612-406-7117", email: "info@tunedyota.com",
   // NAP: must stay character-identical to the Google Business Profile address.
@@ -105,7 +105,42 @@ export const BUSINESS_STUB = JSON.stringify({
   image: `${SITE}/og-image.png`,
   areaServed: ["Minnesota","Iowa","Wisconsin","North Dakota","South Dakota","Nebraska"].map((n) => ({ "@type": "State", name: n })),
   sameAs: ["https://www.facebook.com/TunedYota/","https://www.instagram.com/tunedyota/","https://www.facebook.com/groups/501008078456222"],
-});
+};
+export const BUSINESS_STUB = JSON.stringify(BUSINESS);
+
+// Org-level shipping policy (Google `ShippingService` markup) — emitted ONLY on
+// returns.html, per Google's guidance to describe the standard policy on one
+// page. Facts mirror AMSOIL's published Shipping Information (AMSOIL Inc.
+// fulfills every order): contiguous-US free ground shipping at $100+, flat
+// $12.99 under $100; 5 p.m. Central weekday cutoff, ships within 24h, arrives
+// within 3 business days ground. Deliberately NOT offer-level: product-level
+// shippingDetails outranks org-level and can't express the $100 threshold, so
+// a flat per-offer rate would mask the free-shipping condition.
+const transit = { "@type": "ServicePeriod",
+  duration: { "@type": "QuantitativeValue", minValue: 1, maxValue: 3, unitCode: "DAY" } };
+export const SHIPPING_SERVICE = {
+  "@type": "ShippingService",
+  name: "AMSOIL direct shipping (contiguous U.S.)",
+  description: "AMSOIL product orders placed through Tuned Yota are fulfilled and shipped by AMSOIL Inc. Free ground shipping on orders of $100 or more in the contiguous U.S.; orders under $100 ship for a flat $12.99. Most orders placed by 5 p.m. Central, Monday through Friday, ship within 24 hours and arrive within 3 business days.",
+  fulfillmentType: "https://schema.org/FulfillmentTypeDelivery",
+  handlingTime: { "@type": "ServicePeriod",
+    businessDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"].map((d) => `https://schema.org/${d}`),
+    cutoffTime: "17:00:00-06:00",
+    duration: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" } },
+  shippingConditions: [
+    { "@type": "ShippingConditions",
+      shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
+      orderValue: { "@type": "MonetaryAmount", minValue: 0, maxValue: 99.99, currency: "USD" },
+      shippingRate: { "@type": "MonetaryAmount", value: 12.99, currency: "USD" },
+      transitTime: transit },
+    { "@type": "ShippingConditions",
+      shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
+      orderValue: { "@type": "MonetaryAmount", minValue: 100, currency: "USD" },
+      shippingRate: { "@type": "MonetaryAmount", value: 0, currency: "USD" },
+      transitTime: transit },
+  ],
+};
+export const BUSINESS_STUB_SHIPPING = JSON.stringify({ ...BUSINESS, hasShippingService: SHIPPING_SERVICE });
 
 export function buildEventsJsonLd(events, states) {
   const asArr = (v) => Array.isArray(v) ? v : (v ? [v] : []);

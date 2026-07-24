@@ -59,3 +59,23 @@ test("BUSINESS_STUB is valid JSON with the canonical @id", () => {
   assert.equal(b["@id"], "https://tunedyota.com/#business");
   assert.equal(b.logo["@type"], "ImageObject");
 });
+
+// The shipping-enriched stub (returns.html only) must mirror AMSOIL's real
+// published rates: free ground shipping at $100+, flat $12.99 under, 1-3 day
+// transit. Both conditions must target the US and the base stub must be intact.
+test("BUSINESS_STUB_SHIPPING carries the AMSOIL ShippingService conditions", () => {
+  const b = JSON.parse(M.BUSINESS_STUB_SHIPPING);
+  assert.equal(b["@id"], "https://tunedyota.com/#business");
+  const svc = b.hasShippingService;
+  assert.equal(svc["@type"], "ShippingService");
+  const conds = svc.shippingConditions;
+  assert.equal(conds.length, 2);
+  for (const c of conds) assert.equal(c.shippingDestination.addressCountry, "US");
+  const flat = conds.find((c) => c.shippingRate.value === 12.99);
+  const free = conds.find((c) => c.shippingRate.value === 0);
+  assert.ok(flat && free, "need both the $12.99 flat and free-over-threshold conditions");
+  assert.equal(flat.orderValue.maxValue, 99.99);
+  assert.equal(free.orderValue.minValue, 100);
+  // BUSINESS_STUB itself must stay shipping-free (it lands on every other page).
+  assert.ok(!M.BUSINESS_STUB.includes("hasShippingService"));
+});

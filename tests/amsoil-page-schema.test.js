@@ -94,6 +94,11 @@ test("returns page exists with AMSOIL-accurate terms and is footer-linked", () =
   assert.match(html, /30 days/, "returns.html missing the 30-day window");
   assert.match(html, /unopened/i, "returns.html missing the unopened condition");
   assert.match(html, /amsoil\.com\/t\/return-policy\//, "returns.html missing link to AMSOIL's authoritative policy");
+  // Shipping policy (2026-07-24): visible terms + the org-level ShippingService
+  // markup build-seo injects into this page's business stub (and only this page).
+  assert.match(html, /\$12\.99/, "returns.html missing the flat shipping rate");
+  assert.match(html, /amsoil\.com\/t\/shipping-information\//, "returns.html missing link to AMSOIL shipping info");
+  assert.ok(html.includes('"hasShippingService"'), "returns.html business stub missing ShippingService markup");
   for (const f of PAGE_FILES) {
     const page = fs.readFileSync(path.join(SITE, f), "utf8");
     assert.ok(page.includes('<a href="returns.html">Returns</a>'), `${f}: footer missing Returns link`);
