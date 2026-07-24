@@ -1147,8 +1147,17 @@ const scrapeOf = (stockNo) => SCRAPE.products[stockNo] || null;
 function ratingLine(stockNo, orderHref) {
   const s = scrapeOf(stockNo);
   if (!s || !s.rating || !s.reviews) return "";
-  return `<div style="font-size:13.5px;margin-top:4px">★ ${s.rating.toFixed(1)} · <a target="_blank" rel="noopener" href="${orderHref}">${s.reviews.toLocaleString("en-US")} customer reviews on AMSOIL.com</a></div>`;
+  // Display AMSOIL's published value VERBATIM — an integer stays an integer
+  // ("★ 5", not "★ 5.0"): the source data carries no decimal precision, and
+  // faking it is a credibility problem.
+  const val = Number.isInteger(s.rating) ? String(s.rating) : s.rating.toFixed(1);
+  return `<div style="font-size:13.5px;margin-top:4px">★ ${val} · <a target="_blank" rel="noopener" href="${orderHref}">${s.reviews.toLocaleString("en-US")} customer reviews on AMSOIL.com</a></div>`;
 }
+// Per-variant scrape price (JSON-LD-aligned) beats the sheet's variant price.
+const effVariantPrice = (p, v) => {
+  const sv = ((scrapeOf(p.stockNo) || {}).variants || {})[v.stockNo];
+  return sv && sv.price > 0 ? sv.price : v.retail;
+};
 export const catSlug = (c) => c.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const HUB_CATS = [...new Set(FULL.products.map((p) => p.category))].sort();
 export const AMSOIL_HUB_FILES = ["amsoil-products.html", ...HUB_CATS.map((c) => `amsoil-${catSlug(c)}-products.html`)];
@@ -1221,7 +1230,7 @@ function fullProductPage({ p, e, slug }) {
   const desc = `${name} (${p.stockNo}) — $${price.toFixed(2)} from Tuned Yota, an Authorized AMSOIL Dealer. Genuine AMSOIL ${p.category.toLowerCase()}, shipped direct from AMSOIL — free on orders $100+, 30-day returns.`;
   const hub = `amsoil-${catSlug(p.category)}-products.html`;
   const guide = HUB_GUIDE[p.category];
-  const sizeRows = p.variants.map((v) => `<tr><td>${ESC(v.pkg)}</td><td>${ESC(v.stockNo)}</td><td class="hp">$${v.retail.toFixed(2)}${v.pc ? `<div class="hpc">$${v.pc.toFixed(2)} P.C.</div>` : ""}</td></tr>`).join("\n");
+  const sizeRows = p.variants.map((v) => `<tr><td>${ESC(v.pkg)}</td><td>${ESC(v.stockNo)}</td><td class="hp">$${effVariantPrice(p, v).toFixed(2)}${v.pc ? `<div class="hpc">$${v.pc.toFixed(2)} P.C.</div>` : ""}</td></tr>`).join("\n");
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1352,7 +1361,7 @@ function hubRows(products, curated) {
     const searchUrl = amsoilUrl(`/search/?text=${encodeURIComponent(p.stockNo)}`);
     const nameHref = internal || searchUrl;
     const ext = internal ? "" : ' target="_blank" rel="noopener"';
-    const sizes = p.variants.map((v) => `${ESC(v.pkg)} $${v.retail.toFixed(2)}`).join(" · ");
+    const sizes = p.variants.map((v) => `${ESC(v.pkg)} $${effVariantPrice(p, v).toFixed(2)}`).join(" · ");
     return `<tr><td><a href="${nameHref}"${ext}>${ESC(p.name.replace(/^AMSOIL /, ""))}</a><div class="hsizes">${sizes}</div></td><td>${ESC(p.stockNo)}</td><td class="hp">$${effRetail(p).toFixed(2)}${p.pc ? `<div class="hpc">$${p.pc.toFixed(2)} P.C.</div>` : ""}</td><td><a class="ord" target="_blank" rel="noopener" href="${searchUrl}">Order &#9658;</a></td></tr>`;
   }).join("\n");
 }

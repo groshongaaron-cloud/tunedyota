@@ -57,6 +57,13 @@ for (const f of files) {
       name: r.product_name || null,
       source: f,
     };
+    // Per-variant SKU→size→price from raw JSON-LD (the only aligned mapping).
+    if (Array.isArray(r.variants_ld) && r.variants_ld.length) {
+      entry.variants = {};
+      for (const v of r.variants_ld) entry.variants[v.sku] = { price: v.price, size: v.size };
+      const mine = entry.variants[primary];
+      if (mine && mine.price > 0) entry.price = mine.price;
+    }
     overlay[primary] = entry;
     // Reconcile against our data.
     const cat = byStock.get(primary);

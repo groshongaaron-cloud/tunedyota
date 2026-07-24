@@ -1,5 +1,277 @@
 [
  {
+  "product_url": "https://www.amsoil.com/p/amsoil-motorcycle-octane-boost-mob/",
+  "product_name": "AMSOIL Motorcycle Octane Boost",
+  "page_title": "AMSOIL Motorcycle Octane Boost | MOB - AMSOIL",
+  "product_description": "Shop AMSOIL Motorcycle Octane Boost at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "6.99",
+  "all_available_prices": "6.99, 83.1 USD",
+  "available_sizes": "4 oz. Bottle, 4 oz. Bottles, Case of 12",
+  "variant_skus": "MOBCN-EA, MOBCN-CA",
+  "customer_rating": "5 (159)",
+  "total_reviews": 159,
+  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Gasoline Additives > AMSOIL Motorcycle Octane Boost",
+  "main_product_image": "",
+  "variants_ld": [
+   {
+    "sku": "MOBCN-EA",
+    "size": "4 oz. Bottle",
+    "price": 6.99
+   },
+   {
+    "sku": "MOBCN-CA",
+    "size": "4 oz. Bottles, Case of 12",
+    "price": 83.1
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-diesel-4-in-1-fuel-additive-adb/",
+  "product_name": "AMSOIL Diesel 4-IN-1 Fuel Additive",
+  "page_title": "AMSOIL Diesel 4-IN-1 Fuel Additive | ADB - AMSOIL",
+  "product_description": "Shop AMSOIL Diesel 4-IN-1 Fuel Additive at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "9.39",
+  "all_available_prices": "9.39, 15.39, 54.29, 55.35, 183.3, 323.7, 497.85, 4854.75 USD",
+  "available_sizes": "8 oz. Bottle, 8 oz. Bottles, Case of 6, 64 oz. Bottle, 64 oz. Bottles, Case of 6, 16 oz. Bottle, 16 oz. Bottles, Case of 12, 55 Gallon Drum, 5 Gallon Pail",
+  "variant_skus": "ADBPCN-EA, ADBPCN-CA, ADBHG-EA, ADBHG-CA, ADBCN-EA, ADBCN-CA, ADB55-EA, ADB05-EA",
+  "customer_rating": "5 (309)",
+  "total_reviews": 309,
+  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel 4-IN-1 Fuel Additive",
+  "main_product_image": "",
+  "variants_ld": [
+   {
+    "sku": "ADBPCN-EA",
+    "size": "8 oz. Bottle",
+    "price": 9.39
+   },
+   {
+    "sku": "ADBPCN-CA",
+    "size": "8 oz. Bottles, Case of 6",
+    "price": 55.35
+   },
+   {
+    "sku": "ADBHG-EA",
+    "size": "64 oz. Bottle",
+    "price": 54.29
+   },
+   {
+    "sku": "ADBHG-CA",
+    "size": "64 oz. Bottles, Case of 6",
+    "price": 323.7
+   },
+   {
+    "sku": "ADBCN-EA",
+    "size": "16 oz. Bottle",
+    "price": 15.39
+   },
+   {
+    "sku": "ADBCN-CA",
+    "size": "16 oz. Bottles, Case of 12",
+    "price": 183.3
+   },
+   {
+    "sku": "ADB55-EA",
+    "size": "55 Gallon Drum",
+    "price": 4854.75
+   },
+   {
+    "sku": "ADB05-EA",
+    "size": "5 Gallon Pail",
+    "price": 497.85
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-diesel-injector-clean-fuel-additive-adf/",
+  "product_name": "AMSOIL Diesel Injector Clean Fuel Additive",
+  "page_title": "AMSOIL Diesel Injector Clean Fuel Additive | ADF - AMSOIL",
+  "product_description": "Shop AMSOIL Diesel Injector Clean Fuel Additive at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "7.49",
+  "all_available_prices": "7.49, 12.09, 41.19, 44.15, 143.1, 245.05, 368.7, 3541.05 USD",
+  "available_sizes": "8 oz. Bottle, 8 oz. Bottles, Case of 6, 64 oz. Bottle, 64 oz. Bottles, Case of 6, 16 oz. Bottle, 16 oz. Bottles, Case of 12, 55 Gallon Drum, 5 Gallon Pail",
+  "variant_skus": "ADFPCN-EA, ADFPCN-CA, ADFHG-EA, ADFHG-CA, ADFCN-EA, ADFCN-CA, ADF55-EA, ADF05-EA",
+  "customer_rating": "5 (146)",
+  "total_reviews": 146,
+  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Injector Clean Fuel Additive",
+  "main_product_image": "",
+  "variants_ld": [
+   {
+    "sku": "ADFPCN-EA",
+    "size": "8 oz. Bottle",
+    "price": 7.49
+   },
+   {
+    "sku": "ADFPCN-CA",
+    "size": "8 oz. Bottles, Case of 6",
+    "price": 44.15
+   },
+   {
+    "sku": "ADFHG-EA",
+    "size": "64 oz. Bottle",
+    "price": 41.19
+   },
+   {
+    "sku": "ADFHG-CA",
+    "size": "64 oz. Bottles, Case of 6",
+    "price": 245.05
+   },
+   {
+    "sku": "ADFCN-EA",
+    "size": "16 oz. Bottle",
+    "price": 12.09
+   },
+   {
+    "sku": "ADFCN-CA",
+    "size": "16 oz. Bottles, Case of 12",
+    "price": 143.1
+   },
+   {
+    "sku": "ADF55-EA",
+    "size": "55 Gallon Drum",
+    "price": 3541.05
+   },
+   {
+    "sku": "ADF05-EA",
+    "size": "5 Gallon Pail",
+    "price": 368.7
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-diesel-cetane-boost-fuel-additive-acb/",
+  "product_name": "AMSOIL Diesel Cetane Boost Fuel Additive",
+  "page_title": "AMSOIL Diesel Cetane Boost Fuel Additive | ACB - AMSOIL",
+  "product_description": "Shop AMSOIL Diesel Cetane Boost Fuel Additive at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "13.59",
+  "all_available_prices": "13.59, 46.09, 161.8, 275, 419.05, 4084.8 USD",
+  "available_sizes": "64 oz. Bottle, 64 oz. Bottles, Case of 6, 16 oz. Bottle, 16 oz. Bottles, Case of 12, 55 Gallon Drum, 5 Gallon Pail",
+  "variant_skus": "ACBHG-EA, ACBHG-CA, ACBCN-EA, ACBCN-CA, ACB55-EA, ACB05-EA",
+  "customer_rating": "5 (112)",
+  "total_reviews": 112,
+  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Cetane Boost Fuel Additive",
+  "main_product_image": "",
+  "variants_ld": [
+   {
+    "sku": "ACBHG-EA",
+    "size": "64 oz. Bottle",
+    "price": 46.09
+   },
+   {
+    "sku": "ACBHG-CA",
+    "size": "64 oz. Bottles, Case of 6",
+    "price": 275
+   },
+   {
+    "sku": "ACBCN-EA",
+    "size": "16 oz. Bottle",
+    "price": 13.59
+   },
+   {
+    "sku": "ACBCN-CA",
+    "size": "16 oz. Bottles, Case of 12",
+    "price": 161.8
+   },
+   {
+    "sku": "ACB55-EA",
+    "size": "55 Gallon Drum",
+    "price": 4084.8
+   },
+   {
+    "sku": "ACB05-EA",
+    "size": "5 Gallon Pail",
+    "price": 419.05
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-diesel-recovery-fuel-treatment-drc/",
+  "product_name": "AMSOIL Diesel Recovery Fuel Treatment",
+  "page_title": "AMSOIL Diesel Recovery Fuel Treatment | DRC - AMSOIL",
+  "product_description": "Shop AMSOIL Diesel Recovery Fuel Treatment at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "18.59",
+  "all_available_prices": "18.59, 221.55 USD",
+  "available_sizes": "30 oz. Bottle, 30 oz. Bottles, Case of 12",
+  "variant_skus": "DRCQT-EA, DRCQT-CA",
+  "customer_rating": "5 (8)",
+  "total_reviews": 8,
+  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Recovery Fuel Treatment",
+  "main_product_image": "",
+  "variants_ld": [
+   {
+    "sku": "DRCQT-EA",
+    "size": "30 oz. Bottle",
+    "price": 18.59
+   },
+   {
+    "sku": "DRCQT-CA",
+    "size": "30 oz. Bottles, Case of 12",
+    "price": 221.55
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-diesel-injector-clean-cetane-boost-fuel-additive-ads/",
+  "product_name": "AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive",
+  "page_title": "AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive | ADS - AMSOIL",
+  "product_description": "Shop AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "7.89",
+  "all_available_prices": "7.89, 18.19, 46.45, 61.29, 216.05, 366.35, 565.8, 5260.4 USD",
+  "available_sizes": "8 oz. Bottle, 8 oz. Bottles, Case of 6, 64 oz. Bottle, 64 oz. Bottles, Case of 6, 16 oz. Bottle, 16 oz. Bottles, Case of 12, 55 Gallon Drum, 5 Gallon Pail",
+  "variant_skus": "ADSPCN-EA, ADSPCN-CA, ADSHG-EA, ADSHG-CA, ADSCN-EA, ADSCN-CA, ADS55-EA, ADS05-EA",
+  "customer_rating": "5 (185)",
+  "total_reviews": 185,
+  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive",
+  "main_product_image": "",
+  "variants_ld": [
+   {
+    "sku": "ADSPCN-EA",
+    "size": "8 oz. Bottle",
+    "price": 7.89
+   },
+   {
+    "sku": "ADSPCN-CA",
+    "size": "8 oz. Bottles, Case of 6",
+    "price": 46.45
+   },
+   {
+    "sku": "ADSHG-EA",
+    "size": "64 oz. Bottle",
+    "price": 61.29
+   },
+   {
+    "sku": "ADSHG-CA",
+    "size": "64 oz. Bottles, Case of 6",
+    "price": 366.35
+   },
+   {
+    "sku": "ADSCN-EA",
+    "size": "16 oz. Bottle",
+    "price": 18.19
+   },
+   {
+    "sku": "ADSCN-CA",
+    "size": "16 oz. Bottles, Case of 12",
+    "price": 216.05
+   },
+   {
+    "sku": "ADS55-EA",
+    "size": "55 Gallon Drum",
+    "price": 5260.4
+   },
+   {
+    "sku": "ADS05-EA",
+    "size": "5 Gallon Pail",
+    "price": 565.8
+   }
+  ]
+ },
+ {
   "product_url": "https://www.amsoil.com/p/amsoil-p-i-performance-improver-gasoline-additive-api/",
   "product_name": "AMSOIL P.i.® Performance Improver Gasoline Additive",
   "page_title": "P.i. Performance Improver Gasoline Additive - AMSOIL",
@@ -75,51 +347,6 @@
   "main_product_image": "https://www.amsoil.com/medias/aob-be.jpg?context=bWFzdGVyfGltYWdlc3w0NTM5OXxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJobVlTOW9OV012T1RZek5Ua3lNRFV4TVRBd05pNXFjR2N8MjhmM2Y3N2ViN2RjMWM1ODRmNmQ0ZmI5OWM4ZTkwOTM1NjUxZTg0ZTBhMmU2NDI4YjJiYTFjZmEwMTlmYjQ2OA"
  },
  {
-  "product_url": "https://www.amsoil.com/p/amsoil-motorcycle-octane-boost-mob/",
-  "product_name": "AMSOIL Motorcycle Octane Boost",
-  "page_title": "AMSOIL Motorcycle Octane Boost | MOB - AMSOIL",
-  "product_description": "Shop AMSOIL Motorcycle Octane Boost at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
-  "data_source_format": "json-ld, meta",
-  "offer_price": "6.99",
-  "all_available_prices": "",
-  "available_sizes": "4 oz. Bottle, 4 oz. Bottles, Case of 12",
-  "variant_skus": "MOBCN-EA, MOBCN-CA",
-  "customer_rating": "5 (159)",
-  "total_reviews": "159",
-  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Gasoline Additives > AMSOIL Motorcycle Octane Boost",
-  "main_product_image": "https://www.amsoil.com/medias/mob-cn.jpg?context=bWFzdGVyfGltYWdlc3w1MTE0M3xpbWFnZS9qcGVnfGFXMWhaMlZ6TDJoa055OW9Nemt2T0RjNU9EVXlPVGM0TVRjNU1DNXFjR2N8Mzg4ZjM3OGEzYWE3ODFmNzQ0ZWNmMWQ3NTM1MGJiNGE0MzFmNTAzZmRiMTlkZjMwMTQ2YWVhZjJhNmYwOTgzOA"
- },
- {
-  "product_url": "https://www.amsoil.com/p/amsoil-diesel-injector-clean-fuel-additive-adf/",
-  "product_name": "AMSOIL Diesel Injector Clean Fuel Additive",
-  "page_title": "AMSOIL Diesel Injector Clean Fuel Additive | ADF - AMSOIL",
-  "product_description": "Shop AMSOIL Diesel Injector Clean Fuel Additive at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
-  "data_source_format": "json-ld, meta",
-  "offer_price": "7.49",
-  "all_available_prices": "",
-  "available_sizes": "8 oz. Bottle, 8 oz. Bottles, Case of 6, 64 oz. Bottle, 64 oz. Bottles, Case of 6, 16 oz. Bottle, 16 oz. Bottles, Case of 12, 55 Gallon Drum, 5 Gallon Pail",
-  "variant_skus": "ADFPCN-EA, ADFPCN-CA, ADFHG-EA, ADFHG-CA, ADFCN-EA, ADFCN-CA, ADF55-EA, ADF05-EA",
-  "customer_rating": "5 (146)",
-  "total_reviews": "146",
-  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Injector Clean Fuel Additive",
-  "main_product_image": "https://www.amsoil.com/medias/adfpcn.jpg?context=bWFzdGVyfGltYWdlc3w3MzM1fGltYWdlL2pwZWd8YVcxaFoyVnpMMmcyTkM5b00yTXZPVFE1T0RnM016VTJNVEV4T0M1cWNHY3w1MjFkYTkwY2Q1OGVmY2NmM2NiZjc4NTZmMzI2ZmQyMzY1YmY3ZmMwZWY2MDIzMmZjMTAyNzhiMDhhOTIxMGFl"
- },
- {
-  "product_url": "https://www.amsoil.com/p/amsoil-diesel-cetane-boost-fuel-additive-acb/",
-  "product_name": "AMSOIL Diesel Cetane Boost Fuel Additive",
-  "page_title": "AMSOIL Diesel Cetane Boost Fuel Additive | ACB - AMSOIL",
-  "product_description": "Shop AMSOIL Diesel Cetane Boost Fuel Additive at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
-  "data_source_format": "json-ld, meta",
-  "offer_price": "13.59",
-  "all_available_prices": "",
-  "available_sizes": "64 oz. Bottle, 64 oz. Bottles, Case of 6, 16 oz. Bottle, 16 oz. Bottles, Case of 12, 55 Gallon Drum, 5 Gallon Pail",
-  "variant_skus": "ACBHG-EA, ACBHG-CA, ACBCN-EA, ACBCN-CA, ACB55-EA, ACB05-EA",
-  "customer_rating": "5 (112)",
-  "total_reviews": "112",
-  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Cetane Boost Fuel Additive",
-  "main_product_image": "https://www.amsoil.com/medias/acb-cn.jpg?context=bWFzdGVyfGltYWdlc3wzNjg0NnxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJoaU1TOW9ZVEl2T1RBMk5ETTNNVFk0TXpNMU9DNXFjR2N8ZDhhYzliZWVkMzhhNTdlNjAyMjg1NzA2MTc2NDhkMzYyZTA5MGE1YzM5YjZhNmFjZjk1NjUzMWQyODI1NzQyOQ"
- },
- {
   "product_url": "https://www.amsoil.com/p/amsoil-diesel-cold-flow-fuel-additive-add/",
   "product_name": "AMSOIL Diesel Cold Flow Fuel Additive",
   "page_title": "AMSOIL Diesel Cold Flow Fuel Additive | ADD - AMSOIL",
@@ -133,35 +360,5 @@
   "total_reviews": "309",
   "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Cold Flow Fuel Additive",
   "main_product_image": "https://www.amsoil.com/medias/addcn-ea.jpg?context=bWFzdGVyfGltYWdlc3w0NTIxMXxpbWFnZS9qcGVnfGFEbGhMMmhtTmk4eE16STROekE0TWpReU5qTTVPQzloWkdSamJsOWxZUzVxY0djfDcxOWVjNzhjZmU4MzY1ZjIyZjc1MTZkZmQ3ZTAwYWExZDZmNmFkNWFiNDM3Nzg5OGU4MjVjNDc3MWJhNDkzMDg"
- },
- {
-  "product_url": "https://www.amsoil.com/p/amsoil-diesel-recovery-fuel-treatment-drc/",
-  "product_name": "AMSOIL Diesel Recovery Fuel Treatment",
-  "page_title": "AMSOIL Diesel Recovery Fuel Treatment | DRC - AMSOIL",
-  "product_description": "Shop AMSOIL Diesel Recovery Fuel Treatment at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
-  "data_source_format": "json-ld, meta",
-  "offer_price": "18.59",
-  "all_available_prices": "",
-  "available_sizes": "30 oz. Bottle, 30 oz. Bottles, Case of 12",
-  "variant_skus": "DRCQT-EA, DRCQT-CA",
-  "customer_rating": "5 (8)",
-  "total_reviews": "8",
-  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Recovery Fuel Treatment",
-  "main_product_image": "https://www.amsoil.com/medias/drcqt-ea.jpg?context=bWFzdGVyfGltYWdlc3w0NzIzMXxpbWFnZS9qcGVnfGFEZzFMMmcwTUM4eE16STROekE0TlRJM056SXhOQzlrY21OeGRGOWxZUzVxY0djfDJmMDFlNjVhYWU2MDQwMGIxOWRiNTc1MGVjYWQwMGFiM2Q5MTk1YzkzYjMwZTk0NjMxYWFkYjU3YTM2ZGM3YWM"
- },
- {
-  "product_url": "https://www.amsoil.com/p/amsoil-diesel-injector-clean-cetane-boost-fuel-additive-ads/",
-  "product_name": "AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive",
-  "page_title": "AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive | ADS - AMSOIL",
-  "product_description": "Shop AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
-  "data_source_format": "json-ld, meta",
-  "offer_price": "7.89",
-  "all_available_prices": "",
-  "available_sizes": "8 oz. Bottle, 8 oz. Bottles, Case of 6, 64 oz. Bottle, 64 oz. Bottles, Case of 6, 16 oz. Bottle, 16 oz. Bottles, Case of 12, 55 Gallon Drum, 5 Gallon Pail",
-  "variant_skus": "ADSPCN-EA, ADSPCN-CA, ADSHG-EA, ADSHG-CA, ADSCN-EA, ADSCN-CA, ADS55-EA, ADS05-EA",
-  "customer_rating": "5 (185)",
-  "total_reviews": "185",
-  "breadcrumb_navigation": "HOME > Products > Fuel Additives > Diesel Additives > AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive",
-  "main_product_image": "https://www.amsoil.com/medias/ads-cn.jpg?context=bWFzdGVyfGltYWdlc3w0OTAwNXxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJnek1TOW9ObUl2T0RjNU9ETXpNVE0zTVRVMU1DNXFjR2N8OWY1OTI0NGViNDU1MGY2NDhmYjA1M2Q1NTA1NmMxYWViYzk5MDIxMWNlZTMzZDc0N2Q4MDk4ZGViM2NlZDViOA"
  }
 ]
