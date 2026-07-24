@@ -70,6 +70,22 @@
     "ANTHD-1G": {
       "file": "anthd.jpg",
       "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "AFL-5W40-QT": {
+      "file": "afl-5w40.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "AEL-5W30-QT": {
+      "file": "ael-5w30.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "HM020-QT": {
+      "file": "hm020.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "HM530-QT": {
+      "file": "hm530.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
     }
   },
   "ownerProvided": {

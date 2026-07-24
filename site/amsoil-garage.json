@@ -190,6 +190,46 @@
       "retailPrice": 32.39,
       "salePrice": null,
       "priceVerifiedAt": "2026-07-24"
+    },
+    "AFL-5W40-QT": {
+      "sku": "AFL-5W40-QT",
+      "stockNo": "AFLQT-EA",
+      "name": "5W-40 MS 100% Synthetic European Motor Oil",
+      "productPath": "/p/amsoil-5w-40-ms-100-synthetic-european-motor-oil-afl/",
+      "image": "/images/amsoil/afl-5w40.jpg",
+      "retailPrice": 17.89,
+      "salePrice": null,
+      "priceVerifiedAt": "2026-07-24"
+    },
+    "AEL-5W30-QT": {
+      "sku": "AEL-5W30-QT",
+      "stockNo": "AELQT-EA",
+      "name": "5W-30 LS 100% Synthetic European Motor Oil",
+      "productPath": "/p/amsoil-5w-30-ls-100-synthetic-european-motor-oil-ael/",
+      "image": "/images/amsoil/ael-5w30.jpg",
+      "retailPrice": 18.89,
+      "salePrice": null,
+      "priceVerifiedAt": "2026-07-24"
+    },
+    "HM020-QT": {
+      "sku": "HM020-QT",
+      "stockNo": "HM020QT-EA",
+      "name": "0W-20 100% Synthetic High-Mileage Motor Oil",
+      "productPath": "/p/amsoil-0w-20-100-synthetic-high-mileage-motor-oil-hm020/",
+      "image": "/images/amsoil/hm020.jpg",
+      "retailPrice": 14.39,
+      "salePrice": null,
+      "priceVerifiedAt": "2026-07-24"
+    },
+    "HM530-QT": {
+      "sku": "HM530-QT",
+      "stockNo": "HM530QT-EA",
+      "name": "5W-30 100% Synthetic High-Mileage Motor Oil",
+      "productPath": "/p/amsoil-5w-30-100-synthetic-high-mileage-motor-oil-hm530/",
+      "image": "/images/amsoil/hm530.jpg",
+      "retailPrice": 14.49,
+      "salePrice": null,
+      "priceVerifiedAt": "2026-07-24"
     }
   },
   "vehicles": {

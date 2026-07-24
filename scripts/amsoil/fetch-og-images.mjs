@@ -15,12 +15,10 @@ const OUT = path.join(ROOT, "site", "images", "amsoil");
 
 // file → { page, code: default-variant filename root to match }
 const WANT = {
-  "deo-5w40.jpg": { page: "https://www.amsoil.com/p/amsoil-signature-series-5w-40-100-synthetic-max-duty-diesel-oil-deo/", code: /^deoqt/ },
-  "ado-5w40.jpg": { page: "https://www.amsoil.com/p/amsoil-5w-40-heavy-duty-100-synthetic-diesel-oil-ado/", code: /^ado-?qt/ },
-  "pi-api.jpg": { page: "https://www.amsoil.com/p/amsoil-p-i-performance-improver-gasoline-additive-api/", code: /^apicn/ },
-  "ucl.jpg": { page: "https://www.amsoil.com/p/amsoil-upper-cylinder-lubricant-corrosion-inhibitor-ucl/", code: /^uclcn/ },
-  "antpc.jpg": { page: "https://www.amsoil.com/p/amsoil-passenger-car-light-truck-antifreeze-coolant-antpc/", code: /^antpc1g/ },
-  "anthd.jpg": { page: "https://www.amsoil.com/p/amsoil-heavy-duty-antifreeze-coolant-anthd/", code: /^anthd1g/ },
+  "afl-5w40.jpg": { page: "https://www.amsoil.com/p/amsoil-5w-40-ms-100-synthetic-european-motor-oil-afl/", code: /^aflqt/ },
+  "ael-5w30.jpg": { page: "https://www.amsoil.com/p/amsoil-5w-30-ls-100-synthetic-european-motor-oil-ael/", code: /^aelqt/ },
+  "hm020.jpg": { page: "https://www.amsoil.com/p/amsoil-0w-20-100-synthetic-high-mileage-motor-oil-hm020/", code: /^hm020qt/ },
+  "hm530.jpg": { page: "https://www.amsoil.com/p/amsoil-5w-30-100-synthetic-high-mileage-motor-oil-hm530/", code: /^hm530qt/ },
 };
 
 const ctxSize = (url) => {

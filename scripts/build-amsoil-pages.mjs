@@ -35,6 +35,8 @@ function categoryOf(name) {
   if (n.includes("antifreeze") || n.includes("coolant")) return "Antifreeze & Coolant";
   if (n.includes("performance improver") || n.includes("upper cylinder")) return "Fuel Additive";
   if (n.includes("diesel")) return "Diesel Oil";
+  if (n.includes("european")) return "European Motor Oil";
+  if (n.includes("high-mileage")) return "High-Mileage Motor Oil";
   if (n.includes("transmission") || n.includes("atf") || n.includes("multi-vehicle")) return "Automatic Transmission Fluid";
   if (n.includes("grease")) return "Grease";
   if (n.includes("motor oil") || n.includes("0w") || n.includes("5w")) return "Synthetic Motor Oil";
@@ -239,7 +241,7 @@ function page(model, models) {
     const price = priceOf(p);
     if (price == null) return null;
     const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}}`;
-    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},${p.image?`"image":${JSON.stringify("https://tunedyota.com"+p.image)},`:""}"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
   }).filter(Boolean).join(",");
 
   const capSec = capacitySection(name, gens);
@@ -363,6 +365,8 @@ const CAT_LABEL = {
   "Diesel Oil": "AMSOIL Synthetic Diesel Oil",
   "Fuel Additive": "AMSOIL Fuel Additives",
   "Antifreeze & Coolant": "AMSOIL Antifreeze & Coolant",
+  "European Motor Oil": "AMSOIL Synthetic European Motor Oil",
+  "High-Mileage Motor Oil": "AMSOIL Synthetic High-Mileage Motor Oil",
   "Grease": "AMSOIL Synthetic Grease",
 };
 
@@ -373,17 +377,23 @@ function garageOfferCatalog() {
     const price = typeof p.salePrice === "number" && p.salePrice > 0 ? p.salePrice
       : typeof p.retailPrice === "number" && p.retailPrice > 0 ? p.retailPrice : null;
     if (price == null) continue;
-    (byCat[categoryOf(p.name)] ||= []).push(price);
+    const c = categoryOf(p.name);
+    (byCat[c] ||= { prices: [], image: null });
+    byCat[c].prices.push(price);
+    // Representative image for the category Product node (GSC "Missing field
+    // image" fix — every Product needs one; first priced product's shot wins).
+    if (!byCat[c].image && p.image) byCat[c].image = p.image;
   }
   const shopUrl = amsoilUrl("/shop/");
   const seller = `"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}`;
   // Stable display order; only categories with at least one priced product appear.
-  return Object.keys(CAT_LABEL).filter((c) => byCat[c] && byCat[c].length).map((c) => {
-    const ps = byCat[c], low = Math.min(...ps), high = Math.max(...ps);
+  return Object.keys(CAT_LABEL).filter((c) => byCat[c] && byCat[c].prices.length).map((c) => {
+    const ps = byCat[c].prices, low = Math.min(...ps), high = Math.max(...ps);
     const offer = low === high
       ? `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(low.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(shopUrl)},${seller}}`
       : `{"@type":"AggregateOffer","priceCurrency":"USD","lowPrice":${JSON.stringify(low.toFixed(2))},"highPrice":${JSON.stringify(high.toFixed(2))},"offerCount":${ps.length},"availability":"https://schema.org/InStock","url":${JSON.stringify(shopUrl)},${seller}}`;
-    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(CAT_LABEL[c])},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(c)},"offers":${offer}}}`;
+    const img = byCat[c].image ? `"image":${JSON.stringify("https://tunedyota.com" + byCat[c].image)},` : "";
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(CAT_LABEL[c])},${img}"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(c)},"offers":${offer}}}`;
   }).join(",");
 }
 
@@ -633,7 +643,7 @@ function guidePage(g, vehModels) {
     const price = priceOfP(p);
     if (price == null) return null;
     const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}}`;
-    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},${p.image?`"image":${JSON.stringify("https://tunedyota.com"+p.image)},`:""}"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
   }).filter(Boolean).join(",");
   const faqSchema = g.faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
   const faqVisible = g.faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
@@ -860,6 +870,43 @@ const PRODUCT_COPY = {
     footnotes: "",
     guide: "amsoil-vs-oem-toyota-lexus-fluids.html", guideLabel: "AMSOIL vs. OEM fluids",
   },
+  // Claims from the European Motor Oil Dealer Product Brief (10/23) and the
+  // High-Mileage Motor Oil Product Sales Brief (7/23).
+  "European Motor Oil": {
+    tag: "Covers strict European manufacturer specifications with SAPS-balanced emissions-system protection — for gasoline and diesel engines.",
+    answer: (p) => `${ESC(p.name)} is a premium synthetic formulated for the unique demands of European engines — covering <strong>strict European manufacturer specifications</strong> with a precisely balanced SAPS formulation that protects sensitive emissions systems. Shear-stable synthetic base oils and high-quality anti-wear additives deliver dependable protection through the <strong>long drain intervals European manufacturers recommend</strong>, in both gasoline and diesel engines.`,
+    bullets: [
+      "<strong>Extensive coverage</strong> of strict European manufacturer specifications.",
+      "<strong>Emissions-system protection</strong> — precisely balanced SAPS (sulfated ash, phosphorus, sulfur) keeps exhaust-treatment devices functioning properly.",
+      "<strong>Superior engine cleanliness</strong> — prevents sludge and varnish deposits, reduces oil consumption, extends engine life.",
+      "<strong>Excellent for turbochargers</strong> — thermally stable formulation resists deposits and cools turbos; low pour point protects against oil starvation in subzero cold.",
+    ],
+    faqs: [
+      ["Is it safe if it's not officially approved by my manufacturer?", "Absolutely — if it has the correct viscosity and specification. Manufacturer approvals only mean an oil meets minimum performance standards; AMSOIL goes beyond the minimum, and AMSOIL products are Warranty Secure, keeping your factory warranty intact."],
+      ["Can I use it in my diesel-powered European vehicle?", "Yes — the versatile formulation is suitable for both gasoline and diesel engines. Match the viscosity and specification your owner's manual calls for."],
+      ["How often should I change the oil?", "European manufacturers commonly recommend long drain intervals, and AMSOIL recommends following them — check your owner's manual or change according to the oil-life monitor."],
+    ],
+    footnotes: "",
+    guide: "amsoil-synthetic-motor-oil-guide.html", guideLabel: "AMSOIL synthetic motor oil guide",
+  },
+  "High-Mileage Motor Oil": {
+    tag: "Purpose-built for vehicles past 75,000 miles — seal conditioners protect against leaks, boosted detergents fight deposits, API licensed, 12,000-mile protection.",
+    answer: (p) => `${ESC(p.name)} is purpose-built for engines past <strong>75,000 miles</strong>: added seal conditioners defend seals against drying, cracking and leaking, an added detergent boost cleans up sludge and deposits, and a robust viscosity provides additional wear protection even after some wear has occurred. It's <strong>API licensed</strong> and cleans and protects for up to <strong>12,000 miles or 1 year</strong> in normal service.`,
+    bullets: [
+      "<strong>Purpose-built protection</strong> for high-mileage vehicles — confidence to keep aging vehicles on the road.",
+      "<strong>Protects against leaks</strong> — seal conditioners extend seal life by defending against drying and cracking.",
+      "<strong>Fights deposits</strong> — an added boost of detergents cleans up sludge.",
+      "<strong>API licensed</strong>; formulated to meet and exceed the latest industry specifications, including LSPI protection.",
+      "<strong>Cleans and protects for up to 12,000 miles</strong> or 1 year in normal service.",
+    ],
+    faqs: [
+      ["When should I switch to High-Mileage Motor Oil?", "A good rule of thumb is at or around 75,000 miles — the widely accepted threshold to begin a more robust preventive-maintenance program for maximum engine life."],
+      ["Is this right for my older Tundra, Tacoma or 4Runner?", "It's an excellent fit for high-mileage Toyota and Lexus engines: targeted seal, deposit and wear protection at an affordable price. For ultimate performance and protection regardless of miles, Signature Series remains AMSOIL's top choice."],
+      ["What's the drain interval?", "Up to 12,000 miles or 1 year, whichever comes first, in normal service (see your owner's manual for severe-service schedules). Always change the filter when changing oil."],
+    ],
+    footnotes: "",
+    guide: "amsoil-synthetic-motor-oil-guide.html", guideLabel: "AMSOIL synthetic motor oil guide",
+  },
 };
 
 export function productSlug(p) {
@@ -1020,7 +1067,7 @@ function geoPage(st, vehModels) {
     const price = priceOfP(p);
     if (price == null) return null;
     const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}}`;
-    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
+    return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},${p.image?`"image":${JSON.stringify("https://tunedyota.com"+p.image)},`:""}"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
   }).filter(Boolean).join(",");
   const cityList = st.cities.join(", ");
   const faqs = [

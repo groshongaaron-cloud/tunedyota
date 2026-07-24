@@ -41,6 +41,11 @@ const price2dp = (v) => /^\d+\.\d{2}$/.test(String(v));
 function assertValidProduct(f, p) {
   assert.ok(p.offers || p.review || p.aggregateRating,
     `${f}: Product "${p.name}" missing offers/review/aggregateRating`);
+  // GSC merchant-listing "Missing field image" (2026-07-24, 45 items): every
+  // Product node must carry an absolute self-hosted image.
+  const img = Array.isArray(p.image) ? p.image[0] : p.image;
+  assert.match(String(img || ""), /^https:\/\/tunedyota\.com\/images\//,
+    `${f}: Product "${p.name}" missing/relative image`);
   if (!p.offers) return;
   const offer = Array.isArray(p.offers) ? p.offers[0] : p.offers;
   assert.equal(offer.priceCurrency, "USD", `${f}: Product "${p.name}" missing USD currency`);

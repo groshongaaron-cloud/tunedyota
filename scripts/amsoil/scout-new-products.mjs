@@ -8,12 +8,10 @@ import { withBrowser, fetchProductHtml } from "./lib/browser-fetch.mjs";
 import { parsePrice } from "./lib/price-parse.mjs";
 
 const URLS = [
-  "https://www.amsoil.com/p/amsoil-signature-series-5w-40-100-synthetic-max-duty-diesel-oil-deo/",
-  "https://www.amsoil.com/p/amsoil-5w-40-heavy-duty-100-synthetic-diesel-oil-ado/",
-  "https://www.amsoil.com/p/amsoil-p-i-performance-improver-gasoline-additive-api/",
-  "https://www.amsoil.com/p/amsoil-upper-cylinder-lubricant-corrosion-inhibitor-ucl/",
-  "https://www.amsoil.com/p/amsoil-passenger-car-light-truck-antifreeze-coolant-antpc/",
-  "https://www.amsoil.com/p/amsoil-heavy-duty-antifreeze-coolant-anthd/",
+  "https://www.amsoil.com/p/amsoil-5w-40-ms-100-synthetic-european-motor-oil-afl/",
+  "https://www.amsoil.com/p/amsoil-5w-30-ls-100-synthetic-european-motor-oil-ael/",
+  "https://www.amsoil.com/p/amsoil-0w-20-100-synthetic-high-mileage-motor-oil-hm020/",
+  "https://www.amsoil.com/p/amsoil-5w-30-100-synthetic-high-mileage-motor-oil-hm530/",
 ];
 
 for (const u of URLS) {
