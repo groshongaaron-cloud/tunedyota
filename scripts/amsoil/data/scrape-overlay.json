@@ -1,9 +1,10 @@
 {
  "updated": "2026-07-25",
  "files": [
-  "gasoline-motor-oil.json"
+  "gasoline-motor-oil.json",
+  "hydraulic-oil.json"
  ],
- "count": 42,
+ "count": 54,
  "products": {
   "AZSQT-EA": {
    "path": "/p/amsoil-signature-series-0w-16-100-synthetic-motor-oil-azs/",
@@ -340,6 +341,102 @@
    "reviews": 10,
    "name": "AMSOIL 5W-30 Synthetic-Blend Motor Oil ",
    "source": "gasoline-motor-oil.json"
+  },
+  "AWG05-EA": {
+   "path": "/p/amsoil-iso-22-100-synthetic-anti-wear-hydraulic-oil-awg/",
+   "price": 371.7,
+   "rating": 5,
+   "reviews": 2,
+   "name": "AMSOIL ISO 22 100% Synthetic Anti-Wear Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "AWH05-EA": {
+   "path": "/p/amsoil-iso-32-100-synthetic-anti-wear-hydraulic-oil-awh/",
+   "price": 348,
+   "rating": 5,
+   "reviews": 2,
+   "name": "AMSOIL ISO 32 100% Synthetic Anti-Wear Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "AWI05-EA": {
+   "path": "/p/amsoil-iso-46-100-synthetic-anti-wear-hydraulic-oil-awi/",
+   "price": 346.25,
+   "rating": 5,
+   "reviews": 2,
+   "name": "AMSOIL ISO 46 100% Synthetic Anti-Wear Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "HVH05-EA": {
+   "path": "/p/amsoil-iso-32-100-synthetic-multi-viscosity-hydraulic-oil-hvh/",
+   "price": 282.2,
+   "rating": 5,
+   "reviews": 4,
+   "name": "AMSOIL ISO 32 100% Synthetic Multi-Viscosity Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "HVI05-EA": {
+   "path": "/p/amsoil-iso-46-100-synthetic-multi-viscosity-hydraulic-oil-hvi/",
+   "price": 271.45,
+   "rating": 5,
+   "reviews": 4,
+   "name": "AMSOIL ISO 46 100% Synthetic Multi-Viscosity Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "HCG32TP-EA": {
+   "path": "/p/amsoil-iso-32-commercial-grade-hydraulic-oil-hcg32/",
+   "price": 93.2,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL ISO 32 Commercial-Grade Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "HCG46TP-EA": {
+   "path": "/p/amsoil-iso-46-commercial-grade-hydraulic-oil-hcg46/",
+   "price": 93.2,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL ISO 46 Commercial-Grade Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "HCG68TP-EA": {
+   "path": "/p/amsoil-iso-68-commercial-grade-hydraulic-oil-hcg68/",
+   "price": 93.25,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL ISO 68 Commercial-Grade Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "BHO05-EA": {
+   "path": "/p/amsoil-iso-46-100-synthetic-biodegradable-hydraulic-oil-bho/",
+   "price": 407.4,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL ISO 46 100% Synthetic Biodegradable Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "ATHQT-EA": {
+   "path": "/p/amsoil-5w-30-100-synthetic-tractor-hydraulic-transmission-oil-ath/",
+   "price": 17.49,
+   "rating": 5,
+   "reviews": 50,
+   "name": "AMSOIL 5W-30 100% Synthetic Tractor Hydraulic/Transmission Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "HVG05-EA": {
+   "path": "/p/amsoil-iso-22-100-synthetic-multi-viscosity-hydraulic-oil-hvg/",
+   "price": 274.75,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL ISO 22 100% Synthetic Multi-Viscosity Hydraulic Oil",
+   "source": "hydraulic-oil.json"
+  },
+  "HVJ05-EA": {
+   "path": "/p/amsoil-iso-68-100-synthetic-multi-viscosity-hydraulic-oil-hvj/",
+   "price": 293.25,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL ISO 68 100% Synthetic Multi-Viscosity Hydraulic Oil",
+   "source": "hydraulic-oil.json"
   }
  }
 }

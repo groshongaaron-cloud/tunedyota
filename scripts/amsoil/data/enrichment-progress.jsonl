@@ -697,3 +697,91 @@
 {"stockNo":"CTG05-EA","name":"AMSOIL SAE 10W 100% Synthetic Powershift Transmission Fluid","ok":false,"err":"unvalidated og="}
 {"stockNo":"CTJ05-EA","name":"AMSOIL SAE 30 100% Synthetic Powershift Transmission Fluid","ok":false,"err":"unvalidated og="}
 {"stockNo":"CTL05-EA","name":"AMSOIL SAE 50 100% Synthetic Powershift Transmission Fluid","ok":false,"err":"unvalidated og="}
+{"stockNo":"CK5-EA","name":"AMSOIL ATV/UTV Kits For Can-Am Vehicles","ok":false,"err":"unvalidated og="}
+{"stockNo":"PK3-EA","name":"AMSOIL ATV/UTV Kits for Polaris Vehicles","ok":false,"err":"unvalidated og="}
+{"stockNo":"BP55-EA","name":"\"O\" RING  # 115           BP89","ok":false,"err":"unvalidated og="}
+{"stockNo":"ACL4SC-EA","name":"AMSOIL Chain Lube","ok":false,"err":"unvalidated og="}
+{"stockNo":"AMP4SC-EA","name":"AMSOIL MP Metal Protector","ok":false,"err":"unvalidated og="}
+{"stockNo":"PCH05-EA","name":"AMSOIL ISO 32 100% Synthetic Compressor Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"SEI05-EA","name":"AMSOIL SIROCCO ISO-32/46 Compressor Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"DBA5067-EA","name":"Donaldson Blue Heavy Duty Air Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"DBL7349-EA","name":"Donaldson Blue Oil Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"P535396-EA","name":"Donaldson P-Series Heavy Duty Air Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"P554860-EA","name":"Donaldson P-Series Heavy Duty Coolant Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"P550094-EA","name":"Donaldson P-Series Heavy Duty Fuel Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"P551553-EA","name":"Donaldson P-Series Heavy-Duty Hydraulic Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"P550008-EA","name":"Donaldson P-Series Lube Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"P552479-EA","name":"Donaldson P-Series Transmission Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"C26168-EA","name":"MANN-FILTERS Air Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"CU2882-EA","name":"MANN-FILTERS Cabin Air Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"WK8173X-EA","name":"MANN-FILTERS Fuel Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"HU819X-EA","name":"MANN-FILTERS Oil Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"WA11053-EA","name":"WIX Air Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"WL11042-EA","name":"WIX Bypass Oil Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"24883-EA","name":"WIX Cabin Air Filters","ok":false,"err":"unvalidated og="}
+{"stockNo":"42995-EA","name":"WIX Crankcase Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"33052-EA","name":"WIX Fuel Filters","ok":false,"err":"blocked"}
+{"stockNo":"51315-EA","name":"WIX Oil Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"58707-EA","name":"WIX Transmission Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"51356XP-EA","name":"WIX XP Oil Filter","ok":false,"err":"unvalidated og="}
+{"stockNo":"ADBPCN-EA","name":"AMSOIL Diesel 4-IN-1 Fuel Additive","ok":false,"err":"unvalidated og="}
+{"stockNo":"ADSPCN-EA","name":"AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive","ok":false,"err":"unvalidated og="}
+{"stockNo":"FGO05-EA","name":"AMSOIL 80W-140 Long Life 100% Synthetic Gear Lube","ok":false,"err":"unvalidated og="}
+{"stockNo":"GSF35-EA","name":"AMSOIL Synthetic EP #00 Grease","ok":false,"err":"unvalidated og="}
+{"stockNo":"AWG05-EA","name":"AMSOIL ISO 22 100% Synthetic Anti-Wear Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"HVG05-EA","name":"AMSOIL ISO 22 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"AWH05-EA","name":"AMSOIL ISO 32 100% Synthetic Anti-Wear Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"HVH05-EA","name":"AMSOIL ISO 32 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"AWI05-EA","name":"AMSOIL ISO 46 100% Synthetic Anti-Wear Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"BHO05-EA","name":"AMSOIL ISO 46 100% Synthetic Biodegradable Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"HVI05-EA","name":"AMSOIL ISO 46 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"HVJ05-EA","name":"AMSOIL ISO 68 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"ANGS05-EA","name":"AMSOIL 100% Synthetic Stationary Natural Gas Engine Oil","ok":false,"err":"unvalidated og="}
+{"stockNo":"ANGV05-EA","name":"AMSOIL 100% Synthetic Vehicular Natural Gas Engine Oil","ok":false,"err":"blocked"}
+{"stockNo":"CTG05-EA","name":"AMSOIL SAE 10W 100% Synthetic Powershift Transmission Fluid","ok":false,"err":"unvalidated og="}
+{"stockNo":"CTJ05-EA","name":"AMSOIL SAE 30 100% Synthetic Powershift Transmission Fluid","ok":false,"err":"unvalidated og="}
+{"stockNo":"CTL05-EA","name":"AMSOIL SAE 50 100% Synthetic Powershift Transmission Fluid","ok":false,"err":"unvalidated og="}
+{"stockNo":"CK5-EA","name":"AMSOIL ATV/UTV Kits For Can-Am Vehicles","ok":false,"path":"/p/amsoil-atv-utv-kits-for-can-am-vehicles-ck/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"PK3-EA","name":"AMSOIL ATV/UTV Kits for Polaris Vehicles","ok":false,"path":"/p/amsoil-atv-utv-kits-for-polaris-vehicles-pk/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"BP55-EA","name":"\"O\" RING  # 115           BP89","ok":false,"path":"/p/o-ring-115-bp89-bp/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"ACL4SC-EA","name":"AMSOIL Chain Lube","ok":false,"path":"/p/amsoil-chain-lube-acl4/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"AMP4SC-EA","name":"AMSOIL MP Metal Protector","ok":false,"err":"Cannot read properties of null (reading '1')","path":"/p/amsoil-mp-metal-protector-amp4/","price":null}
+{"stockNo":"PCH05-EA","name":"AMSOIL ISO 32 100% Synthetic Compressor Oil","ok":true,"path":"/p/amsoil-iso-32-100-synthetic-compressor-oil-pch/","price":384.5,"image":"/images/amsoil/full/pch05-ea.jpg"}
+{"stockNo":"SEI05-EA","name":"AMSOIL SIROCCO ISO-32/46 Compressor Oil","ok":true,"path":"/p/amsoil-sirocco-iso-32-46-compressor-oil-sei/","price":543.65,"image":"/images/amsoil/full/sei05-ea.jpg"}
+{"stockNo":"DBA5067-EA","name":"Donaldson Blue Heavy Duty Air Filters","ok":false,"path":"/p/donaldson-blue-heavy-duty-air-filters-dba/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"DBL7349-EA","name":"Donaldson Blue Oil Filter","ok":false,"path":"/p/donaldson-blue-oil-filter-dbl/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"P535396-EA","name":"Donaldson P-Series Heavy Duty Air Filters","ok":false,"path":"/p/donaldson-p-series-heavy-duty-air-filters-p535396/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"P554860-EA","name":"Donaldson P-Series Heavy Duty Coolant Filters","ok":false,"path":"/p/donaldson-p-series-heavy-duty-coolant-filters-p554860/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"P550094-EA","name":"Donaldson P-Series Heavy Duty Fuel Filters","ok":false,"path":"/p/donaldson-p-series-heavy-duty-fuel-filters-p550094/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"P551553-EA","name":"Donaldson P-Series Heavy-Duty Hydraulic Filters","ok":false,"path":"/p/donaldson-p-series-heavy-duty-hydraulic-filters-p551553/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"P550008-EA","name":"Donaldson P-Series Lube Filter","ok":false,"path":"/p/donaldson-p-series-lube-filter-p550008/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"P552479-EA","name":"Donaldson P-Series Transmission Filters","ok":false,"path":"/p/donaldson-p-series-transmission-filters-p552479/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"C26168-EA","name":"MANN-FILTERS Air Filters","ok":false,"path":"/p/mann-filters-air-filters-c26168/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"CU2882-EA","name":"MANN-FILTERS Cabin Air Filters","ok":false,"path":"/p/mann-filters-cabin-air-filters-cu/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"WK8173X-EA","name":"MANN-FILTERS Fuel Filters","ok":false,"path":"/p/mann-filters-fuel-filters-wk8173x/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"HU819X-EA","name":"MANN-FILTERS Oil Filter","ok":false,"path":"/p/mann-filters-oil-filter-hu819x/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"WA11053-EA","name":"WIX Air Filter","ok":false,"path":"/p/wix-air-filter-wa/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"WL11042-EA","name":"WIX Bypass Oil Filter","ok":false,"path":"/p/wix-bypass-oil-filter-wl/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"24883-EA","name":"WIX Cabin Air Filters","ok":false,"path":"/p/wix-cabin-air-filters-24883/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"42995-EA","name":"WIX Crankcase Filter","ok":false,"path":"/p/wix-crankcase-filter-42995/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"33052-EA","name":"WIX Fuel Filters","ok":false,"path":"/p/wix-fuel-filters-33052/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"51315-EA","name":"WIX Oil Filter","ok":false,"path":"/p/wix-oil-filter-51315/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"58707-EA","name":"WIX Transmission Filter","ok":false,"err":"blocked"}
+{"stockNo":"51356XP-EA","name":"WIX XP Oil Filter","ok":false,"path":"/p/wix-xp-oil-filter-51356xp/","price":null,"err":"Cannot read properties of null (reading '1')"}
+{"stockNo":"ADBPCN-EA","name":"AMSOIL Diesel 4-IN-1 Fuel Additive","ok":false,"err":"Cannot read properties of null (reading '1')","path":"/p/amsoil-diesel-4-in-1-fuel-additive-adbp/","price":null}
+{"stockNo":"ADSPCN-EA","name":"AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive","ok":false,"err":"Cannot read properties of null (reading '1')","path":"/p/amsoil-diesel-injector-clean-cetane-boost-fuel-additive-adsp/","price":null}
+{"stockNo":"FGO05-EA","name":"AMSOIL 80W-140 Long Life 100% Synthetic Gear Lube","ok":true,"path":"/p/amsoil-80w-140-long-life-100-synthetic-gear-lube-fgo/","price":381,"image":"/images/amsoil/full/fgo05-ea.jpg"}
+{"stockNo":"GSF35-EA","name":"AMSOIL Synthetic EP #00 Grease","ok":true,"path":"/p/amsoil-synthetic-ep-00-grease-gsf/","price":661.75,"image":"/images/amsoil/full/gsf35-ea.jpg"}
+{"stockNo":"AWG05-EA","name":"AMSOIL ISO 22 100% Synthetic Anti-Wear Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-22-100-synthetic-anti-wear-hydraulic-oil-awg/","price":371.7,"image":"/images/amsoil/full/awg05-ea.jpg"}
+{"stockNo":"HVG05-EA","name":"AMSOIL ISO 22 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-22-100-synthetic-multi-viscosity-hydraulic-oil-hvg/","price":274.75,"image":"/images/amsoil/full/hvg05-ea.jpg"}
+{"stockNo":"AWH05-EA","name":"AMSOIL ISO 32 100% Synthetic Anti-Wear Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-32-100-synthetic-anti-wear-hydraulic-oil-awh/","price":348,"image":"/images/amsoil/full/awh05-ea.jpg"}
+{"stockNo":"HVH05-EA","name":"AMSOIL ISO 32 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-32-100-synthetic-multi-viscosity-hydraulic-oil-hvh/","price":282.2,"image":"/images/amsoil/full/hvh05-ea.jpg"}
+{"stockNo":"AWI05-EA","name":"AMSOIL ISO 46 100% Synthetic Anti-Wear Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-46-100-synthetic-anti-wear-hydraulic-oil-awi/","price":346.25,"image":"/images/amsoil/full/awi05-ea.jpg"}
+{"stockNo":"BHO05-EA","name":"AMSOIL ISO 46 100% Synthetic Biodegradable Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-46-100-synthetic-biodegradable-hydraulic-oil-bho/","price":407.4,"image":"/images/amsoil/full/bho05-ea.jpg"}
+{"stockNo":"HVI05-EA","name":"AMSOIL ISO 46 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-46-100-synthetic-multi-viscosity-hydraulic-oil-hvi/","price":271.45,"image":"/images/amsoil/full/hvi05-ea.jpg"}
+{"stockNo":"HVJ05-EA","name":"AMSOIL ISO 68 100% Synthetic Multi-Viscosity Hydraulic Oil","ok":true,"path":"/p/amsoil-iso-68-100-synthetic-multi-viscosity-hydraulic-oil-hvj/","price":293.25,"image":"/images/amsoil/full/hvj05-ea.jpg"}
+{"stockNo":"ANGS05-EA","name":"AMSOIL 100% Synthetic Stationary Natural Gas Engine Oil","ok":true,"path":"/p/amsoil-100-synthetic-stationary-natural-gas-engine-oil-angs/","price":416.9,"image":"/images/amsoil/full/angs05-ea.jpg"}
+{"stockNo":"ANGV05-EA","name":"AMSOIL 100% Synthetic Vehicular Natural Gas Engine Oil","ok":true,"path":"/p/amsoil-100-synthetic-vehicular-natural-gas-engine-oil-angv/","price":330.25,"image":"/images/amsoil/full/angv05-ea.jpg"}
+{"stockNo":"CTG05-EA","name":"AMSOIL SAE 10W 100% Synthetic Powershift Transmission Fluid","ok":true,"path":"/p/amsoil-sae-10w-100-synthetic-powershift-transmission-fluid-ctg/","price":324.95,"image":"/images/amsoil/full/ctg05-ea.jpg"}
+{"stockNo":"CTJ05-EA","name":"AMSOIL SAE 30 100% Synthetic Powershift Transmission Fluid","ok":true,"path":"/p/amsoil-sae-30-100-synthetic-powershift-transmission-fluid-ctj/","price":323.5,"image":"/images/amsoil/full/ctj05-ea.jpg"}
+{"stockNo":"CTL05-EA","name":"AMSOIL SAE 50 100% Synthetic Powershift Transmission Fluid","ok":true,"path":"/p/amsoil-sae-50-100-synthetic-powershift-transmission-fluid-ctl/","price":340.7,"image":"/images/amsoil/full/ctl05-ea.jpg"}

@@ -404,93 +404,91 @@ function garageOfferCatalog() {
 // landing pages first (Tier-1/3 strategy) with a referral "View at AMSOIL"
 // outbound; images are our SELF-HOSTED copies (never amsoil.com hotlinks).
 // Product line + viscosity are derived at build time, never hand-edited.
-const PRODUCT_LINES = ["Signature Series", "Extended-Life", "European", "High-Mileage", "Hybrid", "Z-ROD", "DOMINATOR", "Premium Protection", "Break-In", "Synthetic-Blend", "OE"];
+const PRODUCT_LINES = ["Signature Series", "Extended-Life", "European", "High-Mileage", "Hybrid", "Z-ROD", "DOMINATOR", "Premium Protection", "Break-In", "Synthetic-Blend", "SEVERE GEAR", "Commercial-Grade", "Heavy-Duty", "Anti-Wear", "Multi-Viscosity", "Biodegradable", "OE"];
 const lineOf = (name) => PRODUCT_LINES.find((l) => name.includes(l)) || "Synthetic";
-const viscOf = (name) => (name.match(/\b(\d{1,2}W-\d{1,3}|SAE \d{2})\b/) || [])[1] || "";
+const viscOf = (name) => (name.match(/\b(\d{1,2}W-\d{1,3}|SAE \d{2}|ISO \d{2,3}|NLGI #?\d)\b/) || [])[1] || "";
 
-export function buildGarageGasolineShowcase(html) {
-  let scrape = [];
-  try { scrape = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "amsoil", "gasoline-motor-oil.json"), "utf8")); } catch { /* no scrape yet */ }
-  const re = /<!-- AMSOIL:GASOLINE:START -->[\s\S]*?<!-- AMSOIL:GASOLINE:END -->/;
-  if (!re.test(html)) throw new Error("AMSOIL:GASOLINE markers not found in amsoil-garage.html");
-  // Map each scrape record to a catalog product (by variant SKU, name fallback).
-  const stockIndex = new Map();
-  FULL.products.forEach((p) => { stockIndex.set(p.stockNo, p); p.variants.forEach((v) => stockIndex.set(v.stockNo, p)); });
-  const nameIndex = new Map(FULL.products.map((p) => [`amsoil ${p.name}`.toLowerCase().replace(/\s+/g, " "), p]));
+// Toyota/Lexus-relevant categories lead and render expanded; the rest follow
+// alphabetically, collapsed.
+const MEGASTORE_LEAD = ["Motor Oil", "High Mileage Motor Oil", "Hybrid Motor Oil", "Diesel Oil", "European Oil", "Transmission Fluid", "Gear Oil", "Filters", "Fuel Additives", "Antifreeze/Coolant", "Grease", "Car Care & Detailing", "Cleaners & Protectants"];
+
+export function buildGarageMegastore(html) {
+  const re = /<!-- AMSOIL:MEGASTORE:START -->[\s\S]*?<!-- AMSOIL:MEGASTORE:END -->/;
+  if (!re.test(html)) throw new Error("AMSOIL:MEGASTORE markers not found in amsoil-garage.html");
   const internal = internalByStock();
-  const seen = new Set(); const cards = [];
-  for (const r of scrape) {
-    const skus = String(r.variant_skus || "").split(/\s*,\s*/).filter(Boolean);
-    let p = skus.map((s) => stockIndex.get(s)).find(Boolean)
-      || nameIndex.get(String(r.product_name || "").toLowerCase().replace(/\s+/g, " "));
-    if (!p || seen.has(p.stockNo)) continue;
-    seen.add(p.stockNo);
-    const img = (Object.values(CAT.products).find((c) => c.stockNo === p.stockNo) || {}).image
-      || (ENRICH.products[p.stockNo] || {}).image;
+  const curatedImg = {};
+  Object.values(CAT.products).forEach((c) => { if (c.stockNo && c.image) curatedImg[c.stockNo] = c.image; });
+  const card = (p) => {
+    const img = curatedImg[p.stockNo] || (ENRICH.products[p.stockNo] || {}).image;
     const page = internal[p.stockNo];
-    if (!img || !page) continue;   // quality bar: self-hosted image + internal page
+    if (!img || !page) return null;   // quality bar: self-hosted image + internal page
     const sc = scrapeOf(p.stockNo) || {};
     const name = cleanName(p.name);
     const line = lineOf(name), visc = viscOf(name);
     const outbound = amsoilUrl((ENRICH.products[p.stockNo] || {}).path || `/search/?text=${encodeURIComponent(p.stockNo)}`);
-    cards.push({ line, visc, html: `<div class="gaso-card" data-line="${ESC(line)}" data-visc="${ESC(visc)}">
+    return `<div class="gaso-card">
   <a href="${page}"><img src="${img}" alt="${ESC(name)}" loading="lazy" width="110" height="110"></a>
   <div class="gaso-meta">${visc ? `<span class="gaso-visc">${ESC(visc)}</span>` : ""}<span class="gaso-line">${ESC(line)}</span></div>
   <a class="gaso-name" href="${page}">${ESC(name)}</a>
   <div class="gaso-price">$${effRetail(p).toFixed(2)}${p.pc ? ` <span>· $${p.pc.toFixed(2)} P.C.</span>` : ""}</div>
   ${sc.rating ? `<div class="gaso-rate">★ ${sc.rating.toFixed(1)} (${(sc.reviews || 0).toLocaleString("en-US")})</div>` : ""}
   <a class="gaso-out" target="_blank" rel="noopener" href="${outbound}">View at AMSOIL &#9658;</a>
-</div>` });
-  }
-  if (!cards.length) return html.replace(re, () => "<!-- AMSOIL:GASOLINE:START -->\n<!-- AMSOIL:GASOLINE:END -->");
-  const lines = [...new Set(cards.map((c) => c.line))];
-  const viscs = [...new Set(cards.map((c) => c.visc).filter(Boolean))].sort();
-  const block = `<!-- AMSOIL:GASOLINE:START -->
+</div>`;
+  };
+  const cats = [...new Set(FULL.products.map((p) => p.category))];
+  const ordered = [...MEGASTORE_LEAD.filter((c) => cats.includes(c)), ...cats.filter((c) => !MEGASTORE_LEAD.includes(c)).sort()];
+  const seen = new Set();
+  let totalCards = 0;
+  const groups = ordered.map((c, i) => {
+    const ps = FULL.products.filter((p) => p.category === c && !seen.has(p.stockNo) && seen.add(p.stockNo));
+    const cardsHtml = ps.map(card).filter(Boolean);
+    if (!cardsHtml.length) return null;
+    totalCards += cardsHtml.length;
+    const slug = catSlug(c);
+    const hero = CAT_IMAGES.images[slug];
+    return { c, slug, count: cardsHtml.length,
+      html: `<details class="mega-grp" id="ms-${slug}"${i < MEGASTORE_LEAD.length ? " open" : ""}>
+<summary>${hero ? `<img src="${hero}" alt="" width="30" height="30" loading="lazy" style="border-radius:50%;vertical-align:-9px;margin-right:8px">` : ""}AMSOIL ${ESC(c)} <span class="mega-n">${cardsHtml.length}</span></summary>
+<div class="gaso-grid">
+${cardsHtml.join("\n")}
+</div>
+<p class="mega-all"><a href="amsoil-${slug}-products.html">All AMSOIL ${ESC(c)} products, sizes &amp; pricing →</a></p>
+</details>` };
+  }).filter(Boolean);
+  const nav = groups.map((g) => `<a href="#ms-${g.slug}">${ESC(g.c)} (${g.count})</a>`).join("");
+  const block = `<!-- AMSOIL:MEGASTORE:START -->
 <style>
 .gaso-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin:14px 0}
 .gaso-card{background:var(--card,#FAF9F7);border:1.4px solid rgba(91,75,66,.16);border-radius:14px;padding:14px;text-align:center}
 .gaso-card img{width:110px;height:110px;object-fit:contain}
-.gaso-meta{display:flex;gap:6px;justify-content:center;margin:6px 0 4px;font-size:11px}
+.gaso-meta{display:flex;gap:6px;justify-content:center;margin:6px 0 4px;font-size:11px;flex-wrap:wrap}
 .gaso-visc{background:#3A2E26;color:#F3EFEA;border-radius:99px;padding:2px 8px;font-weight:900}
 .gaso-line{background:#EDECEB;border-radius:99px;padding:2px 8px;color:#5D4B40;font-weight:700}
 .gaso-name{display:block;font-weight:700;color:#5B4B42;font-size:13.5px;line-height:1.35;text-decoration:none;min-height:36px}
 .gaso-price{font-weight:900;color:#3A2E26;margin:6px 0 2px}.gaso-price span{font-weight:600;font-size:12px;color:#7c8472}
 .gaso-rate{font-size:12px;color:#7c8472}
 .gaso-out{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:900;color:#5B4B42}
-.gaso-filt{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-.gaso-filt button{border:1.4px solid #5B4B42;background:transparent;color:#5B4B42;border-radius:99px;padding:7px 14px;font-weight:700;font-size:12.5px;cursor:pointer}
-.gaso-filt button.on{background:#3A2E26;color:#F3EFEA;border-color:#3A2E26}
+.mega-nav{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.mega-nav a{background:#FAF9F7;border:1.4px solid rgba(91,75,66,.16);border-radius:99px;padding:7px 13px;font-size:12.5px;font-weight:700;color:#5B4B42;text-decoration:none}
+.mega-grp{border:1.4px solid rgba(91,75,66,.16);border-radius:14px;margin:12px 0;padding:0 16px}
+.mega-grp summary{font-family:'Spectral',serif;font-weight:600;font-size:19px;color:#3A2E26;padding:13px 0;cursor:pointer;list-style:none}
+.mega-grp summary::-webkit-details-marker{display:none}
+.mega-n{background:#99A08E;color:#fff;border-radius:99px;padding:1px 9px;font-family:'Lato',sans-serif;font-size:12px;font-weight:900;vertical-align:2px;margin-left:6px}
+.mega-all{padding-bottom:14px;font-size:14px}
 </style>
-<h2 id="gasoline-oils">Gasoline motor oils — the full line</h2>
-<p>Every AMSOIL gasoline motor oil, with live pricing and customer ratings from AMSOIL.com. Prices as of ${ESC(SCRAPE.updated || FULL.updated)}.</p>
-<div class="gaso-filt" data-kind="line"><button class="on" data-v="">All lines</button>${lines.map((l) => `<button data-v="${ESC(l)}">${ESC(l)}</button>`).join("")}</div>
-<div class="gaso-filt" data-kind="visc"><button class="on" data-v="">All viscosities</button>${viscs.map((v) => `<button data-v="${ESC(v)}">${ESC(v)}</button>`).join("")}</div>
-<div class="gaso-grid">
-${cards.map((c) => c.html).join("\n")}
-</div>
-<script>
-(function(){
-  var sel={line:'',visc:''};
-  document.querySelectorAll('.gaso-filt').forEach(function(g){
-    g.addEventListener('click',function(e){
-      var b=e.target.closest('button'); if(!b) return;
-      sel[g.dataset.kind]=b.dataset.v;
-      g.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
-      document.querySelectorAll('.gaso-card').forEach(function(c){
-        c.style.display=((!sel.line||c.dataset.line===sel.line)&&(!sel.visc||c.dataset.visc===sel.visc))?'':'none';
-      });
-    });
-  });
-})();
-</script>
-<!-- AMSOIL:GASOLINE:END -->`;
+<h2 id="store-all">The AMSOIL store — every category</h2>
+<p>The complete AMSOIL line, organized by category, with live pricing and customer ratings from AMSOIL.com. Prices as of ${ESC(SCRAPE.updated || FULL.updated)}. Every product ships direct from AMSOIL — free on orders $100+.</p>
+<div class="mega-nav">${nav}</div>
+${groups.map((g) => g.html).join("\n")}
+<!-- AMSOIL:MEGASTORE:END -->`;
+  if (!totalCards) throw new Error("megastore rendered zero cards — enrichment/catalog data missing");
   return html.replace(re, () => block);
 }
 
 export function buildAmsoilGarageStore() {
   const file = path.join(SITE, "amsoil-garage.html");
   let html = fs.readFileSync(file, "utf8");
-  html = buildGarageGasolineShowcase(html);
+  html = buildGarageMegastore(html);
   const store = `{"@context":"https://schema.org","@type":"Store","@id":"${GARAGE_URL}#store","name":"Tuned Yota — Authorized AMSOIL Dealer","url":"${GARAGE_URL}","image":"https://tunedyota.com/og-image.png","telephone":"+1-612-406-7117","email":"info@tunedyota.com","priceRange":"$$","parentOrganization":{"@id":"https://tunedyota.com/#business"},"areaServed":[{"@type":"State","name":"Minnesota"},{"@type":"State","name":"Iowa"},{"@type":"State","name":"Wisconsin"},{"@type":"State","name":"North Dakota"},{"@type":"State","name":"South Dakota"},{"@type":"State","name":"Nebraska"},{"@type":"Country","name":"United States"}],"description":"Authorized AMSOIL Dealer selling synthetic motor oil, oil and air filters, gear lube, and ATF for Toyota and Lexus vehicles, with capacities and severe-service intervals for tuned and towing builds.","hasOfferCatalog":{"@type":"OfferCatalog","name":"AMSOIL synthetic fluids for Toyota & Lexus","itemListElement":[${garageOfferCatalog()}]}}`;
   const inner = `<script type="application/ld+json">\n${store}\n</script>`;
   const block = `<!-- SEO:AMSOIL-STORE:START -->\n${inner}\n<!-- SEO:AMSOIL-STORE:END -->`;

@@ -68,10 +68,14 @@ function sitemapCandidates(p) {
 function nameSlug(name) {
   return name.toLowerCase().replace(/100%/g, "100").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
+let OVERLAY = { products: {} };
+try { OVERLAY = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "amsoil", "data", "scrape-overlay.json"), "utf8")); } catch { /* optional */ }
+
 const candidatePaths = (p) => {
-  // Sitemap-matched URLs first (authoritative, survives site renames), then
-  // pattern-derived guesses.
-  const out = [...sitemapCandidates(p), ...codeCandidates(p.stockNo).map((c) => `/p/${nameSlug(p.name)}-${c}/`)];
+  // Owner-scraped path first (exact, from amsoil.com's own JSON-LD), then
+  // sitemap-matched URLs, then pattern-derived guesses.
+  const scraped = (OVERLAY.products[p.stockNo] || {}).path;
+  const out = [...(scraped ? [scraped] : []), ...sitemapCandidates(p), ...codeCandidates(p.stockNo).map((c) => `/p/${nameSlug(p.name)}-${c}/`)];
   // Ea filter families live on SELECTOR pages keyed by ?code= (the curated Ea
   // oil filters use /p/amsoil-oil-filter-eaoilfilt/?code=<STOCK>). Try the
   // family selector for filter-coded SKUs — og validation rejects wrong guesses.
@@ -111,8 +115,13 @@ async function main() {
           const ogFile = og ? (og[1].match(/medias\/([^?]+?)\.jpg/i) || [])[1] : null;
           const ogCode = ogFile ? norm(ogFile) : "";
           const cands = codeCandidates(p.stockNo);
-          const validated = ogCode && cands.some((c) => ogCode.startsWith(c) || c.startsWith(ogCode));
-          if (!validated) { rec.err = `unvalidated og=${ogCode}`; return; }
+          // Validate by og-image variant code OR by the /p/ slug's code tail —
+          // pail/drum products use generic placeholder og images
+          // (generic-black-pail-ea.jpg), so the URL tail is the honest signal.
+          const slugTail = norm(link.replace(/\/$/, "").split("?")[0].split("-").pop());
+          const validated = (ogCode && cands.some((c) => ogCode.startsWith(c) || c.startsWith(ogCode)))
+            || cands.some((c) => c === slugTail);
+          if (!validated) { rec.err = `unvalidated og=${ogCode} tail=${slugTail}`; return; }
           rec.path = link;
           const dp = r.html.match(/data-price="([\d.]+)"/);
           rec.price = dp ? parseFloat(dp[1]) : null;

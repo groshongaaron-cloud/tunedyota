@@ -1459,6 +1459,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tunedyota.com/amsoil-iso-32-synthetic-compressor-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tunedyota.com/amsoil-iso-46-synthetic-compressor-oil</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
@@ -1466,6 +1472,12 @@
   </url>
   <url>
     <loc>https://tunedyota.com/amsoil-iso-68-synthetic-compressor-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-sirocco-iso-32-46-compressor-oil</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1771,6 +1783,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tunedyota.com/amsoil-80w-140-long-life-synthetic-gear-lube</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tunedyota.com/amsoil-severe-gear-75w-110-synthetic-gear-lube</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
@@ -1826,6 +1844,12 @@
   </url>
   <url>
     <loc>https://tunedyota.com/amsoil-spray-grease</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-synthetic-ep-00-grease</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1897,13 +1921,61 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tunedyota.com/amsoil-iso-22-synthetic-anti-wear-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-iso-22-synthetic-multi-viscosity-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-iso-32-synthetic-anti-wear-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-iso-32-synthetic-multi-viscosity-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tunedyota.com/amsoil-iso-32-commercial-grade-hydraulic-oil</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tunedyota.com/amsoil-iso-46-synthetic-anti-wear-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-iso-46-synthetic-biodegradable-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-iso-46-synthetic-multi-viscosity-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tunedyota.com/amsoil-iso-46-commercial-grade-hydraulic-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-iso-68-synthetic-multi-viscosity-hydraulic-oil</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2089,6 +2161,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tunedyota.com/amsoil-synthetic-stationary-natural-gas-engine-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-synthetic-vehicular-natural-gas-engine-oil</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tunedyota.com/amsoil-dominator-synthetic-2-stroke-racing-oil</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
@@ -2258,6 +2342,24 @@
   </url>
   <url>
     <loc>https://tunedyota.com/amsoil-oe-multi-vehicle-synthetic-automatic-transmission-fluid</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-sae-10w-synthetic-powershift-transmission-fluid</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-sae-30-synthetic-powershift-transmission-fluid</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tunedyota.com/amsoil-sae-50-synthetic-powershift-transmission-fluid</loc>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

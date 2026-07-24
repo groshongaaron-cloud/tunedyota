@@ -1,6 +1,6 @@
 {
  "updated": "2026-07-25",
- "count": 251,
+ "count": 268,
  "products": {
   "ATPQT-EA": {
    "path": "/p/amsoil-saber-professional-100-synthetic-2-stroke-oil-atp/",
@@ -1256,6 +1256,91 @@
    "path": "/p/amsoil-x-treme-synthetic-food-grade-grease-gxc/",
    "image": "/images/amsoil/full/gxccr-ea.jpg",
    "price": 19.15
+  },
+  "PCH05-EA": {
+   "path": "/p/amsoil-iso-32-100-synthetic-compressor-oil-pch/",
+   "image": "/images/amsoil/full/pch05-ea.jpg",
+   "price": 384.5
+  },
+  "SEI05-EA": {
+   "path": "/p/amsoil-sirocco-iso-32-46-compressor-oil-sei/",
+   "image": "/images/amsoil/full/sei05-ea.jpg",
+   "price": 543.65
+  },
+  "FGO05-EA": {
+   "path": "/p/amsoil-80w-140-long-life-100-synthetic-gear-lube-fgo/",
+   "image": "/images/amsoil/full/fgo05-ea.jpg",
+   "price": 381
+  },
+  "GSF35-EA": {
+   "path": "/p/amsoil-synthetic-ep-00-grease-gsf/",
+   "image": "/images/amsoil/full/gsf35-ea.jpg",
+   "price": 661.75
+  },
+  "AWG05-EA": {
+   "path": "/p/amsoil-iso-22-100-synthetic-anti-wear-hydraulic-oil-awg/",
+   "image": "/images/amsoil/full/awg05-ea.jpg",
+   "price": 371.7
+  },
+  "HVG05-EA": {
+   "path": "/p/amsoil-iso-22-100-synthetic-multi-viscosity-hydraulic-oil-hvg/",
+   "image": "/images/amsoil/full/hvg05-ea.jpg",
+   "price": 274.75
+  },
+  "AWH05-EA": {
+   "path": "/p/amsoil-iso-32-100-synthetic-anti-wear-hydraulic-oil-awh/",
+   "image": "/images/amsoil/full/awh05-ea.jpg",
+   "price": 348
+  },
+  "HVH05-EA": {
+   "path": "/p/amsoil-iso-32-100-synthetic-multi-viscosity-hydraulic-oil-hvh/",
+   "image": "/images/amsoil/full/hvh05-ea.jpg",
+   "price": 282.2
+  },
+  "AWI05-EA": {
+   "path": "/p/amsoil-iso-46-100-synthetic-anti-wear-hydraulic-oil-awi/",
+   "image": "/images/amsoil/full/awi05-ea.jpg",
+   "price": 346.25
+  },
+  "BHO05-EA": {
+   "path": "/p/amsoil-iso-46-100-synthetic-biodegradable-hydraulic-oil-bho/",
+   "image": "/images/amsoil/full/bho05-ea.jpg",
+   "price": 407.4
+  },
+  "HVI05-EA": {
+   "path": "/p/amsoil-iso-46-100-synthetic-multi-viscosity-hydraulic-oil-hvi/",
+   "image": "/images/amsoil/full/hvi05-ea.jpg",
+   "price": 271.45
+  },
+  "HVJ05-EA": {
+   "path": "/p/amsoil-iso-68-100-synthetic-multi-viscosity-hydraulic-oil-hvj/",
+   "image": "/images/amsoil/full/hvj05-ea.jpg",
+   "price": 293.25
+  },
+  "ANGS05-EA": {
+   "path": "/p/amsoil-100-synthetic-stationary-natural-gas-engine-oil-angs/",
+   "image": "/images/amsoil/full/angs05-ea.jpg",
+   "price": 416.9
+  },
+  "ANGV05-EA": {
+   "path": "/p/amsoil-100-synthetic-vehicular-natural-gas-engine-oil-angv/",
+   "image": "/images/amsoil/full/angv05-ea.jpg",
+   "price": 330.25
+  },
+  "CTG05-EA": {
+   "path": "/p/amsoil-sae-10w-100-synthetic-powershift-transmission-fluid-ctg/",
+   "image": "/images/amsoil/full/ctg05-ea.jpg",
+   "price": 324.95
+  },
+  "CTJ05-EA": {
+   "path": "/p/amsoil-sae-30-100-synthetic-powershift-transmission-fluid-ctj/",
+   "image": "/images/amsoil/full/ctj05-ea.jpg",
+   "price": 323.5
+  },
+  "CTL05-EA": {
+   "path": "/p/amsoil-sae-50-100-synthetic-powershift-transmission-fluid-ctl/",
+   "image": "/images/amsoil/full/ctl05-ea.jpg",
+   "price": 340.7
   }
  }
 }
