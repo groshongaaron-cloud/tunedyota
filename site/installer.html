@@ -945,6 +945,11 @@
     // Preserve an in-progress draft (and focus) across the 5s poll re-render.
     var prevTa = document.getElementById('chattext');
     var draft = prevTa ? prevTa.value : '', hadFocus = prevTa && document.activeElement === prevTa;
+    // Preserve scroll: only auto-pin to the bottom if the user was already
+    // there (or this is the thread's first paint) — never yank them mid-read.
+    var prevLog = document.getElementById('chatlog');
+    var wasAtBottom = !prevLog || (prevLog.scrollHeight - prevLog.scrollTop - prevLog.clientHeight) < 40;
+    var prevScroll = prevLog ? prevLog.scrollTop : 0;
     var bubbles = [], prevAt = 0;
     (j.turns||[]).forEach(function(t){
       var at = t.at || 0;
@@ -977,7 +982,7 @@
       assignHtml = j.installer===STATE.me ? ' · <span class="cbadge">mine</span>'
         : ' · <a href="#" id="chatclaim">'+(j.installer?'take over ('+esc(j.installer)+'’s)':'claim chat')+'</a>';
     }
-    host.innerHTML =
+    var html =
       '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <b>'+esc(j.customerName||'Customer')+'</b> '+chanBadge(j.id||'')+' '+esc(j.vehicle||'')+
       (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+
       assignHtml+
@@ -985,7 +990,14 @@
       '<div class="cthread"><div id="chatlog" class="clog">'+bubbles.join('')+'</div>'+
       '<form id="chatreply" class="ccompose"><textarea id="chattext" rows="1" placeholder="Text message…"></textarea>'+
         '<button type="submit" class="csend" title="Send">↑</button></form></div>';
-    var log = document.getElementById('chatlog'); if(log) log.scrollTop = log.scrollHeight;
+    // Nothing changed since last paint → skip the DOM swap entirely; the swap
+    // itself resets scroll (and would close an open assign dropdown). The
+    // already-armed poll and handlers stay live on the untouched DOM.
+    if(prevLog && html === host.__chatHtml && host.__chatHtmlFor === openId && !STATE.chatPrefill) return;
+    host.__chatHtml = html; host.__chatHtmlFor = openId;
+    host.innerHTML = html;
+    var log = document.getElementById('chatlog');
+    if(log) log.scrollTop = wasAtBottom ? log.scrollHeight : prevScroll;
     var ta = document.getElementById('chattext');
     if(ta){
       if(STATE.chatPrefill){ ta.value = STATE.chatPrefill; STATE.chatPrefill=''; ta.focus(); }
@@ -1018,6 +1030,8 @@
       var btn = form.querySelector('button[type="submit"]');
       tin.disabled = true; if(btn) btn.disabled = true;
       try{ await chatApi({op:'reply', session:replyId, text:tin.value}); tin.value='';
+        // Sending always jumps to your new message, even if you'd scrolled up.
+        var lg=document.getElementById('chatlog'); if(lg) lg.scrollTop=lg.scrollHeight;
         if(STATE.tab==='chats' && STATE.chatOpen===replyId) renderChatThread(host);
       }catch(err){}
       finally{ tin.disabled = false; if(btn) btn.disabled = false; }
