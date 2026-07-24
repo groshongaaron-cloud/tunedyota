@@ -59,6 +59,7 @@ async function buildRoster(deps) {
       id: r.id, city: f.City || "", dateISO: dateOnly(f["Event Date"]), installer: owner || "",
       slot: f.Slot || "", slotLabel: f.Slot ? formatSlot(f.Slot) : "",
       scheduledTime: f["Scheduled Time"] || "",
+      address: f.Address || "",   // full install address → console maps/navigation link
       name: f.Name || "", vehicle: f.Vehicle || "", phone: f.Phone || "", email: f.Email || "",
       mods: f.Modifications || "", modelYear: f["Model Year"] || "", status: f.Status || "Booked",
       flexFuelNote: flexFuelNote(f.Vehicle),   // Policy 0011 day-of reminder for Tundras

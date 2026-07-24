@@ -51,10 +51,30 @@ test("completed bookings cannot be rescheduled", async () => {
   assert.equal(out.error, "not-open");
 });
 
-test("validates inputs: bad date, nothing to change, oversize time", async () => {
+test("validates inputs: bad date, nothing to change, oversize time/address", async () => {
   const deps = { env, key: "noah", get: async () => recFor("noah"), update: async () => ({}) };
   assert.equal((await processReschedule({ recordId: "rec1", dateISO: "9/20/2026" }, deps)).error, "bad-date");
   assert.equal((await processReschedule({ recordId: "rec1" }, deps)).error, "nothing-to-change");
   assert.equal((await processReschedule({ recordId: "rec1", time: "x".repeat(50) }, deps)).error, "bad-time");
+  assert.equal((await processReschedule({ recordId: "rec1", address: "x".repeat(201) }, deps)).error, "bad-address");
   assert.equal((await processReschedule({}, deps)).error, "missing-record");
+});
+
+test("address-only update is a valid change ('once we know the address') and is echoed", async () => {
+  let patched;
+  const out = await processReschedule({ recordId: "rec1", address: "123 Main St, Green Bay, WI" },
+    { env, key: "noah", get: async () => recFor("noah"), update: async (a) => { patched = a.fields; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal(patched.Address, "123 Main St, Green Bay, WI");
+  assert.equal("Event Date" in patched, false);
+  assert.equal(out.address, "123 Main St, Green Bay, WI");
+});
+
+test("an empty address leaves the stored Address untouched and echoes the existing one", async () => {
+  let patched;
+  const out = await processReschedule({ recordId: "rec1", time: "9:15 AM" },
+    { env, key: "noah", get: async () => recFor("noah", { Address: "44 Oak Ave" }), update: async (a) => { patched = a.fields; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal("Address" in patched, false);
+  assert.equal(out.address, "44 Oak Ave");
 });

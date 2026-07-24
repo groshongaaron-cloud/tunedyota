@@ -45,6 +45,10 @@ async function processWalkin(body, deps) {
   const vehicle = String(d.vehicle || "").trim();
   const email = String(d.email || "").trim();
   const time = String(d.time || "").trim().slice(0, 40);
+  // Full install address (mobile installs happen at the client's location). Free
+  // text, never required, never validated — owner rule: no booking is ever blocked
+  // on location detail. Feeds the console's maps/navigation link.
+  const address = String(d.address || "").trim().slice(0, 200);
   // Best-effort dedupe: an offline walk-in replay carries a client-generated clientKey.
   // If a booking already exists with that Client Key, return it instead of creating a
   // duplicate. An absent Client Key column simply yields no match — swallow errors and
@@ -57,6 +61,7 @@ async function processWalkin(body, deps) {
         return { status: "booked", recordId: g.id, booking: {
           id: g.id, city: gf.City || bookCity, dateISO: String(gf["Event Date"] || dateISO).slice(0, 10),
           installer: ownerKey, slot: "", slotLabel: "", scheduledTime: gf["Scheduled Time"] || time,
+          address: gf.Address || address,
           name: gf.Name || name, vehicle: gf.Vehicle || vehicle,
           phone: gf.Phone || phone, email: gf.Email || email, mods: gf.Modifications || "", status: gf.Status || "Booked",
           isWalkin: true, calibration: "", vin: "", tuningPlatform: "", calibrationType: "", ecuId: "", gearSize: "", mileage: "" } };
@@ -67,13 +72,14 @@ async function processWalkin(body, deps) {
     Phone: phone, Email: email, Status: "Booked", Source: "installer:walk-in", Installer: ownerKey };
   if (clientKey) fields["Client Key"] = clientKey;
   if (time) fields["Scheduled Time"] = time;
+  if (address) fields.Address = address;
   let rec;
-  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Email", "Client Key", "Scheduled Time"]); }
+  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Email", "Client Key", "Scheduled Time", "Address"]); }
   catch (e) { return { status: "error", error: "store-unavailable" }; }
 
   const id = rec && rec.id;
   return { status: "booked", recordId: id, booking: {
-    id, city: bookCity, dateISO, installer: ownerKey, slot: "", slotLabel: "", scheduledTime: time,
+    id, city: bookCity, dateISO, installer: ownerKey, slot: "", slotLabel: "", scheduledTime: time, address,
     name, vehicle, phone, email,
     mods: "", status: "Booked", isWalkin: true, calibration: "", vin: "", tuningPlatform: "",
     calibrationType: "", ecuId: "", gearSize: "", mileage: "" } };

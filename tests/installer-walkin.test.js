@@ -48,6 +48,22 @@ test("an appointment time is saved to Scheduled Time and echoed back", async () 
   assert.equal(out.booking.scheduledTime, "10:30 AM");
 });
 
+test("a full install address is saved to Address and echoed back (never required)", async () => {
+  let created;
+  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555",
+    address: "  7337 L St, Omaha, NE 68127  " },
+    { env, key: "cody", create: async (a) => { created = a; return { id: "recA" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(created.fields.Address, "7337 L St, Omaha, NE 68127");
+  assert.equal(out.booking.address, "7337 L St, Omaha, NE 68127");
+  // and omitting it stays clean — no Address key, empty echo
+  let created2;
+  const out2 = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
+    { env, key: "cody", create: async (a) => { created2 = a; return { id: "recB" }; } });
+  assert.equal("Address" in created2.fields, false);
+  assert.equal(out2.booking.address, "");
+});
+
 test("rejects a city that routes to a different installer", async () => {
   const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" }, { env, key: "aaron", create: okCreate });
   assert.equal(out.error, "not-your-market");

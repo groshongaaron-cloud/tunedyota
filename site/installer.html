@@ -1466,13 +1466,15 @@
       dl.innerHTML=cities.map(function(x){return '<option value="'+esc(x)+'"></option>';}).join('');
       lc.setAttribute('list', dl.id); box.appendChild(dl);
     }
+    // Full install address — optional, feeds the card's maps/navigation link.
+    var ad=mkInput('Install address (street, city) — optional'); ad.autocomplete='street-address';
     var tm=mkInput('Time (e.g. 10:30 AM) — optional');
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Add walk-in';
-    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(lc); box.appendChild(tm); box.appendChild(em); box.appendChild(btn);
+    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(lc); box.appendChild(ad); box.appendChild(tm); box.appendChild(em); box.appendChild(btn);
     det.appendChild(box);
     btn.onclick=function(){
       var c=(lc.value||'').trim()||e.city;
-      addWalkin({city:c,dateISO:e.dateISO,key:c+'|'+e.dateISO},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,time:tm.value});
+      addWalkin({city:c,dateISO:e.dateISO,key:c+'|'+e.dateISO},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,time:tm.value,address:ad.value});
     };
     return det;
   }
@@ -1544,11 +1546,13 @@
       dl.innerHTML=cities.map(function(x){return '<option value="'+esc(x)+'"></option>';}).join('');
       city.setAttribute('list','ty_walk_cities');
     }
+    // Full install address — optional, feeds the card's maps/navigation link.
+    var ad=mkInput('Install address (street, city) — optional'); ad.autocomplete='street-address';
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Log walk-in';
     var em=mkInput('Customer email (for their certificate)'); em.type='email';
     var tm=mkInput('Time (e.g. 10:30 AM) — optional');
     var instSel=instSelect();   // admin only: direct-assign to any installer
-    [n,v,p,ld,dt,lc,city,tm,em].forEach(function(el){ box.appendChild(el); });
+    [n,v,p,ld,dt,lc,city,ad,tm,em].forEach(function(el){ box.appendChild(el); });
     if(instSel) box.appendChild(instSel);
     box.appendChild(btn);
     if(dl) box.appendChild(dl);
@@ -1559,7 +1563,7 @@
       if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ fail('Pick the date of the tune.'); return; }
       STATE.walkOpen[K]=true;                       // keep this form open for the next entry
       addWalkin({city:c,dateISO:d,key:c+'|'+d},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,
-        time:tm.value,installer:instSel?instSel.value:''});
+        time:tm.value,address:ad.value,installer:instSel?instSel.value:''});
     };
     return det;
   }
@@ -1584,8 +1588,8 @@
     var email=(vals.email||'').trim();
     if(!name){ fail('Enter the customer name.'); return; }
     if(!phone){ fail('Enter a phone number.'); return; }
-    var time=(vals.time||'').trim(), inst=(vals.installer||'').trim();
-    var op = Q().makeOp('walkin', { city:evt.city, dateISO:evt.dateISO, name:name, vehicle:vehicle, phone:phone, email:email, time:time, installer:inst, clientKey:null });
+    var time=(vals.time||'').trim(), inst=(vals.installer||'').trim(), address=(vals.address||'').trim();
+    var op = Q().makeOp('walkin', { city:evt.city, dateISO:evt.dateISO, name:name, vehicle:vehicle, phone:phone, email:email, time:time, address:address, installer:inst, clientKey:null });
     op.body.clientKey = op.clientKey;
     var res, netErr=null;
     try { res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(op.body)}); }
@@ -1625,7 +1629,7 @@
   }
   function optimisticWalkin(evt, op){
     return { id:'pending:'+op.clientKey, city:evt.city, dateISO:evt.dateISO, installer:op.body.installer||'', slot:'', slotLabel:'',
-      scheduledTime:op.body.time||'',
+      scheduledTime:op.body.time||'', address:op.body.address||'',
       name:op.body.name, vehicle:op.body.vehicle, phone:op.body.phone, email:op.body.email, mods:'', status:'Booked',
       isWalkin:true, pendingSync:true, calibration:'', vin:'', tuningPlatform:'', calibrationType:'', ecuId:'', gearSize:'', mileage:'' };
   }
@@ -1971,10 +1975,18 @@
     }catch(e){ clear(); }   // never block on our own failure
   }
 
+  // Google Maps directions link — opens turn-by-turn navigation to the install
+  // location (native maps app on mobile, web on desktop).
+  function mapsHref(a){ return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(a); }
+
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+(b.scheduledTime?esc(b.scheduledTime)+' · ':'')+esc(b.name)+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
+      // Install location: the full address (with tap-to-navigate) when we have it,
+      // else the city so the market is always visible on the card.
+      (b.address?'<div class="meta">📍 '+esc(b.address)+' · <a class="link" href="'+esc(mapsHref(b.address))+'" target="_blank" rel="noopener">🧭 Navigate</a></div>'
+        : b.city?'<div class="meta">📍 '+esc(b.city)+'</div>':'')+
       (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'')+
       (b.pcm?'<div class="ffnote" style="color:#1f4e79;border-color:#b7cfe8;background:#eef4fb">🔧 PCM '+esc(b.pcm.pcm)+(b.pcm.fid?' · '+esc(b.pcm.fid):'')+(b.pcm.throttle?' · start: '+esc(b.pcm.throttle):'')+(b.pcm.note?' — '+esc(b.pcm.note):'')+'</div>':'');
     var overdue = isOpen(b) && b.dateISO < STATE.today;
@@ -2000,10 +2012,11 @@
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
-      '<details style="margin:6px 0"><summary class="link" style="cursor:pointer">🕓 '+(b.scheduledTime?'Time: '+esc(b.scheduledTime)+' — change':'Set time / date')+'</summary>'+
+      '<details style="margin:6px 0"><summary class="link" style="cursor:pointer">🕓 '+(b.scheduledTime?'Time: '+esc(b.scheduledTime)+' — change':'Set time / date / address')+'</summary>'+
       '<div class="row-actions" style="margin-top:6px">'+
       '<input type="date" id="rd_'+b.id+'" value="'+esc(b.dateISO||'')+'">'+
       '<input id="rt_'+b.id+'" autocomplete="off" placeholder="Time (e.g. 10:30 AM)" value="'+esc(b.scheduledTime||'')+'">'+
+      '<input id="ra_'+b.id+'" autocomplete="off" placeholder="Install address (for navigation)" value="'+esc(b.address||'')+'">'+
       '<button class="btn" id="rs_'+b.id+'">Save</button></div></details>'+
       '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
       (canScan()?'<button type="button" class="btn scanvin" id="scan_'+b.id+'">📷 Scan VIN</button>':'')+
@@ -2051,15 +2064,15 @@
   // any installer on their own bookings.
   async function reschedule(id){
     clearMsg();
-    var d=val('rd_'+id), t=val('rt_'+id);
-    if(!d && !t){ fail('Pick a date or enter a time.'); return; }
+    var d=val('rd_'+id), t=val('rt_'+id), a=val('ra_'+id);
+    if(!d && !t && !a){ fail('Pick a date, enter a time, or add the install address.'); return; }
     try{
-      var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,dateISO:d,time:t})});
+      var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,dateISO:d,time:t,address:a})});
       if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
       var out=await res.json().catch(function(){return{};});
       if(res.ok && out.status==='ok'){
         var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
-        if(b){ if(d) b.dateISO=d; if(t) b.scheduledTime=t; }
+        if(b){ if(d) b.dateISO=d; if(t) b.scheduledTime=t; if(a) b.address=a; }
         succeed('✓ Schedule updated.'); renderAll();
       } else { fail('Could not update: '+(out.error||res.status)); }
     }catch(e){ fail('Network error — try again.'); }

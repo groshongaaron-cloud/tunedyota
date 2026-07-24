@@ -17,9 +17,13 @@ async function processReschedule(body, deps) {
   if (!d.recordId) return { status: "error", error: "missing-record" };
   const dateISO = String(d.dateISO || "").trim();
   const time = String(d.time || "").trim();
+  // Install address — set/updated here "once we know the address" (a booking often
+  // arrives before the client's location is confirmed). Free text, never required.
+  const address = String(d.address || "").trim();
   if (dateISO && !/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) return { status: "error", error: "bad-date" };
   if (time.length > 40) return { status: "error", error: "bad-time" };
-  if (!dateISO && !time) return { status: "error", error: "nothing-to-change" };
+  if (address.length > 200) return { status: "error", error: "bad-address" };
+  if (!dateISO && !time && !address) return { status: "error", error: "nothing-to-change" };
 
   const c = cfg(env);
   let rec;
@@ -33,10 +37,12 @@ async function processReschedule(body, deps) {
   const fields = {};
   if (dateISO) fields["Event Date"] = dateISO;
   if (time) fields["Scheduled Time"] = time;
+  if (address) fields.Address = address;
   try {
-    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields }, ["Scheduled Time"]);
+    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields }, ["Scheduled Time", "Address"]);
   } catch (e) { if (log.error) log.error("reschedule update", e.message); return { status: "error", error: "store-unavailable" }; }
-  return { status: "ok", dateISO: dateISO || String(f["Event Date"] || "").slice(0, 10), time: time || String(f["Scheduled Time"] || "") };
+  return { status: "ok", dateISO: dateISO || String(f["Event Date"] || "").slice(0, 10), time: time || String(f["Scheduled Time"] || ""),
+    address: address || String(f.Address || "") };
 }
 
 async function handler(event) {
