@@ -1,6 +1,6 @@
 {
  "updated": "2026-07-25",
- "count": 229,
+ "count": 251,
  "products": {
   "ATPQT-EA": {
    "path": "/p/amsoil-saber-professional-100-synthetic-2-stroke-oil-atp/",
@@ -1146,6 +1146,116 @@
    "path": "/p/amsoil-75w-90-manual-transmission-transaxle-gear-lube-mtg/",
    "image": "/images/amsoil/full/mtgqt-ea.jpg",
    "price": 24.69
+  },
+  "AUV54QT-EA": {
+   "path": "/p/amsoil-5w-40-100-synthetic-atv-utv-motor-oil-auv54/",
+   "image": "/images/amsoil/full/auv54qt-ea.jpg",
+   "price": 19.79
+  },
+  "BMK21-EA": {
+   "path": "/p/amsoil-universal-single-remote-bypass-system-bmk21/",
+   "image": "/images/amsoil/full/bmk21-ea.jpg",
+   "price": 370
+  },
+  "AFOSC-EA": {
+   "path": "/p/amsoil-air-filter-oil-afo/",
+   "image": "/images/amsoil/full/afosc-ea.jpg",
+   "price": 16.79
+  },
+  "APFSC-EA": {
+   "path": "/p/amsoil-power-foam-carburetor-and-induction-system-cleaner-apf/",
+   "image": "/images/amsoil/full/apfsc-ea.jpg",
+   "price": 13.99
+  },
+  "ALSSP-EA": {
+   "path": "/p/amsoil-silicone-spray-alss/",
+   "image": "/images/amsoil/full/alssp-ea.jpg",
+   "price": 12.89
+  },
+  "DP020QT-EA": {
+   "path": "/p/amsoil-0w-20-100-synthetic-diesel-oil-dp0/",
+   "image": "/images/amsoil/full/dp020qt-ea.jpg",
+   "price": 16.39
+  },
+  "SBDF1G-EA": {
+   "path": "/p/amsoil-15w-40-commercial-grade-diesel-oil-sbd/",
+   "image": "/images/amsoil/full/sbdf1g-ea.jpg",
+   "price": 41.79
+  },
+  "DP530QT-EA": {
+   "path": "/p/amsoil-5w-30-100-synthetic-diesel-oil-dp5/",
+   "image": "/images/amsoil/full/dp530qt-ea.jpg",
+   "price": 15.89
+  },
+  "EAHD2160-EA": {
+   "path": "/p/amsoil-heavy-duty-oil-filter-eahd/",
+   "image": "/images/amsoil/full/eahd2160-ea.jpg",
+   "price": 60.4
+  },
+  "FLPBA-EA": {
+   "path": "/p/amsoil-100-synthetic-firearm-lubricant-and-protectant-flp/",
+   "image": "/images/amsoil/full/flpba-ea.jpg",
+   "price": 15.19
+  },
+  "FCPSC-EA": {
+   "path": "/p/amsoil-firearm-cleaner-and-protectant-fcp/",
+   "image": "/images/amsoil/full/fcpsc-ea.jpg",
+   "price": 15.59
+  },
+  "ADFPCN-EA": {
+   "path": "/p/amsoil-diesel-injector-clean-fuel-additive-adf/",
+   "image": "/images/amsoil/full/adfpcn-ea.jpg",
+   "price": 7.49
+  },
+  "AOBBE-EA": {
+   "path": "/p/amsoil-dominator-octane-boost-aob/",
+   "image": "/images/amsoil/full/aobbe-ea.jpg",
+   "price": 14.39
+  },
+  "GRGCR-EA": {
+   "path": "/p/amsoil-dominator-synthetic-racing-grease-grg/",
+   "image": "/images/amsoil/full/grgcr-ea.jpg",
+   "price": 21.2
+  },
+  "GPOR1CR-EA": {
+   "path": "/p/amsoil-nlgi-1-synthetic-polymeric-off-road-grease-gpor1/",
+   "image": "/images/amsoil/full/gpor1cr-ea.jpg",
+   "price": 15.7
+  },
+  "GPTR1CR-EA": {
+   "path": "/p/amsoil-nlgi-1-synthetic-polymeric-truck-chassis-and-equipment-grease-gptr1/",
+   "image": "/images/amsoil/full/gptr1cr-ea.jpg",
+   "price": 13.45
+  },
+  "GPOR2CR-EA": {
+   "path": "/p/amsoil-nlgi-2-synthetic-polymeric-off-road-grease-gpor2/",
+   "image": "/images/amsoil/full/gpor2cr-ea.jpg",
+   "price": 16.4
+  },
+  "GPTR2CR-EA": {
+   "path": "/p/amsoil-nlgi-2-synthetic-polymeric-truck-chassis-and-equipment-grease-gptr2/",
+   "image": "/images/amsoil/full/gptr2cr-ea.jpg",
+   "price": 14.4
+  },
+  "GVCCR-EA": {
+   "path": "/p/amsoil-synthetic-high-viscosity-lithium-complex-grease-gvc/",
+   "image": "/images/amsoil/full/gvccr-ea.jpg",
+   "price": 15.55
+  },
+  "GLCCR-EA": {
+   "path": "/p/amsoil-synthetic-multi-purpose-grease-glc/",
+   "image": "/images/amsoil/full/glccr-ea.jpg",
+   "price": 14.1
+  },
+  "GWRCR-EA": {
+   "path": "/p/amsoil-synthetic-water-resistant-grease-gwr/",
+   "image": "/images/amsoil/full/gwrcr-ea.jpg",
+   "price": 14.75
+  },
+  "GXCCR-EA": {
+   "path": "/p/amsoil-x-treme-synthetic-food-grade-grease-gxc/",
+   "image": "/images/amsoil/full/gxccr-ea.jpg",
+   "price": 19.15
   }
  }
 }

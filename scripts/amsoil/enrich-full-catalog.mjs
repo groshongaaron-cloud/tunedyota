@@ -28,10 +28,38 @@ const baseCode = (stockNo) => norm(stockNo.replace(/-(EA|CA)$/i, ""));
 const codeCandidates = (stockNo) => {
   const b = stockNo.replace(/-(EA|CA)$/i, "");
   const out = [norm(b)];
-  const m = b.match(/^(.*?)(QT|CN|1G|GN|PK|TP|G|K|OZ|EA)$/i);
+  // Package-suffix tokens: quart/can/gallon/pack/tube/spray-can/cartridge/
+  // bottle/spray + trailing numeric sizes (05 pail, 55 drum, 35 keg...).
+  const m = b.match(/^(.*?)(QT|CN|1G|GN|PK|TP|SC|CR|BE|SP|BA|G|K|OZ|EA)$/i);
   if (m && m[1].length >= 2) out.push(norm(m[1]));
+  const d = norm(b).replace(/\d+$/, "");
+  if (d.length >= 2 && !out.includes(d)) out.push(d);
   return out;
 };
+
+// AMSOIL's own sitemap product list (scripts/amsoil/data/sitemap-products.json,
+// fetched via browser) — authoritative /p/ URLs. A held product matches a
+// sitemap URL when the slug's code tail prefixes one of our candidates; name
+// token overlap breaks ties, og validation still gates acceptance.
+let SITEMAP = [];
+try { SITEMAP = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "amsoil", "data", "sitemap-products.json"), "utf8")); } catch { /* optional */ }
+function sitemapCandidates(p) {
+  const cands = codeCandidates(p.stockNo);
+  const nameToks = new Set(nameSlug(p.name).split("-"));
+  return SITEMAP
+    .map((u) => {
+      const tail = norm(u.replace(/\/$/, "").split("-").pop());
+      if (tail.length < 2) return null;
+      const codeHit = cands.some((c) => c === tail || (tail.length >= 3 && c.startsWith(tail)));
+      if (!codeHit) return null;
+      const overlap = u.split(/[/-]/).filter((t) => nameToks.has(t)).length;
+      return { u, overlap };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.overlap - a.overlap)
+    .slice(0, 3)
+    .map((x) => x.u);
+}
 // AMSOIL /p/ slugs follow a strict pattern: "amsoil-" + name slug (with "100%"
 // → "100", "&" dropped as a separator) + "-" + base product code. Verified
 // against all curated paths (asm/ado/api/ucl/antpc/deo/hm020...). We construct
@@ -41,7 +69,9 @@ function nameSlug(name) {
   return name.toLowerCase().replace(/100%/g, "100").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 const candidatePaths = (p) => {
-  const out = codeCandidates(p.stockNo).map((c) => `/p/${nameSlug(p.name)}-${c}/`);
+  // Sitemap-matched URLs first (authoritative, survives site renames), then
+  // pattern-derived guesses.
+  const out = [...sitemapCandidates(p), ...codeCandidates(p.stockNo).map((c) => `/p/${nameSlug(p.name)}-${c}/`)];
   // Ea filter families live on SELECTOR pages keyed by ?code= (the curated Ea
   // oil filters use /p/amsoil-oil-filter-eaoilfilt/?code=<STOCK>). Try the
   // family selector for filter-coded SKUs — og validation rejects wrong guesses.
@@ -50,7 +80,7 @@ const candidatePaths = (p) => {
   if (/^EAA/.test(s)) out.push(`/p/amsoil-air-filter-eaairfilt/?code=${encodeURIComponent(p.stockNo)}`);
   if (/^EAC/.test(s)) out.push(`/p/amsoil-cabin-air-filter-eacabinfilt/?code=${encodeURIComponent(p.stockNo)}`);
   if (/^EAOM/.test(s)) out.push(`/p/amsoil-motorcycle-oil-filter-eaomfilt/?code=${encodeURIComponent(p.stockNo)}`);
-  return out;
+  return [...new Set(out)];
 };
 
 async function main() {
