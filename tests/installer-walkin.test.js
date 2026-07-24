@@ -11,9 +11,41 @@ test("requires name + phone", async () => {
   assert.equal(out.error, "missing-contact");
 });
 
-test("rejects an unknown city", async () => {
-  const out = await processWalkin({ city: "Nowhere", dateISO: "2026-07-03", name: "Jo", phone: "555" }, { env, key: "cody", create: okCreate });
-  assert.equal(out.error, "unknown-city");
+test("an unknown city BOOKS anyway — owned by the adding installer, city kept as typed", async () => {
+  let created;
+  const out = await processWalkin({ city: "Bemidji", dateISO: "2026-07-03", name: "Jo", phone: "555" },
+    { env, key: "cody", create: async (a) => { created = a; return { id: "recFREE" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(created.fields.City, "Bemidji");
+  assert.equal(created.fields.Installer, "cody");
+  assert.equal(out.booking.city, "Bemidji");
+  assert.equal(out.booking.installer, "cody");
+});
+
+test("an admin may direct-assign any booking to a chosen installer (overrides market routing)", async () => {
+  let created;
+  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555", installer: "noah" },
+    { env, key: "aaron", admin: true, create: async (a) => { created = a; return { id: "recOVR" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(created.fields.Installer, "noah");
+  assert.equal(out.booking.installer, "noah");
+});
+
+test("a non-admin cannot use the installer override", async () => {
+  let created;
+  const out = await processWalkin({ city: "Bemidji", dateISO: "2026-07-03", name: "Jo", phone: "555", installer: "noah" },
+    { env, key: "cody", admin: false, create: async (a) => { created = a; return { id: "r" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(created.fields.Installer, "cody");   // override ignored — still the adder
+});
+
+test("an appointment time is saved to Scheduled Time and echoed back", async () => {
+  let created;
+  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555", time: "10:30 AM" },
+    { env, key: "cody", create: async (a) => { created = a; return { id: "recT" }; } });
+  assert.equal(out.status, "booked");
+  assert.equal(created.fields["Scheduled Time"], "10:30 AM");
+  assert.equal(out.booking.scheduledTime, "10:30 AM");
 });
 
 test("rejects a city that routes to a different installer", async () => {

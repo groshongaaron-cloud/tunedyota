@@ -7,7 +7,7 @@ const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolera
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { toLeadView, applyLeadUpdate, logLine, appendActivity } = require("./lib/leads.js");
 const { getMarket } = require("./lib/markets.js");
-const { keyToInstaller } = require("./lib/routing.js");
+const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 
 async function handler(event, ctx = {}) {
   const env = ctx.env || process.env;
@@ -47,9 +47,16 @@ async function handler(event, ctx = {}) {
     // Optional installer-assigned time ("10:30 AM"). Free text — Noah's slot-mode
     // markets have no fixed slot times, so the installer names the exact time.
     const time = String(body.time || "").trim().slice(0, 40);
-    const market = getMarket(lead.city);
-    const owner = market ? keyToInstaller(market.inst).key : (lead.installer || key);
-    const fields = { City: market ? market.city : lead.city, "Event Date": dateISO, Name: lead.name,
+    // Owner freedom: an explicit city (any text) overrides the lead's city; an admin
+    // may direct-assign the booking to a chosen installer. Otherwise a known market
+    // routes to its installer; an unknown city keeps the booking with the lead's
+    // installer (or the converter) so it never silently changes hands.
+    const city = String(body.city || "").trim() || lead.city;
+    const market = getMarket(city);
+    const override = admin ? normalizeInstallerKey(body.installer) : "";
+    const owner = override || (market ? keyToInstaller(market.inst).key : (lead.installer || key));
+    const bookCity = market ? market.city : city;
+    const fields = { City: bookCity, "Event Date": dateISO, Name: lead.name,
       Vehicle: lead.vehicle, Phone: lead.phone, Email: lead.email, Goals: lead.goals,
       Status: "Booked", Source: `lead:${lead.channel || "convert"}`, Installer: owner };
     if (time) fields["Scheduled Time"] = time;
@@ -57,10 +64,16 @@ async function handler(event, ctx = {}) {
     try { bk = await createTolerant(createBookingImpl, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Goals", "Scheduled Time"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
     const patch = { "Converted Booking": bk && bk.id, Stage: "Booked",
-      "Activity Log": appendActivity(lead.activity, logLine(now, `converted → booking ${bk && bk.id} (${dateISO}${time ? " " + time : ""})`)) };
+      "Activity Log": appendActivity(lead.activity, logLine(now, `converted → booking ${bk && bk.id} (${bookCity} ${dateISO}${time ? " " + time : ""})`)) };
     try { await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: patch }, ["Converted Booking", "Stage", "Activity Log"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
-    return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", bookingId: bk && bk.id, stage: "Booked" }) };
+    // The booking payload tells the console exactly WHERE this landed so it can take
+    // the user there — a converted lead must never just vanish from view.
+    const booking = { id: bk && bk.id, city: bookCity, dateISO, installer: owner, slot: "", slotLabel: "",
+      scheduledTime: time, name: lead.name, vehicle: lead.vehicle, phone: lead.phone, email: lead.email,
+      mods: "", status: "Booked", isWalkin: false, calibration: "", vin: "", tuningPlatform: "",
+      calibrationType: "", ecuId: "", gearSize: "", mileage: "" };
+    return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", bookingId: bk && bk.id, stage: "Booked", booking }) };
   }
 
   const built = applyLeadUpdate(lead, action, body, now);

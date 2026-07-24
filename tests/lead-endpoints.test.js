@@ -92,6 +92,59 @@ test("lead-update convert creates a booking, links it, sets Booked", async () =>
   assert.equal(patched.Stage, "Booked");
 });
 
+test("convert responds with WHERE the booking landed (city/date/installer) so the UI can jump to it", async () => {
+  const res = await upd.handler(
+    { headers: { "x-installer-token": "cody-tok" }, body: JSON.stringify({ id: "recL", action: "convert", dateISO: "2026-08-01", time: "10:30 AM" }) },
+    { env: updEnv, getImpl: async () => leadRec,
+      createBookingImpl: async () => ({ id: "recBkX" }),
+      updateImpl: async (a) => ({ id: a.id }) });
+  assert.equal(res.statusCode, 200);
+  const out = JSON.parse(res.body);
+  assert.equal(out.booking.id, "recBkX");
+  assert.equal(out.booking.city, "Sioux Falls");
+  assert.equal(out.booking.dateISO, "2026-08-01");
+  assert.equal(out.booking.installer, "cody");
+  assert.equal(out.booking.scheduledTime, "10:30 AM");
+  assert.equal(out.booking.name, "Dana");
+  assert.equal(out.booking.status, "Booked");
+});
+
+test("convert accepts a city override — the owner books to any city, roadblock-free", async () => {
+  let booking;
+  const res = await upd.handler(
+    { headers: { "x-installer-token": "cody-tok" }, body: JSON.stringify({ id: "recL", action: "convert", dateISO: "2026-08-01", city: "Bemidji" }) },
+    { env: updEnv, getImpl: async () => leadRec,
+      createBookingImpl: async (a) => { booking = a.fields; return { id: "recBkY" }; },
+      updateImpl: async (a) => ({ id: a.id }) });
+  assert.equal(res.statusCode, 200);
+  assert.equal(booking.City, "Bemidji");
+  // Unknown city ⇒ no market routing; the booking stays with the lead's installer.
+  assert.equal(booking.Installer, "cody");
+  assert.equal(JSON.parse(res.body).booking.city, "Bemidji");
+});
+
+test("convert lets an admin direct-assign the booking to a chosen installer", async () => {
+  let booking;
+  const res = await upd.handler(
+    { headers: { "x-installer-token": "aaron-tok" }, body: JSON.stringify({ id: "recL", action: "convert", dateISO: "2026-08-01", installer: "noah" }) },
+    { env: updEnv, getImpl: async () => leadRec,
+      createBookingImpl: async (a) => { booking = a.fields; return { id: "recBkZ" }; },
+      updateImpl: async (a) => ({ id: a.id }) });
+  assert.equal(res.statusCode, 200);
+  assert.equal(booking.Installer, "noah");
+  assert.equal(JSON.parse(res.body).booking.installer, "noah");
+});
+
+test("convert ignores the installer override for a non-admin", async () => {
+  let booking;
+  await upd.handler(
+    { headers: { "x-installer-token": "cody-tok" }, body: JSON.stringify({ id: "recL", action: "convert", dateISO: "2026-08-01", installer: "noah" }) },
+    { env: updEnv, getImpl: async () => leadRec,
+      createBookingImpl: async (a) => { booking = a.fields; return { id: "recBkW" }; },
+      updateImpl: async (a) => ({ id: a.id }) });
+  assert.notEqual(booking.Installer, "noah");
+});
+
 test("convert stamps the booking Source with the lead's channel", async () => {
   let createdBooking;
   const ottLead = { id: "recL2", fields: { Name: "Dana", Phone: "1", City: "Sioux Falls", Installer: "cody", Stage: "New", Channel: "ott-national", "Activity Log": "" } };

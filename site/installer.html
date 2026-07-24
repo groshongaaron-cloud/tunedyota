@@ -71,6 +71,22 @@
   .evt>summary::-webkit-details-marker{display:none;}
   .evt[open]>summary{border-bottom:1px solid var(--line);}
   .evt .etitle{font-weight:800;font-size:15px;color:var(--accent);} .evt .edate{font-size:12px;color:var(--muted);font-weight:600;}
+  /* Flash = "here it is" — applied to the event card a just-created booking landed in,
+     so a booking made from Leads/Week/quick-add is never lost from view. */
+  .evt.flash{animation:tyflash 1.4s ease-out 2;}
+  @keyframes tyflash{0%{box-shadow:0 0 0 3px var(--accent);}100%{box-shadow:0 0 0 0 rgba(0,0,0,0);}}
+  /* 📅 Week view */
+  .weeknav{display:flex;gap:8px;align-items:center;margin:4px 0 10px;flex-wrap:wrap;}
+  .weeklabel{font-weight:800;margin-left:auto;font-size:14px;}
+  .weekgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;}
+  .daycell{border:1px solid rgba(127,127,127,.35);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;min-height:74px;}
+  .daycell.isToday{outline:2px solid var(--accent);}
+  .dayhead{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13px;}
+  .daychip{display:block;width:100%;text-align:left;border:1px solid rgba(127,127,127,.35);border-radius:8px;padding:6px 8px;font-size:12.5px;background:transparent;cursor:pointer;color:inherit;font-family:inherit;}
+  .daychip.done{opacity:.6;} .daychip.noshow{opacity:.6;text-decoration:line-through;}
+  .daychip .dim{color:var(--muted);font-weight:500;}
+  .daychip.evtchip{border-style:dashed;color:var(--muted);cursor:default;}
+  .dayadd{border:1px dashed rgba(127,127,127,.5);border-radius:8px;background:transparent;color:var(--muted);padding:5px;cursor:pointer;font-size:12px;margin-top:auto;font-family:inherit;}
   .pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;background:#eef1ea;color:var(--muted);}
   .pill.hasopen{background:#fdf0dd;color:#8a5a12;} .pill.alldone{background:#e7f2e2;color:#2f5d2a;}
   .ebody{padding:4px 12px 10px;}
@@ -298,7 +314,7 @@
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, eventSel:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:''
+  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, eventSel:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:'', weekAnchor:'', flashKey:'', walkPrefillDate:''
     , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:''
     , jobTab: 'all'      // 'all' | '<city>' | 'done'
     , doneCity: ''       // optional city filter applied inside the Done view
@@ -1001,8 +1017,10 @@
     });
     var list=Object.keys(cities).map(function(k){return cities[k];}).sort(function(a,b){return a.city.localeCompare(b.city);});
     function tab(id,label,dot,badge){ return '<button class="tabbtn'+(STATE.jobTab===id?' on':'')+'" data-sub="'+esc(id)+'" style="white-space:nowrap">'+(dot?'<span style="color:#c0392b">●</span> ':'')+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
-    var html=tab('all','All','','');
-    list.forEach(function(c){ html+=tab(c.city, c.city, c.overdue, c.open?String(c.open):''); });
+    var html=tab('all','All','','')+tab('week','📅 Week','','');
+    // A blank-city group (owner-freedom bookings) gets no tab of its own — it shows
+    // under All and in the Week view, never lost.
+    list.forEach(function(c){ if(c.city) html+=tab(c.city, c.city, c.overdue, c.open?String(c.open):''); });
     html+=tab('done','✓ Done','','');
     host.innerHTML=html;
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){ STATE.jobTab=b.getAttribute('data-sub'); if(STATE.jobTab!=='done') STATE.doneCity=''; renderFeed(); }; });
@@ -1022,6 +1040,74 @@
       e.bookings.forEach(function(b){ if(b.status==='Completed')e.done++; else if(b.status==='No-show')e.no++; else if(isOpen(b))e.open++; });
       e.total=e.bookings.length; e.hasOpen=e.open>0; return e;
     });
+  }
+
+  // Take the user TO a booking: switch tabs, clear anything hiding it (search, admin
+  // installer filter), expand + select it, flash its card. Used after a convert, a
+  // quick-add, and from Week-view chips — a new booking must never just vanish.
+  function jumpToBooking(b){
+    STATE.tab='jobs'; STATE.q='';
+    if(STATE.admin && STATE.installerFilter && STATE.installerFilter!==(b.installer||'')) STATE.installerFilter='';
+    STATE.jobTab = b.status==='Completed' ? 'done' : 'all';
+    if(b.status==='Completed') STATE.doneCity='';
+    var k=(b.city||'')+'|'+(b.dateISO||'');
+    STATE.eventOpen[k]=true; STATE.eventSel[k]=b.id; STATE.flashKey=k;
+    renderAll();
+    setTimeout(function(){
+      var t=null;
+      Array.prototype.forEach.call(document.querySelectorAll('#feed details.evt'),function(d){ if(d.getAttribute('data-key')===k) t=d; });
+      if(t) t.scrollIntoView({block:'start',behavior:'smooth'});
+    },80);
+  }
+
+  // ---- 📅 Week view ----
+  var DAYNAMES=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  function mondayOf(iso){ var d=new Date(iso+'T00:00:00'); var wd=(d.getDay()+6)%7; d.setDate(d.getDate()-wd);
+    var p=function(x){return String(x).padStart(2,'0');}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+  function fmtMD(iso){ return MONTHS[parseInt(iso.slice(5,7),10)-1].slice(0,3)+' '+parseInt(iso.slice(8,10),10); }
+  function renderWeek(host){
+    var start=mondayOf(STATE.weekAnchor||STATE.today);
+    var days=[]; for(var i=0;i<7;i++) days.push(addDays(start,i));
+    var byDay={}; days.forEach(function(d){ byDay[d]=[]; });
+    visibleBookings().forEach(function(b){ if(byDay[b.dateISO] && b.status!=='Cancelled') byDay[b.dateISO].push(b); });
+    var evByDay={}; visibleEvents().forEach(function(e){ if(byDay[e.dateISO]) (evByDay[e.dateISO]=evByDay[e.dateISO]||[]).push(e); });
+    var nav=document.createElement('div'); nav.className='weeknav';
+    function nb(label,fn){ var b=document.createElement('button'); b.className='btn'; b.textContent=label; b.onclick=fn; return b; }
+    nav.appendChild(nb('‹ Prev',function(){ STATE.weekAnchor=addDays(start,-7); renderFeed(); }));
+    nav.appendChild(nb('This week',function(){ STATE.weekAnchor=''; renderFeed(); }));
+    nav.appendChild(nb('Next ›',function(){ STATE.weekAnchor=addDays(start,7); renderFeed(); }));
+    var lab=document.createElement('span'); lab.className='weeklabel'; lab.textContent=fmtMD(days[0])+' – '+fmtMD(days[6]); nav.appendChild(lab);
+    host.appendChild(nav);
+    var grid=document.createElement('div'); grid.className='weekgrid';
+    days.forEach(function(d,i){
+      var cell=document.createElement('div'); cell.className='daycell'+(d===STATE.today?' isToday':'');
+      var head=document.createElement('div'); head.className='dayhead';
+      head.innerHTML='<span>'+DAYNAMES[i]+' · '+esc(fmtMD(d))+'</span>'+(d===STATE.today?'<span class="pill hasopen">today</span>':'');
+      cell.appendChild(head);
+      (evByDay[d]||[]).forEach(function(e){
+        if((byDay[d]||[]).some(function(b){ return b.city===e.city; })) return;
+        var ec=document.createElement('div'); ec.className='daychip evtchip'; ec.textContent='📍 '+(e.city||'(no city)')+' — event day, no bookings yet'; cell.appendChild(ec);
+      });
+      byDay[d].sort(function(a,b){ return String(a.scheduledTime||a.slot||'').localeCompare(String(b.scheduledTime||b.slot||''),undefined,{numeric:true}); })
+        .forEach(function(b){
+          var chip=document.createElement('button'); chip.type='button';
+          chip.className='daychip'+(b.status==='Completed'?' done':(b.status==='No-show'?' noshow':''));
+          chip.innerHTML='<b>'+esc(b.scheduledTime||b.slotLabel||'—')+'</b> '+esc(b.name||'—')+
+            (b.vehicle?' <span class="dim">· '+esc(b.vehicle)+'</span>':'')+
+            '<span class="dim"> · '+esc(b.city||'(no city)')+'</span>'+
+            (b.status==='Completed'?' ✓':(b.status==='No-show'?' ✗':''));
+          chip.onclick=function(){ jumpToBooking(b); };
+          cell.appendChild(chip);
+        });
+      var add=document.createElement('button'); add.type='button'; add.className='dayadd'; add.textContent='＋ Add booking';
+      add.onclick=function(){
+        STATE.walkPrefillDate=d; STATE.walkOpen['__anyday__']=true; STATE.jobTab='all'; renderFeed();
+        var f=document.getElementById('anydayform'); if(f){ f.open=true; f.scrollIntoView({block:'start',behavior:'smooth'}); }
+      };
+      cell.appendChild(add);
+      grid.appendChild(cell);
+    });
+    host.appendChild(grid);
   }
 
   function matchesQ(b){
@@ -1048,6 +1134,10 @@
 
     // Done tab: completed jobs only, grouped by event, newest first.
     if(STATE.jobTab==='done'){ renderDone(events, host); return; }
+
+    // 📅 Week view: a real calendar of who's booked, day by day. Typing a search
+    // hops back to All so results are never silently hidden behind the calendar.
+    if(STATE.jobTab==='week'){ if(STATE.q.trim()){ STATE.jobTab='all'; } else { renderWeek(host); return; } }
 
     host.appendChild(anydayWalkForm());   // everyday walk-in — always available
     host.appendChild(shareEventWidget(events)); // share a per-event booking link
@@ -1123,11 +1213,12 @@
     det.open=open;
     det.setAttribute('data-key', e.key);
     det.addEventListener('toggle',function(){ STATE.eventOpen[e.key]=det.open; });
+    if(STATE.flashKey===e.key){ det.classList.add('flash'); setTimeout(function(){ STATE.flashKey=''; det.classList.remove('flash'); },3000); }
     var pillCls=e.total===0?'':(e.hasOpen?'hasopen':'alldone');
     var pillTxt=e.total===0?'no bookings':(e.done+' done'+(e.open?' · '+e.open+' open':'')+(e.no?' · '+e.no+' no-show':''));
     var tag=STATE.admin&&e.installer?' <span class="installer-tag">'+esc(e.installer)+'</span>':'';
     var sum=document.createElement('summary');
-    sum.innerHTML='<span><span class="etitle">'+esc(e.city)+'</span>'+tag+'<br><span class="edate">'+esc(relDate(e.dateISO))+'</span></span>'+
+    sum.innerHTML='<span><span class="etitle">'+esc(e.city||'(no city)')+'</span>'+tag+'<br><span class="edate">'+esc(relDate(e.dateISO))+'</span></span>'+
       '<span class="pill '+pillCls+'">'+esc(pillTxt)+'</span>';
     det.appendChild(sum);
     var body=document.createElement('div'); body.className='ebody';
@@ -1258,7 +1349,8 @@
     var box=document.createElement('div'); box.className='ebody walkmini';
     var n=mkInput('Customer name'), v=mkInput('Vehicle — incl. year (e.g. 2021 Tundra)'), p=mkInput('Phone'); p.inputMode='tel';
     var ld=document.createElement('label'); ld.className='fld'; ld.textContent='Date of tune';
-    var dt=document.createElement('input'); dt.type='date'; dt.value=STATE.today;
+    var dt=document.createElement('input'); dt.type='date'; dt.value=STATE.walkPrefillDate||STATE.today;
+    if(STATE.walkPrefillDate){ det.open=true; STATE.walkOpen[K]=true; STATE.walkPrefillDate=''; }
     var lc=document.createElement('label'); lc.className='fld'; lc.textContent='Location / market';
     // Always a free-text field so ANY of the installer's markets can be logged — even a
     // city not yet on the roster (everyday call-in). Known cities become datalist
@@ -1272,17 +1364,36 @@
     }
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Log walk-in';
     var em=mkInput('Customer email (for their certificate)'); em.type='email';
-    [n,v,p,ld,dt,lc,city,em,btn].forEach(function(el){ box.appendChild(el); });
+    var tm=mkInput('Time (e.g. 10:30 AM) — optional');
+    var instSel=instSelect();   // admin only: direct-assign to any installer
+    [n,v,p,ld,dt,lc,city,tm,em].forEach(function(el){ box.appendChild(el); });
+    if(instSel) box.appendChild(instSel);
+    box.appendChild(btn);
     if(dl) box.appendChild(dl);
     det.appendChild(box);
     btn.onclick=function(){
       var c=(city.value||'').trim(), d=(dt.value||'').trim();
-      if(!c){ fail('Enter a city / market.'); return; }
+      if(!c){ fail('Enter a city / market — any city works, it doesn’t have to be a known market.'); return; }
       if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ fail('Pick the date of the tune.'); return; }
       STATE.walkOpen[K]=true;                       // keep this form open for the next entry
-      addWalkin({city:c,dateISO:d,key:c+'|'+d},{name:n.value,vehicle:v.value,phone:p.value,email:em.value});
+      addWalkin({city:c,dateISO:d,key:c+'|'+d},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,
+        time:tm.value,installer:instSel?instSel.value:''});
     };
     return det;
+  }
+
+  // Admin-only "assign to installer" select — owner freedom to direct any booking.
+  // Returns null for non-admins (routing stays automatic for the crew).
+  function instSelect(){
+    if(!STATE.admin) return null;
+    var keys=[], seen={};
+    STATE.bookings.concat(STATE.events).forEach(function(b){ var k=b.installer||''; if(k&&!seen[k]){seen[k]=1;keys.push(k);} });
+    if(STATE.me && !seen[STATE.me]){ seen[STATE.me]=1; keys.push(STATE.me); }
+    keys.sort();
+    var sel=document.createElement('select');
+    sel.innerHTML='<option value="">Installer: auto (route by market)</option>'+
+      keys.map(function(k){ return '<option value="'+esc(k)+'">Assign to '+esc(cap(k))+'</option>'; }).join('');
+    return sel;
   }
 
   async function addWalkin(evt, vals){
@@ -1291,7 +1402,8 @@
     var email=(vals.email||'').trim();
     if(!name){ fail('Enter the customer name.'); return; }
     if(!phone){ fail('Enter a phone number.'); return; }
-    var op = Q().makeOp('walkin', { city:evt.city, dateISO:evt.dateISO, name:name, vehicle:vehicle, phone:phone, email:email, clientKey:null });
+    var time=(vals.time||'').trim(), inst=(vals.installer||'').trim();
+    var op = Q().makeOp('walkin', { city:evt.city, dateISO:evt.dateISO, name:name, vehicle:vehicle, phone:phone, email:email, time:time, installer:inst, clientKey:null });
     op.body.clientKey = op.clientKey;
     var res, netErr=null;
     try { res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(op.body)}); }
@@ -1308,11 +1420,18 @@
     }
     var out=await res.json().catch(function(){return{};});
     if(out.status==='booked' && out.booking){
+      var bk=out.booking, k=(bk.city||'')+'|'+bk.dateISO;
       STATE.walkOpen[evt.key]=true;        // keep this event's adder open for the next walk-in
-      STATE.eventOpen[evt.key]=true;       // and keep the event itself expanded
-      STATE.bookings.push(out.booking);
+      STATE.eventOpen[k]=true;             // expand the card the booking actually landed in
+      // If the admin's installer filter would hide this booking, drop the filter —
+      // a booking you just made must never be invisible (the 218 caller lesson).
+      if(STATE.admin && STATE.installerFilter && STATE.installerFilter!==(bk.installer||'')) STATE.installerFilter='';
+      STATE.bookings.push(bk);
+      STATE.flashKey=k;
       renderAll();                         // #msg lives outside the feed, so this message survives
-      succeed('✓ Added '+name+' — walk-in saved for '+evt.city+'.');
+      succeed('✓ Booked '+name+' — '+(bk.city||'no city')+' · '+relDate(bk.dateISO)+
+        (bk.scheduledTime?' · '+bk.scheduledTime:'')+
+        (STATE.admin&&bk.installer?' · assigned to '+cap(bk.installer):'')+'. Card highlighted below.');
     } else {
       var er=out.error||('error '+(res?res.status:'network'));
       fail( er==='unknown-event'   ? 'That event isn’t recognized — reload and try again.'
@@ -1323,7 +1442,8 @@
     }
   }
   function optimisticWalkin(evt, op){
-    return { id:'pending:'+op.clientKey, city:evt.city, dateISO:evt.dateISO, installer:'', slot:'', slotLabel:'',
+    return { id:'pending:'+op.clientKey, city:evt.city, dateISO:evt.dateISO, installer:op.body.installer||'', slot:'', slotLabel:'',
+      scheduledTime:op.body.time||'',
       name:op.body.name, vehicle:op.body.vehicle, phone:op.body.phone, email:op.body.email, mods:'', status:'Booked',
       isWalkin:true, pendingSync:true, calibration:'', vin:'', tuningPlatform:'', calibrationType:'', ecuId:'', gearSize:'', mileage:'' };
   }
@@ -1436,8 +1556,16 @@
       conv.appendChild(evSel);
     }
     var ctime=mkInput('Time (e.g. 10:30 AM)');
-    conv.appendChild(cd); conv.appendChild(ctime);
-    conv.appendChild(act('Convert to booking',function(){ leadUpdate(l.id,{action:'convert',dateISO:cd.value,time:(ctime.value||'').trim()}); }));
+    // Owner freedom: book to ANY city/location — prefilled from the lead, editable,
+    // no known-market requirement. Admin may also direct-assign the installer.
+    var ccity=mkInput('City / location'); ccity.value=l.city||'';
+    var cinst=instSelect();
+    conv.appendChild(ccity); conv.appendChild(cd); conv.appendChild(ctime);
+    if(cinst) conv.appendChild(cinst);
+    conv.appendChild(act('Convert to booking',function(){
+      leadUpdate(l.id,{action:'convert',dateISO:cd.value,time:(ctime.value||'').trim(),
+        city:(ccity.value||'').trim(),installer:cinst?cinst.value:''});
+    }));
     body.appendChild(conv);
     if(l.activity){ var log=document.createElement('div'); log.className='edate'; log.style.whiteSpace='pre-wrap'; log.style.marginTop='6px'; log.textContent=l.activity; body.appendChild(log); }
     det.appendChild(body); return det;
@@ -1449,7 +1577,22 @@
     try{
       var res=await fetch('/.netlify/functions/lead-update',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(Object.assign({id:id},payload))});
       var out=await res.json().catch(function(){return{};});
-      if(res.ok && out.status==='ok'){ succeed(payload.action==='convert'?'✓ Converted to a booking.':(payload.action==='delete'?'✓ Lead deleted.':'✓ Updated.')); loadLeads(); }
+      if(res.ok && out.status==='ok'){
+        if(payload.action==='convert' && out.booking){
+          // Never let a fresh booking vanish: pull the pipeline refresh in the
+          // background and take the user straight to the highlighted booking card.
+          loadLeads();
+          var bk=out.booking;
+          STATE.bookings.push(bk);
+          jumpToBooking(bk);
+          succeed('✓ Booked '+(bk.name||'client')+' — '+(bk.city||'no city')+' · '+relDate(bk.dateISO)+
+            (bk.scheduledTime?' · '+bk.scheduledTime:'')+
+            (STATE.admin&&bk.installer?' · assigned to '+cap(bk.installer):'')+'. Card highlighted below.');
+        } else {
+          succeed(payload.action==='convert'?'✓ Converted to a booking.':(payload.action==='delete'?'✓ Lead deleted.':'✓ Updated.'));
+          loadLeads();
+        }
+      }
       else { fail('Could not update: '+(out.error||res.status)); }
     }catch(e){ fail('Network error — try again.'); }
   }
