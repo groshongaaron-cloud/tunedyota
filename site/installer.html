@@ -87,6 +87,21 @@
   .daychip .dim{color:var(--muted);font-weight:500;}
   .daychip.evtchip{border-style:dashed;color:var(--muted);cursor:default;}
   .dayadd{border:1px dashed rgba(127,127,127,.5);border-radius:8px;background:transparent;color:var(--muted);padding:5px;cursor:pointer;font-size:12px;margin-top:auto;font-family:inherit;}
+  .daychip.leadchip{border-style:dashed;border-color:rgba(200,140,0,.7);}
+  .daychip[draggable="true"]{cursor:grab;}
+  .daycell.dragover{outline:2px dashed var(--accent);outline-offset:-2px;}
+  .daycell.flash{animation:tyflash 1.4s ease-out 2;}
+  /* Month view */
+  .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .mdow{font-size:11px;font-weight:800;color:var(--muted);text-align:center;padding:2px 0;}
+  .mcell{border:1px solid rgba(127,127,127,.3);border-radius:8px;min-height:58px;padding:4px 5px;font-size:11px;cursor:pointer;background:transparent;color:inherit;font-family:inherit;text-align:left;display:flex;flex-direction:column;gap:2px;}
+  .mcell .mnum{font-weight:800;font-size:12px;}
+  .mcell.dim{opacity:.38;}
+  .mcell.isToday{outline:2px solid var(--accent);}
+  .mcell .md{display:inline-block;border-radius:6px;padding:0 4px;font-weight:700;white-space:nowrap;}
+  .mcell .md.open{background:rgba(200,120,0,.18);}
+  .mcell .md.done{background:rgba(40,140,70,.18);}
+  .mcell .md.fu{background:rgba(200,140,0,.14);border:1px dashed rgba(200,140,0,.5);}
   .pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;background:#eef1ea;color:var(--muted);}
   .pill.hasopen{background:#fdf0dd;color:#8a5a12;} .pill.alldone{background:#e7f2e2;color:#2f5d2a;}
   .ebody{padding:4px 12px 10px;}
@@ -314,7 +329,7 @@
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, eventSel:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:'', weekAnchor:'', flashKey:'', walkPrefillDate:''
+  var STATE = { today:'', bookings:[], events:[], admin:false, installerFilter:'', q:'', showAllPast:false, eventOpen:{}, walkOpen:{}, eventSel:{}, vinBlocked:{}, reviewUrl:'', vapidPublicKey:'', weekAnchor:'', flashKey:'', walkPrefillDate:'', calMode:'week', monthAnchor:'', weekFlashDate:'', leadOpenId:'', leadsLoading:false
     , tab:'jobs', leads:[], leadsLoaded:false, leadStageOpen:{}, leadFilter:'', leadQ:''
     , jobTab: 'all'      // 'all' | '<city>' | 'done'
     , doneCity: ''       // optional city filter applied inside the Done view
@@ -1065,22 +1080,73 @@
   function mondayOf(iso){ var d=new Date(iso+'T00:00:00'); var wd=(d.getDay()+6)%7; d.setDate(d.getDate()-wd);
     var p=function(x){return String(x).padStart(2,'0');}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
   function fmtMD(iso){ return MONTHS[parseInt(iso.slice(5,7),10)-1].slice(0,3)+' '+parseInt(iso.slice(8,10),10); }
+  // Follow-up leads belong on the calendar too: an active-stage lead with a
+  // follow-up date is work scheduled for that day, same as a booking.
+  function followupsByDay(){
+    var m={};
+    (STATE.leads||[]).forEach(function(l){
+      if(ACTIVE_LEAD_STAGES.indexOf(l.stage)<0 || !l.nextFollowup) return;
+      (m[l.nextFollowup]=m[l.nextFollowup]||[]).push(l);
+    });
+    return m;
+  }
+  function jumpToLead(l){
+    STATE.tab='leads'; STATE.leadQ=''; STATE.leadOpenId=l.id;
+    if(!STATE.leadsLoaded && !STATE.leadsLoading){ STATE.leadsLoading=true; loadLeads(); return; }
+    renderAll();
+  }
+  // Drag-to-reschedule: a chip dropped on another day POSTs the move, updates local
+  // state, and flashes the landing day. The server re-checks ownership + locks
+  // Completed bookings, so the client only needs the happy path + honest errors.
+  async function dropReschedule(id, newDate){
+    var b=null; STATE.bookings.forEach(function(x){ if(x.id===id) b=x; });
+    if(!b || b.dateISO===newDate) return;
+    if(String(id).indexOf('pending:')===0){ fail('That booking is still syncing — try again in a moment.'); return; }
+    var from=b.dateISO;
+    clearMsg();
+    try{
+      var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',
+        headers:{'Content-Type':'application/json','x-installer-token':tok()},
+        body:JSON.stringify({recordId:id, dateISO:newDate})});
+      var out=await res.json().catch(function(){return{};});
+      if(res.ok && out.status==='ok'){
+        b.dateISO=newDate;
+        STATE.weekFlashDate=newDate;
+        renderFeed();
+        succeed('✓ Moved '+(b.name||'booking')+' — '+relDate(from)+' → '+relDate(newDate)+'.');
+      } else {
+        fail(out.error==='not-open' ? 'Completed bookings are locked — their date feeds the OTT report.'
+           : out.error==='not-yours' ? 'That booking belongs to another installer.'
+           : 'Could not move it: '+(out.error||res.status));
+      }
+    }catch(e){ fail('Network error — the booking was not moved.'); }
+  }
+
   function renderWeek(host){
+    if(!STATE.leadsLoaded && !STATE.leadsLoading){ STATE.leadsLoading=true; loadLeads(); }
+    if(STATE.calMode==='month'){ renderMonth(host); return; }
     var start=mondayOf(STATE.weekAnchor||STATE.today);
     var days=[]; for(var i=0;i<7;i++) days.push(addDays(start,i));
     var byDay={}; days.forEach(function(d){ byDay[d]=[]; });
     visibleBookings().forEach(function(b){ if(byDay[b.dateISO] && b.status!=='Cancelled') byDay[b.dateISO].push(b); });
     var evByDay={}; visibleEvents().forEach(function(e){ if(byDay[e.dateISO]) (evByDay[e.dateISO]=evByDay[e.dateISO]||[]).push(e); });
+    var fuByDay=followupsByDay();
     var nav=document.createElement('div'); nav.className='weeknav';
-    function nb(label,fn){ var b=document.createElement('button'); b.className='btn'; b.textContent=label; b.onclick=fn; return b; }
+    function nb(label,fn,cls){ var b=document.createElement('button'); b.className='btn'+(cls?' '+cls:''); b.textContent=label; b.onclick=fn; return b; }
     nav.appendChild(nb('‹ Prev',function(){ STATE.weekAnchor=addDays(start,-7); renderFeed(); }));
     nav.appendChild(nb('This week',function(){ STATE.weekAnchor=''; renderFeed(); }));
     nav.appendChild(nb('Next ›',function(){ STATE.weekAnchor=addDays(start,7); renderFeed(); }));
+    nav.appendChild(nb('Month',function(){ STATE.calMode='month'; STATE.monthAnchor=STATE.weekAnchor||STATE.today; renderFeed(); },'calmode'));
     var lab=document.createElement('span'); lab.className='weeklabel'; lab.textContent=fmtMD(days[0])+' – '+fmtMD(days[6]); nav.appendChild(lab);
     host.appendChild(nav);
     var grid=document.createElement('div'); grid.className='weekgrid';
     days.forEach(function(d,i){
-      var cell=document.createElement('div'); cell.className='daycell'+(d===STATE.today?' isToday':'');
+      var cell=document.createElement('div'); cell.className='daycell'+(d===STATE.today?' isToday':'')+(STATE.weekFlashDate===d?' flash':'');
+      cell.setAttribute('data-date', d);
+      cell.addEventListener('dragover',function(e){ e.preventDefault(); cell.classList.add('dragover'); });
+      cell.addEventListener('dragleave',function(){ cell.classList.remove('dragover'); });
+      cell.addEventListener('drop',function(e){ e.preventDefault(); cell.classList.remove('dragover');
+        var id=e.dataTransfer&&e.dataTransfer.getData('text/plain'); if(id) dropReschedule(id, d); });
       var head=document.createElement('div'); head.className='dayhead';
       head.innerHTML='<span>'+DAYNAMES[i]+' · '+esc(fmtMD(d))+'</span>'+(d===STATE.today?'<span class="pill hasopen">today</span>':'');
       cell.appendChild(head);
@@ -1096,9 +1162,19 @@
             (b.vehicle?' <span class="dim">· '+esc(b.vehicle)+'</span>':'')+
             '<span class="dim"> · '+esc(b.city||'(no city)')+'</span>'+
             (b.status==='Completed'?' ✓':(b.status==='No-show'?' ✗':''));
+          if(isOpen(b) && String(b.id).indexOf('pending:')!==0){
+            chip.draggable=true;
+            chip.addEventListener('dragstart',function(e){ if(e.dataTransfer) e.dataTransfer.setData('text/plain', b.id); });
+          }
           chip.onclick=function(){ jumpToBooking(b); };
           cell.appendChild(chip);
         });
+      (fuByDay[d]||[]).forEach(function(l){
+        var chip=document.createElement('button'); chip.type='button'; chip.className='daychip leadchip';
+        chip.innerHTML='☎ <b>Follow up</b> · '+esc(l.name||'—')+(l.vehicle?' <span class="dim">· '+esc(l.vehicle)+'</span>':'');
+        chip.onclick=function(){ jumpToLead(l); };
+        cell.appendChild(chip);
+      });
       var add=document.createElement('button'); add.type='button'; add.className='dayadd'; add.textContent='＋ Add booking';
       add.onclick=function(){
         STATE.walkPrefillDate=d; STATE.walkOpen['__anyday__']=true; STATE.jobTab='all'; renderFeed();
@@ -1107,6 +1183,55 @@
       cell.appendChild(add);
       grid.appendChild(cell);
     });
+    host.appendChild(grid);
+    if(STATE.weekFlashDate){ setTimeout(function(){ STATE.weekFlashDate=''; },1500); }
+  }
+
+  // Month view: booking density at a glance; tap a day to zoom into its week.
+  function renderMonth(host){
+    var anchor=(STATE.monthAnchor||STATE.today).slice(0,7);
+    var first=anchor+'-01';
+    var label=MONTHS[parseInt(anchor.slice(5,7),10)-1]+' '+anchor.slice(0,4);
+    var nav=document.createElement('div'); nav.className='weeknav';
+    function nb(l,fn,cls){ var b=document.createElement('button'); b.className='btn'+(cls?' '+cls:''); b.textContent=l; b.onclick=fn; return b; }
+    function shiftMonth(n){ var d=new Date(first+'T00:00:00'); d.setMonth(d.getMonth()+n);
+      var p=function(x){return String(x).padStart(2,'0');}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-01'; }
+    nav.appendChild(nb('‹ Prev',function(){ STATE.monthAnchor=shiftMonth(-1); renderFeed(); }));
+    nav.appendChild(nb('This month',function(){ STATE.monthAnchor=STATE.today; renderFeed(); }));
+    nav.appendChild(nb('Next ›',function(){ STATE.monthAnchor=shiftMonth(1); renderFeed(); }));
+    nav.appendChild(nb('Week',function(){ STATE.calMode='week'; renderFeed(); },'calmode'));
+    var lab=document.createElement('span'); lab.className='weeklabel'; lab.textContent=label; nav.appendChild(lab);
+    host.appendChild(nav);
+    var byDay={};
+    visibleBookings().forEach(function(b){
+      if(b.status==='Cancelled' || (b.dateISO||'').slice(0,7)!==anchor) return;
+      var s=(byDay[b.dateISO]=byDay[b.dateISO]||{open:0,done:0,no:0,fu:0});
+      if(b.status==='Completed') s.done++; else if(b.status==='No-show') s.no++; else s.open++;
+    });
+    var fu=followupsByDay();
+    Object.keys(fu).forEach(function(d){ if(d.slice(0,7)===anchor){ (byDay[d]=byDay[d]||{open:0,done:0,no:0,fu:0}).fu+=fu[d].length; } });
+    var grid=document.createElement('div'); grid.className='mgrid';
+    DAYNAMES.forEach(function(n){ var h=document.createElement('div'); h.className='mdow'; h.textContent=n; grid.appendChild(h); });
+    var cur=mondayOf(first);
+    var end=shiftMonth(1);
+    while(cur<end || new Date(cur+'T00:00:00').getDay()!==1){
+      (function(d){
+        var inMonth=d.slice(0,7)===anchor;
+        var cell=document.createElement('button'); cell.type='button';
+        cell.className='mcell'+(inMonth?'':' dim')+(d===STATE.today?' isToday':'');
+        cell.setAttribute('data-date', d);
+        var s=byDay[d];
+        cell.innerHTML='<span class="mnum">'+parseInt(d.slice(8,10),10)+'</span>'+
+          (s? (s.open?'<span class="md open">'+s.open+' open</span>':'')+
+              (s.done?'<span class="md done">'+s.done+' ✓</span>':'')+
+              (s.no?'<span class="md">'+s.no+' ✗</span>':'')+
+              (s.fu?'<span class="md fu">'+s.fu+' ☎</span>':'') : '');
+        cell.onclick=function(){ STATE.calMode='week'; STATE.weekAnchor=d; renderFeed(); };
+        grid.appendChild(cell);
+      })(cur);
+      cur=addDays(cur,1);
+      if(grid.children.length>7+42) break;   // safety: never more than 6 weeks
+    }
     host.appendChild(grid);
   }
 
@@ -1458,6 +1583,7 @@
       if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
       var data=await res.json(); STATE.leads=data.leads||[]; STATE.leadsLoaded=true;
     }catch(e){ /* keep whatever we have */ }
+    STATE.leadsLoading=false;
     renderAll();
   }
   function leadMatchesQ(l){ var q=STATE.leadQ.trim().toLowerCase(); if(!q) return true;
@@ -1486,6 +1612,12 @@
   function leadCard(l){
     var overdue=(ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
     var det=document.createElement('details'); det.className='evt';
+    // Arriving from a calendar follow-up chip: open this card, flash it, scroll to it.
+    if(STATE.leadOpenId===l.id){
+      det.open=true; det.classList.add('flash'); STATE.leadOpenId='';
+      setTimeout(function(){ det.scrollIntoView({block:'start',behavior:'smooth'}); },80);
+      setTimeout(function(){ det.classList.remove('flash'); },3000);
+    }
     var sum=document.createElement('summary');
     sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' '+esc(l.name)+'</span>'+(l.channel==='ott-national'?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
       '<br><span class="edate">'+esc(l.vehicle||'—')+' · '+esc(l.city||'—')+'</span></span>'+
