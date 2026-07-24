@@ -25,6 +25,9 @@ async function main() {
   fs.mkdirSync(OUT, { recursive: true });
   const done = [], failed = [];
   for (const [sku, p] of Object.entries(man.products)) {
+    // Entries without a cdn2Path (ownerProvided files, amsoil.com-sourced og
+    // images) aren't dealer-library-refreshable — skip, keep the local file.
+    if (!p.cdn2Path) continue;
     const url = thumbor(p.cdn2Path);
     try {
       const res = await fetch(url);

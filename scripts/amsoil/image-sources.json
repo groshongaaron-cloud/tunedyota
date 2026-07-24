@@ -46,6 +46,30 @@
     "ATL-QT": {
       "file": "atf.jpg",
       "cdn2Path": "digitalLibrary/21b3418c-3437-4cdd-951c-4083eae501ee/Signature_Series_Multi-Vehicle_Synthetic_Automatic_Transmission_Fluid_Quart-ATFQT.jpg"
+    },
+    "DEO-5W40-QT": {
+      "file": "deo-5w40.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "ADO-5W40-QT": {
+      "file": "ado-5w40.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "PI-API": {
+      "file": "pi-api.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "UCL-CN": {
+      "file": "ucl.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "ANTPC-1G": {
+      "file": "antpc.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
+    },
+    "ANTHD-1G": {
+      "file": "anthd.jpg",
+      "source": "amsoil.com product-page media (300px max there; no cdn2Path so image-sync skips — upgrade to 800px dealer-library shots when owner pulls them)"
     }
   },
   "ownerProvided": {

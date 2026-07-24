@@ -38,6 +38,9 @@ export const HEAD_PAGES = [
   "amsoil-ea-oil-filter-ea15k49.html","amsoil-ea-oil-filter-ea15k04.html",
   "amsoil-severe-gear-75w-85-synthetic-gear-lube.html","amsoil-severe-gear-75w-90-synthetic-gear-lube.html",
   "amsoil-severe-gear-75w-140-synthetic-gear-lube.html","amsoil-severe-gear-80w-90-synthetic-gear-lube.html",
+  "amsoil-signature-series-5w-40-synthetic-max-duty-diesel-oil.html","amsoil-heavy-duty-5w-40-synthetic-diesel-oil.html",
+  "amsoil-p-i-performance-improver-gasoline-additive.html","amsoil-upper-cylinder-lubricant-corrosion-inhibitor.html",
+  "amsoil-passenger-car-light-truck-antifreeze-coolant.html","amsoil-heavy-duty-antifreeze-coolant.html",
   "amsoil-minnesota.html","amsoil-iowa.html","amsoil-wisconsin.html","amsoil-north-dakota.html","amsoil-south-dakota.html","amsoil-nebraska.html",
   "amsoil-texas.html","amsoil-florida.html","amsoil-colorado.html","amsoil-arizona.html","amsoil-michigan.html","amsoil-california.html",
   "amsoil-georgia.html","amsoil-ohio.html","amsoil-pennsylvania.html","amsoil-illinois.html","amsoil-washington.html","amsoil-tennessee.html",
@@ -62,6 +65,9 @@ export const PRIORITY = {
   "amsoil-ea-oil-filter-ea15k49.html": "0.8", "amsoil-ea-oil-filter-ea15k04.html": "0.8",
   "amsoil-severe-gear-75w-85-synthetic-gear-lube.html": "0.8", "amsoil-severe-gear-75w-90-synthetic-gear-lube.html": "0.8",
   "amsoil-severe-gear-75w-140-synthetic-gear-lube.html": "0.8", "amsoil-severe-gear-80w-90-synthetic-gear-lube.html": "0.8",
+  "amsoil-signature-series-5w-40-synthetic-max-duty-diesel-oil.html": "0.8", "amsoil-heavy-duty-5w-40-synthetic-diesel-oil.html": "0.8",
+  "amsoil-p-i-performance-improver-gasoline-additive.html": "0.8", "amsoil-upper-cylinder-lubricant-corrosion-inhibitor.html": "0.8",
+  "amsoil-passenger-car-light-truck-antifreeze-coolant.html": "0.8", "amsoil-heavy-duty-antifreeze-coolant.html": "0.8",
   "privacy.html": "0.3", "terms.html": "0.3", "returns.html": "0.3",
 };
 // loc path for a filename (index -> "/", others -> "/name" without .html).

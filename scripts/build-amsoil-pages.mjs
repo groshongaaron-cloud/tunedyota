@@ -30,6 +30,11 @@ function categoryOf(name) {
   const n = name.toLowerCase();
   if (n.includes("filter")) return "Oil Filter";
   if (n.includes("gear")) return "Gear Lube";
+  // Order matters: diesel/coolant/additive names also contain viscosity grades
+  // ("5w-40") or generic words, so they must match BEFORE the motor-oil check.
+  if (n.includes("antifreeze") || n.includes("coolant")) return "Antifreeze & Coolant";
+  if (n.includes("performance improver") || n.includes("upper cylinder")) return "Fuel Additive";
+  if (n.includes("diesel")) return "Diesel Oil";
   if (n.includes("transmission") || n.includes("atf") || n.includes("multi-vehicle")) return "Automatic Transmission Fluid";
   if (n.includes("grease")) return "Grease";
   if (n.includes("motor oil") || n.includes("0w") || n.includes("5w")) return "Synthetic Motor Oil";
@@ -355,6 +360,9 @@ const CAT_LABEL = {
   "Oil Filter": "AMSOIL Ea Oil Filter",
   "Gear Lube": "AMSOIL SEVERE GEAR Synthetic Gear Lube",
   "Automatic Transmission Fluid": "AMSOIL Synthetic Automatic Transmission Fluid",
+  "Diesel Oil": "AMSOIL Synthetic Diesel Oil",
+  "Fuel Additive": "AMSOIL Fuel Additives",
+  "Antifreeze & Coolant": "AMSOIL Antifreeze & Coolant",
   "Grease": "AMSOIL Synthetic Grease",
 };
 
@@ -773,6 +781,85 @@ const PRODUCT_COPY = {
     footnotes: "Severe-service and 100,000-mile results are from AMSOIL's Las Vegas Taxi Cab Field Study.",
     guide: "amsoil-synthetic-atf-guide.html", guideLabel: "AMSOIL synthetic ATF guide",
   },
+  // Claims below are from the AMSOIL Dealer Sales Briefs (Diesel Oils 8/23,
+  // Gasoline Additives 10/24, Antifreeze/Coolants 1/16). tag/bullets/faqs/
+  // footnotes may be functions of the product for per-variant copy.
+  "Diesel Oil": {
+    tag: (p) => /max-duty/i.test(p.name)
+      ? "AMSOIL's top-grade diesel oil: 6X better wear protection than required by the Detroit Diesel DD13 scuffing test, with reserve protection to extend drain intervals."
+      : "4X better wear protection than required by the Detroit Diesel DD13 scuffing test — engineered for turbodiesel pickups and hard-working equipment.",
+    answer: (p) => /max-duty/i.test(p.name)
+      ? `${ESC(p.name)} is AMSOIL's top-grade 100% synthetic diesel oil — <strong>6X better wear protection</strong> than required by the Detroit Diesel DD13 scuffing test, with <strong>reserve protection</strong> that lets serious diesel owners extend drain intervals with confidence.<sup>1</sup>`
+      : `${ESC(p.name)} is a 100% synthetic formula developed for hard-working turbodiesel pickups and equipment — <strong>4X better wear protection</strong> than required by the Detroit Diesel DD13 scuffing test, with low volatility that minimizes oil consumption.<sup>1</sup>`,
+    bullets: (p) => /max-duty/i.test(p.name) ? [
+      "<strong>6X better engine wear protection</strong> than required by the Detroit Diesel DD13 scuffing test.<sup>1</sup>",
+      "<strong>Reserve protection</strong> — the option to extend drain intervals with confidence.",
+      "Withstands high-temperature breakdown under heavy use in extreme temperatures; advanced synthetic technology for maximum fuel economy.",
+      "Exceeds the latest API CK-4 specification.",
+    ] : [
+      "<strong>4X better engine wear protection</strong> than required by the Detroit Diesel DD13 scuffing test.<sup>1</sup>",
+      "<strong>Minimizes oil consumption</strong> — low volatility (burn-off) with excellent film strength at high operating temperatures.",
+      "5W-40 is specifically designed for the demands serious turbo-truck enthusiasts put their diesel pickups through.",
+      "Exceeds the latest API CK-4 specification.",
+    ],
+    faqs: [
+      ["Will switching to AMSOIL synthetic diesel oil cause leaks?", "No — synthetic oils do not cause engines to leak. AMSOIL diesel oils are fully compatible with modern seal materials and are formulated to condition seals, keeping them pliable. They're safe in both new and high-mileage engines."],
+      ["What's the difference between Max-Duty and Heavy-Duty?", "Both exceed the API CK-4 specification. Heavy-Duty delivers 4X better wear protection than required by the Detroit Diesel DD13 scuffing test; Signature Series Max-Duty delivers 6X, with reserve protection that allows extended drain intervals — it's the pick for hardcore enthusiasts and owners who want the best."],
+      ["Can AMSOIL diesel oil be used in gasoline engines?", "Signature Series Max-Duty is suitable for applications specifying API SN+ and earlier, making it ideal for mixed fleets. Check your owner's manual for the specified viscosity and rating."],
+    ],
+    footnotes: "<sup>1</sup> Wear-protection comparisons are based on the requirements of the Detroit Diesel DD13 scuffing test.",
+    guide: "is-amsoil-worth-it.html", guideLabel: "Is AMSOIL worth it?",
+  },
+  "Fuel Additive": {
+    tag: (p) => /performance improver/i.test(p.name)
+      ? "Deep-cleans injectors, intake valves and combustion chambers — restores power and fuel economy in one tank. Use every 4,000 miles."
+      : "Lubricates upper cylinders to fight wear, inhibits ethanol corrosion and keeps injectors clean — use at every fill-up.",
+    answer: (p) => /performance improver/i.test(p.name)
+      ? `${ESC(p.name)} is an extremely potent, concentrated detergent additive — unsurpassed in removing damaging fuel-injector, intake-valve and combustion-chamber deposits. It cleans your <strong>entire fuel system and restores power and performance in one tank</strong> of gasoline, and it's excellent for direct-injected (GDI) and port-injected engines. Treats 30 gallons; use every 4,000 miles.`
+      : `${ESC(p.name)} lubricates upper cylinders to fight wear, <strong>inhibits ethanol-related corrosion</strong> and keeps injectors clean — extending engine life at every fill-up. It delivers <strong>18% more lubricity than Lucas and 20% more than Sea Foam</strong> for better retention of horsepower and fuel economy.<sup>1</sup> Treats 25 gallons; use every tank.`,
+    bullets: (p) => /performance improver/i.test(p.name) ? [
+      "<strong>Deep-cleans the entire fuel system</strong> — injectors, intake valves and combustion chambers — in one tank.",
+      "Restores power, performance and fuel economy; helps reduce emissions.",
+      "Excellent for gasoline direct-injected (GDI) and port fuel-injected engines; capless-compatible bottle; E85-safe.",
+    ] : [
+      "<strong>Lubricates upper cylinders</strong> to fight wear — extending engine life at every fill-up.",
+      "<strong>Inhibits ethanol-related corrosion</strong> and keeps injectors clean.",
+      "<strong>18% more lubricity than Lucas, 20% more than Sea Foam</strong> for better retention of horsepower and fuel economy.<sup>1</sup>",
+      "Designed to work hand-in-hand with P.i. Performance Improver; capless-compatible; E85-safe.",
+    ],
+    faqs: [
+      ["What's the difference between P.i. and Upper Cylinder Lubricant?", "P.i. is the deep-cleaning additive — it cleans the entire fuel system and restores like-new performance every 4,000 miles. Upper Cylinder Lubricant is the maintenance product — it lubricates upper cylinders, fights ethanol corrosion and keeps injectors clean at every fill-up."],
+      ["Can I use both at the same time?", "Yes — both products can be used together in one tank of gasoline. Deep-clean with P.i. every 4,000 miles, keep clean with Upper Cylinder Lubricant every tank."],
+      ["Do these work in my Toyota or Lexus?", "Yes — they're formulated for all gasoline engines, including the direct-injected and turbocharged engines across the Toyota and Lexus lineup, and they're compatible with E85 and capless fuel systems."],
+    ],
+    footnotes: (p) => /performance improver/i.test(p.name) ? ""
+      : "<sup>1</sup> Based on independent testing of AMSOIL Upper Cylinder Lubricant, Lucas Upper Cylinder Lubricant and Sea Foam Motor Treatment obtained on 02/13/2019 using ASTM D6079 modified for use with gasoline.",
+    guide: "is-amsoil-worth-it.html", guideLabel: "Is AMSOIL worth it?",
+  },
+  "Antifreeze & Coolant": {
+    tag: (p) => /heavy-duty/i.test(p.name)
+      ? "50/50 premix with no SCAs required — service life up to 600,000 miles, 12,000 hours or 6 years."
+      : "50/50 premixed OAT coolant — outstanding hot- and cold-weather protection against corrosion, cavitation and scaling.",
+    answer: (p) => /heavy-duty/i.test(p.name)
+      ? `${ESC(p.name)} is formulated with cutting-edge organic acid technology for outstanding protection against cavitation, corrosion and scaling. Premixed 50/50 with high-purity water, it requires <strong>no supplemental coolant additives (SCAs)</strong> and provides extended drain intervals of <strong>600,000 miles, 12,000 hours or six years</strong>, whichever comes first.`
+      : `${ESC(p.name)} is formulated with cutting-edge organic acid technology for outstanding protection and performance in both hot and cold weather — effectively protecting against <strong>cavitation, corrosion and scaling</strong>. Premixed 50/50 with high-purity water and <strong>compatible with all other antifreeze/coolant colors</strong> on the market.`,
+    bullets: (p) => /heavy-duty/i.test(p.name) ? [
+      "<strong>600,000-mile / 12,000-hour / 6-year</strong> extended service life — no supplemental coolant additives (SCAs) required.",
+      "Cutting-edge organic acid technology protects against cavitation, corrosion and scaling.",
+      "<strong>50/50 premixed</strong> with high-purity water — no measuring or mixing; compatible with virtually all vehicles.",
+    ] : [
+      "Cutting-edge <strong>organic acid technology</strong> protects against corrosion, cavitation and scaling in both hot and cold weather.",
+      "<strong>50/50 premixed</strong> with high-purity water — no measuring or mixing.",
+      "<strong>Compatible with all other antifreeze/coolant colors</strong> — no poly-organic scaling salts like green conventional coolants.",
+    ],
+    faqs: [
+      ["Is it compatible with the coolant already in my vehicle?", "Yes — AMSOIL Antifreeze & Coolant is compatible with all other coolants and coolant colors on the market. For the most predictable freeze and boil protection, AMSOIL recommends staying with all ethylene glycol or all propylene glycol rather than mixing the two types."],
+      ["Do I need to mix it with water?", "No — it comes premixed 50/50 with high-purity water, eliminating the hassle of measuring and mixing (poor-quality mixing water is a leading cause of cooling-system problems)."],
+      ["Which coolant should I choose for my Toyota or Lexus?", "Passenger Car & Light Truck Antifreeze & Coolant is the fit for the Toyota/Lexus lineup, with a 150,000-mile or 5-year service interval in passenger-vehicle use. Heavy-Duty is the pick for diesel and commercial equipment."],
+    ],
+    footnotes: "",
+    guide: "amsoil-vs-oem-toyota-lexus-fluids.html", guideLabel: "AMSOIL vs. OEM fluids",
+  },
 };
 
 export function productSlug(p) {
@@ -801,14 +888,18 @@ export function fitmentFor(sku) {
 function productPage(sku, p) {
   const cat = categoryOf(p.name);
   const copy = PRODUCT_COPY[cat];
+  if (!copy) throw new Error(`no PRODUCT_COPY for category "${cat}" (${p.name}) — add it before cataloging this product`);
+  // Copy fields may be functions of the product (per-variant claims within a category).
+  const V = (x) => (typeof x === "function" ? x(p) : x);
+  const tag = V(copy.tag), bullets = V(copy.bullets), faqs = V(copy.faqs), footnotes = V(copy.footnotes);
   const price = priceOfP(p);
   const slug = productSlug(p);
   const url = `https://tunedyota.com/${slug}`;
   const fits = fitmentFor(sku);
-  const desc = `${p.name} (${p.stockNo}) — $${price.toFixed(2)} from Tuned Yota, an Authorized AMSOIL Dealer. ${copy.tag} Free shipping on orders $100+, 30-day returns, ships direct from AMSOIL.`;
+  const desc = `${p.name} (${p.stockNo}) — $${price.toFixed(2)} from Tuned Yota, an Authorized AMSOIL Dealer. ${tag} Free shipping on orders $100+, 30-day returns, ships direct from AMSOIL.`;
   const img = `https://tunedyota.com${p.image}`;
-  const faqSchema = copy.faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
-  const faqVisible = copy.faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
+  const faqSchema = faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
+  const faqVisible = faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
   const fitList = fits.map((f) => `<li><a href="amsoil-${f.slug}.html">${ESC(f.make)} ${ESC(f.model)} ${ESC(f.y)} ${ESC(f.e)}</a> — ${ESC(f.system)}${f.capacity ? ` (${ESC(f.capacity)})` : ""}</li>`).join("\n    ");
   const fitSection = fits.length
     ? `  <h2>Fits these Toyota &amp; Lexus vehicles</h2>\n  <p>Applications we've matched from AMSOIL's fitment guide for our supported lineup:</p>\n  <ul class="lp-bul">\n    ${fitList}\n  </ul>\n  <p>Different vehicle? Pick it in the <a href="amsoil-garage.html">AMSOIL Garage</a> — or search all of AMSOIL from there.</p>`
@@ -857,7 +948,7 @@ ${NAV}
 
   <p style="margin:14px 0 0">${copy.answer(p)}</p>
   <h2>Why this product</h2>
-  <ul class="lp-bul">${copy.bullets.map((b) => `<li>${b}</li>`).join("")}</ul>
+  <ul class="lp-bul">${bullets.map((b) => `<li>${b}</li>`).join("")}</ul>
 
 ${fitSection}
 
@@ -873,7 +964,7 @@ ${faqVisible}
   <h2>Keep reading</h2>
   <div class="lp-veh"><a href="${copy.guide}">${ESC(copy.guideLabel)}</a><a href="amsoil-vs-oem-toyota-lexus-fluids.html">AMSOIL vs. OEM fluids</a><a href="amsoil-garage.html">AMSOIL Garage — all vehicles</a><a href="returns.html">Shipping &amp; returns</a></div>
 
-  <p class="lp-disc">${copy.footnotes || ""} Price shown is AMSOIL's current online retail price, synced weekly. Checkout completes on amsoil.com; orders are sold, shipped and fulfilled by AMSOIL Inc. Tuned Yota is an Authorized AMSOIL Dealer.</p>
+  <p class="lp-disc">${footnotes || ""} Price shown is AMSOIL's current online retail price, synced weekly. Checkout completes on amsoil.com; orders are sold, shipped and fulfilled by AMSOIL Inc. Tuned Yota is an Authorized AMSOIL Dealer.</p>
 </div>
 ${FQSCRIPT}
 ${FOOTER}
