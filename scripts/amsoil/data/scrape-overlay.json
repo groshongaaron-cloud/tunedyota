@@ -1,12 +1,110 @@
 {
  "updated": "2026-07-25",
  "files": [
+  "automatic-transmission-fluid.json",
   "compressor-oil.json",
+  "fuel-additives.json",
   "gasoline-motor-oil.json",
   "hydraulic-oil.json"
  ],
- "count": 60,
+ "count": 83,
  "products": {
+  "ATLQT-EA": {
+   "path": "/p/amsoil-signature-series-fuel-efficient-100-synthetic-automatic-transmission-fluid-atl/",
+   "price": 21.19,
+   "rating": null,
+   "reviews": 975,
+   "name": "AMSOIL Signature Series Fuel-Efficient 100% Synthetic Automatic Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "ULVPK-EA": {
+   "path": "/p/amsoil-signature-series-ulv-100-synthetic-automatic-transmission-fluid-ulv/",
+   "price": 25.89,
+   "rating": null,
+   "reviews": 975,
+   "name": "AMSOIL Signature Series ULV 100% Synthetic Automatic Transmission Fluid ",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "OTFQT-EA": {
+   "path": "/p/amsoil-oe-multi-vehicle-100-synthetic-automatic-transmission-fluid-otf/",
+   "price": 14.89,
+   "rating": null,
+   "reviews": 326,
+   "name": "AMSOIL OE Multi-Vehicle 100% Synthetic Automatic Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "OTLQT-EA": {
+   "path": "/p/amsoil-oe-fuel-efficient-100-synthetic-automatic-transmission-fluid-otl/",
+   "price": 14.99,
+   "rating": null,
+   "reviews": 326,
+   "name": "AMSOIL OE Fuel-Efficient 100% Synthetic Automatic Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "DCTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-dct-fluid-dct/",
+   "price": 30.79,
+   "rating": null,
+   "reviews": 33,
+   "name": "AMSOIL 100% Synthetic DCT Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "ATD1G-EA": {
+   "path": "/p/amsoil-torque-drive-100-synthetic-automatic-transmission-fluid-atd/",
+   "price": 77.29,
+   "rating": null,
+   "reviews": 45,
+   "name": "AMSOIL Torque-Drive® 100% Synthetic Automatic Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "ARTQT-EA": {
+   "path": "/p/amsoil-super-shift-racing-transmission-fluid-art/",
+   "price": 20.39,
+   "rating": null,
+   "reviews": 25,
+   "name": "AMSOIL Super Shift® Racing Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "CTG05-EA": {
+   "path": "/p/amsoil-sae-10w-100-synthetic-powershift-transmission-fluid-ctg/",
+   "price": 324.95,
+   "rating": null,
+   "reviews": 4,
+   "name": "AMSOIL SAE 10W 100% Synthetic Powershift Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "CTJ05-EA": {
+   "path": "/p/amsoil-sae-30-100-synthetic-powershift-transmission-fluid-ctj/",
+   "price": 323.5,
+   "rating": null,
+   "reviews": 4,
+   "name": "AMSOIL SAE 30 100% Synthetic Powershift Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "ADBPCN-EA": {
+   "path": "/p/amsoil-diesel-4-in-1-fuel-additive-adb/",
+   "price": 9.39,
+   "rating": null,
+   "reviews": 309,
+   "name": "AMSOIL Diesel 4-IN-1 Fuel Additive",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "CVTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-cvt-fluid-cvt/",
+   "price": 20.39,
+   "rating": null,
+   "reviews": 217,
+   "name": "AMSOIL 100% Synthetic CVT Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
+  "ATFQT-EA": {
+   "path": "/p/amsoil-signature-series-multi-vehicle-100-synthetic-automatic-transmission-fluid-atf/",
+   "price": 21.19,
+   "rating": null,
+   "reviews": 975,
+   "name": "AMSOIL Signature Series Multi-Vehicle 100% Synthetic Automatic Transmission Fluid",
+   "source": "automatic-transmission-fluid.json"
+  },
   "PCH05-EA": {
    "path": "/p/amsoil-iso-32-100-synthetic-compressor-oil-pch/",
    "price": 384.5,
@@ -54,6 +152,94 @@
    "reviews": 8,
    "name": "AMSOIL 100% Synthetic Air Tool Oil",
    "source": "compressor-oil.json"
+  },
+  "APICN-EA": {
+   "path": "/p/amsoil-p-i-performance-improver-gasoline-additive-api/",
+   "price": 18.99,
+   "rating": 5,
+   "reviews": 1167,
+   "name": "AMSOIL P.i.® Performance Improver Gasoline Additive",
+   "source": "fuel-additives.json"
+  },
+  "UCLCN-EA": {
+   "path": "/p/amsoil-upper-cylinder-lubricant-corrosion-inhibitor-ucl/",
+   "price": 7.89,
+   "rating": 5,
+   "reviews": 381,
+   "name": "AMSOIL Upper Cylinder Lubricant Corrosion Inhibitor",
+   "source": "fuel-additives.json"
+  },
+  "AQSQT-EA": {
+   "path": "/p/amsoil-quickshot-gasoline-treatment-and-stabilizer-aqs/",
+   "price": 13.99,
+   "rating": 5,
+   "reviews": 353,
+   "name": "AMSOIL Quickshot® Gasoline Treatment and Stabilizer",
+   "source": "fuel-additives.json"
+  },
+  "ASTCN-EA": {
+   "path": "/p/amsoil-gasoline-stabilizer-ast/",
+   "price": 16.59,
+   "rating": 5,
+   "reviews": 171,
+   "name": "AMSOIL Gasoline Stabilizer",
+   "source": "fuel-additives.json"
+  },
+  "AOBBE-EA": {
+   "path": "/p/amsoil-dominator-octane-boost-aob/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 122,
+   "name": "AMSOIL DOMINATOR® Octane Boost",
+   "source": "fuel-additives.json"
+  },
+  "MOBCN-EA": {
+   "path": "/p/amsoil-motorcycle-octane-boost-mob/",
+   "price": 6.99,
+   "rating": 5,
+   "reviews": 159,
+   "name": "AMSOIL Motorcycle Octane Boost",
+   "source": "fuel-additives.json"
+  },
+  "ADFPCN-EA": {
+   "path": "/p/amsoil-diesel-injector-clean-fuel-additive-adf/",
+   "price": 7.49,
+   "rating": 5,
+   "reviews": 146,
+   "name": "AMSOIL Diesel Injector Clean Fuel Additive",
+   "source": "fuel-additives.json"
+  },
+  "ACBCN-EA": {
+   "path": "/p/amsoil-diesel-cetane-boost-fuel-additive-acb/",
+   "price": 13.59,
+   "rating": 5,
+   "reviews": 112,
+   "name": "AMSOIL Diesel Cetane Boost Fuel Additive",
+   "source": "fuel-additives.json"
+  },
+  "ADDCN-EA": {
+   "path": "/p/amsoil-diesel-cold-flow-fuel-additive-add/",
+   "price": 12.99,
+   "rating": 5,
+   "reviews": 309,
+   "name": "AMSOIL Diesel Cold Flow Fuel Additive",
+   "source": "fuel-additives.json"
+  },
+  "DRCQT-EA": {
+   "path": "/p/amsoil-diesel-recovery-fuel-treatment-drc/",
+   "price": 18.59,
+   "rating": 5,
+   "reviews": 8,
+   "name": "AMSOIL Diesel Recovery Fuel Treatment",
+   "source": "fuel-additives.json"
+  },
+  "ADSPCN-EA": {
+   "path": "/p/amsoil-diesel-injector-clean-cetane-boost-fuel-additive-ads/",
+   "price": 7.89,
+   "rating": 5,
+   "reviews": 185,
+   "name": "AMSOIL Diesel Injector Clean + Cetane Boost Fuel Additive",
+   "source": "fuel-additives.json"
   },
   "AZSQT-EA": {
    "path": "/p/amsoil-signature-series-0w-16-100-synthetic-motor-oil-azs/",

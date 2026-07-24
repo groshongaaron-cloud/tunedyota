@@ -16,8 +16,8 @@ if (!slug || !sources.length) { console.error("usage: node merge-exports.mjs <ca
 const normalize = (r) => ({
   product_url: r.product_url, product_name: r.product_name, page_title: r.page_title,
   product_description: r.product_description, data_source_format: r.data_source_format,
-  offer_price: r.offer_price ?? r.price_usd ?? null,
-  all_available_prices: r.all_available_prices ?? "", available_sizes: r.available_sizes ?? "",
+  offer_price: r.offer_price ?? r.price_usd ?? r.base_price ?? null,
+  all_available_prices: r.all_available_prices ?? r.all_prices_usd ?? "", available_sizes: r.available_sizes ?? "",
   variant_skus: r.variant_skus ?? "",
   customer_rating: r.customer_rating ?? (r.average_rating != null && r.total_review_count != null ? `${r.average_rating} (${r.total_review_count})` : ""),
   total_reviews: r.total_reviews ?? r.total_review_count ?? null,

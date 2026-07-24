@@ -119,7 +119,11 @@ async function main() {
           // pail/drum products use generic placeholder og images
           // (generic-black-pail-ea.jpg), so the URL tail is the honest signal.
           const slugTail = norm(link.replace(/\/$/, "").split("?")[0].split("-").pop());
-          const validated = (ogCode && cands.some((c) => ogCode.startsWith(c) || c.startsWith(ogCode)))
+          // The owner-scraped path is ground truth (keyed by the product's own
+          // variant SKUs on its page) — accept it without URL-shape checks.
+          const isScraped = (OVERLAY.products[p.stockNo] || {}).path === link;
+          const validated = isScraped
+            || (ogCode && cands.some((c) => ogCode.startsWith(c) || c.startsWith(ogCode)))
             || cands.some((c) => c === slugTail);
           if (!validated) { rec.err = `unvalidated og=${ogCode} tail=${slugTail}`; return; }
           rec.path = link;

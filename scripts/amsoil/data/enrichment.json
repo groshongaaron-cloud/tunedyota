@@ -1,6 +1,6 @@
 {
  "updated": "2026-07-25",
- "count": 268,
+ "count": 270,
  "products": {
   "ATPQT-EA": {
    "path": "/p/amsoil-saber-professional-100-synthetic-2-stroke-oil-atp/",
@@ -1341,6 +1341,16 @@
    "path": "/p/amsoil-sae-50-100-synthetic-powershift-transmission-fluid-ctl/",
    "image": "/images/amsoil/full/ctl05-ea.jpg",
    "price": 340.7
+  },
+  "ADBPCN-EA": {
+   "path": "/p/amsoil-diesel-4-in-1-fuel-additive-adb/",
+   "image": "/images/amsoil/full/adbpcn-ea.jpg",
+   "price": 15.39
+  },
+  "ADSPCN-EA": {
+   "path": "/p/amsoil-diesel-injector-clean-cetane-boost-fuel-additive-ads/",
+   "image": "/images/amsoil/full/adspcn-ea.jpg",
+   "price": 7.89
   }
  }
 }

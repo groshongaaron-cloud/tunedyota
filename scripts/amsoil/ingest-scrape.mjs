@@ -51,7 +51,7 @@ for (const f of files) {
     const rate = String(r.customer_rating || "").match(/^([\d.]+)\s*\(([\d,]+)\)/);
     const entry = {
       path: p,
-      price: parseFloat(r.offer_price) || null,
+      price: parseFloat(r.offer_price ?? r.price_usd ?? r.base_price) || null,
       rating: rate ? parseFloat(rate[1]) : null,
       reviews: rate ? parseInt(rate[2].replace(/,/g, ""), 10) : (parseInt(r.total_reviews, 10) || null),
       name: r.product_name || null,
@@ -63,7 +63,7 @@ for (const f of files) {
     if (!cat) { issues.push(`${primary}: in scrape but NOT in pricing-sheet catalog (${(r.product_name || "").slice(0, 50)})`); continue; }
     // Price check against ALL scraped prices — the page's default offer is
     // often a different pack size (e.g. half-quart), which is not drift.
-    const allPrices = String(r.all_available_prices || "").match(/[\d.]+/g)?.map(Number) || [entry.price];
+    const allPrices = String(r.all_available_prices || r.all_prices_usd || "").match(/[\d.]+/g)?.map(Number) || [entry.price];
     if (entry.price != null && !allPrices.some((x) => Math.abs(x - cat.retail) < 0.005) && Math.abs(entry.price - cat.retail) > 0.005) {
       issues.push(`${cat.stockNo}: price drift — scrape ${allPrices.join("/")} vs sheet $${cat.retail.toFixed(2)}`);
     }
