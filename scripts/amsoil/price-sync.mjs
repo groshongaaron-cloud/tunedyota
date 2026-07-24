@@ -11,7 +11,7 @@ import { execSync } from "node:child_process";
 import { parsePrice } from "./lib/price-parse.mjs";
 import { decide, applyToProduct } from "./lib/sync.mjs";
 import { fetchProductHtml } from "./lib/browser-fetch.mjs";
-import { buildAmsoilPages, AMSOIL_PAGE_FILES } from "../build-amsoil-pages.mjs";
+import { buildAmsoilPages, AMSOIL_PAGE_FILES, AMSOIL_GUIDE_FILES, AMSOIL_GEO_FILES, AMSOIL_PRODUCT_FILES } from "../build-amsoil-pages.mjs";
 import { chromium } from "playwright";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -95,8 +95,15 @@ async function main() {
   await notify(summary);
   if (COMMIT && applied.length) {
     // Stage the catalog plus exactly the regenerated landing pages (never a broad
-    // glob — this repo folder is shared with a separate AMSOIL session).
-    const pageArgs = AMSOIL_PAGE_FILES.map((f) => JSON.stringify(path.join("site", f))).join(" ");
+    // glob — this repo folder is shared with a separate AMSOIL session). ALL
+    // generated surfaces carry live prices, so all must ride the sync commit:
+    // vehicle pages + guides + geo pages + per-SKU product pages + the garage
+    // hub. (Guides/geo/garage were previously regenerated but NOT staged — a
+    // price change left them stale on the live site until the next unrelated
+    // build. Product pages make price freshness load-bearing: a stale price
+    // disapproves the Merchant Center item.)
+    const pageArgs = [...AMSOIL_PAGE_FILES, ...AMSOIL_GUIDE_FILES, ...AMSOIL_GEO_FILES, ...AMSOIL_PRODUCT_FILES, "amsoil-garage.html"]
+      .map((f) => JSON.stringify(path.join("site", f))).join(" ");
     execSync(`git add ${JSON.stringify(DATA)} ${pageArgs}`, { cwd: ROOT });
     execSync(`git commit -m "chore(amsoil): weekly retail price sync (${applied.length} updated)"`, { cwd: ROOT });
     execSync("git push", { cwd: ROOT });
