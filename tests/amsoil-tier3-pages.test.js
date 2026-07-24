@@ -31,6 +31,9 @@ test("a Tier-3 page exists for every enriched, non-curated SKU", () => {
     assert.ok(html.includes(`href="https://www.amsoil.com${e.path}`) || html.includes(`${e.path}?zo=`) || html.includes(`${e.path}&zo=`) || html.includes(e.path), `${f}: order link not using the scouted /p/ path`);
     const g = html.match(/"gtin12":"(\d+)"/);
     if (g) assert.match(g[1], /^\d{12}$/, `${f}: malformed gtin12`);
+    // Owner rule 2026-07-12: borrowed AMSOIL.com ratings must NEVER appear in
+    // structured data — visible attributed text only.
+    assert.ok(!html.includes('"aggregateRating"'), `${f}: borrowed rating leaked into schema`);
   }
 });
 

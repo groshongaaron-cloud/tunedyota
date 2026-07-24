@@ -985,7 +985,7 @@ ${NAV}
     <div style="flex:1;min-width:220px">
       <div style="font-size:27px;font-weight:900;color:var(--ink)">$${price.toFixed(2)}</div>
       <div style="font-size:13.5px;color:var(--sage-d);margin-top:2px">AMSOIL Stock&nbsp;#&nbsp;${ESC(p.stockNo)} · In stock — ships direct from AMSOIL</div>
-      <div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="returns.html">30-day returns</a></div>
+      ${ratingLine(p.stockNo, amsoilUrl(p.productPath))}<div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="returns.html">30-day returns</a></div>
     </div>
   </div>
   <div class="lp-cta">
@@ -1047,6 +1047,19 @@ try { ENRICH = require("../scripts/amsoil/data/enrichment.json"); } catch { /* n
 // site/images/amsoil/cats/). Hubs without one simply render text-only.
 let CAT_IMAGES = { images: {} };
 try { CAT_IMAGES = require("../scripts/amsoil/data/category-images.json"); } catch { /* none yet */ }
+// Owner's amsoil.com category scrapes, normalized by ingest-scrape.mjs —
+// highest-fidelity price + customer rating per stockNo. Ratings are rendered
+// as VISIBLE text with attribution only, never as schema aggregateRating
+// (borrowed ratings in structured data = misrepresentation; owner rule
+// 2026-07-12, test-guarded).
+let SCRAPE = { products: {} };
+try { SCRAPE = require("../scripts/amsoil/data/scrape-overlay.json"); } catch { /* none yet */ }
+const scrapeOf = (stockNo) => SCRAPE.products[stockNo] || null;
+function ratingLine(stockNo, orderHref) {
+  const s = scrapeOf(stockNo);
+  if (!s || !s.rating || !s.reviews) return "";
+  return `<div style="font-size:13.5px;margin-top:4px">★ ${s.rating.toFixed(1)} · <a target="_blank" rel="noopener" href="${orderHref}">${s.reviews.toLocaleString("en-US")} customer reviews on AMSOIL.com</a></div>`;
+}
 export const catSlug = (c) => c.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const HUB_CATS = [...new Set(FULL.products.map((p) => p.category))].sort();
 export const AMSOIL_HUB_FILES = ["amsoil-products.html", ...HUB_CATS.map((c) => `amsoil-${catSlug(c)}-products.html`)];
@@ -1112,7 +1125,8 @@ export const AMSOIL_FULL_PRODUCT_FILES = tier3List().map(({ slug }) => `${slug}.
 function fullProductPage({ p, e, slug }) {
   const url = `https://tunedyota.com/${slug}`;
   const name = cleanName(p.name);
-  const price = e.price != null && e.price > 0 ? e.price : p.retail;
+  const sc = scrapeOf(p.stockNo);
+  const price = (sc && sc.price > 0 ? sc.price : null) ?? (e.price != null && e.price > 0 ? e.price : p.retail);
   const img = `https://tunedyota.com${e.image}`;
   const gtin = /^\d{12}$/.test(p.upc || "") ? `"gtin12":${JSON.stringify(p.upc)},` : "";
   const desc = `${name} (${p.stockNo}) — $${price.toFixed(2)} from Tuned Yota, an Authorized AMSOIL Dealer. Genuine AMSOIL ${p.category.toLowerCase()}, shipped direct from AMSOIL — free on orders $100+, 30-day returns.`;
@@ -1152,7 +1166,7 @@ ${NAV}
       <div style="font-size:27px;font-weight:900;color:var(--ink)">$${price.toFixed(2)}</div>
       ${p.pc ? `<div style="font-size:13.5px;color:var(--sage-d)">$${p.pc.toFixed(2)} as a Preferred Customer</div>` : ""}
       <div style="font-size:13.5px;color:var(--sage-d);margin-top:2px">AMSOIL Stock&nbsp;#&nbsp;${ESC(p.stockNo)} · In stock — ships direct from AMSOIL</div>
-      <div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="returns.html">30-day returns</a></div>
+      ${ratingLine(p.stockNo, amsoilUrl(e.path))}<div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="returns.html">30-day returns</a></div>
     </div>
   </div>
   <div class="lp-cta">
@@ -1237,6 +1251,12 @@ ${TRACK}
 `;
 }
 
+// Effective retail: owner-scraped live price wins over the pricing sheet.
+const effRetail = (p) => {
+  const s = scrapeOf(p.stockNo);
+  return (s && s.price > 0 ? s.price : null) ?? p.retail;
+};
+
 function hubRows(products, curated) {
   return products.map((p) => {
     const internal = curated[p.stockNo] || p.variants.map((v) => curated[v.stockNo]).find(Boolean);
@@ -1244,7 +1264,7 @@ function hubRows(products, curated) {
     const nameHref = internal || searchUrl;
     const ext = internal ? "" : ' target="_blank" rel="noopener"';
     const sizes = p.variants.map((v) => `${ESC(v.pkg)} $${v.retail.toFixed(2)}`).join(" · ");
-    return `<tr><td><a href="${nameHref}"${ext}>${ESC(p.name.replace(/^AMSOIL /, ""))}</a><div class="hsizes">${sizes}</div></td><td>${ESC(p.stockNo)}</td><td class="hp">$${p.retail.toFixed(2)}${p.pc ? `<div class="hpc">$${p.pc.toFixed(2)} P.C.</div>` : ""}</td><td><a class="ord" target="_blank" rel="noopener" href="${searchUrl}">Order &#9658;</a></td></tr>`;
+    return `<tr><td><a href="${nameHref}"${ext}>${ESC(p.name.replace(/^AMSOIL /, ""))}</a><div class="hsizes">${sizes}</div></td><td>${ESC(p.stockNo)}</td><td class="hp">$${effRetail(p).toFixed(2)}${p.pc ? `<div class="hpc">$${p.pc.toFixed(2)} P.C.</div>` : ""}</td><td><a class="ord" target="_blank" rel="noopener" href="${searchUrl}">Order &#9658;</a></td></tr>`;
   }).join("\n");
 }
 
@@ -1286,7 +1306,7 @@ ${hubRows(ps, curated)}
   const seenStock = new Set();
   const searchData = FULL.products.filter((p) => !seenStock.has(p.stockNo) && seenStock.add(p.stockNo)).map((p) => {
     const internal = curated[p.stockNo] || p.variants.map((v) => curated[v.stockNo]).find(Boolean);
-    return { n: p.name.replace(/^AMSOIL /, ""), s: p.stockNo, c: p.category, r: p.retail,
+    return { n: p.name.replace(/^AMSOIL /, ""), s: p.stockNo, c: p.category, r: effRetail(p),
       u: internal || amsoilUrl(`/search/?text=${encodeURIComponent(p.stockNo)}`) };
   });
   const catLinks = HUB_CATS.map((c) => {

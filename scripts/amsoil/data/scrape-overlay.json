@@ -1,0 +1,345 @@
+{
+ "updated": "2026-07-25",
+ "files": [
+  "gasoline-motor-oil.json"
+ ],
+ "count": 42,
+ "products": {
+  "AZSQT-EA": {
+   "path": "/p/amsoil-signature-series-0w-16-100-synthetic-motor-oil-azs/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 0W-16 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "ASMQT-EA": {
+   "path": "/p/amsoil-signature-series-0w-20-100-synthetic-motor-oil-asm/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 0W-20 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "AZOQT-EA": {
+   "path": "/p/amsoil-signature-series-0w-30-100-synthetic-motor-oil-azo/",
+   "price": 21.89,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 0W-30 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "AZFQT-EA": {
+   "path": "/p/amsoil-signature-series-0w-40-100-synthetic-motor-oil-azf/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 0W-40 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "ALMQT-EA": {
+   "path": "/p/amsoil-signature-series-5w-20-100-synthetic-motor-oil-alm/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 5W-20 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "ASLQT-EA": {
+   "path": "/p/amsoil-signature-series-5w-30-100-synthetic-motor-oil-asl/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 5W-30 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "AMRQT-EA": {
+   "path": "/p/amsoil-signature-series-5w-50-100-synthetic-motor-oil-amr/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 5W-50 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "ATMQT-EA": {
+   "path": "/p/amsoil-signature-series-10w-30-100-synthetic-motor-oil-atm/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6985,
+   "name": "AMSOIL Signature Series 10W-30 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "XLZQT-EA": {
+   "path": "/p/amsoil-extended-life-0w-20-100-synthetic-motor-oil-xlz/",
+   "price": 15.49,
+   "rating": 5,
+   "reviews": 1470,
+   "name": "AMSOIL Extended-Life 0W-20 100% Synthetic Motor Oil ",
+   "source": "gasoline-motor-oil.json"
+  },
+  "XLFQT-EA": {
+   "path": "/p/amsoil-extended-life-5w-30-100-synthetic-motor-oil-xlf/",
+   "price": 15.59,
+   "rating": 5,
+   "reviews": 1470,
+   "name": "AMSOIL Extended-Life 5W-30 100% Synthetic Motor Oil ",
+   "source": "gasoline-motor-oil.json"
+  },
+  "XLTQT-EA": {
+   "path": "/p/amsoil-extended-life-10w-30-100-synthetic-motor-oil-xlt/",
+   "price": 15.59,
+   "rating": 5,
+   "reviews": 1470,
+   "name": "AMSOIL Extended-Life 10W-30 100% Synthetic Motor Oil ",
+   "source": "gasoline-motor-oil.json"
+  },
+  "XLOQT-EA": {
+   "path": "/p/amsoil-extended-life-10w-40-100-synthetic-motor-oil-xlo/",
+   "price": 15.59,
+   "rating": 5,
+   "reviews": 1470,
+   "name": "AMSOIL Extended-Life 10W-40 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "OESQT-EA": {
+   "path": "/p/amsoil-oe-0w-16-100-synthetic-motor-oil-oes/",
+   "price": 12.59,
+   "rating": 5,
+   "reviews": 1300,
+   "name": "AMSOIL OE 0W-16 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "OEZQT-EA": {
+   "path": "/p/amsoil-oe-0w-20-100-synthetic-motor-oil-oez/",
+   "price": 12.59,
+   "rating": 5,
+   "reviews": 1300,
+   "name": "AMSOIL OE 0W-20 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "OEMQT-EA": {
+   "path": "/p/amsoil-oe-5w-20-100-synthetic-motor-oil-oem/",
+   "price": 12.59,
+   "rating": 5,
+   "reviews": 1300,
+   "name": "AMSOIL OE 5W-20 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "OEFQT-EA": {
+   "path": "/p/amsoil-oe-5w-30-100-synthetic-motor-oil-oef/",
+   "price": 12.59,
+   "rating": 5,
+   "reviews": 1300,
+   "name": "AMSOIL OE 5W-30 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "OETQT-EA": {
+   "path": "/p/amsoil-oe-10w-30-100-synthetic-motor-oil-oet/",
+   "price": 12.59,
+   "rating": 5,
+   "reviews": 1300,
+   "name": "AMSOIL OE 10W-30 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "EZTQT-EA": {
+   "path": "/p/amsoil-0w-20-ls-vw-100-synthetic-european-motor-oil-ezt/",
+   "price": 17.49,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 0W-20 LS-VW 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "EOTQT-EA": {
+   "path": "/p/amsoil-0w-30-ms-100-synthetic-european-motor-oil-eot/",
+   "price": 17.19,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 0W-30 MS 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "AELQT-EA": {
+   "path": "/p/amsoil-5w-30-ls-100-synthetic-european-motor-oil-ael/",
+   "price": 18.89,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 5W-30 LS 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "AFLQT-EA": {
+   "path": "/p/amsoil-5w-40-ms-100-synthetic-european-motor-oil-afl/",
+   "price": 17.89,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 5W-40 MS 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "EFMQT-EA": {
+   "path": "/p/amsoil-5w-40-fs-100-synthetic-european-motor-oil-efm/",
+   "price": 14.29,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 5W-40 FS 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "ETSQT-EA": {
+   "path": "/p/amsoil-10w-60-fs-100-synthetic-european-motor-oil-ets/",
+   "price": 15.49,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 10W-60 FS 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "HM020QT-EA": {
+   "path": "/p/amsoil-0w-20-100-synthetic-high-mileage-motor-oil-hm020/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 411,
+   "name": "AMSOIL 0W-20 100% Synthetic High-Mileage Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "HM520QT-EA": {
+   "path": "/p/amsoil-5w-20-100-synthetic-high-mileage-motor-oil-hm520/",
+   "price": 14.49,
+   "rating": 5,
+   "reviews": 411,
+   "name": "AMSOIL 5W-20 100% Synthetic High-Mileage Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "HM530QT-EA": {
+   "path": "/p/amsoil-5w-30-100-synthetic-high-mileage-motor-oil-hm530/",
+   "price": 14.49,
+   "rating": 5,
+   "reviews": 411,
+   "name": "AMSOIL 5W-30 100% Synthetic High-Mileage Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "HM1030QT-EA": {
+   "path": "/p/amsoil-10w-30-100-synthetic-high-mileage-motor-oil-hm1030/",
+   "price": 14.49,
+   "rating": 5,
+   "reviews": 411,
+   "name": "AMSOIL 10W-30 100% Synthetic High-Mileage Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "HE016QT-EA": {
+   "path": "/p/amsoil-0w-16-100-synthetic-hybrid-motor-oil-he016/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 56,
+   "name": "AMSOIL 0W-16 100% Synthetic Hybrid Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "HE020QT-EA": {
+   "path": "/p/amsoil-0w-20-100-synthetic-hybrid-motor-oil-he020/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 56,
+   "name": "AMSOIL 0W-20 100% Synthetic Hybrid Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "ZRTQT-EA": {
+   "path": "/p/amsoil-z-rod-10w-30-100-synthetic-motor-oil-zrt/",
+   "price": 17.69,
+   "rating": 5,
+   "reviews": 77,
+   "name": "AMSOIL Z-ROD® 10W-30 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "ZRDQT-EA": {
+   "path": "/p/amsoil-z-rod-10w-40-100-synthetic-motor-oil-zrd/",
+   "price": 17.69,
+   "rating": 5,
+   "reviews": 77,
+   "name": "AMSOIL Z-ROD® 10W-40 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "RD20QT-EA": {
+   "path": "/p/amsoil-dominator-5w-20-100-synthetic-racing-oil-rd20/",
+   "price": 21.09,
+   "rating": 5,
+   "reviews": 91,
+   "name": "AMSOIL DOMINATOR® 5W-20 100% Synthetic Racing Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "RD30QT-EA": {
+   "path": "/p/amsoil-dominator-10w-30-100-synthetic-racing-oil-rd30/",
+   "price": 20.39,
+   "rating": 5,
+   "reviews": 91,
+   "name": "AMSOIL DOMINATOR® 10W-30 100% Synthetic Racing Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "RD40QT-EA": {
+   "path": "/p/amsoil-dominator-10w-40-100-synthetic-racing-oil-rd40/",
+   "price": 20.39,
+   "rating": 5,
+   "reviews": 91,
+   "name": "AMSOIL DOMINATOR® 10W-40 100% Synthetic Racing Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "RD50QT-EA": {
+   "path": "/p/amsoil-dominator-15w-50-100-synthetic-racing-oil-rd50/",
+   "price": 21.19,
+   "rating": 5,
+   "reviews": 91,
+   "name": "AMSOIL DOMINATOR® 15W-50 100% Synthetic Racing Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "RD60QT-EA": {
+   "path": "/p/amsoil-dominator-sae-60-100-synthetic-racing-oil-rd60/",
+   "price": 21.79,
+   "rating": 5,
+   "reviews": 91,
+   "name": "AMSOIL DOMINATOR® SAE 60 100% Synthetic Racing Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "AMOQT-EA": {
+   "path": "/p/amsoil-premium-protection-10w-40-100-synthetic-motor-oil-amo/",
+   "price": 17.89,
+   "rating": 5,
+   "reviews": 148,
+   "name": "AMSOIL Premium Protection 10W-40 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "AROQT-EA": {
+   "path": "/p/amsoil-premium-protection-20w-50-100-synthetic-motor-oil-aro/",
+   "price": 18.49,
+   "rating": 5,
+   "reviews": 148,
+   "name": "AMSOIL Premium Protection 20W-50 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "BRKQT-EA": {
+   "path": "/p/amsoil-sae-30-break-in-oil-brk/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 77,
+   "name": "AMSOIL SAE 30 Break-In Oil",
+   "source": "gasoline-motor-oil.json"
+  },
+  "SB020QT-EA": {
+   "path": "/p/amsoil-0w-20-synthetic-blend-motor-oil-sb020/",
+   "price": 10.49,
+   "rating": 5,
+   "reviews": 10,
+   "name": "AMSOIL 0W-20 Synthetic-Blend Motor Oil ",
+   "source": "gasoline-motor-oil.json"
+  },
+  "SB520QT-EA": {
+   "path": "/p/amsoil-5w-20-synthetic-blend-motor-oil-sb520/",
+   "price": 10.59,
+   "rating": 5,
+   "reviews": 10,
+   "name": "AMSOIL 5W-20 Synthetic-Blend Motor Oil ",
+   "source": "gasoline-motor-oil.json"
+  },
+  "SB530QT-EA": {
+   "path": "/p/amsoil-5w-30-synthetic-blend-motor-oil-sb530/",
+   "price": 10.59,
+   "rating": 5,
+   "reviews": 10,
+   "name": "AMSOIL 5W-30 Synthetic-Blend Motor Oil ",
+   "source": "gasoline-motor-oil.json"
+  }
+ }
+}
