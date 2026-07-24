@@ -10,7 +10,7 @@ const { keyToInstaller, FALLBACK_KEY, smsNumberFor } = require("./lib/routing.js
 const { ingestLead, sendSms } = require("./lib/twilio.js");
 const { sendWebPush } = require("./lib/webpush.js");
 const { cfg, createRecord } = require("./lib/airtable.js");
-const { resolveInstaller } = require("./lib/installer-auth.js");
+const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const chatAdmin = require("./lib/chat-admin.js");
 
 const MAX_MESSAGES = 40;
@@ -135,7 +135,8 @@ async function processChat(body, deps) {
 async function installerOp(body, installerKey, deps = {}) {
   const { list = chatAdmin.listSessions, transcript = chatAdmin.getTranscript,
           reply = chatAdmin.installerReply, close = chatAdmin.closeSession,
-          openSms = chatAdmin.openSmsThread } = deps;
+          openSms = chatAdmin.openSmsThread, assign = chatAdmin.assignSession,
+          admin = false } = deps;
   if (body.op === "list") return { status: 200, body: { sessions: await list(installerKey, deps) } };
   if (body.op === "openSms") {
     const r = await openSms(body, installerKey, deps);
@@ -153,6 +154,10 @@ async function installerOp(body, installerKey, deps = {}) {
     const r = await close(String(body.session || ""), deps);
     return { status: r.status === "ok" ? 200 : 404, body: r };
   }
+  if (body.op === "assign") {
+    const r = await assign(String(body.session || ""), String(body.installer || ""), installerKey, admin, deps);
+    return { status: r.status === "ok" ? 200 : (r.error === "not-found" ? 404 : 400), body: r };
+  }
   return { status: 400, body: { error: "bad-op" } };
 }
 
@@ -163,7 +168,7 @@ async function handler(event) {
   if (body && body.installer) {
     const key = resolveInstaller(event.headers || {}, process.env);
     if (!key) return { statusCode: 401, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ error: "unauthorized" }) };
-    const out = await installerOp(body, key, {});
+    const out = await installerOp(body, key, { admin: isAdmin(key, process.env) });
     return { statusCode: out.status, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out.body) };
   }
   const out = await processChat(body, {});

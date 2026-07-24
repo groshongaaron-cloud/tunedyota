@@ -5,6 +5,7 @@
 const { cfg, escapeFormula, listRecords } = require("./airtable.js");
 const { loadSession, saveSession, parseTranscript, loadActiveByPrefix, TABLE } = require("./chat-store.js");
 const { deliverInstallerTurn } = require("./meta-deliver.js");
+const { normalizeInstallerKey } = require("./routing.js");
 
 // Installer-initiated SMS thread for a Priority List client. Find-or-create by
 // phone; new sessions are marked human-only via pageContext "sms-direct" — the
@@ -51,7 +52,7 @@ async function getTranscript(sessionId, deps = {}) {
   const { loadFn = loadSession } = deps;
   const sess = await loadFn(sessionId, deps);
   if (!sess) return null;
-  return { id: sess.id, status: sess.status, customerName: sess.customerName, phone: sess.phone, vehicle: sess.vehicle, city: sess.city, turns: sess.turns };
+  return { id: sess.id, status: sess.status, customerName: sess.customerName, phone: sess.phone, vehicle: sess.vehicle, city: sess.city, installer: sess.installer || "", turns: sess.turns };
 }
 
 async function installerReply(sessionId, installerKey, text, deps = {}) {
@@ -73,6 +74,23 @@ async function installerReply(sessionId, installerKey, text, deps = {}) {
   return { status: "ok", turnCount: sess.turns.length };
 }
 
+// Assign a chat to an installer (owner ask 2026-07-24: once a chat's market is
+// known, route the thread to its installer). Admin may assign to anyone; a
+// regular installer may only claim a chat for themselves. Assignment scopes the
+// inbox: listSessions shows "mine + unassigned", so assigning to X moves the
+// thread into X's inbox and out of everyone else's.
+async function assignSession(sessionId, targetKey, byKey, isAdminFlag, deps = {}) {
+  const { loadFn = loadSession, saveFn = saveSession } = deps;
+  const target = normalizeInstallerKey(targetKey);
+  if (!target) return { status: "error", error: "bad-installer" };
+  if (!isAdminFlag && target !== byKey) return { status: "error", error: "admin-only" };
+  const sess = await loadFn(sessionId, deps);
+  if (!sess) return { status: "error", error: "not-found" };
+  sess.installer = target;
+  await saveFn(sess, deps);
+  return { status: "ok", installer: target };
+}
+
 async function closeSession(sessionId, deps = {}) {
   const { loadFn = loadSession, saveFn = saveSession } = deps;
   const sess = await loadFn(sessionId, deps);
@@ -82,4 +100,4 @@ async function closeSession(sessionId, deps = {}) {
   return { status: "ok" };
 }
 
-module.exports = { listSessions, getTranscript, installerReply, closeSession, openSmsThread };
+module.exports = { listSessions, getTranscript, installerReply, closeSession, openSmsThread, assignSession };

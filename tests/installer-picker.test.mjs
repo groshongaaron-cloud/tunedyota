@@ -101,6 +101,13 @@ test("the add-a-booking option reveals the walk-in form for that event", async (
   if (!browserOk) return t.skip("no browser available");
   const page = await boot();
   await page.selectOption("select.bookingpick", "__add__");
-  await page.waitForFunction(() => Array.from(document.querySelectorAll("#feed details.evt button")).some((b) => /Add walk-in to Fargo/.test(b.textContent)));
+  // The adder now carries an editable Location/market prefilled with the event's
+  // city (owner rule: location is visible + changeable on every booking form).
+  await page.waitForFunction(() => Array.from(document.querySelectorAll("#feed details.evt button")).some((b) => /Add walk-in/.test(b.textContent)));
+  const loc = await page.evaluate(() => {
+    const i = Array.from(document.querySelectorAll("#feed input")).find((x) => /location \/ market/i.test(x.placeholder || ""));
+    return i ? i.value : null;
+  });
+  if (loc !== "Fargo") throw new Error("Location input must prefill with the event city, got: " + loc);
   await page.context().close();
 });

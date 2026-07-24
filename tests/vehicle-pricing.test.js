@@ -75,3 +75,19 @@ test("Lexus GX 2020 resolves the 2019+ 4.6L V8 config (no forced induction)", ()
   assert.equal(r.options[0].customCalibration, 750);
   assert.equal(r.options[0].forcedInduction, undefined);
 });
+
+test("a 2024 Land Cruiser (LC-250 launch year) prices at the new-gen $650, not the old gen", () => {
+  const r = priceVehicle({ make: "Toyota", model: "Land Cruiser", year: 2024 }, YEAR);
+  assert.equal(r.supported, true);
+  assert.equal(r.options.length, 1);
+  assert.equal(r.options[0].ottTuneFrom, 650);
+});
+
+test("new-gen trio all start at $650: 2024+ Tacoma, 2025+ 4Runner, 2024+ Land Cruiser", () => {
+  [["Tacoma", 2024], ["4Runner", 2025], ["Land Cruiser", 2024]].forEach(([model, year]) => {
+    const r = priceVehicle({ make: "Toyota", model, year }, YEAR);
+    assert.equal(r.supported, true, `${year} ${model} must be supported`);
+    assert.ok(r.options.some((o) => o.ottTuneFrom === 650), `${year} ${model} must offer $650 base`);
+    assert.ok(!r.options.some((o) => o.ottTuneFrom < 650), `${year} ${model} must not fall back to an older-gen price`);
+  });
+});

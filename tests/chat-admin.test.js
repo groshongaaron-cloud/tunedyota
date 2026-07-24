@@ -154,3 +154,48 @@ test("openSmsThread rejects a bad phone", async () => {
   const r = await openSmsThread({ phone: "911" }, "cody", { loadActive: async () => null, saveFn: async () => {} });
   assert.equal(r.status, "error");
 });
+
+// ---- chat assignment (owner ask 2026-07-24: route a known-market chat to its installer) ----
+
+test("assignSession: admin assigns any chat to any installer", async () => {
+  let saved = null;
+  const r = await admin.assignSession("s1", "noah", "aaron", true,
+    { env: ENV, loadFn: async () => SESS({ installer: "" }), saveFn: async (s) => { saved = s; return s; } });
+  assert.equal(r.status, "ok");
+  assert.equal(r.installer, "noah");
+  assert.equal(saved.installer, "noah");
+});
+
+test("assignSession: a non-admin may claim a chat for THEMSELVES", async () => {
+  let saved = null;
+  const r = await admin.assignSession("s1", "cody", "cody", false,
+    { env: ENV, loadFn: async () => SESS({ installer: "" }), saveFn: async (s) => { saved = s; return s; } });
+  assert.equal(r.status, "ok");
+  assert.equal(saved.installer, "cody");
+});
+
+test("assignSession: a non-admin cannot assign a chat to someone else", async () => {
+  const r = await admin.assignSession("s1", "noah", "cody", false,
+    { env: ENV, loadFn: async () => SESS({ installer: "" }), saveFn: async (s) => s });
+  assert.equal(r.status, "error");
+  assert.equal(r.error, "admin-only");
+});
+
+test("assignSession: rejects an unknown installer key and a missing session", async () => {
+  const bad = await admin.assignSession("s1", "zorp", "aaron", true,
+    { env: ENV, loadFn: async () => SESS({}), saveFn: async (s) => s });
+  assert.equal(bad.error, "bad-installer");
+  const gone = await admin.assignSession("nope", "noah", "aaron", true,
+    { env: ENV, loadFn: async () => null, saveFn: async (s) => s });
+  assert.equal(gone.error, "not-found");
+});
+
+test("installerOp routes op:assign with the admin flag", async () => {
+  const deps = { env: ENV, admin: true,
+    loadFn: async () => SESS({ installer: "" }), saveFn: async (s) => s };
+  const ok = await installerOp({ op: "assign", session: "s1", installer: "noah" }, "aaron", deps);
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.installer, "noah");
+  const deny = await installerOp({ op: "assign", session: "s1", installer: "noah" }, "cody", { ...deps, admin: false });
+  assert.equal(deny.status, 400);
+});

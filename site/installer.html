@@ -926,7 +926,8 @@
       return '<div class="crow" data-chat="'+esc(s.id)+'">'+
         '<div class="cava">'+esc(initial)+'</div>'+
         '<div class="cmeta"><div class="cname">'+esc(s.customerName||'Customer')+
-          ' <span class="cbadge">'+chanBadge(s.id)+'</span></div>'+
+          ' <span class="cbadge">'+chanBadge(s.id)+'</span>'+
+          (STATE.admin?(s.installer?' <span class="installer-tag">'+esc(s.installer)+'</span>':' <span class="cbadge" style="opacity:.7">unassigned</span>'):'')+'</div>'+
         '<div class="csnip">'+(s.lastRole==='installer'?'You: ':'')+esc(s.lastText||(s.vehicle||''))+'</div></div>'+
         '<div class="cwhen">'+esc(relTime(s.lastActivity))+'</div>'+
         (s.lastRole==='user'?'<div class="cdot" title="needs reply"></div>':'')+
@@ -959,9 +960,27 @@
       else if(t.role==='installer'){ bubbles.push('<div class="cbub cme">'+esc(t.text)+'</div>'); }
       else { bubbles.push('<div class="cbub cai"><span class="caitag">AI</span>'+esc(t.text)+'</div>'); }
     });
+    // Assignment control: admin picks any installer; a non-admin can claim an
+    // unassigned (or mis-routed) chat for themselves. Assignment moves the thread
+    // into that installer's inbox (list shows "mine + unassigned").
+    var assignHtml;
+    if(STATE.admin){
+      var akeys=[], aseen={};
+      STATE.bookings.concat(STATE.events).forEach(function(b){ var k=b.installer||''; if(k&&!aseen[k]){aseen[k]=1;akeys.push(k);} });
+      if(STATE.me && !aseen[STATE.me]){ aseen[STATE.me]=1; akeys.push(STATE.me); }
+      if(j.installer && !aseen[j.installer]){ akeys.push(j.installer); }
+      akeys.sort();
+      assignHtml=' · <select id="chatassign" style="font:inherit;font-size:12px">'+
+        '<option value=""'+(j.installer?'':' selected')+'>'+(j.installer?'Reassign…':'Assign to…')+'</option>'+
+        akeys.map(function(k){ return '<option value="'+esc(k)+'"'+(j.installer===k?' selected':'')+'>'+esc(cap(k))+(j.installer===k?' ✓':'')+'</option>'; }).join('')+'</select>';
+    } else {
+      assignHtml = j.installer===STATE.me ? ' · <span class="cbadge">mine</span>'
+        : ' · <a href="#" id="chatclaim">'+(j.installer?'take over ('+esc(j.installer)+'’s)':'claim chat')+'</a>';
+    }
     host.innerHTML =
       '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <b>'+esc(j.customerName||'Customer')+'</b> '+chanBadge(j.id||'')+' '+esc(j.vehicle||'')+
       (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+
+      assignHtml+
       ' · <a href="#" id="chatclose" style="color:var(--muted,#8a8a8e)">close chat</a></p>'+
       '<div class="cthread"><div id="chatlog" class="clog">'+bubbles.join('')+'</div>'+
       '<form id="chatreply" class="ccompose"><textarea id="chattext" rows="1" placeholder="Text message…"></textarea>'+
@@ -979,6 +998,17 @@
     if(!CHAT_POLL) CHAT_POLL = setInterval(function(){ if(STATE.tab==='chats' && STATE.chatOpen) renderChatThread(host); }, 5000);
     var back = document.getElementById('chatback');
     if(back) back.onclick = function(e){ e.preventDefault(); STATE.chatOpen=null; if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; } loadChats(); };
+    async function doAssign(target){
+      try{
+        var r=await chatApi({op:'assign', session:openId, installer:target});
+        if(r && r.status==='ok'){ succeed('✓ Chat assigned to '+cap(r.installer)+' — it now lives in their inbox.'); renderChatThread(host); }
+        else fail('Could not assign: '+((r&&r.error)||'error'));
+      }catch(e){ fail('Could not assign the chat — try again.'); }
+    }
+    var asel = document.getElementById('chatassign');
+    if(asel) asel.onchange = function(){ if(asel.value) doAssign(asel.value); };
+    var claim = document.getElementById('chatclaim');
+    if(claim) claim.onclick = function(e){ e.preventDefault(); doAssign(STATE.me); };
     var form = document.getElementById('chatreply');
     if(form) form.onsubmit = async function(e){
       e.preventDefault();
@@ -1413,10 +1443,23 @@
     var box=document.createElement('div'); box.className='walkmini';
     var n=mkInput('Customer name'), v=mkInput('Vehicle (e.g. 2021 Tundra)'), p=mkInput('Phone'); p.inputMode='tel';
     var em=mkInput('Customer email (for their certificate)'); em.type='email';
-    var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Add walk-in to '+e.city;
-    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(em); box.appendChild(btn);
+    // Location is visible + editable everywhere a booking is made (owner rule):
+    // prefilled with this event's city, but changeable — any city/location books.
+    var lc=mkInput('Location / market'); lc.value=e.city||'';
+    var cities=knownCities();
+    if(cities.length){
+      var dl=document.createElement('datalist'); dl.id='ty_evt_cities_'+(e.key||'').replace(/[^a-z0-9]/gi,'');
+      dl.innerHTML=cities.map(function(x){return '<option value="'+esc(x)+'"></option>';}).join('');
+      lc.setAttribute('list', dl.id); box.appendChild(dl);
+    }
+    var tm=mkInput('Time (e.g. 10:30 AM) — optional');
+    var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Add walk-in';
+    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(lc); box.appendChild(tm); box.appendChild(em); box.appendChild(btn);
     det.appendChild(box);
-    btn.onclick=function(){ addWalkin(e,{name:n.value,vehicle:v.value,phone:p.value,email:em.value}); };
+    btn.onclick=function(){
+      var c=(lc.value||'').trim()||e.city;
+      addWalkin({city:c,dateISO:e.dateISO,key:c+'|'+e.dateISO},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,time:tm.value});
+    };
     return det;
   }
 
