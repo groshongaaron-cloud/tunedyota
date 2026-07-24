@@ -1,0 +1,23 @@
+{
+ "source": "owner-provided assets-source/Amsoil/Product Category Images (2026-07-25)",
+ "images": {
+  "motor-oil": "/images/amsoil/cats/motor-oil.jpg",
+  "firearm-products": "/images/amsoil/cats/firearm-products.jpg",
+  "car-care-and-detailing": "/images/amsoil/cats/car-care-and-detailing.jpg",
+  "cleaners-and-protectants": "/images/amsoil/cats/cleaners-and-protectants.jpg",
+  "general-purpose-cleaners-and-protectants": "/images/amsoil/cats/general-purpose-cleaners-and-protectants.jpg",
+  "filters": "/images/amsoil/cats/filters.jpg",
+  "marine-oil": "/images/amsoil/cats/marine-oil.jpg",
+  "diesel-oil": "/images/amsoil/cats/diesel-oil.jpg",
+  "hydraulic-oil": "/images/amsoil/cats/hydraulic-oil.jpg",
+  "snowmobile-oil": "/images/amsoil/cats/snowmobile-oil.jpg",
+  "2-stroke-power-equipment-oil": "/images/amsoil/cats/2-stroke-power-equipment-oil.jpg",
+  "4-stroke-power-equipment-oil": "/images/amsoil/cats/4-stroke-power-equipment-oil.jpg",
+  "atv-utv-oil": "/images/amsoil/cats/atv-utv-oil.jpg",
+  "racing-oil": "/images/amsoil/cats/racing-oil.jpg",
+  "dirt-bike-oil": "/images/amsoil/cats/dirt-bike-oil.jpg",
+  "adventure-motorcycle-oil": "/images/amsoil/cats/adventure-motorcycle-oil.jpg",
+  "v-twin-motorcycle-oil": "/images/amsoil/cats/v-twin-motorcycle-oil.jpg",
+  "scooter-oil": "/images/amsoil/cats/scooter-oil.jpg"
+ }
+}

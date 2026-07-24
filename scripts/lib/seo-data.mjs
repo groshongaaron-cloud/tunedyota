@@ -2,7 +2,7 @@
 // Pure, side-effect-free builders for the SEO generator. No fs, no network —
 // except the AMSOIL_HUB_FILES import below, which loads the committed full-line
 // catalog JSON so the Tier-2 hub pages self-register in HEAD_PAGES.
-import { AMSOIL_HUB_FILES } from "../build-amsoil-pages.mjs";
+import { AMSOIL_HUB_FILES, AMSOIL_FULL_PRODUCT_FILES } from "../build-amsoil-pages.mjs";
 
 export const SITE = "https://tunedyota.com";
 export const BIZ_ID = `${SITE}/#business`;
@@ -54,6 +54,8 @@ export const HEAD_PAGES = [
   // Tier-2 full-line hubs (one per AMSOIL category + searchable master index),
   // derived from the full catalog so a new category auto-registers.
   ...AMSOIL_HUB_FILES,
+  // Tier-3 long-tail product pages (one per enriched full-catalog SKU).
+  ...AMSOIL_FULL_PRODUCT_FILES,
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 

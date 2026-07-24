@@ -19,7 +19,7 @@ const SITE = path.join(__dirname, "..", "site");
 let PAGE_FILES;
 test.before(async () => {
   const mod = await import("../scripts/build-amsoil-pages.mjs");
-  PAGE_FILES = [...mod.AMSOIL_PAGE_FILES, ...mod.AMSOIL_PRODUCT_FILES, "amsoil-garage.html"];
+  PAGE_FILES = [...mod.AMSOIL_PAGE_FILES, ...mod.AMSOIL_PRODUCT_FILES, ...mod.AMSOIL_FULL_PRODUCT_FILES, "amsoil-garage.html"];
 });
 
 function ldBlocks(html) {
