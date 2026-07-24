@@ -37,6 +37,12 @@ function categoryOf(name) {
 }
 const prod = (sku) => CAT.products[sku];
 
+// Merchant-listing return policy for every Offer (GSC/Merchant Center reads
+// `hasMerchantReturnPolicy`). Mirrors AMSOIL Inc.'s actual policy — AMSOIL
+// fulfills all orders: 30-day returns on unopened product, refund to original
+// payment, customer pays return freight. Human-readable page: /returns.
+const RETURN_POLICY = `"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"US","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow","merchantReturnDays":30,"returnMethod":"https://schema.org/ReturnByMail","returnFees":"https://schema.org/ReturnFeesCustomerResponsibility","refundType":"https://schema.org/FullRefund","merchantReturnLink":"https://tunedyota.com/returns"}`;
+
 // Shared with the guide generator (Front B): live retail price + product-image tag.
 const priceOfP = (p) => (p && typeof p.salePrice === "number" && p.salePrice > 0 ? p.salePrice
   : p && typeof p.retailPrice === "number" && p.retailPrice > 0 ? p.retailPrice : null);
@@ -54,7 +60,7 @@ const FAVICON = `<link rel="icon" href="/favicon.ico" sizes="32x32">
 <meta name="theme-color" content="#3A2E26">`;
 const NAV = `<header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>`;
 const FOOTER = `<footer class="sfoot"><div class="fmark">Tuned Yota</div><div class="ftag">Undeniable Performance</div>
-  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
+  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="returns.html">Returns</a></div>
   <div class="fcon">Call or text <a href="tel:+16124067117">(612) 406-7117</a> &nbsp;·&nbsp; <a href="mailto:info@tunedyota.com">info@tunedyota.com</a><br>
   Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
@@ -227,7 +233,7 @@ function page(model, models) {
   const offers = products.map((p) => {
     const price = priceOf(p);
     if (price == null) return null;
-    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."}}`;
+    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}}`;
     return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
   }).filter(Boolean).join(",");
 
@@ -362,7 +368,7 @@ function garageOfferCatalog() {
     (byCat[categoryOf(p.name)] ||= []).push(price);
   }
   const shopUrl = amsoilUrl("/shop/");
-  const seller = `"seller":{"@type":"Organization","name":"AMSOIL Inc."}`;
+  const seller = `"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}`;
   // Stable display order; only categories with at least one priced product appear.
   return Object.keys(CAT_LABEL).filter((c) => byCat[c] && byCat[c].length).map((c) => {
     const ps = byCat[c], low = Math.min(...ps), high = Math.max(...ps);
@@ -609,7 +615,7 @@ function guidePage(g, vehModels) {
   const offers = products.map((p) => {
     const price = priceOfP(p);
     if (price == null) return null;
-    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."}}`;
+    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}}`;
     return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
   }).filter(Boolean).join(",");
   const faqSchema = g.faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
@@ -722,7 +728,7 @@ function geoPage(st, vehModels) {
   const offers = products.map((p) => {
     const price = priceOfP(p);
     if (price == null) return null;
-    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."}}`;
+    const offer = `{"@type":"Offer","priceCurrency":"USD","price":${JSON.stringify(price.toFixed(2))},"availability":"https://schema.org/InStock","url":${JSON.stringify(amsoilUrl(p.productPath))},"seller":{"@type":"Organization","name":"AMSOIL Inc."},${RETURN_POLICY}}`;
     return `{"@type":"Offer","itemOffered":{"@type":"Product","name":${JSON.stringify(p.name)},"brand":{"@type":"Brand","name":"AMSOIL"},"category":${JSON.stringify(categoryOf(p.name))},"offers":${offer}}}`;
   }).filter(Boolean).join(",");
   const cityList = st.cities.join(", ");

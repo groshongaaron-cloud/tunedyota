@@ -53,6 +53,18 @@ function assertValidProduct(f, p) {
     assert.equal(offer["@type"], "Offer", `${f}: Product "${p.name}" offer not an Offer/AggregateOffer`);
     assert.ok(price2dp(offer.price), `${f}: Product "${p.name}" price not "N.NN"`);
   }
+  // GSC merchant-listing return policy (2026-07-24): every offer must carry
+  // hasMerchantReturnPolicy mirroring AMSOIL's real 30-day policy, with the
+  // human-readable page at /returns.
+  const rp = offer.hasMerchantReturnPolicy;
+  assert.ok(rp, `${f}: Product "${p.name}" offer missing hasMerchantReturnPolicy`);
+  assert.equal(rp["@type"], "MerchantReturnPolicy", `${f}: "${p.name}" return policy wrong @type`);
+  assert.equal(rp.applicableCountry, "US", `${f}: "${p.name}" return policy missing applicableCountry`);
+  assert.equal(rp.returnPolicyCategory, "https://schema.org/MerchantReturnFiniteReturnWindow",
+    `${f}: "${p.name}" return policy category wrong`);
+  assert.equal(rp.merchantReturnDays, 30, `${f}: "${p.name}" merchantReturnDays !== 30`);
+  assert.equal(rp.merchantReturnLink, "https://tunedyota.com/returns",
+    `${f}: "${p.name}" merchantReturnLink wrong`);
 }
 
 test("every AMSOIL page's Products carry a valid offer (Offer or AggregateOffer)", () => {
@@ -70,5 +82,20 @@ test("all AMSOIL page JSON-LD blocks are parseable", () => {
   for (const f of PAGE_FILES) {
     const html = fs.readFileSync(path.join(SITE, f), "utf8");
     assert.doesNotThrow(() => ldBlocks(html), `${f}: unparseable JSON-LD`);
+  }
+});
+
+// The /returns page the merchantReturnLink points at must exist, state the real
+// AMSOIL terms, and be reachable from every page footer (Merchant Center
+// reviewers and Google both check for an on-site, linked return policy).
+test("returns page exists with AMSOIL-accurate terms and is footer-linked", () => {
+  const html = fs.readFileSync(path.join(SITE, "returns.html"), "utf8");
+  assert.match(html, /<link rel="canonical" href="https:\/\/tunedyota\.com\/returns">/);
+  assert.match(html, /30 days/, "returns.html missing the 30-day window");
+  assert.match(html, /unopened/i, "returns.html missing the unopened condition");
+  assert.match(html, /amsoil\.com\/t\/return-policy\//, "returns.html missing link to AMSOIL's authoritative policy");
+  for (const f of PAGE_FILES) {
+    const page = fs.readFileSync(path.join(SITE, f), "utf8");
+    assert.ok(page.includes('<a href="returns.html">Returns</a>'), `${f}: footer missing Returns link`);
   }
 });
