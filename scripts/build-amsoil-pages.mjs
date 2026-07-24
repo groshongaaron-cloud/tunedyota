@@ -1027,6 +1027,175 @@ export const AMSOIL_PRODUCT_FILES = Object.values(CAT.products)
   .filter((p) => priceOfP(p) != null)
   .map((p) => `${productSlug(p)}.html`);
 
+// ---- Tier-2 full-line category hubs (Phase 2 of the 541-product strategy) ----
+// The FULL catalog (site/amsoil-catalog-full.json, built by
+// scripts/amsoil/build-full-catalog.mjs from the owner's authoritative U.S.
+// Pricing sheet) drives one hub page per AMSOIL category + a searchable master
+// index — every product in the line visible with live retail + PC pricing and
+// one-click referral ordering. Curated Tier-1 SKUs link to their internal
+// product pages; the long tail orders via amsoil.com stock-number search (the
+// runtime amsoil-track.js rewrites those through the tracked go-link).
+// DELIBERATE: hubs emit CollectionPage/ItemList schema, NOT Product nodes —
+// long-tail items have no self-hosted images yet, and imageless Product nodes
+// are exactly the GSC error fixed on 2026-07-24.
+const FULL = require("../site/amsoil-catalog-full.json");
+export const catSlug = (c) => c.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const HUB_CATS = [...new Set(FULL.products.map((p) => p.category))].sort();
+export const AMSOIL_HUB_FILES = ["amsoil-products.html", ...HUB_CATS.map((c) => `amsoil-${catSlug(c)}-products.html`)];
+
+// Category → deeper Tier-1 reading where we have it.
+const HUB_GUIDE = {
+  "Motor Oil": ["amsoil-synthetic-motor-oil-guide.html", "AMSOIL synthetic motor oil guide"],
+  "Gear Oil": ["amsoil-severe-gear-guide.html", "AMSOIL SEVERE GEAR guide"],
+  "Transmission Fluid": ["amsoil-synthetic-atf-guide.html", "AMSOIL synthetic ATF guide"],
+  "Filters": ["amsoil-ea-oil-filter-guide.html", "AMSOIL Ea oil filter guide"],
+  "High Mileage Motor Oil": ["is-amsoil-worth-it.html", "Is AMSOIL worth it?"],
+  "European Oil": ["amsoil-vs-oem-toyota-lexus-fluids.html", "AMSOIL vs. OEM fluids"],
+};
+const HUBSTYLE = `<style>
+.htab{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+.htab th{font-family:'Spectral SC',serif;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-d);text-align:left;padding:8px 8px;border-bottom:1.6px solid var(--line)}
+.htab td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.htab a{color:var(--brown);font-weight:700;text-decoration:none}
+.hsizes{font-size:12px;color:var(--sage-d);margin-top:3px}
+.hp{white-space:nowrap;font-weight:900;color:var(--ink)}
+.hpc{font-size:11.5px;color:var(--sage-d);font-weight:600}
+.htab .ord{display:inline-block;background:var(--ink);color:#F3EFEA;border-radius:99px;padding:7px 14px;font-weight:900;font-size:12.5px}
+.hcats{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.hcats a{background:var(--card);border:1.4px solid var(--line);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--brown);text-decoration:none}
+#hsearch{width:100%;padding:13px 16px;font-size:16px;border:1.6px solid var(--brown);border-radius:12px;margin:14px 0 4px}
+@media(max-width:560px){.htab th:nth-child(2),.htab td:nth-child(2){display:none}}
+</style>`;
+
+// stockNo (any variant) → internal Tier-1 page, for curated SKUs.
+function curatedByStock() {
+  const m = {};
+  for (const p of Object.values(CAT.products)) if (p.stockNo && priceOfP(p) != null) m[p.stockNo] = `${productSlug(p)}.html`;
+  return m;
+}
+
+function hubChrome({ file, title, desc, h1, eyebrow, body, itemList }) {
+  const url = `https://tunedyota.com/${file.replace(/\.html$/, "")}`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title}</title>
+<meta name="description" content="${desc}">
+<link rel="canonical" href="${url}">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"CollectionPage","name":${JSON.stringify(h1)},"url":"${url}","isPartOf":{"@id":"https://tunedyota.com/#business"},"mainEntity":{"@type":"ItemList","numberOfItems":${itemList.length},"itemListElement":[${itemList.map((it, i) => `{"@type":"ListItem","position":${i + 1},"name":${JSON.stringify(it.name)},"url":${JSON.stringify(it.url)}}`).join(",")}]}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tunedyota.com/"},{"@type":"ListItem","position":2,"name":"AMSOIL Garage","item":"https://tunedyota.com/amsoil-garage"},{"@type":"ListItem","position":3,"name":${JSON.stringify(h1)},"item":"${url}"}]}
+</script>
+${FONTS}
+${SITECSS}
+${FAVICON}
+${STYLE}
+${HUBSTYLE}
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+${NAV}
+<a id="main" tabindex="-1"></a>
+<div class="lp">
+  <div class="lp-eyebrow">${eyebrow}</div>
+  <h1>${h1}</h1>
+${body}
+  <div class="lp-book">
+    <h2>Save up to 25% for life</h2>
+    <p>Become a Preferred Customer under Tuned Yota — the P.C. prices shown above, points, exclusive promotions and free gear. The membership pays for itself in about two oil changes.</p>
+    <a class="btn primary" target="_blank" rel="noopener" href="${amsoilUrl("/offers/pc/")}">Become a Preferred Customer →</a>
+  </div>
+  <p class="lp-disc">Prices are AMSOIL's published U.S. retail (online/catalog) and Preferred Customer prices; checkout completes on amsoil.com with free shipping on orders $100+. Orders are sold, shipped and fulfilled by AMSOIL Inc. See <a href="returns.html">shipping &amp; returns</a>. Tuned Yota is an Authorized AMSOIL Dealer.</p>
+</div>
+${FOOTER}
+${TRACK}
+<script src="/chat.js" defer></script>
+</body>
+</html>
+`;
+}
+
+function hubRows(products, curated) {
+  return products.map((p) => {
+    const internal = curated[p.stockNo] || p.variants.map((v) => curated[v.stockNo]).find(Boolean);
+    const searchUrl = amsoilUrl(`/search/?text=${encodeURIComponent(p.stockNo)}`);
+    const nameHref = internal || searchUrl;
+    const ext = internal ? "" : ' target="_blank" rel="noopener"';
+    const sizes = p.variants.map((v) => `${ESC(v.pkg)} $${v.retail.toFixed(2)}`).join(" · ");
+    return `<tr><td><a href="${nameHref}"${ext}>${ESC(p.name.replace(/^AMSOIL /, ""))}</a><div class="hsizes">${sizes}</div></td><td>${ESC(p.stockNo)}</td><td class="hp">$${p.retail.toFixed(2)}${p.pc ? `<div class="hpc">$${p.pc.toFixed(2)} P.C.</div>` : ""}</td><td><a class="ord" target="_blank" rel="noopener" href="${searchUrl}">Order &#9658;</a></td></tr>`;
+  }).join("\n");
+}
+
+export function buildAmsoilHubs() {
+  const curated = curatedByStock();
+  // Per-category hubs.
+  for (const c of HUB_CATS) {
+    const ps = FULL.products.filter((p) => p.category === c);
+    const file = `amsoil-${catSlug(c)}-products.html`;
+    const guide = HUB_GUIDE[c];
+    const itemList = ps.map((p) => {
+      const internal = curated[p.stockNo] || p.variants.map((v) => curated[v.stockNo]).find(Boolean);
+      return { name: p.name, url: internal ? `https://tunedyota.com/${internal.replace(/\.html$/, "")}` : amsoilUrl(`/search/?text=${encodeURIComponent(p.stockNo)}`) };
+    });
+    const body = `  <div class="lp-answer">Every AMSOIL <strong>${ESC(c)}</strong> product — all ${ps.length} of them — with AMSOIL's published retail and Preferred Customer pricing and one-click ordering, shipped direct from AMSOIL anywhere in the U.S. (free on orders $100+). Ordering through Tuned Yota, an Authorized AMSOIL Dealer, costs nothing extra and supports a Toyota/Lexus specialist shop.${guide ? ` New to the category? Read the <a href="${guide[0]}">${guide[1]}</a>.` : ""}</div>
+  <table class="htab"><thead><tr><th>Product &amp; sizes</th><th>Stock #</th><th>Price</th><th></th></tr></thead><tbody>
+${hubRows(ps, curated)}
+  </tbody></table>
+  <p><a href="amsoil-products.html">← All AMSOIL products</a> · <a href="amsoil-garage.html">AMSOIL Garage — fluids for your Toyota/Lexus</a></p>`;
+    fs.writeFileSync(path.join(SITE, file), hubChrome({
+      file, h1: `AMSOIL ${ESC(c)}`, eyebrow: "Tuned Yota · Authorized AMSOIL Dealer · Full product line",
+      title: `AMSOIL ${ESC(c)} — All ${ps.length} Products, Prices &amp; Ordering | Tuned Yota`,
+      desc: `Complete AMSOIL ${c} line — all ${ps.length} products with current retail and Preferred Customer prices, stock numbers and direct ordering from Tuned Yota, an Authorized AMSOIL Dealer. Free shipping on orders $100+.`,
+      body, itemList,
+    }));
+  }
+  // Master index with instant client-side search. Cross-category listings are
+  // deduped by stock number so a search shows each product once.
+  const seenStock = new Set();
+  const searchData = FULL.products.filter((p) => !seenStock.has(p.stockNo) && seenStock.add(p.stockNo)).map((p) => {
+    const internal = curated[p.stockNo] || p.variants.map((v) => curated[v.stockNo]).find(Boolean);
+    return { n: p.name.replace(/^AMSOIL /, ""), s: p.stockNo, c: p.category, r: p.retail,
+      u: internal || amsoilUrl(`/search/?text=${encodeURIComponent(p.stockNo)}`) };
+  });
+  const catLinks = HUB_CATS.map((c) => `<a href="amsoil-${catSlug(c)}-products.html">${ESC(c)} (${FULL.products.filter((p) => p.category === c).length})</a>`).join("");
+  const idxBody = `  <div class="lp-answer">The <strong>complete AMSOIL product line — ${FULL.count} products</strong> — searchable below with AMSOIL's published pricing, and browsable by category. Every order ships direct from AMSOIL (free on orders $100+) through Tuned Yota, an Authorized AMSOIL Dealer.</div>
+  <input id="hsearch" type="search" placeholder="Search all ${FULL.count} AMSOIL products — name or stock number…" autocomplete="off">
+  <div id="hresults"></div>
+  <h2>Browse by category</h2>
+  <div class="hcats">${catLinks}</div>
+  <p><a href="amsoil-garage.html">Not sure what your Toyota or Lexus needs? Use the AMSOIL Garage →</a></p>
+  <script id="hdata" type="application/json">${JSON.stringify(searchData)}</script>
+  <script>
+  (function(){
+    var data=JSON.parse(document.getElementById('hdata').textContent);
+    var inp=document.getElementById('hsearch'),out=document.getElementById('hresults');
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+    inp.addEventListener('input',function(){
+      var q=inp.value.trim().toLowerCase();
+      if(q.length<2){out.innerHTML='';return;}
+      var hits=data.filter(function(p){return (p.n+' '+p.s+' '+p.c).toLowerCase().indexOf(q)>-1;}).slice(0,30);
+      out.innerHTML=hits.length?'<table class="htab"><tbody>'+hits.map(function(p){
+        var ext=/^https:/.test(p.u)?' target="_blank" rel="noopener"':'';
+        return '<tr><td><a href="'+esc(p.u)+'"'+ext+'>'+esc(p.n)+'</a><div class="hsizes">'+esc(p.c)+'</div></td><td>'+esc(p.s)+'</td><td class="hp">$'+p.r.toFixed(2)+'</td></tr>';
+      }).join('')+'</tbody></table>':'<p style="color:var(--sage-d)">No matches — try a shorter term or browse the categories below.</p>';
+    });
+  })();
+  </script>`;
+  fs.writeFileSync(path.join(SITE, "amsoil-products.html"), hubChrome({
+    file: "amsoil-products.html", h1: "All AMSOIL Products",
+    eyebrow: "Tuned Yota · Authorized AMSOIL Dealer · Full product line",
+    title: `All ${FULL.count} AMSOIL Products — Search, Prices &amp; Ordering | Tuned Yota`,
+    desc: `Search and shop the complete AMSOIL product line — ${FULL.count} products across ${HUB_CATS.length} categories with current retail and Preferred Customer pricing, from Tuned Yota, an Authorized AMSOIL Dealer.`,
+    body: idxBody,
+    itemList: HUB_CATS.map((c) => ({ name: `AMSOIL ${c}`, url: `https://tunedyota.com/amsoil-${catSlug(c)}-products` })),
+  }));
+  return HUB_CATS.length + 1;
+}
+
 // ---- Front B: national "Buy AMSOIL in [State]" geo pages ----------------------
 // Substantive (NOT thin doorway) — each state gets real cities + a climate/driving
 // angle, the AMSOIL value case, product cards + schema, and a national-shipping FAQ.
@@ -1167,6 +1336,7 @@ export function buildAmsoilPages() {
   for (const [sku, p] of Object.entries(CAT.products)) {
     if (priceOfP(p) != null) fs.writeFileSync(path.join(SITE, `${productSlug(p)}.html`), productPage(sku, p));
   }
+  buildAmsoilHubs();
   buildAmsoilGarageStore();
   return list.length;
 }

@@ -1,5 +1,8 @@
 // scripts/lib/seo-data.mjs
-// Pure, side-effect-free builders for the SEO generator. No fs, no network.
+// Pure, side-effect-free builders for the SEO generator. No fs, no network —
+// except the AMSOIL_HUB_FILES import below, which loads the committed full-line
+// catalog JSON so the Tier-2 hub pages self-register in HEAD_PAGES.
+import { AMSOIL_HUB_FILES } from "../build-amsoil-pages.mjs";
 
 export const SITE = "https://tunedyota.com";
 export const BIZ_ID = `${SITE}/#business`;
@@ -48,6 +51,9 @@ export const HEAD_PAGES = [
   "amsoil-georgia.html","amsoil-ohio.html","amsoil-pennsylvania.html","amsoil-illinois.html","amsoil-washington.html","amsoil-tennessee.html",
   "amsoil-north-carolina.html","amsoil-missouri.html","amsoil-montana.html","amsoil-idaho.html","amsoil-oklahoma.html","amsoil-indiana.html",
   "privacy.html","terms.html","returns.html",
+  // Tier-2 full-line hubs (one per AMSOIL category + searchable master index),
+  // derived from the full catalog so a new category auto-registers.
+  ...AMSOIL_HUB_FILES,
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 
@@ -73,6 +79,7 @@ export const PRIORITY = {
   "amsoil-5w-40-ms-synthetic-european-motor-oil.html": "0.8", "amsoil-5w-30-ls-synthetic-european-motor-oil.html": "0.8",
   "amsoil-0w-20-synthetic-high-mileage-motor-oil.html": "0.8", "amsoil-5w-30-synthetic-high-mileage-motor-oil.html": "0.8",
   "privacy.html": "0.3", "terms.html": "0.3", "returns.html": "0.3",
+  "amsoil-products.html": "0.9",
 };
 // loc path for a filename (index -> "/", others -> "/name" without .html).
 export function locFor(file) {
