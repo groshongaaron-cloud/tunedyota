@@ -2,12 +2,13 @@
  "updated": "2026-07-25",
  "files": [
   "automatic-transmission-fluid.json",
+  "car-care-detailing.json",
   "compressor-oil.json",
   "fuel-additives.json",
   "gasoline-motor-oil.json",
   "hydraulic-oil.json"
  ],
- "count": 83,
+ "count": 96,
  "products": {
   "ATLQT-EA": {
    "path": "/p/amsoil-signature-series-fuel-efficient-100-synthetic-automatic-transmission-fluid-atl/",
@@ -138,6 +139,224 @@
    "reviews": 975,
    "name": "AMSOIL Signature Series Multi-Vehicle 100% Synthetic Automatic Transmission Fluid",
    "source": "automatic-transmission-fluid.json"
+  },
+  "HFBCN-EA": {
+   "path": "/p/amsoil-high-foam-car-shampoo-hfb/",
+   "price": 15.29,
+   "rating": 5,
+   "reviews": 48,
+   "name": "AMSOIL High-Foam Car Shampoo",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "HFBCN-EA": {
+     "price": 15.29,
+     "size": "16 oz. Bottle"
+    },
+    "HFBCN-CA": {
+     "price": 181.55,
+     "size": "16 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "QDSCN-EA": {
+   "path": "/p/amsoil-quick-detailer-qdscn/",
+   "price": 15.29,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Quick Detailer",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "QDSCN-EA": {
+     "price": 15.29,
+     "size": "16 oz. Bottle"
+    },
+    "QDSCN-CA": {
+     "price": 181.55,
+     "size": "16 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "TTPCN-EA": {
+   "path": "/p/amsoil-tire-trim-protectant-ttpcn/",
+   "price": 21.89,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Tire + Trim Protectant",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "TTPCN-EA": {
+     "price": 21.89,
+     "size": "16 oz. Bottle"
+    },
+    "TTPCN-CA": {
+     "price": 261.45,
+     "size": "16 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "WTCCN-EA": {
+   "path": "/p/amsoil-wheel-tire-cleaner-wtccn/",
+   "price": 19.69,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Wheel + Tire Cleaner",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "WTCCN-EA": {
+     "price": 19.69,
+     "size": "16 oz. Bottle"
+    },
+    "WTCCN-CA": {
+     "price": 234.8,
+     "size": "16 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "IDNCN-EA": {
+   "path": "/p/amsoil-interior-detailer--scent-free-idn/",
+   "price": 15.29,
+   "rating": 5,
+   "reviews": 35,
+   "name": "AMSOIL Interior Detailer - Scent Free",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "IDNCN-EA": {
+     "price": 15.29,
+     "size": "16 oz. Bottle"
+    },
+    "IDNCN-CA": {
+     "price": 181.55,
+     "size": "16 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "IDLCN-EA": {
+   "path": "/p/amsoil-interior-detailer--light-lemon-idl/",
+   "price": 15.29,
+   "rating": 5,
+   "reviews": 35,
+   "name": "AMSOIL Interior Detailer - Light Lemon",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "IDLCN-EA": {
+     "price": 15.29,
+     "size": "16 oz. Bottle"
+    },
+    "IDLCN-CA": {
+     "price": 181.55,
+     "size": "16 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "AMSSC-EA": {
+   "path": "/p/amsoil-mudslinger-mud-and-dirt-repellent-amssc/",
+   "price": 14.19,
+   "rating": 5,
+   "reviews": 98,
+   "name": "AMSOIL Mudslinger® Mud and Dirt Repellent",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "AMSSC-EA": {
+     "price": 14.19,
+     "size": "12 oz. Spray Can"
+    },
+    "AMSSC-CA": {
+     "price": 168.45,
+     "size": "12 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "AGCSC-EA": {
+   "path": "/p/amsoil-glass-cleaner-agcsc/",
+   "price": 9.39,
+   "rating": 5,
+   "reviews": 106,
+   "name": "AMSOIL Glass Cleaner",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "AGCSC-EA": {
+     "price": 9.39,
+     "size": "19 oz. Spray Can"
+    },
+    "AGCSC-CA": {
+     "price": 111.95,
+     "size": "19 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "AMWSC-EA": {
+   "path": "/p/amsoil-miracle-wash-waterless-wash-and-wax-spray-amwsc/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 60,
+   "name": "AMSOIL Miracle Wash Waterless Wash and Wax Spray",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "AMWSC-EA": {
+     "price": 14.39,
+     "size": "13 oz. Spray Can"
+    },
+    "AMWSC-CA": {
+     "price": 170.85,
+     "size": "13 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "G3911-EA": {
+   "path": "/p/amsoil-foam-cannon-g3911/",
+   "price": 75,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Foam Cannon",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "G3911-EA": {
+     "price": 75,
+     "size": "One"
+    }
+   }
+  },
+  "G3912-EA": {
+   "path": "/p/amsoil-microfiber-detail-towel-2-pack-g3912/",
+   "price": 12,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Microfiber Detail Towel 2-Pack",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "G3912-EA": {
+     "price": 12,
+     "size": "One"
+    }
+   }
+  },
+  "G3913-EA": {
+   "path": "/p/amsoil-drying-towel-g3913/",
+   "price": 27,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Drying Towel",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "G3913-EA": {
+     "price": 27,
+     "size": "One"
+    }
+   }
+  },
+  "G3914-EA": {
+   "path": "/p/amsoil-microfiber-wash-mitt-g3914/",
+   "price": 13.75,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Microfiber Wash Mitt",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "G3914-EA": {
+     "price": 13.75,
+     "size": "One"
+    }
+   }
   },
   "PCH05-EA": {
    "path": "/p/amsoil-iso-32-100-synthetic-compressor-oil-pch/",

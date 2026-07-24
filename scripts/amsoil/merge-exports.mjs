@@ -45,6 +45,8 @@ const normalize = (r) => {
       }
       const hv = g.hasVariant;
       if (Array.isArray(hv) && hv.length) {
+        const o0 = Array.isArray(hv[0].offers) ? hv[0].offers[0] : (hv[0].offers || {});
+        if (o0.priceCurrency) out._currency = o0.priceCurrency;
         out.variants_ld = hv.map((v) => {
           const o = Array.isArray(v.offers) ? v.offers[0] : (v.offers || {});
           return { sku: v.sku, size: v.size || v.name || "", price: parseFloat(o.price) || null };
@@ -73,6 +75,14 @@ for (const src of sources) {
   for (const r of arr) {
     const n = normalize(r);
     if (!n.product_url) continue;
+    // US-market gate (car-care handoff §1.1): the cloud scraper is sometimes
+    // served amsoil.ca content. Reject any row with a non-USD variant currency
+    // or French/metric size strings — NEVER currency-convert; the row gets
+    // re-scraped or the sheet governs.
+    if (n._currency && n._currency !== "USD") { console.error(`GATE: rejected ${n.product_name} — currency ${n._currency}`); continue; }
+    const sizeBlob = [(n.available_sizes || ""), ...(n.variants_ld || []).map((v) => v.size)].join(" ");
+    if (/\bml\b|Bouteille|Flacon|Caisse|Boîte/i.test(sizeBlob)) { console.error(`GATE: rejected ${n.product_name} — non-US locale sizes`); continue; }
+    delete n._currency;
     // Dedupe rule (per the fuel-additives handoff): the row WITH raw JSON-LD
     // (variants_ld) wins — failed-capture rows are meta-only junk that must
     // never shadow a good retry row.
