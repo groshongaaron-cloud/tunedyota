@@ -326,6 +326,27 @@
 <div class="toast" id="toast"></div>
 <script>
   var CAL = ["Light","Mild","Medium","Spicy","SS","Light and Mild","Mild and Medium","Medium and Spicy","Spicy and SS"];
+  // Stage tiers OTT uses on the 2024+ turbo trucks — offered IN ADDITION to the
+  // classic tiers, and only when the booking's vehicle is one of those platforms
+  // (Tacoma 2024+, 4Runner 2025+, LC250). Keep in sync with CAL_OPTIONS in
+  // netlify/functions/lib/certificate.js, which is what the server accepts.
+  var CAL_STAGES = ["Stage 1 Enhanced","Stage 2","Stage 3"];
+  // Platform-derived vehicle strings look like "2024+ Toyota Tacoma 2.4L-T I4 · goals";
+  // walk-ins are free text ("2024 Tacoma", "LC250"). A closed year range
+  // ("2020-2024 4Runner 4.0L V6") is always a pre-turbo platform even when the
+  // range touches 2024, so it stays on the classic list.
+  function stageEligible(b){
+    var v=String(b.vehicle||'');
+    if(!/tacoma|4\s*runner|land\s*cruiser|lc\s*-?\s*250/i.test(v)) return false;
+    if(/lc\s*-?\s*250/i.test(v)) return true;
+    if(/2\.4\s*L\s*-?\s*T/i.test(v)) return true;
+    if(/\b20(?:2[4-9]|[3-9]\d)\s*\+/.test(v)) return true;
+    if(/\b(?:19|20)\d{2}\s*[-–]\s*(?:19|20)\d{2}/.test(v)) return false;
+    var y=parseInt(b.modelYear,10)||0;
+    if(!y){ (v.match(/\b(?:19|20)\d{2}\b/g)||[]).forEach(function(t){ y=Math.max(y,+t); }); }
+    return y>=2024;
+  }
+  function calOptions(b){ return stageEligible(b) ? CAL.concat(CAL_STAGES) : CAL; }
   var TP = ["VFT","HPT","PCM","BB"];
   var CT = ["Basic","MAF","Basic + MAF","Supercharger","CARB Update","9.2 New","9.2 Update","TCM Update","Custom","K-Line"];
   var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -2010,7 +2031,7 @@
       return c;
     }
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
-    var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+CAL.map(function(o){return '<option>'+o+'</option>';}).join('');
+    var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+calOptions(b).map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
       '<details style="margin:6px 0"><summary class="link" style="cursor:pointer">🕓 '+(b.scheduledTime?'Time: '+esc(b.scheduledTime)+' — change':'Set time / date / address')+'</summary>'+
       '<div class="row-actions" style="margin-top:6px">'+

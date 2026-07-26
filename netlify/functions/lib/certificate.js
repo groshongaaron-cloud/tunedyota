@@ -7,8 +7,11 @@ function esc(s) {
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// The choosable OTT Calibration values (single tiers + adjacent combos).
-const CAL_OPTIONS = ["Light", "Mild", "Medium", "Spicy", "SS", "Light and Mild", "Mild and Medium", "Medium and Spicy", "Spicy and SS"];
+// The choosable OTT Calibration values (single tiers + adjacent combos), plus
+// the Stage tiers OTT uses on the 2024+ turbo trucks (Tacoma 2024+, 4Runner
+// 2025+, LC250). The installer console only OFFERS the Stage tiers on those
+// platforms; this list is what the server ACCEPTS, so it carries all of them.
+const CAL_OPTIONS = ["Light", "Mild", "Medium", "Spicy", "SS", "Light and Mild", "Mild and Medium", "Medium and Spicy", "Spicy and SS", "Stage 1 Enhanced", "Stage 2", "Stage 3"];
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function longDate(iso) {

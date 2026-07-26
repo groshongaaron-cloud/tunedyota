@@ -47,6 +47,19 @@ test("complete requires a valid calibration", async () => {
   assert.equal(out.error, "bad-calibration");
 });
 
+test("complete accepts the 2024+ turbo-truck Stage calibrations", async () => {
+  for (const cal of ["Stage 1 Enhanced", "Stage 2", "Stage 3"]) {
+    const updates = [];
+    const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: cal },
+      { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+        get: async () => recFor("cody", { Vehicle: "2024+ Toyota Tacoma 2.4L-T I4" }),
+        update: async (a) => { updates.push(a.fields); return {}; },
+        send: async () => ({ ok: true }) });
+    assert.equal(out.status, "completed");
+    assert.equal(updates[0]["OTT Calibration"], cal);
+  }
+});
+
 test("complete sets fields, sends the cert, marks Certificate Sent", async () => {
   const updates = []; let sent = null;
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Medium and Spicy" },

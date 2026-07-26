@@ -16,7 +16,9 @@ Merge fields (replace with Airtable Bookings values when generating per-booking)
 
 The **OTT Calibration** row is a choosable field: Light / Mild / Medium / Spicy /
 SS, or the adjacent combos (Light and Mild, Mild and Medium, Medium and Spicy,
-Spicy and SS). It prints as plain text (input chrome is hidden via `@media print`).
+Spicy and SS). The 2024+ turbo trucks (Tacoma 2024+, 4Runner 2025+, LC250) add
+Stage 1 Enhanced / Stage 2 / Stage 3. It prints as plain text (input chrome is
+hidden via `@media print`).
 
 > Note: this is the *design master*. The live booking system currently emails the
 > simpler `lib/certificate.js` certificate. Wiring this master into
