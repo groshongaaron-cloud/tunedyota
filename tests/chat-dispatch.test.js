@@ -60,6 +60,60 @@ test("plain dispatcher reply on unassigned thread claims it", async () => {
   assert.equal(saved.turns[saved.turns.length - 1].role, "installer");
 });
 
+test("admin (non-dispatcher) may dispatch via @key", async () => {
+  const sent = []; let saved = null;
+  const env = { ...ENV, INSTALLER_ADMINS: "noah" };
+  const r = await relayInstallerReply({ from: "+19208607050", text: "@cody" }, {
+    env, findSession: async () => mkSess({ installer: "noah" }), save: async (s) => { saved = s; },
+    sms: async (a) => { sent.push(a); },
+  });
+  assert.equal(r.relayed, true);
+  assert.equal(saved.installer, "cody");
+});
+
+test("malformed @command from dispatcher is consumed with help SMS — never reaches the client", async () => {
+  for (const text of ["@codyy", "@cody take this one", "@aaron"]) {
+    const sent = []; let savedTurns = null;
+    const r = await relayInstallerReply({ from: "+16126557611", text }, {
+      env: ENV, findSession: async () => mkSess(), save: async (s) => { savedTurns = s.turns; },
+      sms: async (a) => { sent.push(a); }, onInstallerTurn: async () => { throw new Error("must not deliver to client"); },
+    });
+    assert.equal(r.relayed, true, text);
+    assert.match(sent[0].body, /dispatch commands are/, text);
+    assert.equal(savedTurns, null, text + " — nothing saved to the thread");
+  }
+});
+
+test("bare installer name without @ relays as normal chat text (no silent reassignment)", async () => {
+  let saved = null;
+  const r = await relayInstallerReply({ from: "+16126557611", text: "Cody" }, {
+    env: ENV, findSession: async () => mkSess({ installer: "aaron" }), save: async (s) => { saved = s; },
+    sms: async () => {}, onInstallerTurn: async () => {},
+  });
+  assert.equal(r.relayed, true);
+  assert.equal(saved.installer, "aaron", "not reassigned");
+  assert.equal(saved.turns[saved.turns.length - 1].text, "Cody");
+});
+
+test("dispatch save failure is consumed with error SMS (never hits the AI/lead path)", async () => {
+  const sent = [];
+  const r = await relayInstallerReply({ from: "+16126557611", text: "@cody" }, {
+    env: ENV, findSession: async () => mkSess(), save: async () => { throw new Error("airtable 503"); },
+    sms: async (a) => { sent.push(a); },
+  });
+  assert.equal(r.relayed, true);
+  assert.ok(sent.some((a) => /dispatch failed/.test(a.body)));
+});
+
+test("@Cody uppercase dispatches (case-insensitive key)", async () => {
+  let saved = null;
+  const r = await relayInstallerReply({ from: "+16126557611", text: "@Cody" }, {
+    env: ENV, findSession: async () => mkSess(), save: async (s) => { saved = s; }, sms: async () => {},
+  });
+  assert.equal(r.relayed, true);
+  assert.equal(saved.installer, "cody");
+});
+
 const { loadRelayTargetSession } = require("../netlify/functions/lib/chat-store.js");
 
 test("loadRelayTargetSession picks greatest Last Relayed At; dispatcher also sees unassigned", async () => {

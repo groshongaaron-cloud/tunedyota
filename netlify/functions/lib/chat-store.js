@@ -3,6 +3,7 @@
 // wrappers with injected fetch/env — the transcript lives as a JSON array in a
 // long-text field; session identity is the widget-generated Session ID string.
 const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./airtable.js");
+const { dispatcherKey } = require("./routing.js");
 
 const TABLE = (env) => env.AIRTABLE_CHAT_TABLE || "Chat Sessions";
 const STALE_AI_MS = 30 * 60 * 1000;         // ai sessions close after 30 min idle
@@ -64,12 +65,11 @@ async function loadEscalatedForInstaller(key, { env = process.env, fetchImpl = f
 // recently hit this person's phone. The dispatcher's pool includes every
 // unassigned thread — those relay to them by definition.
 async function loadRelayTargetSession(key, { env = process.env, fetchImpl = fetch, now = Date.now } = {}) {
-  const { dispatcherKey } = require("./routing.js");
   const c = cfg(env);
   const k = escapeFormula(key);
   const filter = key === dispatcherKey(env)
     ? `AND({Status}="escalated", OR({Installer}="${k}", {Installer}=""))`
-    : `AND({Installer}="${k}",{Status}="escalated")`;
+    : `AND({Installer}="${k}", {Status}="escalated")`;
   const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env), filterByFormula: filter });
   const sessions = recs.map(fromRecord).filter((s) => !isStale(s, now()));
   const stamp = (s) => s.lastRelayedAt || s.lastActivity || "";

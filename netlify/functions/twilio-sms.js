@@ -43,14 +43,21 @@ async function relayInstallerReply({ from, text }, deps = {}) {
   const clean = String(text || "").trim();
   if (!clean) return { relayed: false }; // blank/media-only texts fall through to normal handling
 
-  // Dispatch command: a bare installer key ("@cody" or "cody"), sent by the
-  // dispatcher or an admin. Consumed — never forwarded to a client. NOTE: this
-  // means the dispatcher cannot send a one-word message that IS an installer
-  // key as chat text; use the console for that edge.
-  const cmd = /^@?([a-zA-Z]+)$/.exec(clean);
-  const target = cmd ? normalizeInstallerKey(cmd[1]) : "";
+  // Dispatch command: "@cody" sent alone by the dispatcher or an admin. The @
+  // is REQUIRED — a bare word ("Cody") always relays as chat text, so answering
+  // a client's "who's my installer?" can never silently reassign the thread.
+  // Any @-prefixed text from a dispatcher is command INTENT: if it isn't a
+  // valid "@key" alone, it's consumed with an error SMS — never leaked to the
+  // client ("@codyy", "@cody take this one").
   const mayDispatch = inst.key === dispatcherKey(env) || isAdmin(inst.key, env);
-  if (target && target !== inst.key && mayDispatch) {
+  if (mayDispatch && clean.startsWith("@")) {
+    const m = /^@([a-zA-Z]+)$/.exec(clean);
+    const target = m ? normalizeInstallerKey(m[1]) : "";
+    if (!target || target === inst.key) {
+      const keys = Object.keys(INSTALLERS).filter((k) => k !== inst.key).map((k) => "@" + k).join(" or ");
+      try { await sms({ to: smsNumberFor(inst.key, env), body: `TY: dispatch commands are ${keys}, sent alone. Nothing was sent to the client.` }); } catch (e) {}
+      return { relayed: true };
+    }
     let sess = null;
     try { sess = await findSession(inst.key); } catch (e) { if (log.error) log.error("dispatch find", e.message); }
     if (!sess) {
@@ -59,7 +66,11 @@ async function relayInstallerReply({ from, text }, deps = {}) {
     }
     sess.installer = target;
     sess.lastRelayedAt = new Date().toISOString(); // target's replies route here
-    try { await save(sess); } catch (e) { if (log.error) log.error("dispatch save", e.message); return { relayed: false }; }
+    try { await save(sess); } catch (e) {
+      if (log.error) log.error("dispatch save", e.message);
+      try { await sms({ to: smsNumberFor(inst.key, env), body: "TY: dispatch failed to save — try again or assign in the console." }); } catch (e2) {}
+      return { relayed: true };
+    }
     const lastClient = (sess.turns || []).slice().reverse().find((t) => t.role === "user");
     const handoff = `TY handoff: ${sess.customerName || "Customer"}${sess.vehicle ? " · " + sess.vehicle : ""}${sess.phone ? " · " + sess.phone : ""}. ` +
       (lastClient ? `Latest: "${String(lastClient.text).slice(0, 200)}" ` : "") +
