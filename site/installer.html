@@ -357,6 +357,7 @@
     , theme: '', me: ''
     , chats:[], chatOpen:null, chatsLoaded:false };
   var CHAT_POLL = null;
+  var DEL_TOAST_TIMER = null;
   function Q(){ return window.OfflineQueue; }
   function store(){ return window.localStorage; }
 
@@ -2070,7 +2071,7 @@
       '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
     c.querySelector('#rs_'+b.id).onclick=function(){ reschedule(b.id); };
-    var db=c.querySelector('#del_'+b.id); if(db) db.onclick=function(){ cancelBooking(b.id); };
+    var db=c.querySelector('#del_'+b.id); if(db) db.onclick=function(){ db.disabled=true; cancelBooking(b.id).finally(function(){ db.disabled=false; }); };
     if(canScan()){ var sb=c.querySelector('#scan_'+b.id); if(sb) sb.onclick=function(){ startScan(b.id); }; }
     var cb=c.querySelector('#nsc_'+b.id), nsb=c.querySelector('#ns_'+b.id);
     cb.onchange=function(){ nsb.disabled=!cb.checked; };
@@ -2128,24 +2129,27 @@
       var out=await res.json().catch(function(){return{};});
       if(!(res.ok && out.status==='cancelled')){ fail('Could not delete: '+(out.error||res.status)); return; }
     }catch(e){ fail('Network error — try again.'); return; }
-    if(idx>=0) STATE.bookings.splice(idx,1);
+    if(idx>=0 && STATE.bookings[idx] && STATE.bookings[idx].id===id) STATE.bookings.splice(idx,1); else { var j=STATE.bookings.findIndex(function(x){return x.id===id;}); if(j>=0) STATE.bookings.splice(j,1); }
     renderAll();
     var el=document.getElementById('msg'); el.className='msg ok';
     el.innerHTML='✓ Booking deleted'+(b&&b.name?' — '+esc(b.name):'')+'. <a href="#" id="undodel"><b>Undo</b></a>';
     el.scrollIntoView({block:'nearest'});
-    var t=setTimeout(clearMsg, 10000);
+    if(DEL_TOAST_TIMER) clearTimeout(DEL_TOAST_TIMER); DEL_TOAST_TIMER=setTimeout(clearMsg, 10000);
     var u=document.getElementById('undodel');
     if(u) u.onclick=async function(e){
-      e.preventDefault(); clearTimeout(t);
+      e.preventDefault(); clearTimeout(DEL_TOAST_TIMER);
+      if(u.__busy) return; u.__busy=true;
       try{
         var r=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,action:'uncancel'})});
+        if(r.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
         var o=await r.json().catch(function(){return{};});
         if(r.ok && o.status==='uncancelled'){
-          if(b) STATE.bookings.splice(idx>=0?idx:STATE.bookings.length, 0, b);
+          if(b && !STATE.bookings.some(function(x){return x.id===id;})) STATE.bookings.splice(idx>=0?idx:STATE.bookings.length, 0, b);
           succeed('✓ Booking restored.');
           if(b) jumpToBooking(b);
         } else { fail('Could not restore: '+(o.error||r.status)); }
       }catch(e2){ fail('Network error — the booking is still deleted; Undo again or restore in Airtable.'); }
+      finally{ u.__busy=false; }
     };
   }
 
