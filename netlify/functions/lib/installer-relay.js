@@ -8,12 +8,13 @@
 // phone. Deps-injected like every lib here.
 const { cfg, escapeFormula, listRecords } = require("./airtable.js");
 const { sendSms } = require("./twilio.js");
-const { smsNumberFor, dispatcherKey, INSTALLERS } = require("./routing.js");
+const { smsNumberFor, dispatcherKey, normalizeInstallerKey, INSTALLERS } = require("./routing.js");
 const { isStale, TABLE } = require("./chat-store.js");
 
+// The · separators keep the owner-approved label look; they force UCS-2 SMS segments (67/153 chars) — accepted for readability at TY's volume.
 const MAX_RELAY_CHARS = 320;
 
-function relayTargetKey(sess, env) { return sess.installer || dispatcherKey(env); }
+function relayTargetKey(sess, env) { return normalizeInstallerKey(sess.installer) || dispatcherKey(env); }
 
 // Prior COMPLETED booking with this phone -> returning client. null = unknown
 // (no phone, or lookup failed) -> the tag is simply omitted; never blocks relay.
@@ -21,8 +22,9 @@ async function isReturningClient(sess, { env = process.env, fetchImpl = fetch } 
   const digits = String(sess.phone || "").replace(/\D/g, "").slice(-10);
   if (digits.length !== 10) return null;
   const c = cfg(env);
+  // Phone column holds raw form input — strip separators in-formula before matching.
   const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings,
-    filterByFormula: `AND({Status}="Completed", FIND("${digits}", {Phone}&"")>0)`, fields: ["Name"] });
+    filterByFormula: `AND({Status}="Completed", FIND("${digits}", SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({Phone}&"", " ", ""), "-", ""), "(", ""), ")", ""), "+", ""), ".", ""))>0)`, fields: ["Name"] });
   return recs.length > 0;
 }
 
@@ -60,14 +62,15 @@ async function relayClientTurn(sess, message, deps = {}) {
   const target = relayTargetKey(sess, env);
   const firstRelay = !sess.lastRelayedAt;
   let returning = null;
-  try { returning = await returningLookup(sess); } catch (e) { /* tag omitted */ }
+  try { returning = await returningLookup(sess); } catch (e) { if (log.warn) log.warn("relay returning-lookup", e.message); }
   let activeCount = 1;
-  try { activeCount = await activeFor(target); } catch (e) { /* warning omitted */ }
+  try { activeCount = await activeFor(target); } catch (e) { if (log.warn) log.warn("relay active-count", e.message); }
   const lines = relayLabel(sess, { returning, activeCount, firstRelay, env });
-  const text = String(message || "").slice(0, MAX_RELAY_CHARS);
-  const body = lines[0] + "\n“" + text + "”" + (lines.length > 1 ? "\n" + lines.slice(1).join("\n") : "");
+  const raw = String(message || "");
+  const text = raw.length > MAX_RELAY_CHARS ? raw.slice(0, MAX_RELAY_CHARS) + "..." : raw;
+  const body = lines[0] + '\n"' + text + '"' + (lines.length > 1 ? "\n" + lines.slice(1).join("\n") : "");
   const out = await sms({ to: smsNumberFor(target, env), body });
-  if (out && out.ok === false) throw new Error(out.error || "sms send failed");
+  if (out && out.ok === false) throw new Error(out.error || (out.skipped ? "sms skipped (twilio env unconfigured)" : "sms send failed"));
   sess.lastRelayedAt = new Date(now()).toISOString();
   return { target };
 }

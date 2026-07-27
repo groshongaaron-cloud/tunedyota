@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { relayClientTurn, relayTargetKey, relayLabel } = require("../netlify/functions/lib/installer-relay.js");
+const { relayClientTurn, relayTargetKey, relayLabel, isReturningClient, countActiveFor } = require("../netlify/functions/lib/installer-relay.js");
 
 const ENV = { CHAT_DISPATCHER: "aaron", INSTALLER_SMS_NUMBERS: '{"aaron":"+16126557611","cody":"+16052141335"}' };
 
@@ -54,4 +54,47 @@ test("relayClientTurn: {ok:false} from sendSms counts as failure — throws, no 
     returningLookup: async () => null, activeFor: async () => 1,
   }), /A2P blocked/);
   assert.ok(!sess.lastRelayedAt);
+});
+
+test("isReturningClient: separator-stripping formula, short phone -> null without fetch", async () => {
+  let url = "";
+  const fetchImpl = async (u) => { url = decodeURIComponent(String(u)); return { ok: true, status: 200, json: async () => ({ records: [{ id: "r", fields: {} }] }) }; };
+  const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" };
+  const r = await isReturningClient({ phone: "+15075550123" }, { env, fetchImpl });
+  assert.equal(r, true);
+  assert.match(url, /SUBSTITUTE/);
+  assert.match(url, /5075550123/);
+  assert.match(url, /\{Status\}="Completed"/);
+  let fetched = false;
+  const r2 = await isReturningClient({ phone: "555012" }, { env, fetchImpl: async () => { fetched = true; } });
+  assert.equal(r2, null);
+  assert.equal(fetched, false);
+});
+
+test("countActiveFor: dispatcher filter includes unassigned; stale sessions excluded", async () => {
+  const now = Date.now();
+  const fresh = new Date(now - 60 * 60 * 1000).toISOString();
+  const dead = new Date(now - 80 * 60 * 60 * 1000).toISOString();
+  let url = "";
+  const fetchImpl = async (u) => { url = decodeURIComponent(String(u)); return { ok: true, status: 200, json: async () => ({ records: [
+    { id: "1", fields: { "Session ID": "a", "Last Activity": fresh } },
+    { id: "2", fields: { "Session ID": "b", "Last Activity": dead } },
+  ] }) }; };
+  const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", CHAT_DISPATCHER: "aaron" };
+  const n = await countActiveFor("aaron", { env, fetchImpl });
+  assert.equal(n, 1); // stale one dropped
+  assert.match(url, /\{Installer\}=""/); // unassigned included for dispatcher
+  await countActiveFor("cody", { env, fetchImpl });
+  assert.ok(!/\{Installer\}=""/.test(url), "non-dispatcher scoped to own key only");
+});
+
+test("relayClientTurn truncates long messages with a visible marker", async () => {
+  const sent = [];
+  const sess = { installer: "cody", customerName: "M", vehicle: "", phone: "", turns: [] };
+  await relayClientTurn(sess, "x".repeat(400), {
+    env: ENV, sms: async (a) => { sent.push(a); return { ok: true }; },
+    returningLookup: async () => null, activeFor: async () => 1,
+  });
+  assert.match(sent[0].body, /x{10}\.\.\."$/);
+  assert.ok(sent[0].body.length < 400);
 });
