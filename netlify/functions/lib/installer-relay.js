@@ -61,15 +61,22 @@ async function relayClientTurn(sess, message, deps = {}) {
     activeFor = (k) => countActiveFor(k, { env }) } = deps;
   const target = relayTargetKey(sess, env);
   const firstRelay = !sess.lastRelayedAt;
-  let returning = null;
-  try { returning = await returningLookup(sess); } catch (e) { if (log.warn) log.warn("relay returning-lookup", e.message); }
-  let activeCount = 1;
-  try { activeCount = await activeFor(target); } catch (e) { if (log.warn) log.warn("relay active-count", e.message); }
+  // Both lookups are decorative (tag + warning) and independent — run them in
+  // parallel; either failing just omits its line.
+  const [returning, activeCount] = await Promise.all([
+    Promise.resolve().then(() => returningLookup(sess)).catch((e) => { if (log.warn) log.warn("relay returning-lookup", e.message); return null; }),
+    Promise.resolve().then(() => activeFor(target)).catch((e) => { if (log.warn) log.warn("relay active-count", e.message); return 1; }),
+  ]);
   const lines = relayLabel(sess, { returning, activeCount, firstRelay, env });
   const raw = String(message || "");
   const text = raw.length > MAX_RELAY_CHARS ? raw.slice(0, MAX_RELAY_CHARS) + "..." : raw;
   const body = lines[0] + '\n"' + text + '"' + (lines.length > 1 ? "\n" + lines.slice(1).join("\n") : "");
-  const out = await sms({ to: smsNumberFor(target, env), body });
+  const to = smsNumberFor(target, env);
+  const own = String(env.TWILIO_FROM_NUMBER || "").replace(/\D/g, "").slice(-10);
+  if (own && String(to).replace(/\D/g, "").slice(-10) === own) {
+    throw new Error(`relay target ${target} resolves to our own Twilio number — check INSTALLER_SMS_NUMBERS`);
+  }
+  const out = await sms({ to, body });
   if (out && out.ok === false) throw new Error(out.error || (out.skipped ? "sms skipped (twilio env unconfigured)" : "sms send failed"));
   sess.lastRelayedAt = new Date(now()).toISOString();
   return { target };

@@ -113,7 +113,7 @@ async function processChat(body, deps) {
   }
 
   // Human-takeover pause: manual off, or auto within 72 h of the installer's
-  // latest reply. The client's turn is already saved+relayed; the AI stays quiet.
+  // latest reply. The client's turn is already relayed; it's saved here and the AI stays quiet.
   if (aiPaused(sess, Date.now())) {
     try { await save(sess); } catch (e) { if (log.error) log.error("chat save", e.message); }
     return { status: 200, body: { reply: "", escalated: sess.status === "escalated", turnCount: sess.turns.length } };

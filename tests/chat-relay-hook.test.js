@@ -74,6 +74,18 @@ test("escalate routes SMS to the dispatcher and appends the dispatch hint", asyn
   assert.match(sms[0].body, /@cody|@noah/);
 });
 
+test("plain AI session never relays — relay only fires on escalated threads", async () => {
+  let relayCalled = false;
+  await processChat({ session: "web-2", message: "what tunes fit a 2021 Tundra?" }, {
+    env: ENV, load: async () => ({ id: "web-2", recordId: "r", status: "ai", pageContext: "default", aiMode: "auto",
+      turns: [], lastActivity: new Date().toISOString() }),
+    relay: async () => { relayCalled = true; },
+    save: async () => {},
+    ai: async () => ({ reply: "Plenty — what's your setup?" }),
+  });
+  assert.equal(relayCalled, false);
+});
+
 test("new escalation leaves the session unassigned and stamps lastRelayedAt", async () => {
   let saved = null;
   await processChat({ session: "web-1", message: "help", page: "default" }, {

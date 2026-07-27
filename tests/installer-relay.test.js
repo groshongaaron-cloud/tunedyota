@@ -88,6 +88,15 @@ test("countActiveFor: dispatcher filter includes unassigned; stale sessions excl
   assert.ok(!/\{Installer\}=""/.test(url), "non-dispatcher scoped to own key only");
 });
 
+test("relayClientTurn refuses to text our own Twilio number (config-drift guard)", async () => {
+  const sess = { installer: "", customerName: "M", vehicle: "", phone: "", turns: [] };
+  const env = { CHAT_DISPATCHER: "aaron", INSTALLER_SMS_NUMBERS: '{"aaron":"+16124067117"}', TWILIO_FROM_NUMBER: "+16124067117" };
+  await assert.rejects(() => relayClientTurn(sess, "hi", {
+    env, sms: async () => ({ ok: true }), returningLookup: async () => null, activeFor: async () => 1,
+  }), /own Twilio number/);
+  assert.ok(!sess.lastRelayedAt);
+});
+
 test("relayClientTurn truncates long messages with a visible marker", async () => {
   const sent = [];
   const sess = { installer: "cody", customerName: "M", vehicle: "", phone: "", turns: [] };
