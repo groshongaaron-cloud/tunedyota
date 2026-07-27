@@ -2047,7 +2047,7 @@
     if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+calOptions(b).map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
-      '<details style="margin:6px 0"><summary class="link" style="cursor:pointer">🕓 '+(b.scheduledTime?'Time: '+esc(b.scheduledTime)+' — change':'Set time / date / address')+'</summary>'+
+      '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✏️ Edit'+(b.scheduledTime?' — '+esc(b.scheduledTime):' date / time / address')+'</summary>'+
       '<div class="row-actions" style="margin-top:6px">'+
       '<input type="date" id="rd_'+b.id+'" value="'+esc(b.dateISO||'')+'">'+
       '<input id="rt_'+b.id+'" autocomplete="off" placeholder="Time (e.g. 10:30 AM)" value="'+esc(b.scheduledTime||'')+'">'+
