@@ -139,7 +139,7 @@ async function processChat(body, deps) {
     sess.installer = "";                                   // dispatcher-first: dispatch assigns
     sess.lastRelayedAt = new Date().toISOString();          // escalation SMS = first relay
     escalated = true;
-    reply = `${out.reply ? out.reply + " " : ""}You're set — I've sent your question to ${installer.name}, your nearest OTT installer. Their direct line is ${installer.phone}. If they reply while you're here, it'll appear right in this chat.`;
+    reply = `${out.reply ? out.reply + " " : ""}You're set — I've sent your question straight to ${installer.name} at Tuned Yota. Their direct line is ${installer.phone}. If they reply while you're here, it'll appear right in this chat.`;
   }
   if (reply) sess.turns.push({ role: "assistant", text: reply, at: Date.now() });
   try { await save(sess); } catch (e) { if (log.error) log.error("chat save", e.message); }
