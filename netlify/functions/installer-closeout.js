@@ -38,6 +38,28 @@ async function processCloseout(body, deps) {
   // admin close-out never misattributes the job.
   if (!admin && owner !== key) return { status: "error", error: "not-yours" };
 
+  // Soft-delete (owner decision 2026-07-27): Cancelled vanishes from roster +
+  // calendar (both filter it) but stays in Airtable; purge-cancelled.js hard-
+  // deletes 30 days after "Cancelled At". uncancel = the console's Undo.
+  if (d.action === "cancel") {
+    if (f.Status === "Completed" || f.Status === "Cancelled") return { status: "error", error: "not-open" };
+    try {
+      await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId,
+        fields: { Status: "Cancelled", "Cancelled At": now.toISOString(), "Cancelled By": key } },
+        ["Cancelled At", "Cancelled By"]);
+    } catch (e) { if (log.error) log.error("closeout cancel", e.message); return { status: "error", error: "store-unavailable" }; }
+    return { status: "cancelled" };
+  }
+  if (d.action === "uncancel") {
+    if (f.Status !== "Cancelled") return { status: "error", error: "not-cancelled" };
+    try {
+      await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId,
+        fields: { Status: "Booked", "Cancelled At": "", "Cancelled By": "" } },
+        ["Cancelled At", "Cancelled By"]);
+    } catch (e) { if (log.error) log.error("closeout uncancel", e.message); return { status: "error", error: "store-unavailable" }; }
+    return { status: "uncancelled" };
+  }
+
   if (d.action === "noshow") {
     if (d.confirmed !== true) return { status: "error", error: "unconfirmed" };
     if (f.Status === "No-show") return { status: "noshow", alreadyWaitlisted: true };
