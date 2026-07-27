@@ -8,6 +8,7 @@ const baseDeps = (over = {}) => ({
   load: async () => null,
   save: async (s) => s,
   ai: async () => ({ reply: "hello there", transfer: null }),
+  relay: async () => {}, // stub: default relayClientTurn would hit live Airtable/Twilio
   doEscalate: async () => ({ installer: { name: "Aaron Groshong", phone: "(612) 406-7117" } }),
   ...over,
 });
@@ -68,7 +69,7 @@ test("poll returns turns after since index", async () => {
   assert.equal(out.body.turns[0].text, "b");
 });
 
-test("escalate: routes by city, creates lead, notifies, logs escalation — best-effort", async () => {
+test("escalate: routes to the dispatcher, creates lead, notifies, logs escalation — best-effort", async () => {
   const calls = [];
   const r = await escalate({ transfer: { customerName: "Ty", contactMethod: "phone", contactValue: "5075550101",
       vehicleMake: "Toyota", vehicleModel: "Tacoma", modelYear: "2019", city: "Rochester", state: "MN",
@@ -80,11 +81,13 @@ test("escalate: routes by city, creates lead, notifies, logs escalation — best
     push: async (k) => { calls.push(["push", k]); return { sent: 1 }; },
     logEscalation: async (f) => { calls.push(["esc", f]); },
   });
-  assert.equal(r.installer.key, "aaron"); // Rochester routes to aaron
+  assert.equal(r.installer.key, "aaron"); // dispatcher (CHAT_DISPATCHER default), not market routing
   assert.deepEqual(calls.map((c) => c[0]).sort(), ["esc", "lead", "push", "sms"]);
   const lead = calls.find((c) => c[0] === "lead")[1];
   assert.equal(lead.channel, "chat");
   assert.match(lead.vehicle, /2019 Toyota Tacoma/);
+  const smsBody = calls.find((c) => c[0] === "sms")[1].body;
+  assert.match(smsBody, /or send @noah \/ @cody to dispatch/); // dispatch hint
 });
 
 test("already-escalated session never re-fires escalation fan-out", async () => {
@@ -123,7 +126,7 @@ test("escalate: notify failures never throw; customer still gets installer info"
     ingest: async () => { throw new Error("down"); }, sms: async () => { throw new Error("down"); },
     push: async () => { throw new Error("down"); }, logEscalation: async () => { throw new Error("down"); },
   });
-  assert.equal(r.installer.key, "aaron"); // unknown city → fallback installer
+  assert.equal(r.installer.key, "aaron"); // dispatcher — city no longer picks the chat owner
 });
 
 test("escalate: facebook pageContext → lead gets channel 'facebook' and source 'chat:facebook'", async () => {

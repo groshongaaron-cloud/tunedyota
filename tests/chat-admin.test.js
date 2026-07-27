@@ -104,6 +104,7 @@ test("client message on an escalated session notifies the installer, ai session 
     load: async () => SESS({ status, lastActivity: new Date().toISOString() }),
     save: async (s) => s,
     ai: async () => ({ reply: "ok", transfer: null }),
+    relay: async () => {}, // stub: default relayClientTurn would hit live Airtable/Twilio
     notify: async (sess, text) => { pings.push([sess.installer, text]); },
   });
   await processChat({ session: "s1", message: "are you there?" }, mk("escalated"));
@@ -119,6 +120,7 @@ test("sync-throwing notify does not prevent customer from receiving a 200 reply"
     load: async () => SESS({ status: "escalated", lastActivity: new Date().toISOString() }),
     save: async (s) => s,
     ai: async () => ({ reply: "ok", transfer: null }),
+    relay: async () => {}, // stub: default relayClientTurn would hit live Airtable/Twilio
     notify: function () { throw new Error("sync boom"); },
   };
   const out = await processChat({ session: "s1", message: "still there?" }, deps);

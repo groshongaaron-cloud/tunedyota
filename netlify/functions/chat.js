@@ -3,10 +3,10 @@
 // POST {session, poll:true, since} → new turns (installer relay polling).
 // Never throws at the customer: AI/storage failures degrade to a contact-info
 // fallback message. Escalation fan-out mirrors book-background.js best-effort style.
-const { loadSession, saveSession, isStale } = require("./lib/chat-store.js");
+const { loadSession, saveSession, isStale, aiPaused } = require("./lib/chat-store.js");
 const { runChat } = require("./lib/chat-agent.js");
-const { getMarket } = require("./lib/markets.js");
-const { keyToInstaller, FALLBACK_KEY, smsNumberFor } = require("./lib/routing.js");
+const { keyToInstaller, dispatcherKey, INSTALLERS, smsNumberFor } = require("./lib/routing.js");
+const { relayClientTurn } = require("./lib/installer-relay.js");
 const { ingestLead, sendSms } = require("./lib/twilio.js");
 const { sendWebPush } = require("./lib/webpush.js");
 const { cfg, createRecord } = require("./lib/airtable.js");
@@ -30,8 +30,11 @@ async function escalate({ transfer, sess }, deps) {
     sms = (a) => sendSms(a, { env, log }),
     push = (k, m) => sendWebPush(k, m, { env, log }),
     logEscalation = (f) => defaultLogEscalation(f, { env }) } = deps || {};
-  const market = getMarket(transfer.city);
-  const inst = keyToInstaller(market ? market.inst : FALLBACK_KEY);
+  // Centralized intake: every escalation lands on the dispatcher's phone; they
+  // answer or dispatch (@key SMS / console Assign). Market routing no longer
+  // picks the chat owner — the dispatcher does.
+  const inst = keyToInstaller(dispatcherKey(env));
+  const others = Object.keys(INSTALLERS).filter((k) => k !== inst.key).map((k) => "@" + k).join(" / ");
   const vehicle = `${transfer.modelYear} ${transfer.vehicleMake} ${transfer.vehicleModel}`;
   const contact = `${transfer.contactMethod}: ${transfer.contactValue}`;
   const transcriptTail = (sess.turns || []).slice(-12).map((t) => `${t.role}: ${t.text}`).join("\n");
@@ -47,7 +50,7 @@ async function escalate({ transfer, sess }, deps) {
   } catch (e) { if (log.error) log.error("chat lead", e.message); }
   try {
     await sms({ to: smsNumberFor(inst.key, env),
-      body: `Tuned Yota chat: ${transfer.customerName} (${contact}) — ${vehicle}, ${transfer.city} ${transfer.state}. Q: ${transfer.questionSummary}. Reply to this text and it appears in their chat window.` });
+      body: `Tuned Yota chat: ${transfer.customerName} (${contact}) — ${vehicle}, ${transfer.city} ${transfer.state}. Q: ${transfer.questionSummary}. Reply to this text and it appears in their chat window, or send ${others} to dispatch.` });
   } catch (e) { if (log.error) log.error("chat sms", e.message); }
   try { await push(inst.key, { title: "Live chat transfer", body: `${transfer.customerName} — ${vehicle}`, url: "/installer.html" }); }
   catch (e) { if (log.error) log.error("chat push", e.message); }
@@ -65,6 +68,7 @@ async function processChat(body, deps) {
     save = (s) => saveSession(s, { env }),
     ai = (s) => runChat(s, { env }),
     doEscalate = (a) => escalate(a, { env, log }),
+    relay = (s, m) => relayClientTurn(s, m, { env, log }),
     notify = (sess, text) => sendWebPush(sess.installer, { title: "Chat: " + (sess.customerName || "customer"), body: String(text).slice(0, 90), url: "/installer.html#chats" }, { env, log }) } = deps || {};
   const id = String(body.session || "").slice(0, 64);
   if (!id) return { status: 400, body: { error: "missing session" } };
@@ -91,16 +95,26 @@ async function processChat(body, deps) {
   }
   sess.turns.push({ role: "user", text: message, at: Date.now() });
 
-  // Notify the assigned installer when a customer sends a message on an escalated session.
-  // Fire-and-forget: never await so a slow push never delays the customer reply.
-  if (sess.status === "escalated" && sess.installer) {
-    try { notify(sess, message).catch(function () {}); } catch (e) {}
+  // Escalated thread: forward the customer's message to the phone of whoever is
+  // working it (assigned installer, else the dispatcher). MUST be awaited —
+  // Lambda freezes un-awaited work (252428c). A relay failure never blocks the
+  // turn: it's saved below and the console still shows it.
+  if (sess.status === "escalated") {
+    try { await relay(sess, message); } catch (e) { if (log.error) log.error("chat relay", e.message); }
+    if (sess.installer) { try { notify(sess, message).catch(function () {}); } catch (e) {} }
   }
 
   // Human-only threads (installer-initiated SMS, pageContext "sms-direct"): the
   // AI never speaks in a conversation an installer started. Save the customer
   // turn, let the notify above do its job, and return no reply.
   if (sess.pageContext === "sms-direct") {
+    try { await save(sess); } catch (e) { if (log.error) log.error("chat save", e.message); }
+    return { status: 200, body: { reply: "", escalated: sess.status === "escalated", turnCount: sess.turns.length } };
+  }
+
+  // Human-takeover pause: manual off, or auto within 72 h of the installer's
+  // latest reply. The client's turn is already saved+relayed; the AI stays quiet.
+  if (aiPaused(sess, Date.now())) {
     try { await save(sess); } catch (e) { if (log.error) log.error("chat save", e.message); }
     return { status: 200, body: { reply: "", escalated: sess.status === "escalated", turnCount: sess.turns.length } };
   }
@@ -122,7 +136,8 @@ async function processChat(body, deps) {
     sess.phone = out.transfer.contactMethod === "phone" ? out.transfer.contactValue : "";
     sess.vehicle = `${out.transfer.modelYear} ${out.transfer.vehicleMake} ${out.transfer.vehicleModel}`;
     sess.city = out.transfer.city;
-    sess.installer = installer.key;
+    sess.installer = "";                                   // dispatcher-first: dispatch assigns
+    sess.lastRelayedAt = new Date().toISOString();          // escalation SMS = first relay
     escalated = true;
     reply = `${out.reply ? out.reply + " " : ""}You're set — I've sent your question to ${installer.name}, your nearest OTT installer. Their direct line is ${installer.phone}. If they reply while you're here, it'll appear right in this chat.`;
   }
