@@ -15,7 +15,7 @@ test("isStale by status", () => {
   const now = Date.parse("2026-07-17T12:00:00Z");
   const old = new Date(now - STALE_AI_MS - 1000).toISOString();
   assert.equal(isStale({ status: "ai", lastActivity: old }, now), true);
-  assert.equal(isStale({ status: "escalated", lastActivity: old }, now), false); // 2h window
+  assert.equal(isStale({ status: "escalated", lastActivity: old }, now), false); // 72h window
   const veryOld = new Date(now - STALE_ESCALATED_MS - 1000).toISOString();
   assert.equal(isStale({ status: "escalated", lastActivity: veryOld }, now), true);
 });
