@@ -6,13 +6,27 @@ const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require(
 
 const TABLE = (env) => env.AIRTABLE_CHAT_TABLE || "Chat Sessions";
 const STALE_AI_MS = 30 * 60 * 1000;         // ai sessions close after 30 min idle
-const STALE_ESCALATED_MS = 2 * 60 * 60 * 1000; // escalated sessions get 2 h
+const STALE_ESCALATED_MS = 72 * 60 * 60 * 1000; // escalated sessions live 72 h (matches AI pause)
 
 function parseTranscript(s) { try { const v = JSON.parse(s || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } }
 function isStale(sess, nowMs) {
   const last = Date.parse(sess.lastActivity || "") || 0;
   const limit = sess.status === "escalated" ? STALE_ESCALATED_MS : STALE_AI_MS;
   return nowMs - last > limit;
+}
+
+// 72-hour human-takeover pause. "auto" (default): the AI goes quiet for 72 h
+// after the installer's LATEST reply, rolling. Manual "on"/"off" (console
+// toggle) beat the clock in both directions.
+const AI_PAUSE_MS = 72 * 60 * 60 * 1000;
+function aiPaused(sess, nowMs) {
+  if (sess.aiMode === "off") return true;
+  if (sess.aiMode === "on") return false;
+  let lastInstallerAt = 0;
+  for (const t of sess.turns || []) {
+    if (t.role === "installer" && (t.at || 0) > lastInstallerAt) lastInstallerAt = t.at;
+  }
+  return !!lastInstallerAt && nowMs - lastInstallerAt < AI_PAUSE_MS;
 }
 
 function fromRecord(r) {
@@ -23,6 +37,8 @@ function fromRecord(r) {
     phone: f.Phone || "", vehicle: f.Vehicle || "", city: f.City || "",
     installer: f.Installer || "", turns: parseTranscript(f.Transcript),
     lastActivity: f["Last Activity"] || "",
+    lastRelayedAt: f["Last Relayed At"] || "",
+    aiMode: ["on", "off"].includes(f["AI Mode"]) ? f["AI Mode"] : "auto",
   };
 }
 
@@ -51,6 +67,7 @@ async function saveSession(sess, { env = process.env, fetchImpl = fetch, now = D
     "Customer Name": sess.customerName || "", Phone: sess.phone || "", Vehicle: sess.vehicle || "",
     City: sess.city || "", Installer: sess.installer || "",
     Transcript: JSON.stringify(sess.turns || []), "Last Activity": new Date(now()).toISOString(),
+    "Last Relayed At": sess.lastRelayedAt || "", "AI Mode": sess.aiMode || "auto",
   };
   if (!sess.recordId) {
     fields.Created = new Date(now()).toISOString();
@@ -71,7 +88,7 @@ async function loadActiveByPrefix(prefix, { env = process.env, fetchImpl = fetch
     const recs = await listRecords({
       fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
       filterByFormula: `AND(OR({Session ID}="${p}",FIND("${p}:", {Session ID})=1), {Status}!="closed")`,
-      fields: ["Session ID", "Status", "Transcript", "Page Context", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Last Activity"],
+      fields: ["Session ID", "Status", "Transcript", "Page Context", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Last Activity", "Last Relayed At", "AI Mode"],
     });
     if (!recs.length) return null;
     const sessions = recs.map(fromRecord).filter((s) => s.status !== "closed").sort((a, b) => (a.lastActivity < b.lastActivity ? 1 : -1));
@@ -79,4 +96,4 @@ async function loadActiveByPrefix(prefix, { env = process.env, fetchImpl = fetch
   } catch (e) { return null; }
 }
 
-module.exports = { loadSession, loadEscalatedForInstaller, loadActiveByPrefix, saveSession, parseTranscript, isStale, STALE_AI_MS, STALE_ESCALATED_MS, TABLE };
+module.exports = { loadSession, loadEscalatedForInstaller, loadActiveByPrefix, saveSession, parseTranscript, isStale, aiPaused, STALE_AI_MS, STALE_ESCALATED_MS, AI_PAUSE_MS, TABLE };
