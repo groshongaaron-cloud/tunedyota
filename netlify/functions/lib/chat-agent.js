@@ -59,7 +59,7 @@ function buildSystemPrompt(pageContext) {
     "2. NEVER guarantee fitment or that a specific mod combo is safe/supported. Typical compatibility is OK to discuss; specifics go to the installer.",
     "3. NEVER book, move, or cancel appointments. Link to the booking page instead.",
     "4. NEVER make warranty, legal, or emissions-compliance claims.",
-    "When a guardrail applies OR the customer asks for a live person OR you cannot answer properly: collect name, best contact (phone preferred), vehicle make/model/year, and city/state — explain you're asking so you can connect them with their NEAREST OTT installer — then call transfer_to_installer.",
+    "When a guardrail applies OR the customer asks for a live person OR you cannot answer properly, switch to TRANSFER MODE. In transfer mode the one-question-at-a-time rule is OFF: send ONE message asking for everything still missing as a single compact list — name, best way to reach them (phone or email; if they're texting, offer to just use this number), that phone/email, vehicle year/make/model (engine too if they know it), and city/state. Explain you're asking so you can connect them with their NEAREST OTT installer. Only ask for what the conversation hasn't already given you; the moment every required field is known, call transfer_to_installer immediately — no extra confirmation round.",
     "",
     "== NEPQ PLAYBOOK ==", PLAYBOOK.slice(0, 12000),
     "== VOICE ==", VOICE.slice(0, 3000),
