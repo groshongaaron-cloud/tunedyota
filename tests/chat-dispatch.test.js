@@ -6,4 +6,6 @@ test("dispatcherKey: env override, default aaron, garbage falls back", () => {
   assert.equal(dispatcherKey({ CHAT_DISPATCHER: "cody" }), "cody");
   assert.equal(dispatcherKey({}), "aaron");
   assert.equal(dispatcherKey({ CHAT_DISPATCHER: "nobody" }), "aaron");
+  assert.equal(dispatcherKey(), "aaron");
+  assert.equal(dispatcherKey(null), "aaron");
 });
