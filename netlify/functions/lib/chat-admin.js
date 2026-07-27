@@ -5,7 +5,9 @@
 const { cfg, escapeFormula, listRecords } = require("./airtable.js");
 const { loadSession, saveSession, parseTranscript, loadActiveByPrefix, aiPaused, AI_MODES, TABLE } = require("./chat-store.js");
 const { deliverInstallerTurn } = require("./meta-deliver.js");
-const { normalizeInstallerKey } = require("./routing.js");
+const { normalizeInstallerKey, smsNumberFor } = require("./routing.js");
+const { buildHandoffBody } = require("./installer-relay.js");
+const { sendSms } = require("./twilio.js");
 
 // Installer-initiated SMS thread for a Priority List client. Find-or-create by
 // phone; new sessions are marked human-only via pageContext "sms-direct" — the
@@ -79,16 +81,27 @@ async function installerReply(sessionId, installerKey, text, deps = {}) {
 // known, route the thread to its installer). Admin may assign to anyone; a
 // regular installer may only claim a chat for themselves. Assignment scopes the
 // inbox: listSessions shows "mine + unassigned", so assigning to X moves the
-// thread into X's inbox and out of everyone else's.
+// thread into X's inbox and out of everyone else's. Parity with the @key SMS
+// dispatch (twilio-sms.js): stamp lastRelayedAt so the assignee's phone replies
+// route to THIS thread, and text them the same handoff SMS — a console-assigned
+// installer must learn about the thread without opening the console.
+// Self-claims skip the SMS (you already know); the send is awaited (Lambda
+// freeze) and failure-guarded — assignment succeeds even if the text doesn't.
 async function assignSession(sessionId, targetKey, byKey, isAdminFlag, deps = {}) {
-  const { loadFn = loadSession, saveFn = saveSession } = deps;
+  const { loadFn = loadSession, saveFn = saveSession, env = process.env, log = console,
+    sms = (a) => sendSms(a, { env }) } = deps;
   const target = normalizeInstallerKey(targetKey);
   if (!target) return { status: "error", error: "bad-installer" };
   if (!isAdminFlag && target !== byKey) return { status: "error", error: "admin-only" };
   const sess = await loadFn(sessionId, deps);
   if (!sess) return { status: "error", error: "not-found" };
   sess.installer = target;
+  sess.lastRelayedAt = new Date().toISOString(); // target's phone replies route here
   await saveFn(sess, deps);
+  if (target !== byKey) {
+    try { await sms({ to: smsNumberFor(target, env), body: buildHandoffBody(sess) }); }
+    catch (e) { if (log.error) log.error("assign handoff sms", e.message); }
+  }
   return { status: "ok", installer: target };
 }
 

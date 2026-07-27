@@ -7,6 +7,7 @@
 const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType, sendSms } = require("./lib/twilio.js");
 const { INSTALLERS, parseSmsOverrides, keyToInstaller, normalizeInstallerKey, smsNumberFor, dispatcherKey } = require("./lib/routing.js");
 const { loadRelayTargetSession, saveSession, loadActiveByPrefix } = require("./lib/chat-store.js");
+const { buildHandoffBody } = require("./lib/installer-relay.js");
 const { isAdmin } = require("./lib/installer-auth.js");
 const { deliverInstallerTurn } = require("./lib/meta-deliver.js");
 const { processChat } = require("./chat.js");
@@ -71,11 +72,7 @@ async function relayInstallerReply({ from, text }, deps = {}) {
       try { await sms({ to: smsNumberFor(inst.key, env), body: "TY: dispatch failed to save — try again or assign in the console." }); } catch (e2) {}
       return { relayed: true };
     }
-    const lastClient = (sess.turns || []).slice().reverse().find((t) => t.role === "user");
-    const handoff = `TY handoff: ${sess.customerName || "Customer"}${sess.vehicle ? " · " + sess.vehicle : ""}${sess.phone ? " · " + sess.phone : ""}. ` +
-      (lastClient ? `Latest: "${String(lastClient.text).slice(0, 200)}" ` : "") +
-      "This thread is yours — reply to this text and it goes to the client.";
-    try { await sms({ to: smsNumberFor(target, env), body: handoff }); } catch (e) { if (log.error) log.error("dispatch handoff", e.message); }
+    try { await sms({ to: smsNumberFor(target, env), body: buildHandoffBody(sess) }); } catch (e) { if (log.error) log.error("dispatch handoff", e.message); }
     try { await sms({ to: smsNumberFor(inst.key, env), body: `✓ ${sess.customerName || "Chat"} → ${keyToInstaller(target).name}` }); } catch (e) {}
     return { relayed: true };
   }

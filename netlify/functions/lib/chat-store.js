@@ -52,16 +52,6 @@ async function loadSession(id, { env = process.env, fetchImpl = fetch } = {}) {
   return recs.length ? fromRecord(recs[0]) : null;
 }
 
-// Load the most recently active escalated session for an installer key (SMS relay).
-async function loadEscalatedForInstaller(key, { env = process.env, fetchImpl = fetch, now = Date.now } = {}) {
-  const c = cfg(env);
-  const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
-    filterByFormula: `AND({Installer}="${escapeFormula(key)}",{Status}="escalated")` });
-  const sessions = recs.map(fromRecord).filter((s) => !isStale(s, now()));
-  sessions.sort((a, b) => (a.lastActivity < b.lastActivity ? 1 : -1));
-  return sessions[0] || null;
-}
-
 // Reply routing (labeled single chain): the thread whose client message most
 // recently hit this person's phone. The dispatcher's pool includes every
 // unassigned thread — those relay to them by definition.
@@ -114,4 +104,4 @@ async function loadActiveByPrefix(prefix, { env = process.env, fetchImpl = fetch
   } catch (e) { return null; }
 }
 
-module.exports = { loadSession, loadEscalatedForInstaller, loadRelayTargetSession, loadActiveByPrefix, saveSession, parseTranscript, isStale, aiPaused, STALE_AI_MS, STALE_ESCALATED_MS, AI_PAUSE_MS, AI_MODES, TABLE };
+module.exports = { loadSession, loadRelayTargetSession, loadActiveByPrefix, saveSession, parseTranscript, isStale, aiPaused, STALE_AI_MS, STALE_ESCALATED_MS, AI_PAUSE_MS, AI_MODES, TABLE };

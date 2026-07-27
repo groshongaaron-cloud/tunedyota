@@ -54,6 +54,16 @@ function relayLabel(sess, { returning = null, activeCount = 1, firstRelay = fals
   return lines;
 }
 
+// Handoff SMS body for a newly assigned thread — one string, two senders: the
+// dispatcher's "@key" SMS (twilio-sms.js) and console Assign (chat-admin.js).
+// ASCII quotes on the latest client line; keep the two paths byte-identical.
+function buildHandoffBody(sess) {
+  const lastClient = (sess.turns || []).slice().reverse().find((t) => t.role === "user");
+  return `TY handoff: ${sess.customerName || "Customer"}${sess.vehicle ? " · " + sess.vehicle : ""}${sess.phone ? " · " + sess.phone : ""}. ` +
+    (lastClient ? `Latest: "${String(lastClient.text).slice(0, 200)}" ` : "") +
+    "This thread is yours — reply to this text and it goes to the client.";
+}
+
 async function relayClientTurn(sess, message, deps = {}) {
   const { env = process.env, log = console, now = Date.now,
     sms = (a) => sendSms(a, { env, log }),
@@ -82,4 +92,4 @@ async function relayClientTurn(sess, message, deps = {}) {
   return { target };
 }
 
-module.exports = { relayClientTurn, relayTargetKey, relayLabel, isReturningClient, countActiveFor, MAX_RELAY_CHARS };
+module.exports = { relayClientTurn, relayTargetKey, relayLabel, buildHandoffBody, isReturningClient, countActiveFor, MAX_RELAY_CHARS };

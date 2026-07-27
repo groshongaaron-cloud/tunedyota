@@ -11,6 +11,7 @@ const { ingestLead, sendSms } = require("./lib/twilio.js");
 const { sendWebPush } = require("./lib/webpush.js");
 const { cfg, createRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
+const { notifyOwner } = require("./lib/alert.js");
 const chatAdmin = require("./lib/chat-admin.js");
 
 const MAX_MESSAGES = 40;
@@ -69,6 +70,7 @@ async function processChat(body, deps) {
     ai = (s) => runChat(s, { env }),
     doEscalate = (a) => escalate(a, { env, log }),
     relay = (s, m) => relayClientTurn(s, m, { env, log }),
+    notifyRelayFailure = (s, e) => notifyOwner({ webhookUrl: env.SLACK_WEBHOOK_URL, text: `⚠ Chat relay to installer phone failed for ${s.customerName || s.id}: ${e.message}` }),
     notify = (sess, text) => sendWebPush(sess.installer, { title: "Chat: " + (sess.customerName || "customer"), body: String(text).slice(0, 90), url: "/installer.html#chats" }, { env, log }) } = deps || {};
   const id = String(body.session || "").slice(0, 64);
   if (!id) return { status: 400, body: { error: "missing session" } };
@@ -98,9 +100,15 @@ async function processChat(body, deps) {
   // Escalated thread: forward the customer's message to the phone of whoever is
   // working it (assigned installer, else the dispatcher). MUST be awaited —
   // Lambda freezes un-awaited work (252428c). A relay failure never blocks the
-  // turn: it's saved below and the console still shows it.
+  // turn: it's saved below and the console still shows it — but it must be
+  // VISIBLE (delivery-failure pattern, mirrors meta-deliver.js): a system turn
+  // in the transcript + a Slack notify, so nobody assumes the phone got it.
   if (sess.status === "escalated") {
-    try { await relay(sess, message); } catch (e) { if (log.error) log.error("chat relay", e.message); }
+    try { await relay(sess, message); } catch (e) {
+      if (log.error) log.error("chat relay", e.message);
+      sess.turns.push({ role: "system", text: "⚠ not relayed to the installer's phone (" + e.message + ") — reply from the console.", at: Date.now() });
+      try { notifyRelayFailure(sess, e).catch(function () {}); } catch (e2) {}
+    }
     if (sess.installer) { try { notify(sess, message).catch(function () {}); } catch (e) {} }
   }
 

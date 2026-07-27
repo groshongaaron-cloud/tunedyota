@@ -20,16 +20,23 @@ test("client turn on an escalated session is relayed (awaited) before returning"
   assert.ok(saved);
 });
 
-test("relay failure never blocks the turn", async () => {
-  let saved = null;
+test("relay failure never blocks the turn — but surfaces as a system turn + Slack notify", async () => {
+  let saved = null; const notified = [];
   const out = await processChat({ session: "sms:+15075550123", message: "hello?" }, {
-    env: ENV, load: async () => baseSess(),
+    env: ENV, log: { error: () => {} },
+    load: async () => baseSess(),
     relay: async () => { throw new Error("twilio down"); },
+    notifyRelayFailure: async (s, e) => { notified.push([s.id, e.message]); },
     save: async (s) => { saved = s; },
     ai: async () => ({ reply: "AI answer" }),
   });
   assert.equal(out.status, 200);
-  assert.equal(saved.turns[saved.turns.length - 2].text, "hello?"); // user turn stored (AI turn after)
+  assert.ok(saved.turns.some((t) => t.role === "user" && t.text === "hello?"), "user turn stored");
+  const sys = saved.turns.find((t) => t.role === "system");
+  assert.ok(sys, "delivery-failure pattern: visible system turn");
+  assert.match(sys.text, /not relayed/);
+  assert.match(sys.text, /twilio down/);
+  assert.deepEqual(notified, [["sms:+15075550123", "twilio down"]]);
 });
 
 test("AI pause: installer replied 1h ago -> no AI reply, turn saved + relayed", async () => {
