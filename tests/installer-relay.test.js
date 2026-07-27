@@ -46,3 +46,12 @@ test("relayClientTurn: send failure propagates (caller logs; turn already safe)"
   }));
   assert.ok(!sess.lastRelayedAt, "no stamp when nothing reached the phone");
 });
+
+test("relayClientTurn: {ok:false} from sendSms counts as failure — throws, no stamp", async () => {
+  const sess = { installer: "cody", customerName: "M", vehicle: "", phone: "", turns: [] };
+  await assert.rejects(() => relayClientTurn(sess, "hi", {
+    env: ENV, sms: async () => ({ ok: false, error: "A2P blocked" }),
+    returningLookup: async () => null, activeFor: async () => 1,
+  }), /A2P blocked/);
+  assert.ok(!sess.lastRelayedAt);
+});

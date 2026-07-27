@@ -66,7 +66,8 @@ async function relayClientTurn(sess, message, deps = {}) {
   const lines = relayLabel(sess, { returning, activeCount, firstRelay, env });
   const text = String(message || "").slice(0, MAX_RELAY_CHARS);
   const body = lines[0] + "\n“" + text + "”" + (lines.length > 1 ? "\n" + lines.slice(1).join("\n") : "");
-  await sms({ to: smsNumberFor(target, env), body });
+  const out = await sms({ to: smsNumberFor(target, env), body });
+  if (out && out.ok === false) throw new Error(out.error || "sms send failed");
   sess.lastRelayedAt = new Date(now()).toISOString();
   return { target };
 }
