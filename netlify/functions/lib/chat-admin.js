@@ -3,7 +3,7 @@
 // like every lib here. Replies write the IDENTICAL turn shape the SMS relay
 // writes (twilio-sms.js relayInstallerReply) — one conversation, two channels.
 const { cfg, escapeFormula, listRecords } = require("./airtable.js");
-const { loadSession, saveSession, parseTranscript, loadActiveByPrefix, aiPaused, TABLE } = require("./chat-store.js");
+const { loadSession, saveSession, parseTranscript, loadActiveByPrefix, aiPaused, AI_MODES, TABLE } = require("./chat-store.js");
 const { deliverInstallerTurn } = require("./meta-deliver.js");
 const { normalizeInstallerKey } = require("./routing.js");
 
@@ -49,11 +49,11 @@ async function listSessions(installerKey, { env = process.env, fetchImpl = fetch
 }
 
 async function getTranscript(sessionId, deps = {}) {
-  const { loadFn = loadSession } = deps;
+  const { loadFn = loadSession, now = Date.now } = deps;
   const sess = await loadFn(sessionId, deps);
   if (!sess) return null;
   return { id: sess.id, status: sess.status, customerName: sess.customerName, phone: sess.phone, vehicle: sess.vehicle, city: sess.city, installer: sess.installer || "", turns: sess.turns,
-    aiMode: sess.aiMode || "auto", aiActive: !aiPaused(sess, Date.now()) };
+    aiMode: sess.aiMode || "auto", aiActive: !aiPaused(sess, now()) };
 }
 
 async function installerReply(sessionId, installerKey, text, deps = {}) {
@@ -106,7 +106,7 @@ async function closeSession(sessionId, deps = {}) {
 async function setAiMode(sessionId, mode, deps = {}) {
   const { loadFn = loadSession, saveFn = saveSession } = deps;
   const m = String(mode || "").toLowerCase();
-  if (["auto", "on", "off"].indexOf(m) < 0) return { status: "error", error: "bad-mode" };
+  if (!AI_MODES.includes(m)) return { status: "error", error: "bad-mode" };
   const sess = await loadFn(sessionId, deps);
   if (!sess) return { status: "error", error: "not-found" };
   sess.aiMode = m;

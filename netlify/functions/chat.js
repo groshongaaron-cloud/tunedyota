@@ -148,6 +148,7 @@ async function processChat(body, deps) {
 
 // Installer-authed inbox operations (console Chats panel).
 async function installerOp(body, installerKey, deps = {}) {
+  const opStatus = (r) => r.status === "ok" ? 200 : (r.error === "not-found" ? 404 : 400);
   const { list = chatAdmin.listSessions, transcript = chatAdmin.getTranscript,
           reply = chatAdmin.installerReply, close = chatAdmin.closeSession,
           openSms = chatAdmin.openSmsThread, assign = chatAdmin.assignSession,
@@ -171,11 +172,11 @@ async function installerOp(body, installerKey, deps = {}) {
   }
   if (body.op === "assign") {
     const r = await assign(String(body.session || ""), String(body.installer || ""), installerKey, admin, deps);
-    return { status: r.status === "ok" ? 200 : (r.error === "not-found" ? 404 : 400), body: r };
+    return { status: opStatus(r), body: r };
   }
   if (body.op === "aiMode") {
-    const r = await (deps.setAi || chatAdmin.setAiMode)(String(body.session || ""), body.mode, deps);
-    return { status: r.status === "ok" ? 200 : (r.error === "not-found" ? 404 : 400), body: r };
+    const r = await (deps.setAi || chatAdmin.setAiMode)(String(body.session || ""), String(body.mode || ""), deps);
+    return { status: opStatus(r), body: r };
   }
   return { status: 400, body: { error: "bad-op" } };
 }

@@ -29,3 +29,9 @@ test("installerOp routes op:aiMode", async () => {
   assert.equal(out.status, 200);
   assert.equal(out.body.aiMode, "off");
 });
+
+test("installerOp aiMode on unknown session -> 404", async () => {
+  const out = await installerOp({ op: "aiMode", session: "nope", mode: "off" }, "aaron",
+    { loadFn: async () => null });
+  assert.equal(out.status, 404);
+});

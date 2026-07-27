@@ -20,6 +20,7 @@ function isStale(sess, nowMs) {
 // after the installer's LATEST reply, rolling. Manual "on"/"off" (console
 // toggle) beat the clock in both directions.
 const AI_PAUSE_MS = 72 * 60 * 60 * 1000;
+const AI_MODES = ["auto", "on", "off"];
 function aiPaused(sess, nowMs) {
   if (sess.aiMode === "off") return true;
   if (sess.aiMode === "on") return false;
@@ -39,7 +40,7 @@ function fromRecord(r) {
     installer: f.Installer || "", turns: parseTranscript(f.Transcript),
     lastActivity: f["Last Activity"] || "",
     lastRelayedAt: f["Last Relayed At"] || "",
-    aiMode: ["on", "off"].includes(f["AI Mode"]) ? f["AI Mode"] : "auto",
+    aiMode: AI_MODES.includes(f["AI Mode"]) ? f["AI Mode"] : "auto",
   };
 }
 
@@ -113,4 +114,4 @@ async function loadActiveByPrefix(prefix, { env = process.env, fetchImpl = fetch
   } catch (e) { return null; }
 }
 
-module.exports = { loadSession, loadEscalatedForInstaller, loadRelayTargetSession, loadActiveByPrefix, saveSession, parseTranscript, isStale, aiPaused, STALE_AI_MS, STALE_ESCALATED_MS, AI_PAUSE_MS, TABLE };
+module.exports = { loadSession, loadEscalatedForInstaller, loadRelayTargetSession, loadActiveByPrefix, saveSession, parseTranscript, isStale, aiPaused, STALE_AI_MS, STALE_ESCALATED_MS, AI_PAUSE_MS, AI_MODES, TABLE };
