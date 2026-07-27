@@ -1007,6 +1007,8 @@
       '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <b>'+esc(j.customerName||'Customer')+'</b> '+chanBadge(j.id||'')+' '+esc(j.vehicle||'')+
       (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+
       assignHtml+
+      ' · AI <a href="#" id="chatai" title="Toggle AI auto-replies for this chat">'+(j.aiActive?'on':'off')+'</a>'+
+      (j.aiMode && j.aiMode!=='auto' ? ' <a href="#" id="chataiauto" style="color:var(--muted,#8a8a8e);font-size:12px" title="Back to automatic — AI pauses 72h after you reply">auto</a>' : '')+
       ' · <a href="#" id="chatclose" style="color:var(--muted,#8a8a8e)">close chat</a></p>'+
       '<div class="cthread"><div id="chatlog" class="clog">'+bubbles.join('')+'</div>'+
       '<form id="chatreply" class="ccompose"><textarea id="chattext" rows="1" placeholder="Text message…"></textarea>'+
@@ -1042,6 +1044,17 @@
     if(asel) asel.onchange = function(){ if(asel.value) doAssign(asel.value); };
     var claim = document.getElementById('chatclaim');
     if(claim) claim.onclick = function(e){ e.preventDefault(); doAssign(STATE.me); };
+    async function setAi(mode){
+      try{
+        var r=await chatApi({op:'aiMode', session:openId, mode:mode});
+        if(r && r.status==='ok'){ host.__chatHtml=''; renderChatThread(host); }
+        else fail('Could not change AI mode.');
+      }catch(e){ fail('Could not change AI mode.'); }
+    }
+    var aiBtn=document.getElementById('chatai');
+    if(aiBtn) aiBtn.onclick=function(e){ e.preventDefault(); setAi(j.aiActive?'off':'on'); };
+    var aiAuto=document.getElementById('chataiauto');
+    if(aiAuto) aiAuto.onclick=function(e){ e.preventDefault(); setAi('auto'); };
     var form = document.getElementById('chatreply');
     if(form) form.onsubmit = async function(e){
       e.preventDefault();
