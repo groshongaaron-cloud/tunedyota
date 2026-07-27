@@ -67,6 +67,11 @@
 [functions."nurture-sweep"]
   schedule = "0 15 * * *"
 
+# Daily purge of bookings soft-cancelled 30+ days ago (netlify/functions/purge-cancelled.js).
+# Only records stamped "Cancelled At" by the console delete are eligible.
+[functions."purge-cancelled"]
+  schedule = "@daily"
+
 # Per-event booking links: /book/<city-slug>-<date> → the times-first mini flow
 # (200 rewrite keeps the pretty URL; book.html reads the slug from location.pathname).
 [[redirects]]
