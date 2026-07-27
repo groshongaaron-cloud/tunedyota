@@ -72,6 +72,11 @@
 [functions."purge-cancelled"]
   schedule = "@daily"
 
+# Daily SMS volume canary → Slack, morning Central (netlify/functions/sms-volume-report.js).
+# Added 2026-07-27 to watch A2P volume after the chat relay went live.
+[functions."sms-volume-report"]
+  schedule = "0 13 * * *"
+
 # Per-event booking links: /book/<city-slug>-<date> → the times-first mini flow
 # (200 rewrite keeps the pretty URL; book.html reads the slug from location.pathname).
 [[redirects]]
