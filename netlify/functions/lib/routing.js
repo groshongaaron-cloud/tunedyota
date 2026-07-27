@@ -41,4 +41,11 @@ function smsNumberFor(key, env) {
   return digits.length === 10 ? `+1${digits}` : String((INSTALLERS[key] || {}).phone || "");
 }
 
-module.exports = { INSTALLERS, FALLBACK_KEY, keyToInstaller, normalizeInstallerKey, parseSmsOverrides, smsNumberFor };
+// Centralized chat intake (owner decision 2026-07-27): every escalated chat
+// relays to this person first; they dispatch via "@key" SMS or the console.
+function dispatcherKey(env) {
+  const k = normalizeInstallerKey((env || {}).CHAT_DISPATCHER);
+  return k || FALLBACK_KEY;
+}
+
+module.exports = { INSTALLERS, FALLBACK_KEY, keyToInstaller, normalizeInstallerKey, parseSmsOverrides, smsNumberFor, dispatcherKey };
