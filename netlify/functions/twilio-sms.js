@@ -4,7 +4,7 @@
 // (b) route the customer's text into their sms: chat session where the AI
 // answers exactly as it does in Messenger (human-only threads excepted), or
 // (c) if the session path fails, the original behavior: lead + canned reply.
-const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType, sendSms } = require("./lib/twilio.js");
+const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType, isTapbackText, sendSms } = require("./lib/twilio.js");
 const { INSTALLERS, parseSmsOverrides, keyToInstaller, normalizeInstallerKey, smsNumberFor, dispatcherKey } = require("./lib/routing.js");
 const { loadRelayTargetSession, saveSession, loadActiveByPrefix } = require("./lib/chat-store.js");
 const { buildHandoffBody } = require("./lib/installer-relay.js");
@@ -43,6 +43,19 @@ async function relayInstallerReply({ from, text }, deps = {}) {
   if (!inst) return { relayed: false };
   const clean = String(text || "").trim();
   if (!clean) return { relayed: false }; // blank/media-only texts fall through to normal handling
+
+  // Tapback reactions (owner decision 2026-07-27): keep as a quiet transcript
+  // note, never forward — 'Loved "…"' texted verbatim would read to the client
+  // as a typed message. Consumed either way; a reaction is never a lead.
+  if (isTapbackText(clean)) {
+    let sess = null;
+    try { sess = await findSession(inst.key); } catch (e) { if (log.error) log.error("reaction find", e.message); }
+    if (sess) {
+      sess.turns.push({ role: "system", text: `(reaction) ${clean}`, at: Date.now() });
+      try { await save(sess); } catch (e) { if (log.error) log.error("reaction save", e.message); }
+    }
+    return { relayed: true };
+  }
 
   // Dispatch command: "@cody" sent alone by the dispatcher or an admin. The @
   // is REQUIRED — a bare word ("Cody") always relays as chat text, so answering
@@ -110,6 +123,20 @@ async function handler(event, ctx = {}) {
     const r = await relay({ from: params.From || "", text: params.Body || "" });
     if (r && r.relayed) return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body: EMPTY_TWIML };
   } catch (e) { console.error("twilio-sms relay failed", e && e.message); /* fall through to lead path */ }
+
+  // Client Tapback reaction: transcript note only — no lead, no AI, no relay.
+  // A reaction with no active conversation is simply consumed.
+  if (isTapbackText(params.Body)) {
+    try {
+      const loadActive = ctx.loadActive || ((p) => loadActiveByPrefix(p, { env }));
+      const active = await loadActive("sms:" + String(params.From || ""));
+      if (active) {
+        active.turns.push({ role: "system", text: `(reaction) ${String(params.Body).trim()}`, at: Date.now() });
+        await (ctx.save || ((s) => saveSession(s, { env })))(active);
+      }
+    } catch (e) { console.error("twilio-sms reaction note failed", e && e.message); }
+    return { statusCode: 200, headers: { "Content-Type": "text/xml; charset=utf-8" }, body: EMPTY_TWIML };
+  }
 
   // Customer text -> their sms: chat session, AI answering like any other
   // channel (silent on human-only installer-initiated threads). Lead ingest

@@ -134,6 +134,13 @@ function smsKeywordType(body) {
   return null;
 }
 
+// iPhone Tapback reactions arrive at non-iMessage numbers as literal texts
+// ('Loved "…"', 'Reacted 😂 to "…"'). Conservative match: a reaction verb
+// immediately followed by a quoted tail spanning the rest of the body — a real
+// sentence that merely starts with "Loved" has no quote and never matches.
+const TAPBACK_RE = /^(?:Loved|Liked|Disliked|Laughed at|Emphasized|Questioned|Reacted .{1,12} to) [“"][\s\S]*[”"]$/;
+function isTapbackText(body) { return TAPBACK_RE.test(String(body || "").trim()); }
+
 function parseInboundSms(params) {
   const from = params.From || "";
   const body = String(params.Body || "").trim();
@@ -212,4 +219,4 @@ async function sendSms({ to, body }, deps = {}) {
 
 module.exports = { validateTwilioSignature, decodeBody, webhookUrl, formatPhone, displayName, parseForwardNumbers,
   escapeXml, smsReplyTwiml, dialTwiml, voicemailTwiml, hangupTwiml, screenTwiml, acceptTwiml, GREETING, SCREEN_PROMPT,
-  parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms, smsKeywordType, getDialedCallTo };
+  parseInboundSms, parseInboundCall, parseTranscription, ingestLead, sendSms, smsKeywordType, isTapbackText, getDialedCallTo };
