@@ -60,6 +60,23 @@ async function loadEscalatedForInstaller(key, { env = process.env, fetchImpl = f
   return sessions[0] || null;
 }
 
+// Reply routing (labeled single chain): the thread whose client message most
+// recently hit this person's phone. The dispatcher's pool includes every
+// unassigned thread — those relay to them by definition.
+async function loadRelayTargetSession(key, { env = process.env, fetchImpl = fetch, now = Date.now } = {}) {
+  const { dispatcherKey } = require("./routing.js");
+  const c = cfg(env);
+  const k = escapeFormula(key);
+  const filter = key === dispatcherKey(env)
+    ? `AND({Status}="escalated", OR({Installer}="${k}", {Installer}=""))`
+    : `AND({Installer}="${k}",{Status}="escalated")`;
+  const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env), filterByFormula: filter });
+  const sessions = recs.map(fromRecord).filter((s) => !isStale(s, now()));
+  const stamp = (s) => s.lastRelayedAt || s.lastActivity || "";
+  sessions.sort((a, b) => (stamp(a) < stamp(b) ? 1 : -1));
+  return sessions[0] || null;
+}
+
 async function saveSession(sess, { env = process.env, fetchImpl = fetch, now = Date.now } = {}) {
   const c = cfg(env);
   const fields = {
@@ -96,4 +113,4 @@ async function loadActiveByPrefix(prefix, { env = process.env, fetchImpl = fetch
   } catch (e) { return null; }
 }
 
-module.exports = { loadSession, loadEscalatedForInstaller, loadActiveByPrefix, saveSession, parseTranscript, isStale, aiPaused, STALE_AI_MS, STALE_ESCALATED_MS, AI_PAUSE_MS, TABLE };
+module.exports = { loadSession, loadEscalatedForInstaller, loadRelayTargetSession, loadActiveByPrefix, saveSession, parseTranscript, isStale, aiPaused, STALE_AI_MS, STALE_ESCALATED_MS, AI_PAUSE_MS, TABLE };

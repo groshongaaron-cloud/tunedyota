@@ -4,9 +4,10 @@
 // (b) route the customer's text into their sms: chat session where the AI
 // answers exactly as it does in Messenger (human-only threads excepted), or
 // (c) if the session path fails, the original behavior: lead + canned reply.
-const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType } = require("./lib/twilio.js");
-const { INSTALLERS, parseSmsOverrides } = require("./lib/routing.js");
-const { loadEscalatedForInstaller, saveSession, loadActiveByPrefix } = require("./lib/chat-store.js");
+const { validateTwilioSignature, decodeBody, webhookUrl, parseInboundSms, smsReplyTwiml, ingestLead, smsKeywordType, sendSms } = require("./lib/twilio.js");
+const { INSTALLERS, parseSmsOverrides, keyToInstaller, normalizeInstallerKey, smsNumberFor, dispatcherKey } = require("./lib/routing.js");
+const { loadRelayTargetSession, saveSession, loadActiveByPrefix } = require("./lib/chat-store.js");
+const { isAdmin } = require("./lib/installer-auth.js");
 const { deliverInstallerTurn } = require("./lib/meta-deliver.js");
 const { processChat } = require("./chat.js");
 
@@ -28,20 +29,50 @@ function installerForNumber(from, env) {
   return Object.values(INSTALLERS).find((i) => last10(i.phone) === d) || null;
 }
 
-// If `from` is an installer with an active escalated session, append their text
-// as an installer turn. Returns {relayed} — false means: treat as a normal lead.
+// If `from` is an installer: either a dispatch command ("@cody" — dispatcher/
+// admin only) or a reply into the thread that most recently relayed to their
+// phone. Returns {relayed} — false means: treat as a normal lead.
 async function relayInstallerReply({ from, text }, deps = {}) {
   const { env = process.env, log = console,
-    findSession = (k) => loadEscalatedForInstaller(k, { env }),
+    findSession = (k) => loadRelayTargetSession(k, { env }),
     save = (s) => saveSession(s, { env }),
+    sms = (a) => sendSms(a, { env, log }),
     onInstallerTurn = deliverInstallerTurn } = deps;
   const inst = installerForNumber(from, env);
   if (!inst) return { relayed: false };
+  const clean = String(text || "").trim();
+  if (!clean) return { relayed: false }; // blank/media-only texts fall through to normal handling
+
+  // Dispatch command: a bare installer key ("@cody" or "cody"), sent by the
+  // dispatcher or an admin. Consumed — never forwarded to a client. NOTE: this
+  // means the dispatcher cannot send a one-word message that IS an installer
+  // key as chat text; use the console for that edge.
+  const cmd = /^@?([a-zA-Z]+)$/.exec(clean);
+  const target = cmd ? normalizeInstallerKey(cmd[1]) : "";
+  const mayDispatch = inst.key === dispatcherKey(env) || isAdmin(inst.key, env);
+  if (target && target !== inst.key && mayDispatch) {
+    let sess = null;
+    try { sess = await findSession(inst.key); } catch (e) { if (log.error) log.error("dispatch find", e.message); }
+    if (!sess) {
+      try { await sms({ to: smsNumberFor(inst.key, env), body: "TY: no active chat to dispatch right now." }); } catch (e) {}
+      return { relayed: true };
+    }
+    sess.installer = target;
+    sess.lastRelayedAt = new Date().toISOString(); // target's replies route here
+    try { await save(sess); } catch (e) { if (log.error) log.error("dispatch save", e.message); return { relayed: false }; }
+    const lastClient = (sess.turns || []).slice().reverse().find((t) => t.role === "user");
+    const handoff = `TY handoff: ${sess.customerName || "Customer"}${sess.vehicle ? " · " + sess.vehicle : ""}${sess.phone ? " · " + sess.phone : ""}. ` +
+      (lastClient ? `Latest: "${String(lastClient.text).slice(0, 200)}" ` : "") +
+      "This thread is yours — reply to this text and it goes to the client.";
+    try { await sms({ to: smsNumberFor(target, env), body: handoff }); } catch (e) { if (log.error) log.error("dispatch handoff", e.message); }
+    try { await sms({ to: smsNumberFor(inst.key, env), body: `✓ ${sess.customerName || "Chat"} → ${keyToInstaller(target).name}` }); } catch (e) {}
+    return { relayed: true };
+  }
+
   let sess = null;
   try { sess = await findSession(inst.key); } catch (e) { if (log.error) log.error("relay find", e.message); }
   if (!sess) return { relayed: false };
-  const clean = String(text || "").trim();
-  if (!clean) return { relayed: false }; // blank/media-only texts fall through to normal handling
+  if (!sess.installer) sess.installer = inst.key; // dispatcher answered → thread is theirs
   sess.turns.push({ role: "installer", text: clean, at: Date.now() });
   try { await save(sess); } catch (e) { if (log.error) log.error("relay save", e.message); return { relayed: false }; }
   const turn = sess.turns[sess.turns.length - 1];
