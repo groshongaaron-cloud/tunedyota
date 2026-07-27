@@ -92,10 +92,19 @@ async function processChat(body, deps) {
   if (message.length > MAX_CHARS) return { status: 400, body: { error: "message too long" } };
 
   if (!sess) sess = { id, status: "ai", turns: [], pageContext: String(body.page || "default").slice(0, 32) };
+
+  // Redelivered webhook (Twilio retries carry the same MessageSid — mirrors
+  // the Meta channel's `mid` dedup): already processed → no AI, no relay,
+  // nothing stored.
+  const sid = String(body.sid || "").slice(0, 64);
+  if (sid && (sess.turns || []).some((t) => t.sid === sid)) {
+    return { status: 200, body: { reply: "", duplicate: true, escalated: sess.status === "escalated", turnCount: sess.turns.length } };
+  }
+
   if ((sess.turns || []).filter((t) => t.role === "user").length >= MAX_MESSAGES) {
     return { status: 200, body: { reply: "We've covered a lot! For the fastest next step, grab a spot at https://tunedyota.com/find-your-exact-tune or text (612) 406-7117.", capped: true } };
   }
-  sess.turns.push({ role: "user", text: message, at: Date.now() });
+  sess.turns.push({ role: "user", text: message, at: Date.now(), ...(sid ? { sid } : {}) });
 
   // Escalated thread: forward the customer's message to the phone of whoever is
   // working it (assigned installer, else the dispatcher). MUST be awaited —

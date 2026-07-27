@@ -150,10 +150,10 @@ async function handler(event, ctx = {}) {
     let active = null;
     try { active = await loadActive(base); } catch (e) { /* fresh session */ }
     let sessionId = active ? active.id : base;
-    let out = await chat({ session: sessionId, message: params.Body || "", page: "sms" });
+    let out = await chat({ session: sessionId, message: params.Body || "", page: "sms", sid: params.MessageSid || "" });
     if (out && out.body && out.body.expired) {
       sessionId = base + ":" + Date.now();
-      out = await chat({ session: sessionId, message: params.Body || "", page: "sms" });
+      out = await chat({ session: sessionId, message: params.Body || "", page: "sms", sid: params.MessageSid || "" });
     }
     const reply = out && out.body && out.body.reply;
     if (out && out.status === 200 && !(out.body && out.body.degraded)) {

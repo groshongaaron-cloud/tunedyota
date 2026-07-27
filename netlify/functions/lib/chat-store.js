@@ -2,7 +2,7 @@
 // Chat session persistence in the Airtable "Chat Sessions" table. Pure I/O
 // wrappers with injected fetch/env — the transcript lives as a JSON array in a
 // long-text field; session identity is the widget-generated Session ID string.
-const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./airtable.js");
+const { cfg, escapeFormula, listRecords, createRecord, updateRecord, deleteRecord } = require("./airtable.js");
 const { dispatcherKey } = require("./routing.js");
 
 const TABLE = (env) => env.AIRTABLE_CHAT_TABLE || "Chat Sessions";
@@ -81,10 +81,50 @@ async function saveSession(sess, { env = process.env, fetchImpl = fetch, now = D
     fields.Created = new Date(now()).toISOString();
     const r = await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env), fields });
     sess.recordId = r.id;
+    // Airtable has no unique constraint: two concurrent first-message
+    // invocations can both check-then-create this Session ID (observed live
+    // 2026-07-27 — Twilio double-delivery, records 91 ms apart). Best-effort
+    // convergence; a guard failure just leaves today's oldest-wins reads.
+    try { await dedupeAfterCreate(sess, { env, fetchImpl, now }); } catch (e) { /* best-effort */ }
     return sess;
   }
   await updateRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env), id: sess.recordId, fields });
   return sess;
+}
+
+// Post-create duplicate convergence. Both racers run this independently: the
+// canonical winner (oldest Created, record-ID tiebreak — the same rule
+// loadSession reads by) keeps its record; the loser merges its turns into the
+// winner and deletes itself. Turn matching is by role+text, NOT timestamp:
+// raced duplicates are the same message processed twice with different `at`
+// values and must not double the transcript. Closed records are never merge
+// targets — a closed thread must not swallow a new conversation.
+async function dedupeAfterCreate(sess, { env = process.env, fetchImpl = fetch, now = Date.now } = {}) {
+  const c = cfg(env);
+  const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
+    filterByFormula: `{Session ID}="${escapeFormula(sess.id)}"` });
+  const live = recs.filter((r) => ((r.fields || {}).Status || "ai") !== "closed");
+  if (live.length < 2) return { deduped: false };
+  const key = (r) => `${String((r.fields || {}).Created || "")}|${r.id}`;
+  const winner = live.slice().sort((a, b) => (key(a) < key(b) ? -1 : 1))[0];
+  if (winner.id === sess.recordId) return { deduped: false }; // we are canonical; the loser cleans itself up
+  const win = fromRecord(winner);
+  const seen = new Set(win.turns.map((t) => `${t.role}|${t.text}`));
+  const missing = (sess.turns || []).filter((t) => !seen.has(`${t.role}|${t.text}`));
+  if (missing.length || (sess.status === "escalated" && win.status !== "escalated")) {
+    win.turns = win.turns.concat(missing).sort((a, b) => (a.at || 0) - (b.at || 0));
+    win.customerName = win.customerName || sess.customerName || "";
+    win.phone = win.phone || sess.phone || "";
+    win.vehicle = win.vehicle || sess.vehicle || "";
+    win.city = win.city || sess.city || "";
+    win.installer = win.installer || sess.installer || "";
+    if (sess.status === "escalated") win.status = "escalated";
+    if ((sess.lastRelayedAt || "") > (win.lastRelayedAt || "")) win.lastRelayedAt = sess.lastRelayedAt;
+    await saveSession(win, { env, fetchImpl, now });
+  }
+  await deleteRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env), id: sess.recordId });
+  sess.recordId = win.recordId; // later saves in this invocation update the canonical record
+  return { deduped: true, winner: win.recordId };
 }
 
 // DM feeder: latest non-closed session for a sender (ids "fb:<PSID>" or
