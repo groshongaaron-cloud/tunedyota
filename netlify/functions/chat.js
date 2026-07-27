@@ -173,6 +173,10 @@ async function installerOp(body, installerKey, deps = {}) {
     const r = await assign(String(body.session || ""), String(body.installer || ""), installerKey, admin, deps);
     return { status: r.status === "ok" ? 200 : (r.error === "not-found" ? 404 : 400), body: r };
   }
+  if (body.op === "aiMode") {
+    const r = await (deps.setAi || chatAdmin.setAiMode)(String(body.session || ""), body.mode, deps);
+    return { status: r.status === "ok" ? 200 : (r.error === "not-found" ? 404 : 400), body: r };
+  }
   return { status: 400, body: { error: "bad-op" } };
 }
 
