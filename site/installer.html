@@ -2051,7 +2051,9 @@
       '<input type="date" id="rd_'+b.id+'" value="'+esc(b.dateISO||'')+'">'+
       '<input id="rt_'+b.id+'" autocomplete="off" placeholder="Time (e.g. 10:30 AM)" value="'+esc(b.scheduledTime||'')+'">'+
       '<input id="ra_'+b.id+'" autocomplete="off" placeholder="Install address (for navigation)" value="'+esc(b.address||'')+'">'+
-      '<button class="btn" id="rs_'+b.id+'">Save</button></div></details>'+
+      '<button class="btn" id="rs_'+b.id+'">Save</button>'+
+      '<button type="button" class="btn ns" id="del_'+b.id+'" title="Remove this booking (wrong entry / duplicate). Undo available for 10s.">🗑 Delete booking</button>'+
+      '</div></details>'+
       '<input id="vin_'+b.id+'" maxlength="17" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="VIN — 17 characters" style="text-transform:uppercase;margin:6px 0">'+
       (canScan()?'<button type="button" class="btn scanvin" id="scan_'+b.id+'">📷 Scan VIN</button>':'')+
       '<div id="vinwarn_'+b.id+'" class="vinwarn hidden"></div>'+
@@ -2068,6 +2070,7 @@
       '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
     c.querySelector('#rs_'+b.id).onclick=function(){ reschedule(b.id); };
+    var db=c.querySelector('#del_'+b.id); if(db) db.onclick=function(){ cancelBooking(b.id); };
     if(canScan()){ var sb=c.querySelector('#scan_'+b.id); if(sb) sb.onclick=function(){ startScan(b.id); }; }
     var cb=c.querySelector('#nsc_'+b.id), nsb=c.querySelector('#ns_'+b.id);
     cb.onchange=function(){ nsb.disabled=!cb.checked; };
@@ -2110,6 +2113,40 @@
         succeed('✓ Schedule updated.'); renderAll();
       } else { fail('Could not update: '+(out.error||res.status)); }
     }catch(e){ fail('Network error — try again.'); }
+  }
+
+  // Soft-delete with Undo (owner decision 2026-07-27): no blocking confirm —
+  // the card vanishes instantly and a 10s Undo toast is the safety net. Undo
+  // restores and jumps-and-flashes the booking (console rule: no silent outcomes).
+  async function cancelBooking(id){
+    clearMsg();
+    var idx=-1, b=null;
+    STATE.bookings.forEach(function(x,i){ if(x.id===id){ idx=i; b=x; } });
+    try{
+      var res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,action:'cancel'})});
+      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      var out=await res.json().catch(function(){return{};});
+      if(!(res.ok && out.status==='cancelled')){ fail('Could not delete: '+(out.error||res.status)); return; }
+    }catch(e){ fail('Network error — try again.'); return; }
+    if(idx>=0) STATE.bookings.splice(idx,1);
+    renderAll();
+    var el=document.getElementById('msg'); el.className='msg ok';
+    el.innerHTML='✓ Booking deleted'+(b&&b.name?' — '+esc(b.name):'')+'. <a href="#" id="undodel"><b>Undo</b></a>';
+    el.scrollIntoView({block:'nearest'});
+    var t=setTimeout(clearMsg, 10000);
+    var u=document.getElementById('undodel');
+    if(u) u.onclick=async function(e){
+      e.preventDefault(); clearTimeout(t);
+      try{
+        var r=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,action:'uncancel'})});
+        var o=await r.json().catch(function(){return{};});
+        if(r.ok && o.status==='uncancelled'){
+          if(b) STATE.bookings.splice(idx>=0?idx:STATE.bookings.length, 0, b);
+          succeed('✓ Booking restored.');
+          if(b) jumpToBooking(b);
+        } else { fail('Could not restore: '+(o.error||r.status)); }
+      }catch(e2){ fail('Network error — the booking is still deleted; Undo again or restore in Airtable.'); }
+    };
   }
 
   async function closeout(id,extra){
