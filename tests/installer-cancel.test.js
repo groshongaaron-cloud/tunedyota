@@ -30,8 +30,8 @@ test("uncancel: restores Booked and clears the stamps; only from Cancelled", asy
   const out = await processCloseout({ recordId: "rec1", action: "uncancel" }, d);
   assert.equal(out.status, "uncancelled");
   assert.equal(deps.updated.fields.Status, "Booked");
-  assert.equal(deps.updated.fields["Cancelled At"], "");
-  assert.equal(deps.updated.fields["Cancelled By"], "");
+  assert.equal(deps.updated.fields["Cancelled At"], null);
+  assert.equal(deps.updated.fields["Cancelled By"], null);
   const nope = await processCloseout({ recordId: "r", action: "uncancel" }, deps({ Installer: "cody", Status: "Booked" }));
   assert.equal(nope.error, "not-cancelled");
 });

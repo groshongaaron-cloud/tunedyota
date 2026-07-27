@@ -54,7 +54,8 @@ async function processCloseout(body, deps) {
     if (f.Status !== "Cancelled") return { status: "error", error: "not-cancelled" };
     try {
       await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId,
-        fields: { Status: "Booked", "Cancelled At": "", "Cancelled By": "" } },
+        // null clears regardless of column type ("" would 422 if the column ever becomes a Date field)
+        fields: { Status: "Booked", "Cancelled At": null, "Cancelled By": null } },
         ["Cancelled At", "Cancelled By"]);
     } catch (e) { if (log.error) log.error("closeout uncancel", e.message); return { status: "error", error: "store-unavailable" }; }
     return { status: "uncancelled" };
@@ -162,9 +163,11 @@ async function handler(event) {
   let body = {};
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, body: "bad json" }; }
   const out = await processCloseout(body, { key, admin: isAdmin(key, process.env) });
+  // Default client errors to 400; 502 only when the store itself failed
+  // (matches installer-reschedule.js — "not-open"/"not-cancelled" are 400s).
   const code = out.status !== "error" ? 200
     : out.error === "not-yours" ? 403
-    : (out.error === "bad-calibration" || out.error === "missing-record" || out.error === "unconfirmed") ? 400 : 502;
+    : out.error === "store-unavailable" ? 502 : 400;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 module.exports = { handler, processCloseout };
