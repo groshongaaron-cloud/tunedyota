@@ -980,7 +980,7 @@
           '<div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(title)+(m&&m.kind==='booking'?' <span style="font-size:11px;color:#7c8472;font-weight:400">booking</span>':'')+'</div>'+
           (detail?'<div style="font-size:12.5px;color:#aaa">'+esc(detail)+'</div>':'')+
           '<div style="font-size:12px;color:#888">'+meta+'</div></div>'+
-          (d ? '<button class="tabbtn" data-callmsg="'+i+'">Message</button><button class="tabbtn" data-callback="'+i+'">Call as TY</button>' : '')+
+          (d ? '<button class="tabbtn" data-callmsg="'+i+'">💬 Open chat</button><button class="tabbtn" data-callback="'+i+'">Call as TY</button>' : '')+
           '</div>';
       }).join('') + '</div>';
       Array.prototype.forEach.call(host.querySelectorAll('[data-callback]'),function(b){ b.onclick=async function(){
@@ -1012,7 +1012,7 @@
             STATE.tab='chats'; STATE.chatOpen=r.session; renderAll(); return;
           } else { b.textContent='Failed'; }
         }catch(e){ b.textContent='Failed'; }
-        setTimeout(function(){ b.textContent='Message'; b.disabled=false; },4000);
+        setTimeout(function(){ b.textContent='💬 Open chat'; b.disabled=false; },4000);
       }; });
     }
     var rf=document.getElementById('callsRefresh'); if(rf) rf.onclick=function(){ STATE.callsLoaded=false; renderCalls(); loadCalls(); };
@@ -1835,7 +1835,7 @@
       }));
       // Text through the business line: opens (or creates) this client's thread
       // in Chats. New threads prefill a personal, self-identifying first message.
-      row.appendChild(act('Message',async function(ev){
+      row.appendChild(act('💬 Open chat',async function(ev){
         var b=ev.target; b.disabled=true;
         try{
           var r=await chatApi({op:'openSms', phone:l.phone, name:l.name, vehicle:l.vehicle});
@@ -1848,7 +1848,7 @@
             STATE.tab='chats'; STATE.chatOpen=r.session; renderAll();
           } else { b.textContent='Failed'; }
         }catch(e){ b.textContent='Failed'; }
-        finally{ setTimeout(function(){ b.textContent='Message'; b.disabled=false; },4000); }
+        finally{ setTimeout(function(){ b.textContent='💬 Open chat'; b.disabled=false; },4000); }
       }));
     }
     if(l.email){ row.appendChild(linkBtn('Email','mailto:'+l.email)); }
