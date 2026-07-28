@@ -15,8 +15,9 @@ Short. Event footage upgrades this later; it does not gate launch.
 2. Branding: profile = `site/logo.png`, banner = `site/og-image.png` (or a crop),
    description = the business one-liner + service area + (612) 406-7117 + tunedyota.com.
 3. Links: tunedyota.com, /find-your-exact-tune, Facebook, Instagram.
-4. Tell Claude the channel URL → it gets added to the site's `sameAs` schema
-   (scripts/lib/seo-data.mjs BUSINESS stub) so search engines connect channel ↔ site.
+4. ✅ Done 2026-07-28 — https://www.youtube.com/@tunedyota is registered and wired
+   into the site's `sameAs` schema (BUSINESS stub + the five self-defining pages),
+   so search engines connect channel ↔ site.
 
 ## Cadence & calendar (launch order)
 

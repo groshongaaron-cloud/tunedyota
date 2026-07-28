@@ -139,7 +139,7 @@ const BUSINESS = {
   logo: { "@type": "ImageObject", url: `${SITE}/logo.png`, width: 512, height: 512 },
   image: `${SITE}/og-image.png`,
   areaServed: ["Minnesota","Iowa","Wisconsin","North Dakota","South Dakota","Nebraska"].map((n) => ({ "@type": "State", name: n })),
-  sameAs: ["https://www.facebook.com/TunedYota/","https://www.instagram.com/tunedyota/","https://www.facebook.com/groups/501008078456222"],
+  sameAs: ["https://www.facebook.com/TunedYota/","https://www.instagram.com/tunedyota/","https://www.facebook.com/groups/501008078456222","https://www.youtube.com/@tunedyota"],
 };
 export const BUSINESS_STUB = JSON.stringify(BUSINESS);
 
