@@ -2141,7 +2141,15 @@
       if(sv) sv.onclick=function(e){ e.preventDefault(); viewSignature(b.id); };
       return c;
     }
-    if(b.status==='No-show'){ c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'; return c; }
+    if(b.status==='No-show'){
+      // No-show cards keep the delete affordance (owner rule: never a dead end).
+      // Same soft-delete + 10s Undo as open bookings; Undo restores to Booked,
+      // so a mistaken delete just needs no-show re-marked afterward.
+      c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'+
+        '<div class="row-actions" style="margin-top:6px"><button type="button" class="btn ns" id="del_'+b.id+'" title="Remove this no-show from the list. Undo available for 10s.">🗑 Delete booking</button></div>';
+      var ndb=c.querySelector('#del_'+b.id); if(ndb) ndb.onclick=function(){ ndb.disabled=true; cancelBooking(b.id).finally(function(){ ndb.disabled=false; }); };
+      return c;
+    }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+calOptions(b).map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+
       '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✏️ Edit'+(b.scheduledTime?' — '+esc(b.scheduledTime):' date / time / address')+'</summary>'+
