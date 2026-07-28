@@ -135,7 +135,7 @@ const { openSmsThread } = require("../netlify/functions/lib/chat-admin.js");
 test("openSmsThread creates a human-only escalated session bound to the installer", async () => {
   const saved = [];
   const r = await openSmsThread({ phone: "(218) 555-1234", name: "Pat Client", vehicle: "2019 4Runner" }, "cody",
-    { loadActive: async () => null, saveFn: async (s) => { saved.push(s); return s; } });
+    { loadActive: async () => null, loadFn: async () => null, saveFn: async (s) => { saved.push(s); return s; } });
   assert.equal(r.status, "ok");
   assert.equal(r.session, "sms:+12185551234");
   assert.equal(r.isNew, true);
@@ -200,4 +200,26 @@ test("installerOp routes op:assign with the admin flag", async () => {
   assert.equal(ok.body.installer, "noah");
   const deny = await installerOp({ op: "assign", session: "s1", installer: "noah" }, "cody", { ...deps, admin: false });
   assert.equal(deny.status, 400);
+});
+
+test("openSmsThread REOPENS a closed thread with the same number instead of shadowing it", async () => {
+  // Live failure 2026-07-28: Message to 651-278-1401 created a second record
+  // under the closed thread's Session ID; loadSession reads oldest-first, so
+  // every reply routed to the closed record and bounced with not-escalated.
+  const saved = [];
+  const closed = { id: "sms:+16512781401", recordId: "recOLD", status: "closed", installer: "",
+    customerName: "", vehicle: "", phone: "+16512781401",
+    turns: [{ role: "user", text: "On my way", at: 1 }] };
+  const r = await openSmsThread({ phone: "+16512781401", name: "Caller", vehicle: "2019 4Runner" }, "aaron",
+    { loadActive: async () => null, loadFn: async () => closed,
+      saveFn: async (s) => { saved.push(s); return s; } });
+  assert.equal(r.status, "ok");
+  assert.equal(r.session, "sms:+16512781401");
+  assert.equal(r.isNew, false, "existing history means no new-thread prefill");
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].recordId, "recOLD", "must update the existing record, never create a duplicate");
+  assert.equal(saved[0].status, "escalated");
+  assert.equal(saved[0].installer, "aaron");
+  assert.equal(saved[0].customerName, "Caller", "backfills a missing name");
+  assert.equal(saved[0].turns.length, 1, "prior transcript preserved");
 });

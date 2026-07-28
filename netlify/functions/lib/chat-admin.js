@@ -14,6 +14,7 @@ const { sendSms } = require("./twilio.js");
 // AI never speaks in a conversation an installer started.
 async function openSmsThread(body, installerKey, deps = {}) {
   const { env = process.env, loadActive = (p) => loadActiveByPrefix(p, { env, ...deps }),
+          loadFn = (i) => loadSession(i, { env, ...deps }),
           saveFn = saveSession } = deps;
   const digits = String((body && body.phone) || "").replace(/\D/g, "").slice(-10);
   if (digits.length !== 10) return { status: "error", error: "bad-phone" };
@@ -21,6 +22,21 @@ async function openSmsThread(body, installerKey, deps = {}) {
   let active = null;
   try { active = await loadActive(id); } catch (e) { /* store hiccup -> create fresh */ }
   if (active) return { status: "ok", session: active.id, isNew: false };
+  // A closed thread with this number is REOPENED in place, never shadowed:
+  // Airtable has no unique constraint, and loadSession reads oldest-first, so
+  // a second record under the same Session ID would route every reply to the
+  // closed record, which installerReply rejects as not-escalated (surfaced
+  // live 2026-07-28 via the Calls tab). Reopening also keeps the transcript.
+  let prior = null;
+  try { prior = await loadFn(id); } catch (e) { /* store hiccup -> create fresh */ }
+  if (prior) {
+    prior.status = "escalated";
+    prior.installer = prior.installer || installerKey;
+    if (!prior.customerName && body && body.name) prior.customerName = String(body.name).slice(0, 80);
+    if (!prior.vehicle && body && body.vehicle) prior.vehicle = String(body.vehicle).slice(0, 80);
+    await saveFn(prior, deps);
+    return { status: "ok", session: prior.id, isNew: false };
+  }
   const sess = { id, status: "escalated", pageContext: "sms-direct", installer: installerKey,
     customerName: String((body && body.name) || "").slice(0, 80),
     vehicle: String((body && body.vehicle) || "").slice(0, 80),
