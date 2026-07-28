@@ -355,7 +355,8 @@
     , jobTab: 'all'      // 'all' | '<city>' | 'done'
     , doneCity: ''       // optional city filter applied inside the Done view
     , theme: '', me: ''
-    , chats:[], chatOpen:null, chatsLoaded:false };
+    , chats:[], chatOpen:null, chatsLoaded:false
+    , calls:[], callsLoaded:false, callsError:false };
   var CHAT_POLL = null;
   var DEL_TOAST_TIMER = null;
   function Q(){ return window.OfflineQueue; }
@@ -918,9 +919,64 @@
   function renderAll(){
     if(STATE.tab!=='chats' && CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; }
     renderTally(); renderSummary(); renderTabs();
-    var st=document.getElementById('subtabs'); if(st) st.style.display = (STATE.tab==='leads'||STATE.tab==='chats') ? 'none' : 'flex';
+    var st=document.getElementById('subtabs'); if(st) st.style.display = (STATE.tab==='leads'||STATE.tab==='chats'||STATE.tab==='calls') ? 'none' : 'flex';
     if(STATE.tab==='chats'){ renderChats(); return; }
+    if(STATE.tab==='calls'){ renderCalls(); return; }
     if(STATE.tab==='leads'){ renderLeads(); } else { renderFeed(); } }
+  async function loadCalls(){
+    STATE.callsError=false;
+    try{
+      var res = await fetch('/.netlify/functions/call-log', { headers:{ 'x-installer-token':tok() } });
+      if(!res.ok) throw new Error('http '+res.status);
+      var j = await res.json(); STATE.calls = j.calls||[];
+    }catch(e){ STATE.calls = []; STATE.callsError = true; }
+    STATE.callsLoaded = true;
+    renderAll();
+  }
+  // Calls tab: one row per real call (bridged legs are folded server-side).
+  // The counterparty is the number that matters to a human: the caller on
+  // inbound, the bridged client (not the installer's own cell) on outbound.
+  function callParty(c){ return c.direction==='inbound' ? c.from : (c.bridgedTo || c.to); }
+  function fmtCallPhone(p){
+    var d = String(p||'').replace(/\D/g,''); if(d.length===11 && d.charAt(0)==='1') d=d.slice(1);
+    return d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : (p||'');
+  }
+  function fmtCallDur(s){ s=Number(s||0); return s>=60 ? Math.floor(s/60)+'m '+(s%60)+'s' : s+'s'; }
+  function renderCalls(){
+    var host = document.getElementById('feed');
+    if(!STATE.callsLoaded){ host.innerHTML='<div class="card" style="text-align:center;color:#888">Loading calls…</div>'; return; }
+    var bar = '<div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 8px">'+
+      '<div style="font-weight:700">Business line — last '+STATE.calls.length+' calls</div>'+
+      '<button class="tabbtn" id="callsRefresh">↻ Refresh</button></div>';
+    if(STATE.callsError){ host.innerHTML=bar+'<div class="card" style="text-align:center;color:#c66">Couldn\'t load the call log — check the connection and refresh.</div>'; }
+    else if(!STATE.calls.length){ host.innerHTML=bar+'<div class="card" style="text-align:center;color:#888">No calls on the business line yet.</div>'; }
+    else{
+      host.innerHTML = bar + '<div class="card" style="padding:0;overflow:hidden">' + STATE.calls.map(function(c){
+        var missed = c.direction==='inbound' && ['no-answer','busy','failed','canceled'].indexOf(c.status)>=0;
+        var icon = c.direction==='inbound' ? (missed?'&#10548;':'&#10549;') : '&#10547;';
+        var party = fmtCallPhone(callParty(c));
+        var meta = relTime(c.startTime) + (c.duration&&!missed ? ' · '+fmtCallDur(c.duration) : '') + (missed ? ' · <span style="color:#c66;font-weight:700">Missed</span>' : '');
+        var canDial = String(callParty(c)||'').replace(/\D/g,'').length>=10;
+        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(128,128,128,.15)">'+
+          '<div style="font-size:18px;width:22px;text-align:center;'+(missed?'color:#c66':'color:#7c8472')+'">'+icon+'</div>'+
+          '<div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(party||'Unknown')+'</div>'+
+          '<div style="font-size:12px;color:#888">'+(c.direction==='inbound'?'Incoming':'Outgoing')+' · '+meta+'</div></div>'+
+          (canDial ? '<button class="tabbtn" data-callback="'+esc(callParty(c))+'">Call as TY</button>' : '')+
+          '</div>';
+      }).join('') + '</div>';
+      Array.prototype.forEach.call(host.querySelectorAll('[data-callback]'),function(b){ b.onclick=async function(){
+        b.disabled=true; var orig=b.textContent;
+        try{
+          var r=await fetch('/.netlify/functions/twilio-call-out',{method:'POST',
+            headers:{'Content-Type':'application/json','x-installer-token':tok()},
+            body:JSON.stringify({to:b.getAttribute('data-callback'),name:''})});
+          b.textContent=r.ok?'☎ Ringing you — press 1':'Call failed';
+        }catch(e){ b.textContent='Call failed'; }
+        setTimeout(function(){ b.textContent=orig; b.disabled=false; },8000);
+      }; });
+    }
+    var rf=document.getElementById('callsRefresh'); if(rf) rf.onclick=function(){ STATE.callsLoaded=false; renderCalls(); loadCalls(); };
+  }
   async function loadChats(){
     try{ var j = await chatApi({op:'list'}); STATE.chats = j.sessions||[]; STATE.chatsLoaded = true; }
     catch(e){ STATE.chats = []; STATE.chatsLoaded = true; }
@@ -1087,11 +1143,12 @@
       var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
     function tab(id,label,badge){ return '<button class="tabbtn'+(STATE.tab===id?' on':'')+'" data-tab="'+id+'">'+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
     var due=STATE.leads.filter(function(l){ return ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today; }).length;
-    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chats.length?String(STATE.chats.length):'');
+    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chats.length?String(STATE.chats.length):'')+tab('calls','Calls','');
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){
       STATE.tab=b.getAttribute('data-tab');
       if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); }
       if(STATE.tab==='chats'&&!STATE.chatsLoaded){ loadChats(); }
+      if(STATE.tab==='calls'&&!STATE.callsLoaded){ loadCalls(); }
       renderAll();
     }; });
   }
