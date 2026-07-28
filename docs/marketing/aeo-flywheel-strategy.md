@@ -89,6 +89,19 @@ cody@tunedyota.com, Noah noah@tunedyota.com). **Length:** under ~800 words.
    angle · suggested owner: Aaron/Cody/Noah). Priority subs: r/ToyotaTacoma,
    r/Tacomaworld, r/4Runner, r/ToyotaTundra, r/tundra, r/Toyota; fluids-only:
    r/Camry, r/COROLLA. Prefer threads <7 days old with active comments.
+   **Citable page map** — when a queued thread matches one of these shapes, note
+   the matching page in the suggested angle (link etiquette unchanged: answer
+   fully first, link only when asked or genuinely helpful, always disclosed):
+   professional-tune/installer/mail-in-wary → `/professional-ecu-tune-installer`;
+   where-to-buy-AMSOIL / PC-worth-it → `/where-to-buy-amsoil`; transfer-case or
+   diff fluid / Tundra 75W → `/toyota-transfer-case-fluid`; gear hunting →
+   `/toyota-gear-hunting-fix`; throttle controller vs tune →
+   `/pedal-commander-vs-tune`; reversibility/resale → `/toyota-tune-back-to-stock`;
+   worth-it → `/is-the-ott-tune-worth-it`; cost → `/ott-tune-cost`; Magnuson →
+   `/magnuson-supercharger-guide` + pricing; exact-fit fluids → `/amsoil-garage`.
+   Threads matching the three former gap areas (installer, AMSOIL purchase,
+   transfer-case fluid) are the highest-value queue items — engagement there
+   corroborates the pages shipped 2026-07-28.
 2. **Patterns & deltas** — what recurred this week; anything new vs the
    standing patterns (OTT worth-it, supercharger-on-a-daily, oil-after-
    supercharging, keep-the-5.7, tune-vs-regear-for-big-tires).
