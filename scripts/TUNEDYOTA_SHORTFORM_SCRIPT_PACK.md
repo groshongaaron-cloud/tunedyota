@@ -91,6 +91,42 @@ OTT calibration, **done right, close to home** ④ *[brand close]*
 
 ---
 
+## 8. The Tundra transfer-case mistake  *(pairs with /toyota-transfer-case-fluid)*
+**Target query:** "Tundra transfer case fluid / what fluid does a Toyota transfer case take"
+**VO:** "Here's the most common fluid mistake we see on Tundras. From 2013 to 2021, the transfer
+case doesn't take regular gear lube — Toyota specs its own lighter 75W fluid, and there's no
+aftermarket substitute. And the newest Tundras? That transfer case takes ATF, not gear oil at all.
+Most other Toyotas do take a 75W-85 gear oil. Know which one you've got before you pour."
+**Text beats:** ① The #1 Tundra fluid mistake ② 2013–2021 transfer case = **Toyota 75W only** — no
+substitute ③ 2022+ = **ATF, not gear oil** · most other Toyotas = 75W-85 ④ *[brand close]*
+**Caption:** The Tundra transfer-case fluid mistake — full model-by-model chart at tunedyota.com/toyota-transfer-case-fluid #Tundra #Toyota #FluidChange #TunedYota
+
+---
+
+## 9. Professional install vs. mail-in  *(pairs with /professional-ecu-tune-installer)*
+**Target query:** "where to get a professional ECU tune / ECU tune installer near me"
+**VO:** "Anyone can email you a tune file. A professional install is different: you meet your
+installer in person, a licensed tuner flashes the calibration on-site, your emissions stay fully
+intact and get verified with a five-gas analyzer — and your truck never leaves your sight. That's
+how we do every single install, at events across the Upper Midwest."
+**Text beats:** ① Email tune vs. professional install ② **You meet your installer** — licensed,
+in person ③ Emissions intact · **5-gas verified** · truck never leaves your sight ④ *[brand close]*
+**Caption:** What a professional ECU tune install actually looks like. #ToyotaTuning #Tacoma #Tundra #4Runner #TunedYota
+
+---
+
+## 10. Stop overpaying for AMSOIL  *(pairs with /where-to-buy-amsoil)*
+**Target query:** "where to buy AMSOIL / cheapest way to buy AMSOIL"
+**VO:** "If you're buying AMSOIL at retail, you're leaving money on the table. As a Preferred
+Customer you buy at wholesale — up to twenty-five percent off — shipped factory-direct from
+AMSOIL's own warehouse, and the membership typically pays for itself in about two oil changes.
+Sign up under a dealer who actually works on your platform, and you get fitment answers too."
+**Text beats:** ① Buying AMSOIL at retail? ② Preferred Customer = **wholesale, up to 25% off** ③
+Factory-direct · pays for itself in **~2 oil changes** ④ *[brand close]*
+**Caption:** The cheapest legit way to buy AMSOIL (and get real fitment help). tunedyota.com/where-to-buy-amsoil #AMSOIL #Toyota #OilChange #TunedYota
+
+---
+
 ## Production notes
 - **One asset, four platforms:** export the vertical once; post to Shorts, Reels, TikTok, Facebook.
   No per-platform re-edit needed — only the caption hashtags shift slightly if you want.
