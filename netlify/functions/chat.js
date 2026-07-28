@@ -12,6 +12,7 @@ const { sendWebPush } = require("./lib/webpush.js");
 const { cfg, createRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { notifyOwner } = require("./lib/alert.js");
+const { detectVisitIntent } = require("./lib/urgent-visit.js");
 const chatAdmin = require("./lib/chat-admin.js");
 
 const MAX_MESSAGES = 40;
@@ -63,12 +64,49 @@ async function escalate({ transfer, sess }, deps) {
   return { installer: inst };
 }
 
+// Lean urgent path (spec 2026-07-28): unlike escalate(), this never waits for
+// the structured transfer payload — a customer already acting doesn't do
+// intake. Every delivery is individually failure-guarded and the SMS failure
+// mode is LOUD (full alert re-routed to Slack), because this is the one alert
+// that must not die silently.
+async function urgentEscalate({ sess, message, why }, deps) {
+  const { env = process.env, log = console,
+    sms = (a) => sendSms(a, { env, log }),
+    push = (k, m) => sendWebPush(k, m, { env, log }),
+    slack = (t) => notifyOwner({ webhookUrl: env.SLACK_WEBHOOK_URL, text: t }),
+    ingest = (b) => ingestLead(b, { env }),
+    logEscalation = (f) => defaultLogEscalation(f, { env }) } = deps || {};
+  const inst = keyToInstaller(dispatcherKey(env));
+  const others = Object.keys(INSTALLERS).filter((k) => k !== inst.key).map((k) => "@" + k).join(" / ");
+  const who = [sess.customerName, sess.phone || sess.id].filter(Boolean).join(" · ");
+  const snippet = String(message || "").slice(0, 160);
+  const body = `⚠ URGENT — customer may be COMING TO YOU. "${snippet}" — ${who} — thread is open in the console. Reply to this text to reach them, or ${others} to dispatch.`;
+  try { await sms({ to: smsNumberFor(inst.key, env), body }); }
+  catch (e) {
+    if (log.error) log.error("urgent sms", e.message);
+    try { await slack(`⚠ URGENT visit-intent SMS FAILED (${e.message}) — act on this from the console:\n${body}`); } catch (e2) {}
+  }
+  try { await push(inst.key, { title: "URGENT: possible walk-up", body: snippet.slice(0, 90), url: "/installer.html#chats" }); } catch (e) {}
+  try { await slack(`⚠ URGENT visit-intent (${why}) on ${sess.id}: "${snippet}"`); } catch (e) {}
+  try {
+    await ingest({ name: sess.customerName || "", phone: sess.phone || "",
+      channel: /^sms:/.test(String(sess.id)) ? "phone" : "chat", source: "chat:urgent-visit",
+      message: `URGENT visit-intent (${why}): ${String(message || "").slice(0, 300)}` });
+  } catch (e) {}
+  try {
+    await logEscalation({ Question: snippet, Reason: "urgent-visit-intent",
+      "Page Context": sess.pageContext || "", "Session ID": sess.id,
+      Date: new Date().toISOString(), Status: "New" });
+  } catch (e) {}
+}
+
 async function processChat(body, deps) {
   const { env = process.env, log = console,
     load = (id) => loadSession(id, { env }),
     save = (s) => saveSession(s, { env }),
     ai = (s) => runChat(s, { env }),
     doEscalate = (a) => escalate(a, { env, log }),
+    doUrgent = (a) => urgentEscalate(a, { env, log }),
     relay = (s, m) => relayClientTurn(s, m, { env, log }),
     notifyRelayFailure = (s, e) => notifyOwner({ webhookUrl: env.SLACK_WEBHOOK_URL, text: `⚠ Chat relay to installer phone failed for ${s.customerName || s.id}: ${e.message}` }),
     notify = (sess, text) => sendWebPush(sess.installer, { title: "Chat: " + (sess.customerName || "customer"), body: String(text).slice(0, 90), url: "/installer.html#chats" }, { env, log }) } = deps || {};
@@ -105,6 +143,26 @@ async function processChat(body, deps) {
     return { status: 200, body: { reply: "We've covered a lot! For the fastest next step, grab a spot at https://tunedyota.com/find-your-exact-tune or text (612) 406-7117.", capped: true } };
   }
   sess.turns.push({ role: "user", text: message, at: Date.now(), ...(sid ? { sid } : {}) });
+
+  // Urgent visit-intent tripwire (spec 2026-07-28-address-seeking-urgent-
+  // escalation): deterministic and model-independent — fires before the AI on
+  // every channel. Escalated threads already relay every turn to a phone, so
+  // the tripwire only arms on un-escalated ones (that's also the once-per-
+  // thread guard: tripping sets escalated). The reply is fixed copy; the model
+  // never gets a say on this turn.
+  const urgentWhy = sess.status !== "escalated" ? detectVisitIntent(message, env) : "";
+  if (urgentWhy) {
+    sess.status = "escalated";
+    sess.installer = "";                                 // dispatcher-first: dispatch assigns
+    sess.lastRelayedAt = new Date().toISOString();       // urgent SMS = first relay
+    sess.urgentAt = new Date().toISOString();
+    try { await doUrgent({ sess, message, why: urgentWhy }); }
+    catch (e) { if (log.error) log.error("chat urgent", e.message); }
+    const reply = "I've flagged this straight to Aaron — he'll reach you directly in a few minutes. Please don't head anywhere until you hear from him; nothing is confirmed except through him.";
+    sess.turns.push({ role: "assistant", text: reply, at: Date.now() });
+    try { await save(sess); } catch (e) { if (log.error) log.error("chat save", e.message); }
+    return { status: 200, body: { reply, escalated: true, urgent: true, turnCount: sess.turns.length } };
+  }
 
   // Escalated thread: forward the customer's message to the phone of whoever is
   // working it (assigned installer, else the dispatcher). MUST be awaited —
@@ -212,4 +270,4 @@ async function handler(event) {
   return { statusCode: out.status, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out.body) };
 }
 
-module.exports = { handler, processChat, escalate, installerOp, MAX_MESSAGES, MAX_CHARS };
+module.exports = { handler, processChat, escalate, urgentEscalate, installerOp, MAX_MESSAGES, MAX_CHARS };
