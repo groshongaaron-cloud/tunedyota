@@ -87,7 +87,8 @@ What changes:
 |---|---|---|
 | ✅ Shipped 2026-07-28 | `/professional-ecu-tune-installer` | Gap #14 (installer query — was the biggest) |
 | ✅ Shipped 2026-07-28 | `/where-to-buy-amsoil` (Preferred Customer framing) | Gap #15 (affiliate microsites own it) |
-| August | Toyota transfer-case fluid explainer (Toyota 75W; never SVL for 2013+ Tundra transfer) | Gap #10 (legacy forums own it) |
+| ✅ Shipped 2026-07-28 | `/toyota-transfer-case-fluid` (per-model table; Tundra 75W/ATF exceptions) | Gap #10 (legacy forums own it) |
+| August+ | Next page chosen by Weekly Intel recurring-question patterns | — |
 | Ongoing | Keep Magnuson guide + pricing fresh; refresh dyno data | Defends prompts 3/6/11/13 |
 
 Every new page: answer-first opening, FAQPage + Service schema, customer
