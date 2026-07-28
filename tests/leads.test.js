@@ -280,3 +280,33 @@ test("installerKeyForPhone routes Booked clients to their installer", async () =
   assert.equal(await L.installerKeyForPhone("+12185551234",
     { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, list: async () => rows }), "cody");
 });
+
+test("dedupe backfills a placeholder 'Caller …' name with the real one (owner ask 2026-07-29)", async () => {
+  let updated;
+  const existing = { id: "recX", fields: { Name: "Caller 402-250-2733", Phone: "14022502733", Stage: "New", "Activity Log": "old" } };
+  const out = await L.processLeadIngest({ name: "Frank Sleder", phone: "(402) 250-2733", channel: "chat", message: "escalated" },
+    { list: async () => [existing], create: async () => { throw new Error("no create"); },
+      update: async (a) => { updated = a; return { id: a.id }; } });
+  assert.equal(out.deduped, true);
+  assert.equal(updated.fields.Name, "Frank Sleder");
+  assert.match(updated.fields["Activity Log"], /name: Caller 402-250-2733 → Frank Sleder/);
+});
+
+test("dedupe never overwrites a real name — not with a placeholder, not with a different real name", async () => {
+  let updated;
+  const existing = { id: "recY", fields: { Name: "Dana", Phone: "16055551212", Stage: "Contacted", "Activity Log": "old" } };
+  await L.processLeadIngest({ name: "Caller (605) 555-1212", phone: "605-555-1212", channel: "phone", message: "called again" },
+    { list: async () => [existing], create: async () => ({}), update: async (a) => { updated = a; return { id: a.id }; } });
+  assert.equal("Name" in updated.fields, false, "placeholder must not clobber a real name");
+  await L.processLeadIngest({ name: "Dana Smith", phone: "605-555-1212", channel: "phone", message: "called again" },
+    { list: async () => [existing], create: async () => ({}), update: async (a) => { updated = a; return { id: a.id }; } });
+  assert.equal("Name" in updated.fields, false, "a different real name is a human's call, not a silent merge");
+});
+
+test("dedupe backfills an entirely blank existing name", async () => {
+  let updated;
+  const existing = { id: "recZ", fields: { Name: "", Phone: "17015550000", Stage: "New", "Activity Log": "" } };
+  await L.processLeadIngest({ name: "Sam Blank", phone: "701-555-0000", channel: "sms", message: "hi" },
+    { list: async () => [existing], create: async () => ({}), update: async (a) => { updated = a; return { id: a.id }; } });
+  assert.equal(updated.fields.Name, "Sam Blank");
+});

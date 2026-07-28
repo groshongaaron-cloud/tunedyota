@@ -104,6 +104,17 @@ async function processLeadIngest(body, deps) {
   if (match) {
     const fields = { "Last Contact": new Date(now).toISOString().slice(0, 10),
       "Activity Log": appendActivity(match.fields["Activity Log"], touch) };
+    // Name backfill (owner ask 2026-07-29): channel adapters auto-name leads
+    // "Caller (xxx) xxx-xxxx"; when a later touch carries the real name
+    // (usually the chat agent's transfer), upgrade the placeholder. Never
+    // overwrite a real name — a conflicting real name is a human's call —
+    // and never downgrade a real name to a placeholder.
+    const isPlaceholder = (n) => !String(n || "").trim() || /^caller\b/i.test(String(n).trim());
+    if (!isPlaceholder(name) && isPlaceholder(match.fields.Name)) {
+      fields.Name = name;
+      fields["Activity Log"] = appendActivity(fields["Activity Log"],
+        logLine(now, `name: ${String(match.fields.Name || "").trim() || "(blank)"} → ${name}`));
+    }
     if (emailThread) fields["Email Thread"] = emailThread;
     if (emailMessageId) fields["Email Message-Id"] = emailMessageId;
     if (replyTo) fields["Reply-To"] = replyTo;
