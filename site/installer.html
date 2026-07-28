@@ -2216,7 +2216,14 @@
       if(res.ok && out.status==='ok'){
         var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
         if(b){ if(d) b.dateISO=d; if(t) b.scheduledTime=t; if(a) b.address=a; }
-        succeed('✓ Schedule updated.'); renderAll();
+        // Confidence, not just a toast (console rule: every booking action ends
+        // with the booking visibly highlighted). A date change relocates the
+        // card to another day group, which read as "my update vanished"
+        // (Noah, 2026-07-28) — so say exactly what saved, then jump-and-flash
+        // the card at its NEW location, same as delete/undo already do.
+        var what=[]; if(d) what.push(fmtMD(d)); if(t) what.push(t); if(a) what.push('address saved');
+        succeed('✓ '+((b&&b.name)||'Booking')+' updated — '+what.join(' · ')+'.');
+        if(b) jumpToBooking(b); else renderAll();
       } else { fail('Could not update: '+(out.error||res.status)); }
     }catch(e){ fail('Network error — try again.'); }
   }
