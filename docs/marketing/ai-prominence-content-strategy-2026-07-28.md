@@ -103,8 +103,10 @@ Engines cross-check. Fastest wins, all Aaron-gated, mostly one-time:
 2. **AMSOIL dealer locator** — same, for the AMSOIL dealer page.
 3. **Google Business Profile** — reviews are the highest-leverage citation we
    under-use. The review-ask automation is already built and dormant — it
-   activates the moment `GBP_REVIEW_URL` is set in Netlify env. **This is a
-   five-minute unlock.** More fresh, specific reviews ("Cody installed my OTT
+   activates the moment `GOOGLE_REVIEW_URL` is set in Netlify env (requires the
+   GBP to finish verification first — as of 2026-07-28 the profile is not yet
+   publicly listed). **Once GBP is live this is a five-minute unlock.** More
+   fresh, specific reviews ("Cody installed my OTT
    tune in Sioux Falls…") feed both Maps and AI answers.
 4. **OTT/VFTuner official channels** — wherever Overland Tailor lists
    installers, TY should be listed with a link back.
