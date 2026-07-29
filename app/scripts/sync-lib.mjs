@@ -25,7 +25,7 @@ export const ASSETS = [
   "apple-touch-icon.png", "fox.svg", "logo.png", "installer.webmanifest",
   "commission-tally.js", "offline-queue.js", "sw.js",
   "app-shell.js", "product-lines.js", "native-fetch.js", "payment-checkout.js",
-  "magnuson-catalog.js", "amsoil-garage-render.js", "amsoil-garage.json",
+  "magnuson-catalog.js", "banks-catalog.js", "amsoil-garage-render.js", "amsoil-garage.json",
   "vehicles.json", "chat.js",
 ];
 

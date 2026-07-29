@@ -49,6 +49,33 @@
     return out;
   }
 
+  // Banks Power — same application shape as Magnuson (the catalog generator
+  // merges Banks' per-year fitment tags into ranged applications). Reserve
+  // mode until the dealer price sheet lands; kits deep-link their store page.
+  function banksItems(vehicle, catalog) {
+    if (!vehicle || !catalog || !Array.isArray(catalog.applications)) return [];
+    var name = (String(vehicle.make || "") + " " + String(vehicle.model || "")).trim().toLowerCase();
+    var y = yearNum(vehicle.year);
+    if (y == null) return [];
+    var out = [], seen = {};
+    catalog.applications.forEach(function (app) {
+      if (String(app.vehicle || "").toLowerCase() !== name) return;
+      if (!AG.inRange(app.years, y)) return;
+      (app.kits || []).forEach(function (k) {
+        if (!k.sku || seen[k.sku]) return; // engine variants can repeat a SKU
+        seen[k.sku] = true;
+        out.push({
+          sku: k.sku,
+          name: k.name,
+          price: k.retail,
+          blurb: k.note || ((app.engine ? app.engine + " · " : "") + (app.years || "")),
+          url: k.slug ? "/" + k.slug : "/banks-products"
+        });
+      });
+    });
+    return out;
+  }
+
   // Fix 4: delegate to canonical resolveVehicle; split "|" garage option value
   // resolveVehicle signature: resolveVehicle(params, catalog, currentYear, includeUnverified)
   // returns: { make, model, gen, matches } or null; verified-only by default (no includeUnverified)
@@ -75,6 +102,8 @@
   var LINES = [
     { id: "magnuson", label: "Power — Magnuson", icon: "⚡", checkout: "converge",
       itemsFor: function (vehicle, data) { return magnusonItems(vehicle, (data || {}).magnuson); } },
+    { id: "banks", label: "Air & Gauges — Banks Power", icon: "🌀", checkout: "reserve",
+      itemsFor: function (vehicle, data) { return banksItems(vehicle, (data || {}).banks); } },
     { id: "amsoil", label: "Fluids — AMSOIL", icon: "🛢", checkout: "reserve",
       itemsFor: function (vehicle, data) { return amsoilItems(vehicle, (data || {}).amsoil); } },
   ];

@@ -57,6 +57,7 @@
 
 <script>window.TY_CHAT_DOCKED = true;</script>
 <script src="/magnuson-catalog.js"></script>
+<script src="/banks-catalog.js"></script>
 <script src="/amsoil-garage-render.js"></script>
 <script src="/product-lines.js"></script>
 <script src="/app-shell.js"></script>
@@ -65,7 +66,7 @@
 <script>
 (function () {
   var S = window.TYAppShell, PL = window.TYProductLines, AG = window.AmsoilGarage;
-  var DATA = { magnuson: window.MAGNUSON_CATALOG, amsoil: null };
+  var DATA = { magnuson: window.MAGNUSON_CATALOG, banks: window.BANKS_CATALOG, amsoil: null };
   var CERTS = null; // null = not loaded; [] = loaded, none
   var VIEW = document.getElementById("view");
   var renderGen = 0; // stale-render guard: incremented each render(); async callbacks check this
@@ -240,7 +241,7 @@
       } else if (t.dataset.buy) { startBuy(t.dataset.buy, t); }
       else if (t.dataset.reserve) {
         var reserveLine = PL.linesFor(v, DATA).find(function (x) { return x.id === t.dataset.reserve; });
-        if (reserveLine && reserveLine.items.length) openReserve(v, reserveLine.items.map(function (it) { return it.sku; }));
+        if (reserveLine && reserveLine.items.length) openReserve(v, reserveLine.items.map(function (it) { return it.sku; }), reserveLine.id);
       }
       else if (t.id === "rmveh") { e.preventDefault(); setGarage(S.removeVehicle(garage(), i)); go("#garage"); }
     };
@@ -264,11 +265,17 @@
     p.textContent = text;
   }
 
-  // AMSOIL reserve — the compliant flow: no online payment (G-4000 §7.6).
-  function openReserve(v, kit) {
+  // Reserve — the no-online-payment flow (AMSOIL: G-4000 §7.6 compliance;
+  // Banks: dealer onboarding in progress). Endpoint + copy switch per line.
+  var RESERVE_LINES = {
+    amsoil: { fn: "amsoil-reserve", title: "Reserve your AMSOIL kit" },
+    banks: { fn: "banks-reserve", title: "Reserve your Banks Power parts" }
+  };
+  function openReserve(v, kit, lineId) {
+    var rl = RESERVE_LINES[lineId] || RESERVE_LINES.amsoil;
     var yearLabel = String(v.year || "").split("|")[0];
     sheetBody.innerHTML =
-      '<h3 style="margin-top:0">Reserve your AMSOIL kit</h3>' +
+      '<h3 style="margin-top:0">' + esc(rl.title) + "</h3>" +
       '<p class="muted">' + esc(yearLabel + " " + v.make + " " + v.model) + " — we'll confirm personally; pay at pickup or install.</p>" +
       '<input class="field" id="rname" placeholder="Name" style="margin-bottom:8px">' +
       '<input class="field" id="remail" type="email" placeholder="Email" style="margin-bottom:8px">' +
@@ -289,7 +296,7 @@
         kit: kit
       };
       if (!body.name || (!body.email && !body.phone)) { msg.className = "err"; msg.textContent = "Name plus an email or phone, please."; return; }
-      fetch("/.netlify/functions/amsoil-reserve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      fetch("/.netlify/functions/" + rl.fn, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
         .then(function (r) { return r.json(); })
         .then(function (j) {
           if (j.status === "ok") { msg.className = "muted"; msg.textContent = "Reserved ✓ — we'll confirm shortly."; document.getElementById("rgo").disabled = true; }
@@ -353,7 +360,7 @@
         if (e.target.dataset.buy) return startBuy(e.target.dataset.buy, e.target);
         if (e.target.dataset.reserve && v) {
           var shopLine = PL.linesFor(v, DATA).find(function (x) { return x.id === e.target.dataset.reserve; });
-          if (shopLine && shopLine.items.length) return openReserve(v, shopLine.items.map(function (it) { return it.sku; }));
+          if (shopLine && shopLine.items.length) return openReserve(v, shopLine.items.map(function (it) { return it.sku; }), shopLine.id);
         }
       };
     }
