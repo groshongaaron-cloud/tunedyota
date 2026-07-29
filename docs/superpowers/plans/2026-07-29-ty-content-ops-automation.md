@@ -140,6 +140,7 @@ Modes: **check** (watcher entry, silent when idle) · **stage** (default when ne
 - `check` mode ends silently when there is nothing new — no notification, no summary.
 - Never push `master` except in **ship** mode, and there only via the REPO ship skill.
 - Files matching `test-*` are dry-run only: run verification, print results, touch nothing else.
+- A top-level PNG matching no known prefix (`magnuson-` / `ott-` / `amsoil-` / `banks-` / `test-`) is never auto-staged: record it in `.processed.json` so it's reported only once, log it in the watcher log, and notify `[error]` "unrecognized export <name> — rename with a pack prefix or remove." Recognized files in the same run still stage normally.
 
 ## Notifications
 
