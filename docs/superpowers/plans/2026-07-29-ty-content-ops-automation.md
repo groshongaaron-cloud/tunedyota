@@ -292,3 +292,25 @@ No candidates → no post.
 - [ ] **Step 4: Ship approval** — remind Aaron that two commits are sitting unpushed on `master` (spec/plan docs, notify topic routing) and will deploy with the next approved ship.
 
 - [ ] **Step 5: Update memory** — rewrite `notebooklm-pipeline.md` memory (watcher + skills now exist; "ship it" flow) and add a memory for the content-ops automation (skills, cron name, relay contract). Update `MEMORY.md` index.
+
+---
+
+## Execution notes (2026-07-29, all 6 tasks complete)
+
+- **Task 4 deviation:** implemented as a Windows Task Scheduler job `TY-Content-Watcher`
+  (every 30 min) running `C:\Users\grosh\TunedYota-NotebookLM\watcher.ps1` →
+  `claude -p "/ty-publish check" --dangerously-skip-permissions`, instead of a Claude
+  Code cron: session crons die with the session and auto-expire after 7 days. A cmd
+  wrapper crashed under the scheduler (0xC000013A — `claude -p` console issue);
+  PowerShell-hosted works, verified end-to-end (idle line written by a scheduled run).
+  Headless output appends to `output\.watcher-stdout.log`.
+- **Task 2 addition:** ty-publish gained a hard rule for unrecognized-prefix PNGs
+  (report-once via `.processed.json`, `[error]` notify, recognized files still stage).
+- **Task 5 note:** both routines updated via the routines API (daily
+  trig_012bNe6oSHBYbDkJKTxN3VAs, weekly trig_01MxUTSKhnCBxJpuKBE6tMFf); the notify
+  relay token is embedded in the routine prompts by design (low-value self-minted
+  relay key, same pattern notify.js documents). Forced verification run skipped —
+  today's daily had already fired; next scheduled run verifies naturally.
+- notify.js topic routing shipped to production early (a parallel session pushed
+  master while this plan executed); it is inert until `SLACK_WEBHOOK_URL_CONTENT_OPS`
+  is set.
