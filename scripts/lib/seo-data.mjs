@@ -116,8 +116,20 @@ export function extractMeta(html) {
   return { title, description, canonical };
 }
 
-export function buildOgTags({ title, description, canonical }) {
-  const img = `${SITE}/og-image.png`;
+// Per-page OG/Twitter card image (self-hosted Magnuson product shots — same
+// files the Product schema uses). Everything else falls back to the site banner.
+export const OG_IMAGES = {
+  "toyota-tacoma-supercharger.html": "/images/magnuson/tacoma-35-tvs1900.jpg",
+  "toyota-tundra-supercharger.html": "/images/magnuson/tundra-57-tvs2650.jpg",
+  "toyota-4runner-supercharger.html": "/images/magnuson/4runner-fj-40-tvs1320.jpg",
+  "toyota-fj-cruiser-supercharger.html": "/images/magnuson/4runner-fj-40-tvs1320.jpg",
+  "toyota-land-cruiser-supercharger.html": "/images/magnuson/lc-sequoia-lx570-tvs2650.jpg",
+  "toyota-sequoia-supercharger.html": "/images/magnuson/lc-sequoia-lx570-tvs2650.jpg",
+  "lexus-lx570-supercharger.html": "/images/magnuson/lc-sequoia-lx570-tvs2650.jpg",
+};
+
+export function buildOgTags({ title, description, canonical, file }) {
+  const img = `${SITE}${OG_IMAGES[file] || "/og-image.png"}`;
   const lines = [
     `<meta property="og:title" content="${ESC(title)}">`,
     `<meta property="og:description" content="${ESC(description)}">`,
