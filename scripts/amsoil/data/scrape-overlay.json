@@ -6,9 +6,10 @@
   "compressor-oil.json",
   "fuel-additives.json",
   "gasoline-motor-oil.json",
+  "gear-oil.json",
   "hydraulic-oil.json"
  ],
- "count": 96,
+ "count": 108,
  "products": {
   "ATLQT-EA": {
    "path": "/p/amsoil-signature-series-fuel-efficient-100-synthetic-automatic-transmission-fluid-atl/",
@@ -943,6 +944,374 @@
    "reviews": 10,
    "name": "AMSOIL 5W-30 Synthetic-Blend Motor Oil ",
    "source": "gasoline-motor-oil.json"
+  },
+  "SVGQT-EA": {
+   "path": "/p/amsoil-severe-gear-75w-90-100-synthetic-gear-lube-svg/",
+   "price": 24.59,
+   "rating": 5,
+   "reviews": 1168,
+   "name": "AMSOIL SEVERE GEAR® 75W-90 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "SVGQT-EA": {
+     "price": 24.59,
+     "size": "Quart Bottle"
+    },
+    "SVGQT-CA": {
+     "price": 292.6,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "SVGPK-EA": {
+     "price": 24.59,
+     "size": "Quart Easy-Pack"
+    },
+    "SVGPK-CA": {
+     "price": 292.6,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "SVG55-EA": {
+     "price": 4520.3,
+     "size": "55 Gallon Drum"
+    },
+    "SVG16-EA": {
+     "price": 1513.4,
+     "size": "16 Gallon Keg"
+    },
+    "SVG05-EA": {
+     "price": 461.75,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "SVLPK-EA": {
+   "path": "/p/amsoil-severe-gear-75w-85-100-synthetic-gear-lube-svl/",
+   "price": 24.59,
+   "rating": 5,
+   "reviews": 1168,
+   "name": "AMSOIL SEVERE GEAR® 75W-85 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "SVLPK-EA": {
+     "price": 24.59,
+     "size": "Quart Easy-Pack"
+    },
+    "SVLPK-CA": {
+     "price": 292.6,
+     "size": "Quart Easy-Pack, Case of 12"
+    }
+   }
+  },
+  "SVTQT-EA": {
+   "path": "/p/amsoil-severe-gear-75w-110-100-synthetic-gear-lube-svt/",
+   "price": 24.79,
+   "rating": 5,
+   "reviews": 1168,
+   "name": "AMSOIL SEVERE GEAR® 75W-110 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "SVTQT-EA": {
+     "price": 24.79,
+     "size": "Quart Bottle"
+    },
+    "SVTQT-CA": {
+     "price": 295,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "SVTPK-EA": {
+     "price": 26.89,
+     "size": "Quart Easy-Pack"
+    },
+    "SVTPK-CA": {
+     "price": 320,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "SVT55-EA": {
+     "price": 4560.05,
+     "size": "55 Gallon Drum"
+    },
+    "SVT05-EA": {
+     "price": 465.6,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "SVOQT-EA": {
+   "path": "/p/amsoil-severe-gear-75w-140-100-synthetic-gear-lube-svo/",
+   "price": 26.69,
+   "rating": 5,
+   "reviews": 1168,
+   "name": "AMSOIL SEVERE GEAR® 75W-140 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "SVOQT-EA": {
+     "price": 26.69,
+     "size": "Quart Bottle"
+    },
+    "SVOQT-CA": {
+     "price": 317.65,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "SVOPK-EA": {
+     "price": 26.69,
+     "size": "Quart Easy-Pack"
+    },
+    "SVOPK-CA": {
+     "price": 317.65,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "SVO55-EA": {
+     "price": 4938.5,
+     "size": "55 Gallon Drum"
+    },
+    "SVO27-EA": {
+     "price": 24620.15,
+     "size": "275 Gallon Tote"
+    },
+    "SVO16-EA": {
+     "price": 1640.05,
+     "size": "16 Gallon Keg"
+    },
+    "SVO05-EA": {
+     "price": 502.8,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "AGLQT-EA": {
+   "path": "/p/amsoil-severe-gear-80w-90-100-synthetic-gear-lube-agl/",
+   "price": 19.49,
+   "rating": 5,
+   "reviews": 123,
+   "name": "AMSOIL SEVERE GEAR® 80W-90 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "AGLQT-EA": {
+     "price": 19.49,
+     "size": "Quart Bottle"
+    },
+    "AGLQT-CA": {
+     "price": 231,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AGLPK-EA": {
+     "price": 21.39,
+     "size": "Quart Easy-Pack"
+    },
+    "AGLPK-CA": {
+     "price": 254.6,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "AGL55-EA": {
+     "price": 3491.55,
+     "size": "55 Gallon Drum"
+    },
+    "AGL27-EA": {
+     "price": 17385.6,
+     "size": "275 Gallon Tote"
+    },
+    "AGL16-EA": {
+     "price": 1201.95,
+     "size": "16 Gallon Keg"
+    },
+    "AGL05-EA": {
+     "price": 360.6,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "SRTQT-EA": {
+   "path": "/p/amsoil-severe-gear-sae-250-100-synthetic-gear-lube-srt/",
+   "price": 25.59,
+   "rating": 5,
+   "reviews": 9,
+   "name": "AMSOIL SEVERE GEAR® SAE 250 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "SRTQT-EA": {
+     "price": 25.59,
+     "size": "Quart Bottle"
+    },
+    "SRTQT-CA": {
+     "price": 305.1,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "SRT55-EA": {
+     "price": 4847.75,
+     "size": "55 Gallon Drum"
+    },
+    "SRT05-EA": {
+     "price": 493.9,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "FGRQT-EA": {
+   "path": "/p/amsoil-75w-90-long-life-100-synthetic-gear-lube-fgr/",
+   "price": 20.79,
+   "rating": 5,
+   "reviews": 44,
+   "name": "AMSOIL 75W-90 Long Life 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "FGRQT-EA": {
+     "price": 20.79,
+     "size": "Quart Bottle"
+    },
+    "FGRQT-CA": {
+     "price": 247.4,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "FGR55-EA": {
+     "price": 3884,
+     "size": "55 Gallon Drum"
+    },
+    "FGR27-EA": {
+     "price": 19347.7,
+     "size": "275 Gallon Tote"
+    },
+    "FGR1G-EA": {
+     "price": 82.19,
+     "size": "Gallon Jug"
+    },
+    "FGR1G-CA": {
+     "price": 326.7,
+     "size": "Gallon Jugs, Case of 4"
+    },
+    "FGR16-EA": {
+     "price": 1320.75,
+     "size": "16 Gallon Keg"
+    },
+    "FGR05-EA": {
+     "price": 399.15,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "FGO05-EA": {
+   "path": "/p/amsoil-80w-140-long-life-100-synthetic-gear-lube-fgo/",
+   "price": 381,
+   "rating": 5,
+   "reviews": 44,
+   "name": "AMSOIL 80W-140 Long Life 100% Synthetic Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "FGO55-EA": {
+     "price": 3699.9,
+     "size": "55 Gallon Drum"
+    },
+    "FGO27-EA": {
+     "price": 18427.35,
+     "size": "275 Gallon Tote"
+    },
+    "FGO05-EA": {
+     "price": 381,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "ADATB-EA": {
+   "path": "/p/amsoil-slip-lock-differential-additive-adatb/",
+   "price": 13.29,
+   "rating": 5,
+   "reviews": 98,
+   "name": "AMSOIL Slip Lock® Differential Additive",
+   "source": "gear-oil.json",
+   "variants": {
+    "ADATB-EA": {
+     "price": 13.29,
+     "size": "4 oz. Tube"
+    },
+    "ADATB-CA": {
+     "price": 157.65,
+     "size": "4 oz. Tubes, Case of 12"
+    }
+   }
+  },
+  "MVPQT-EA": {
+   "path": "/p/amsoil-100-synthetic-v-twin-primary-fluid-mvp/",
+   "price": 19.69,
+   "rating": 5,
+   "reviews": 535,
+   "name": "AMSOIL 100% Synthetic V-Twin Primary Fluid",
+   "source": "gear-oil.json",
+   "variants": {
+    "MVPQT-EA": {
+     "price": 19.69,
+     "size": "Quart Bottle"
+    },
+    "MVPQT-CA": {
+     "price": 234.1,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "TCCCN-EA": {
+   "path": "/p/amsoil-100-synthetic-chaincase-gear-oil-tcc/",
+   "price": 15.49,
+   "rating": 5,
+   "reviews": 34,
+   "name": "AMSOIL 100% Synthetic Chaincase &amp; Gear Oil",
+   "source": "gear-oil.json",
+   "variants": {
+    "TCCCN-EA": {
+     "price": 15.49,
+     "size": "16 oz. Bottle"
+    },
+    "TCCCN-CA": {
+     "price": 92.1,
+     "size": "16 oz. Bottles, Case of 6"
+    },
+    "TCC05-EA": {
+     "price": 405.2,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "AGMQT-EA": {
+   "path": "/p/amsoil-75w-90-100-synthetic-marine-gear-lube-agm/",
+   "price": 19.89,
+   "rating": 5,
+   "reviews": 107,
+   "name": "AMSOIL 75W-90 100% Synthetic Marine Gear Lube",
+   "source": "gear-oil.json",
+   "variants": {
+    "AGMTB-EA": {
+     "price": 10.29,
+     "size": "10 oz. Tube"
+    },
+    "AGMTB-CA": {
+     "price": 61.65,
+     "size": "10 oz. Tubes, Case of 6"
+    },
+    "AGMQT-EA": {
+     "price": 19.89,
+     "size": "Quart Bottle"
+    },
+    "AGMQT-CA": {
+     "price": 236.4,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AGMPK-EA": {
+     "price": 21.99,
+     "size": "Quart Easy-Pack"
+    },
+    "AGMPK-CA": {
+     "price": 261.05,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "AGM55-EA": {
+     "price": 3700.1,
+     "size": "55 Gallon Drum"
+    },
+    "AGM16-EA": {
+     "price": 1265.05,
+     "size": "16 Gallon Keg"
+    },
+    "AGM05-EA": {
+     "price": 381.1,
+     "size": "5 Gallon Pail"
+    }
+   }
   },
   "AWG05-EA": {
    "path": "/p/amsoil-iso-22-100-synthetic-anti-wear-hydraulic-oil-awg/",
