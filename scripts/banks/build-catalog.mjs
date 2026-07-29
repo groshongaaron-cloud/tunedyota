@@ -1,6 +1,6 @@
 // Banks Power catalog generator — from the committed site scrape
 // (data/banks-site-scrape.json, public bankspower.com retail pricing) build:
-//   1. app/www/banks-catalog.js — window.BANKS_CATALOG applications for the
+//   1. site/banks-catalog.js — window.BANKS_CATALOG applications for the
 //      client-app product line (Toyota + Lexus fitment front and center).
 //   2. site/banks-catalog.json — server-side SKU → {name, retail} lookup for
 //      netlify/functions/banks-reserve.js (prices resolve server-side; the
@@ -97,7 +97,7 @@ function main() {
    ═══════════════════════════════════════════════════════════════ */
 window.BANKS_CATALOG = ${JSON.stringify({ updated: SCRAPE.scraped, applications }, null, 2)};
 `;
-  fs.writeFileSync("app/www/banks-catalog.js", js);
+  fs.writeFileSync("site/banks-catalog.js", js);
   fs.writeFileSync("site/banks-catalog.json", JSON.stringify({ updated: SCRAPE.scraped, products: buildSkuIndex(SCRAPE.products) }, null, 1) + "\n");
   console.log(`banks catalog: ${applications.length} Toyota/Lexus applications, ${kitCount} kit rows; sku index ${Object.keys(buildSkuIndex(SCRAPE.products)).length}`);
 }
