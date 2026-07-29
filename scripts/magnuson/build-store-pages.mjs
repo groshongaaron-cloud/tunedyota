@@ -264,7 +264,7 @@ ${notes.length ? `
 ${notes.map((n) => `    <li>${ESC(n)}</li>`).join("\n")}
   </ul>` : ""}
   <h2>Keep browsing</h2>
-  <div class="lp-veh">${vp ? `<a href="${vp}">${ESC(Object.entries(VEHICLE_PAGE).find(([, h]) => h === vp)[0])} supercharger overview</a>` : ""}<a href="/magnuson-products">Every Magnuson product</a><a href="/magnuson-supercharger-pricing">Toyota &amp; Lexus price list + quote builder</a><a href="/supercharger">Superchargers at Tuned Yota</a></div>
+  <div class="lp-veh">${vp ? `<a href="${vp}">${ESC(Object.entries(VEHICLE_PAGE).find(([, h]) => h === vp)[0])} supercharger overview</a>` : ""}<a href="/magnuson-products">Every Magnuson product</a><a href="/magnuson-supercharger-pricing">Toyota &amp; Lexus price list + quote builder</a><a href="/banks-products">Banks Power catalog</a><a href="/supercharger">Superchargers at Tuned Yota</a></div>
   <p class="lp-disc">Prices are Magnuson's published retail (MSP) pricing as of ${ESC(CAT.updated)} and are subject to change. Ordering through Tuned Yota, an authorized Magnuson dealer, costs nothing extra. Freight and any applicable install/calibration quoted before you commit.</p>
 </div>
 ${FOOTER}
@@ -333,7 +333,7 @@ ${sections.map((s) => `  <h2 id="${s.id}">${ESC(s.title)}</h2>
 ${s.rows.join("\n")}
   </tbody></table>`).join("\n")}
   <h2>Keep browsing</h2>
-  <div class="lp-veh"><a href="/magnuson-supercharger-pricing">Toyota &amp; Lexus quote builder</a><a href="/supercharger">Why supercharge with Tuned Yota</a><a href="/find-your-exact-tune">Find Your Exact Tune</a></div>
+  <div class="lp-veh"><a href="/magnuson-supercharger-pricing">Toyota &amp; Lexus quote builder</a><a href="/banks-products">Banks Power catalog</a><a href="/supercharger">Why supercharge with Tuned Yota</a><a href="/find-your-exact-tune">Find Your Exact Tune</a></div>
   <p class="lp-disc">Prices are Magnuson's published retail (MSP) pricing as of ${ESC(CAT.updated)}, subject to change without notice. Tuned Yota is an authorized Magnuson dealer; freight and install/calibration quoted before you commit.</p>
 </div>
 ${FOOTER}
