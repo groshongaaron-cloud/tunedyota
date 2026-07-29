@@ -1,0 +1,46 @@
+[
+ {
+  "product_url": "https://www.amsoil.com/p/mann-filters-cabin-air-filters-manncab/",
+  "product_name": "MANN-FILTERS Cabin Air Filters",
+  "page_title": "MANN-FILTERS Cabin Air Filters - AMSOIL",
+  "product_description": "Shop MANN-FILTERS Cabin Air Filters at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "32.91",
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "CUK8430-EA",
+  "customer_rating": "",
+  "total_reviews": null,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/cu1009.jpg?context=bWFzdGVyfGltYWdlc3wxMTY1MjZ8aW1hZ2UvanBlZ3xhVzFoWjJWekwyZzRNQzlvTTJVdk9EYzVPRE0zTkRVNU1qVTBNaTVxY0djfDQxOTc1MWI1NDAxNTEwZjc1OGQ2MWJiYWRmZGJkY2I5MTE2Yzk3MmVmMjJiMjlmZGJjZmZhYzAwZDRkNTc3Yjk",
+  "variants_ld": [
+   {
+    "sku": "CUK8430-EA",
+    "size": "CUK8430",
+    "price": 32.91
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/wix-cabin-air-filters-wixcab/",
+  "product_name": "WIX Cabin Air Filters",
+  "page_title": "WIX Cabin Air Filters - AMSOIL",
+  "product_description": "Shop WIX Cabin Air Filters at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "25.21",
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "24909-EA",
+  "customer_rating": "",
+  "total_reviews": null,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/24161.jpg?context=bWFzdGVyfGltYWdlc3w4NTMyN3xpbWFnZS9qcGVnfGFXMWhaMlZ6TDJnMFl5OW9ORE12T0RjNU9ESTVNakE0TWpjeE9DNXFjR2N8MTc5YWE0MTFlYjNlNWNlMjRlZDRhMmUxMzVhZjZmY2E1Y2VmMmEyNWI2NjY5YmQ0MDcwZjFhZDg0MGM3NGVmOQ",
+  "variants_ld": [
+   {
+    "sku": "24909-EA",
+    "size": "24909",
+    "price": 25.21
+   }
+  ]
+ }
+]

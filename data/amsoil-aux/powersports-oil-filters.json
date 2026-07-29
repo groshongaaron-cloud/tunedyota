@@ -1,0 +1,76 @@
+[
+ {
+  "product_url": "https://www.amsoil.com/p/wix-xp-oil-filter-wixxpoil/",
+  "product_name": "WIX XP Oil Filter",
+  "page_title": "WIX XP Oil Filter - AMSOIL",
+  "product_description": "Shop WIX XP Oil Filter at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "19.05",
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "WL10255XP-EA",
+  "customer_rating": "",
+  "total_reviews": null,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/wixxpoil-ea.jpg?context=bWFzdGVyfGltYWdlc3w1NDc0OHxpbWFnZS9qcGVnfGFERmhMMmhtWlM4eU9UUXdPRFUyTnpneU1ETXhPQzkzYVhoNGNHOXBiRjlsWVM1cWNHY3xhNjJjN2JmMjUwMjhlZjgzNTliNzYyNDYxNzAwMzYyNTM3MzViNmY4ODVjNjVkYmQ5M2I4M2Q2ZGE4YmMzMDFi",
+  "variants_ld": [
+   {
+    "sku": "WL10255XP-EA",
+    "size": "WL10255XP",
+    "price": 19.05
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/wix-oil-filter-wixoil/",
+  "product_name": "WIX Oil Filter",
+  "page_title": "WIX Oil Filter - AMSOIL",
+  "product_description": "Shop WIX Oil Filter at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "18.64",
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "WL7490-EA",
+  "customer_rating": "",
+  "total_reviews": null,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/wixnew-ea.jpg?context=bWFzdGVyfGltYWdlc3w1NjMwNXxpbWFnZS9qcGVnfGFEaGtMMmcyWkM4eE5EQXpOams1TlRjek5UVTRNaTkzYVhodVpYZGZaV0V1YW5CbnwxZTE2ZjMyNzY0ZTUyMDY3OGRhMWNkZjJkYmJlMTZmZDE3ZTM1ZTI3MWYwYmM2NzhhYjhmN2YxMjg1MWQ1ZmU1",
+  "variants_ld": [
+   {
+    "sku": "WL7490-EA",
+    "size": "WL7490",
+    "price": 18.64
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-black-oil-filter-eaom/",
+  "product_name": "AMSOIL Black Oil Filter",
+  "page_title": "EaOM Motorcycle Oil Filters - AMSOIL",
+  "product_description": "Shop AMSOIL Black Oil Filter at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": null,
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "",
+  "customer_rating": "5 (3358)",
+  "total_reviews": 3358,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/eaom-black.jpg?context=bWFzdGVyfGltYWdlc3w1MzY3MHxpbWFnZS9qcGVnfGFHWTJMMmhoTUM4eE16UTVOalUwTXpRME5UQXlNaTlsWVc5dFgySnNZV05yTG1wd1p3fDU2ZWFhY2Y4YmM4ZGRiZGRhYTFjYWYyYzgwZWY1YzU4NGU3OTRiNzA3ODA0MzMxYTVlYzFiMmVlYmU2NmRlZjI"
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-chrome-oil-filter-eaomc/",
+  "product_name": "AMSOIL Chrome Oil Filter",
+  "page_title": "EaOM Chrome Motorcycle Oil Filters - AMSOIL",
+  "product_description": "Shop AMSOIL Chrome Oil Filter at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": null,
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "",
+  "customer_rating": "5 (3358)",
+  "total_reviews": 3358,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/eaom-chrome.jpg?context=bWFzdGVyfGltYWdlc3w1MjQ5M3xpbWFnZS9qcGVnfGFHRXdMMmd6TXk4eE16UTVOalUwTkRVMU9URXpOQzlsWVc5dFgyTm9jbTl0WlM1cWNHY3wwMzkyMjk2NzY4NjY5MjE5MTY5M2MzMGVmMmZlZGJhMjZkYWI0YjYyZWFkODYzZjk3MjE2MDM4OGQ3YmVkZWUx"
+ }
+]

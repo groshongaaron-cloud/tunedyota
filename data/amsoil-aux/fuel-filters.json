@@ -1,0 +1,66 @@
+[
+ {
+  "product_url": "https://www.amsoil.com/p/wix-fuel-filters-wixfuel/",
+  "product_name": "WIX Fuel Filters",
+  "page_title": "WIX Fuel Filters - AMSOIL",
+  "product_description": "Shop WIX Fuel Filters at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "60.32",
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "WF10659-EA",
+  "customer_rating": "",
+  "total_reviews": null,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/24050.jpg?context=bWFzdGVyfGltYWdlc3w0OTEzMHxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJnNE9DOW9aR1V2T0RjNU9ESTVNVGc0TmpFeE1DNXFjR2N8OWYxYzRhY2QxYzljYmE0OThkNGViMThmOTViOTJjMzI4ZGQ2ODI5MGVjNTkwNDRmODcyODQ4ZGJmODNiODdkNA",
+  "variants_ld": [
+   {
+    "sku": "WF10659-EA",
+    "size": "WF10659",
+    "price": 60.32
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/mann-filters-fuel-filters-mannfuel/",
+  "product_name": "MANN-FILTERS Fuel Filters",
+  "page_title": "MANN-FILTERS Fuel Filters - AMSOIL",
+  "product_description": "Shop MANN-FILTERS Fuel Filters at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "offer_price": "34.7",
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "WK8533X-EA",
+  "customer_rating": "",
+  "total_reviews": null,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/bfu900x.jpg?context=bWFzdGVyfGltYWdlc3w4NzQ5NXxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJoaU5DOW9PR1l2T0RjNU9ETTFPRGcyTXprd01pNXFjR2N8YWUxMjY2NzliZTBjOWQ3MzU1MGUwNjVhYzkzNTRmNDM3NDFjNDUzMWQ4ODY0NGU2Y2FhYTYwNzJjN2JiZTAxOA",
+  "variants_ld": [
+   {
+    "sku": "WK8533X-EA",
+    "size": "WK8533X",
+    "price": 34.7
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/donaldson-p-series-heavy-duty-fuel-filters-dnlsnphdfl/",
+  "product_name": "Donaldson P-Series Heavy Duty Fuel Filters",
+  "page_title": "Donaldson P-Series Heavy Duty Fuel Filters - AMSOIL",
+  "product_description": "Shop Donaldson P-Series Heavy Duty Fuel Filters at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "offer_price": "15.09",
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "P559100-EA",
+  "customer_rating": "",
+  "total_reviews": null,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/p502134.jpg?context=bWFzdGVyfGltYWdlc3wzOTg0MnxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJneU5DOW9OREV2T0RjNU9EVTJNekl6TnpreE9DNXFjR2N8MmVmMjVhOWM3MmUyNzJiODFmOWUyZDkwYzA4MzU1ZTExYThlNDQ5NmE3NmJiZWQ1MDk2NjdmNGMzYmE3N2ZiZQ",
+  "variants_ld": [
+   {
+    "sku": "P559100-EA",
+    "size": "P559100",
+    "price": 15.09
+   }
+  ]
+ }
+]
