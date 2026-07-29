@@ -43,6 +43,14 @@ function imageForApp(app) {
 
 const ESC = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+// Per-SKU store pages (scripts/magnuson/build-store-pages.mjs) are the
+// preferred landing pages — one product, one price, one schema block — which
+// satisfies Merchant Center's specific-landing-page requirement. Fall back to
+// the vehicle page only if a SKU has no store page.
+const SLUGS = fs.existsSync(path.join(SITE_DIR, "magnuson-slugs.json"))
+  ? JSON.parse(fs.readFileSync(path.join(SITE_DIR, "magnuson-slugs.json"), "utf8"))
+  : {};
+
 // Group every (app, kit) pair by SKU so shared SKUs become one item.
 const bySku = new Map();
 for (const app of C.applications) {
@@ -63,11 +71,12 @@ const items = [...bySku.values()].map(({ kit, apps }) => {
     `    <g:id>${ESC(kit.sku)}</g:id>`,
     `    <g:title>${ESC(title)}</g:title>`,
     `    <g:description>${ESC(description)}</g:description>`,
-    `    <g:link>${SITE}/${ESC(app.slug)}</g:link>`,
+    `    <g:link>${SITE}/${ESC(SLUGS[kit.sku] || app.slug)}</g:link>`,
     `    <g:image_link>${ESC(imageForApp(app))}</g:image_link>`,
     `    <g:price>${kit.retail.toFixed(2)} USD</g:price>`,
     "    <g:availability>in_stock</g:availability>",
     "    <g:condition>new</g:condition>",
+    "    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>250.00 USD</g:price></g:shipping>",
     "    <g:brand>Magnuson Superchargers</g:brand>",
     `    <g:mpn>${ESC(kit.sku)}</g:mpn>`,
     "    <g:google_product_category>Vehicles &amp; Parts &gt; Vehicle Parts &amp; Accessories &gt; Motor Vehicle Parts &gt; Motor Vehicle Engine Parts</g:google_product_category>",
