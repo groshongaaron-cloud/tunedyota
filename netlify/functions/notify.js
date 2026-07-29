@@ -31,7 +31,13 @@ async function handler(event, _ctx, deps = {}) {
   const text = (body.text || "").toString().trim();
   if (!text) return { statusCode: 400, body: "missing text" };
 
-  const r = await notify({ fetchImpl, webhookUrl: env.SLACK_WEBHOOK_URL, text, log });
+  // Optional per-topic channel: "content-ops" → SLACK_WEBHOOK_URL_CONTENT_OPS, etc.
+  // Unset topic env var falls back to the default channel, so topics are safe to send
+  // before their webhook exists.
+  const topic = (body.topic || "").toString().trim().toUpperCase().replace(/[^A-Z0-9]+/g, "_");
+  const webhookUrl = (topic && env["SLACK_WEBHOOK_URL_" + topic]) || env.SLACK_WEBHOOK_URL;
+
+  const r = await notify({ fetchImpl, webhookUrl, text, log });
   if (r.skipped) return { statusCode: 503, body: "slack not configured" };
   return { statusCode: r.ok ? 200 : 502, body: r.ok ? "ok" : "slack error" };
 }

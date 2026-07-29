@@ -58,3 +58,31 @@ test("502 when Slack post fails", async () => {
     env: { NOTIFY_TOKEN: "secret", SLACK_WEBHOOK_URL: "https://x" }, notify });
   assert.equal(r.statusCode, 502);
 });
+
+test("topic content-ops routes to its webhook when configured", async () => {
+  let seen;
+  const notify = async ({ webhookUrl, text }) => { seen = { webhookUrl, text }; return { ok: true }; };
+  const r = await handler(post({ text: "staged", token: "secret", topic: "content-ops" }), {}, {
+    env: { NOTIFY_TOKEN: "secret", SLACK_WEBHOOK_URL: "https://hooks.slack.test/default",
+           SLACK_WEBHOOK_URL_CONTENT_OPS: "https://hooks.slack.test/content" }, notify });
+  assert.equal(r.statusCode, 200);
+  assert.equal(seen.webhookUrl, "https://hooks.slack.test/content");
+});
+
+test("topic falls back to default webhook when topic env not set", async () => {
+  let seen;
+  const notify = async ({ webhookUrl }) => { seen = { webhookUrl }; return { ok: true }; };
+  const r = await handler(post({ text: "staged", token: "secret", topic: "content-ops" }), {}, {
+    env: { NOTIFY_TOKEN: "secret", SLACK_WEBHOOK_URL: "https://hooks.slack.test/default" }, notify });
+  assert.equal(r.statusCode, 200);
+  assert.equal(seen.webhookUrl, "https://hooks.slack.test/default");
+});
+
+test("unknown topic falls back to default webhook", async () => {
+  let seen;
+  const notify = async ({ webhookUrl }) => { seen = { webhookUrl }; return { ok: true }; };
+  const r = await handler(post({ text: "x", token: "secret", topic: "weird/../thing" }), {}, {
+    env: { NOTIFY_TOKEN: "secret", SLACK_WEBHOOK_URL: "https://hooks.slack.test/default" }, notify });
+  assert.equal(r.statusCode, 200);
+  assert.equal(seen.webhookUrl, "https://hooks.slack.test/default");
+});
