@@ -1,0 +1,76 @@
+[
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-firearm-cleaner-and-protectant-fcp/",
+  "product_name": "AMSOIL Firearm Cleaner and Protectant",
+  "page_title": "Firearm Cleaner and Protectant - AMSOIL",
+  "product_description": "Shop AMSOIL Firearm Cleaner and Protectant at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "11.29",
+  "all_available_prices": "11.29, 15.59, 134, 186.2 USD",
+  "available_sizes": "",
+  "variant_skus": "FCPSC-EA, FCPSC-CA, FCPCN-EA, FCPCN-CA",
+  "customer_rating": "5 (85)",
+  "total_reviews": 85,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/fcp-cn.jpg?context=bWFzdGVyfGltYWdlc3w1MDA2OHxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJnME1TOW9OREV2T0RjNU9EUXhPVEl5TWpVMU9DNXFjR2N8M2YxODYwNzVjYjFhYTk2Mjk3NTNmYmIzMGQ0MWI1NmE0YmI2MGMwZjE4MTU5MzEyNDFjMzg4MTA3NDU0Zjc2ZA",
+  "variants_ld": [
+   {
+    "sku": "FCPSC-EA",
+    "size": "5 oz. Spray Can",
+    "price": 11.29
+   },
+   {
+    "sku": "FCPSC-CA",
+    "size": "5 oz. Spray Cans, Case of 12",
+    "price": 134
+   },
+   {
+    "sku": "FCPCN-EA",
+    "size": "8 oz. Bottle",
+    "price": 15.59
+   },
+   {
+    "sku": "FCPCN-CA",
+    "size": "8 oz. Bottles, Case of 12",
+    "price": 186.2
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-100-synthetic-firearm-lubricant-and-protectant-flp/",
+  "product_name": "AMSOIL 100% Synthetic Firearm Lubricant and Protectant",
+  "page_title": "100% Synthetic Firearm Lubricant and Protectant - AMSOIL",
+  "product_description": "Shop AMSOIL 100% Synthetic Firearm Lubricant and Protectant at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "13.29",
+  "all_available_prices": "13.29, 15.19, 158.25, 180.85 USD",
+  "available_sizes": "",
+  "variant_skus": "FLPSC-EA, FLPSC-CA, FLPBA-EA, FLPBA-CA",
+  "customer_rating": "5 (121)",
+  "total_reviews": 121,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/flp-sc.jpg?context=bWFzdGVyfGltYWdlc3w0ODY2NXxpbWFnZS9qcGVnfGFXMWhaMlZ6TDJnMU55OW9PV1l2T0RjNU9EUXlNRGsxT1RJMk1pNXFjR2N8NzEyNTIyZmQ2MzRhMWE1ZDViZDBlYTZmMmEwNDI5ZWUyMDEwYTg5ZTAyNjIxZTBjY2E2MWE4ODAyM2ZmZjBiNA",
+  "variants_ld": [
+   {
+    "sku": "FLPSC-EA",
+    "size": "5 oz. Spray Can",
+    "price": 15.19
+   },
+   {
+    "sku": "FLPSC-CA",
+    "size": "5 oz. Spray Cans, Case of 12",
+    "price": 180.85
+   },
+   {
+    "sku": "FLPBA-EA",
+    "size": "4 oz. Bottle",
+    "price": 13.29
+   },
+   {
+    "sku": "FLPBA-CA",
+    "size": "4 oz. Bottles, Case of 12",
+    "price": 158.25
+   }
+  ]
+ }
+]

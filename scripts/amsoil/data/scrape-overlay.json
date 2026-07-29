@@ -1,19 +1,31 @@
 {
  "updated": "2026-07-25",
  "files": [
+  "air-tool-oil.json",
   "antifreeze-coolant.json",
+  "bar-chain-oil.json",
   "bearing-chassis-grease.json",
   "car-care-detailing.json",
   "compressor-oil.json",
+  "firearm-products.json",
   "fuel-additives.json",
   "gasoline-motor-oil.json",
   "gear-oil.json",
+  "general-purpose-cleaners-protectants.json",
   "hydraulic-oil.json",
   "steering-brake-suspension-fluid.json",
   "transmission-fluid.json"
  ],
- "count": 142,
+ "count": 157,
  "products": {
+  "AIRBA-EA": {
+   "path": "/p/amsoil-100-synthetic-air-tool-oil-airba/",
+   "price": 5.59,
+   "rating": null,
+   "reviews": 8,
+   "name": "AMSOIL 100% Synthetic Air Tool Oil",
+   "source": "compressor-oil.json"
+  },
   "ANTPC1G-EA": {
    "path": "/p/amsoil-passenger-car-light-truck-antifreeze-coolant-antpc/",
    "price": 30.69,
@@ -121,6 +133,40 @@
     "PSAFQT-CA": {
      "price": 134.55,
      "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "ABCQT-EA": {
+   "path": "/p/amsoil-semi-synthetic-bar-and-chain-oil-abc/",
+   "price": 11.59,
+   "rating": 5,
+   "reviews": 77,
+   "name": "AMSOIL Semi-Synthetic Bar and Chain Oil",
+   "source": "bar-chain-oil.json",
+   "variants": {
+    "ABCQT-EA": {
+     "price": 11.59,
+     "size": "Quart Bottle"
+    },
+    "ABCQT-CA": {
+     "price": 136.1,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ABC55-EA": {
+     "price": 2024.2,
+     "size": "55 Gallon Drum"
+    },
+    "ABC1G-EA": {
+     "price": 44.99,
+     "size": "Gallon Jug"
+    },
+    "ABC1G-CA": {
+     "price": 178.3,
+     "size": "Gallon Jugs, Case of 4"
+    },
+    "ABC05-EA": {
+     "price": 216.35,
+     "size": "5 Gallon Pail"
     }
    }
   },
@@ -440,7 +486,7 @@
    "rating": 5,
    "reviews": 21,
    "name": "AMSOIL Spray Grease",
-   "source": "bearing-chassis-grease.json",
+   "source": "general-purpose-cleaners-protectants.json",
    "variants": {
     "GSPSC-EA": {
      "price": 12.99,
@@ -566,7 +612,7 @@
    "rating": 5,
    "reviews": 98,
    "name": "AMSOIL Mudslinger® Mud and Dirt Repellent",
-   "source": "car-care-detailing.json",
+   "source": "general-purpose-cleaners-protectants.json",
    "variants": {
     "AMSSC-EA": {
      "price": 14.19,
@@ -584,7 +630,7 @@
    "rating": 5,
    "reviews": 106,
    "name": "AMSOIL Glass Cleaner",
-   "source": "car-care-detailing.json",
+   "source": "general-purpose-cleaners-protectants.json",
    "variants": {
     "AGCSC-EA": {
      "price": 9.39,
@@ -602,7 +648,7 @@
    "rating": 5,
    "reviews": 60,
    "name": "AMSOIL Miracle Wash Waterless Wash and Wax Spray",
-   "source": "car-care-detailing.json",
+   "source": "general-purpose-cleaners-protectants.json",
    "variants": {
     "AMWSC-EA": {
      "price": 14.39,
@@ -728,13 +774,57 @@
    "name": "AMSOIL ISO 46 100% Synthetic Compressor Oil",
    "source": "compressor-oil.json"
   },
-  "AIRBA-EA": {
-   "path": "/p/amsoil-100-synthetic-air-tool-oil-airba/",
-   "price": 5.59,
-   "rating": null,
-   "reviews": 8,
-   "name": "AMSOIL 100% Synthetic Air Tool Oil",
-   "source": "compressor-oil.json"
+  "FCPSC-EA": {
+   "path": "/p/amsoil-firearm-cleaner-and-protectant-fcp/",
+   "price": 11.29,
+   "rating": 5,
+   "reviews": 85,
+   "name": "AMSOIL Firearm Cleaner and Protectant",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "FCPSC-EA": {
+     "price": 11.29,
+     "size": "5 oz. Spray Can"
+    },
+    "FCPSC-CA": {
+     "price": 134,
+     "size": "5 oz. Spray Cans, Case of 12"
+    },
+    "FCPCN-EA": {
+     "price": 15.59,
+     "size": "8 oz. Bottle"
+    },
+    "FCPCN-CA": {
+     "price": 186.2,
+     "size": "8 oz. Bottles, Case of 12"
+    }
+   }
+  },
+  "FLPBA-EA": {
+   "path": "/p/amsoil-100-synthetic-firearm-lubricant-and-protectant-flp/",
+   "price": 13.29,
+   "rating": 5,
+   "reviews": 121,
+   "name": "AMSOIL 100% Synthetic Firearm Lubricant and Protectant",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "FLPSC-EA": {
+     "price": 15.19,
+     "size": "5 oz. Spray Can"
+    },
+    "FLPSC-CA": {
+     "price": 180.85,
+     "size": "5 oz. Spray Cans, Case of 12"
+    },
+    "FLPBA-EA": {
+     "price": 13.29,
+     "size": "4 oz. Bottle"
+    },
+    "FLPBA-CA": {
+     "price": 158.25,
+     "size": "4 oz. Bottles, Case of 12"
+    }
+   }
   },
   "APICN-EA": {
    "path": "/p/amsoil-p-i-performance-improver-gasoline-additive-api/",
@@ -1757,6 +1847,242 @@
     "AGM05-EA": {
      "price": 381.1,
      "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "AFOSC-EA": {
+   "path": "/p/amsoil-air-filter-oil-afo/",
+   "price": 16.79,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Air Filter Oil",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "AFOSC-EA": {
+     "price": 16.79,
+     "size": "14 oz. Spray Can"
+    },
+    "AFOSC-CA": {
+     "price": 200.05,
+     "size": "14 oz. Spray Can, Case of 12"
+    }
+   }
+  },
+  "AMHSC-EA": {
+   "path": "/p/amsoil-heavy-duty-metal-protector-amhsc/",
+   "price": 19.99,
+   "rating": 5,
+   "reviews": 79,
+   "name": "AMSOIL Heavy-Duty Metal Protector",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "AMHSC-EA": {
+     "price": 19.99,
+     "size": "15 oz. Spray Can"
+    },
+    "AMHSC-CA": {
+     "price": 238.65,
+     "size": "15 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "FLSHCN-EA": {
+   "path": "/p/amsoil-engine-and-transmission-flush-flsh/",
+   "price": 16.99,
+   "rating": 5,
+   "reviews": 263,
+   "name": "AMSOIL Engine and Transmission Flush",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "FLSHCN-EA": {
+     "price": 16.99,
+     "size": "16 oz. Bottle"
+    },
+    "FLSHCN-CA": {
+     "price": 202.1,
+     "size": "16 oz. Bottles, Case of 12"
+    },
+    "FLSH55-EA": {
+     "price": 5515.35,
+     "size": "55 Gallon Drum"
+    }
+   }
+  },
+  "APFSC-EA": {
+   "path": "/p/amsoil-power-foam-carburetor-and-induction-system-cleaner-apf/",
+   "price": 13.99,
+   "rating": 5,
+   "reviews": 29,
+   "name": "AMSOIL Power Foam® Carburetor and Induction-System Cleaner",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "APFSC-EA": {
+     "price": 13.99,
+     "size": "18 oz. Spray Can"
+    },
+    "APFSC-CA": {
+     "price": 166.7,
+     "size": "18 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "BPCSC-EA": {
+   "path": "/p/amsoil-brake-and-parts-cleaner-bpcsc/",
+   "price": 9.79,
+   "rating": 5,
+   "reviews": 83,
+   "name": "AMSOIL Brake and Parts Cleaner",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "BPCSC-EA": {
+     "price": 9.79,
+     "size": "19 oz. Spray Can"
+    },
+    "BPCSC-CA": {
+     "price": 116.1,
+     "size": "19 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "ALSSP-EA": {
+   "path": "/p/amsoil-silicone-spray-alss/",
+   "price": 12.89,
+   "rating": 5,
+   "reviews": 45,
+   "name": "AMSOIL Silicone Spray",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "ALSSP-EA": {
+     "price": 12.89,
+     "size": "10 oz. Spray Can"
+    },
+    "ALSSP-CA": {
+     "price": 153.5,
+     "size": "10 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "AEDSC-EA": {
+   "path": "/p/amsoil-engine-degreaser-aedsc/",
+   "price": 11.59,
+   "rating": 4,
+   "reviews": 13,
+   "name": "AMSOIL Engine Degreaser",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "AEDSC-EA": {
+     "price": 11.59,
+     "size": "15 oz. Spray Can"
+    },
+    "AEDSC-CA": {
+     "price": 137.45,
+     "size": "15 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "ADGSC-EA": {
+   "path": "/p/amsoil-heavy-duty-degreaser-adgsc/",
+   "price": 17.79,
+   "rating": 5,
+   "reviews": 16,
+   "name": "AMSOIL Heavy-Duty Degreaser",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "ADGSC-EA": {
+     "price": 17.79,
+     "size": "15 oz. Spray Can"
+    },
+    "ADGSC-CA": {
+     "price": 212.15,
+     "size": "15 oz. Spray Cans, Case of 12"
+    }
+   }
+  },
+  "FOGSC-EA": {
+   "path": "/p/amsoil-engine-fogging-oil-fogsc/",
+   "price": 13.59,
+   "rating": 5,
+   "reviews": 14,
+   "name": "AMSOIL Engine Fogging Oil",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "FOGSC-EA": {
+     "price": 13.59,
+     "size": "12 oz. Spray Can"
+    },
+    "FOGSC-CA": {
+     "price": 161.5,
+     "size": "12 oz. Spray Can, Case of 12"
+    }
+   }
+  },
+  "ACL4SC-EA": {
+   "path": "/p/amsoil-chain-lube-aclsc/",
+   "price": 8.99,
+   "rating": 5,
+   "reviews": 35,
+   "name": "AMSOIL Chain Lube",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "ACLSC-EA": {
+     "price": 18.59,
+     "size": "11 oz. Spray Can"
+    },
+    "ACLSC-CA": {
+     "price": 111.35,
+     "size": "11 oz. Spray Cans, Case of 6"
+    },
+    "ACL4SC-EA": {
+     "price": 8.99,
+     "size": "4.5 oz. Spray Can"
+    },
+    "ACL4SC-CA": {
+     "price": 106.85,
+     "size": "4.5 oz. Spray Can, Case of 12"
+    }
+   }
+  },
+  "NCBCSC-EA": {
+   "path": "/p/amsoil-non-chlorinated-brake-and-parts-cleaner-ncbcsc/",
+   "price": 9.29,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL Non-Chlorinated Brake and Parts Cleaner",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "NCBCSC-EA": {
+     "price": 9.29,
+     "size": "14 oz. Spray Can"
+    },
+    "NCBCSC-CA": {
+     "price": 110.3,
+     "size": "14 oz. Spray Can, Case of 12"
+    }
+   }
+  },
+  "AMP4SC-EA": {
+   "path": "/p/amsoil-mp-metal-protector-amp/",
+   "price": 8.79,
+   "rating": 5,
+   "reviews": 105,
+   "name": "AMSOIL MP Metal Protector",
+   "source": "general-purpose-cleaners-protectants.json",
+   "variants": {
+    "AMPSC-EA": {
+     "price": 11.49,
+     "size": "8.75 oz. Spray Can"
+    },
+    "AMPSC-CA": {
+     "price": 136.15,
+     "size": "8.75 oz. Spray Cans, Case of 12"
+    },
+    "AMP4SC-EA": {
+     "price": 8.79,
+     "size": "4 oz. Spray Can"
+    },
+    "AMP4SC-CA": {
+     "price": 104,
+     "size": "4 oz. Spray Cans, Case of 12"
     }
    }
   },

@@ -1,0 +1,29 @@
+[
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-100-synthetic-air-tool-oil-airba/",
+  "product_name": "AMSOIL 100% Synthetic Air Tool Oil",
+  "page_title": "AMSOIL 100% Synthetic Air Tool Oil | AIRBA - AMSOIL",
+  "product_description": "Shop AMSOIL 100% Synthetic Air Tool Oil at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "data_source_format": "json-ld, meta",
+  "offer_price": "5.59",
+  "all_available_prices": "5.59, 65.85 USD",
+  "available_sizes": "",
+  "variant_skus": "AIRBA-EA, AIRBA-CA",
+  "customer_rating": "5 (8)",
+  "total_reviews": 8,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/airba.jpg?context=bWFzdGVyfGltYWdlc3w3OTg1fGltYWdlL2pwZWd8YVcxaFoyVnpMMmhoT1M5b09HWXZPVFUwTkRjMk9ESXlOVE14TUM1cWNHY3wzMjg2ZmI4NjQ0ZTFjYzg4NDdlZTQ0ZTczYzg2ZWNmMzgwOGIxNzUyYTEzMDEyOWM0YWQxYmI0Yjk1MjcxMGQ3",
+  "variants_ld": [
+   {
+    "sku": "AIRBA-EA",
+    "size": "4 oz. Bottle",
+    "price": 5.59
+   },
+   {
+    "sku": "AIRBA-CA",
+    "size": "4 oz. Bottles, Case of 12",
+    "price": 65.85
+   }
+  ]
+ }
+]
