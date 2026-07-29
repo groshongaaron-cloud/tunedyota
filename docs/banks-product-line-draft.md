@@ -4,7 +4,14 @@ Grounded in `data/banks-site-scrape.json` (full bankspower.com catalogue, 335
 products / 534 variants, scraped 2026-07-29) and the registry pattern in
 `app/www/product-lines.js`.
 
-## The business gate (Aaron decides first)
+## The business gate — RESOLVED 2026-07-29
+
+**Banks sent a dealer application; Tuned Yota will be onboarded with full
+access to sell the line.** Dealer mode it is: Converge checkout like
+Magnuson once the dealer price sheet arrives. Until pricing lands, the
+line can launch in reserve (install-partner) mode and flip to converge.
+
+### Original mode analysis (for the record)
 
 Banks sells direct on their own Shopify store. Unlike AMSOIL (we're a dealer
 with referral code `zo=30713116`) and Magnuson (distributor pricing, we sell
