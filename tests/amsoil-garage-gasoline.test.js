@@ -25,7 +25,7 @@ test("garage mega-store renders per-category groups with self-hosted images", ()
   assert.ok(block.includes("zo=30713116"), "outbound links missing referral");
   assert.match(block, /Prices as of \d{4}-\d{2}-\d{2}/, "scrape-dated price note missing");
   // Every group links its full-line hub; jump nav present.
-  const hubLinks = (block.match(/href="amsoil-[a-z0-9-]+-products\.html"/g) || []).length;
+  const hubLinks = (block.match(/href="\/amsoil-[a-z0-9-]+-products"/g) || []).length;
   assert.ok(hubLinks >= groups, "each group needs its hub link");
   assert.ok(block.includes('class="mega-nav"'), "jump nav missing");
   assert.ok(!block.includes("aggregateRating"), "borrowed rating leaked into markup");

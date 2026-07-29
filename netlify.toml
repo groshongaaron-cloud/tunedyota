@@ -77,6 +77,74 @@
 [functions."sms-volume-report"]
   schedule = "0 13 * * *"
 
+# Legacy Wix-site URLs (pre-2026 www.tunedyota.com) still indexed by Google — 301 each
+# to its closest new page so residual rankings/traffic land somewhere useful instead of 404.
+# Specific paths first; /post/* and /service-page/* catch-alls last (first match wins).
+[[redirects]]
+  from = "/services-1"
+  to = "/ott-tune"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "/team"
+  status = 301
+
+[[redirects]]
+  from = "/about"
+  to = "/team"
+  status = 301
+
+[[redirects]]
+  from = "/about-5"
+  to = "/team"
+  status = 301
+
+[[redirects]]
+  from = "/gift-card"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/service-page/4runner-5th-gen-4-0l-v6-2020-2023"
+  to = "/toyota-4runner-ott-tune"
+  status = 301
+
+[[redirects]]
+  from = "/service-page/sequoia-2nd-gen-5-7l-v8-2007-2018"
+  to = "/toyota-sequoia-ott-tune"
+  status = 301
+
+[[redirects]]
+  from = "/service-page/land-cruiser-lc250-2-4l-i4-2024"
+  to = "/toyota-land-cruiser-ott-tune"
+  status = 301
+
+[[redirects]]
+  from = "/service-page/tacoma-2nd-gen-4-0l-v6-2005-2015"
+  to = "/toyota-tacoma-ott-tune"
+  status = 301
+
+[[redirects]]
+  from = "/service-page/tacoma-3rd-gen-3-5l-v6-2016-2023"
+  to = "/toyota-tacoma-ott-tune"
+  status = 301
+
+[[redirects]]
+  from = "/service-page/tacoma-4th-gen-2-4l-i4-hybrid-2024"
+  to = "/toyota-tacoma-ott-tune"
+  status = 301
+
+[[redirects]]
+  from = "/post/*"
+  to = "/faq"
+  status = 301
+
+[[redirects]]
+  from = "/service-page/*"
+  to = "/find-your-exact-tune"
+  status = 301
+
 # Per-event booking links: /book/<city-slug>-<date> → the times-first mini flow
 # (200 rewrite keeps the pretty URL; book.html reads the slug from location.pathname).
 [[redirects]]

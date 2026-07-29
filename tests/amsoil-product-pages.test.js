@@ -85,6 +85,6 @@ test("fitment capacity integrity: unverified generations expose no capacity", ()
 test("garage hub links every product page", () => {
   const html = fs.readFileSync(path.join(SITE, "amsoil-garage.html"), "utf8");
   for (const f of mod.AMSOIL_PRODUCT_FILES) {
-    assert.ok(html.includes(`href="${f}"`), `garage hub missing link to ${f}`);
+    assert.ok(html.includes(`href="/${f.replace(/\.html$/, "")}"`), `garage hub missing link to ${f}`);
   }
 });

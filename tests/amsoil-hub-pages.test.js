@@ -66,8 +66,8 @@ test("curated Tier-1 SKUs link to their internal product pages from the hubs", (
     .map((f) => fs.readFileSync(path.join(SITE, f), "utf8")).join("");
   let checked = 0;
   for (const p of Object.values(CAT.products)) {
-    const slug = `${mod.productSlug(p)}.html`;
-    if (all.includes(`>${p.stockNo}<`)) { assert.ok(all.includes(`href="${slug}"`), `${p.stockNo}: hub row not linking internal page ${slug}`); checked++; }
+    const slug = mod.productSlug(p);
+    if (all.includes(`>${p.stockNo}<`)) { assert.ok(all.includes(`href="/${slug}"`), `${p.stockNo}: hub row not linking internal page /${slug}`); checked++; }
   }
   assert.ok(checked >= 10, `expected most curated SKUs present in hubs, checked ${checked}`);
 });

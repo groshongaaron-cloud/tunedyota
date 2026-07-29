@@ -44,14 +44,14 @@ test("terms carry SMS program terms + governing law", () => {
   const t = text("terms.html");
   assert.match(t, /SMS|text[- ]messaging/i, "SMS program section");
   assert.match(t, /Minnesota/, "governing law");
-  assert.match(read("terms.html"), /tune-warranty-emissions-legality\.html/, "links the tuning/warranty disclaimer");
+  assert.match(read("terms.html"), /href="\/tune-warranty-emissions-legality"/, "links the tuning/warranty disclaimer");
 });
 
 test("privacy + terms are linked in the site footer", () => {
   for (const f of ["index.html", "find-your-exact-tune.html", "amsoil-garage.html"]) {
     const html = read(f);
-    assert.ok(html.includes('href="privacy.html"'), `${f}: footer Privacy link`);
-    assert.ok(html.includes('href="terms.html"'), `${f}: footer Terms link`);
+    assert.ok(html.includes('href="/privacy"'), `${f}: footer Privacy link`);
+    assert.ok(html.includes('href="/terms"'), `${f}: footer Terms link`);
   }
 });
 
@@ -69,5 +69,5 @@ test("booking form shows the text-consent line at the point of phone capture", (
   const after = html.slice(idx, idx + 900);
   assert.match(after.replace(/<[^>]+>/g, " "), /text/i, "consent mentions text");
   assert.match(after, /\bSTOP\b/, "consent has STOP");
-  assert.ok(after.includes('href="privacy.html"') && after.includes('href="terms.html"'), "consent links Privacy + Terms");
+  assert.ok(after.includes('href="/privacy"') && after.includes('href="/terms"'), "consent links Privacy + Terms");
 });

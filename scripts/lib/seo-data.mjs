@@ -7,6 +7,14 @@ import { AMSOIL_HUB_FILES, AMSOIL_FULL_PRODUCT_FILES } from "../build-amsoil-pag
 export const SITE = "https://tunedyota.com";
 export const BIZ_ID = `${SITE}/#business`;
 
+// GA4 web stream "Tuned Yota" (property 323293715). Injected into every
+// HEAD_PAGES page by build-seo.mjs; book.html carries the same marked block
+// by hand (it's head-managed only for GA, not OG/schema).
+export const GA_ID = "G-RFJ9K4HRDP";
+export const GA_SNIPPET =
+  `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>\n` +
+  `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","${GA_ID}");</script>`;
+
 // Brand mark (decoded from the inline SVG favicon used sitewide) + palette.
 export const BRAND = {
   ink: "#3A2E26", blue: "#B3D0D9", bg: "#EDECEB", cream: "#F3EFEA",

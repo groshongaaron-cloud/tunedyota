@@ -74,6 +74,7 @@ function processHead(file) {
       `<script type="application/ld+json">\n${stub}\n</script>`);
   }
   html = injectMarked(html, "OG", SD.buildOgTags(meta));
+  html = injectMarked(html, "GA", SD.GA_SNIPPET);
   fs.writeFileSync(p, html);
 }
 

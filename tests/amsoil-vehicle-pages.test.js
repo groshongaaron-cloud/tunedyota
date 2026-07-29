@@ -107,8 +107,8 @@ test("SEO: title targets the vehicle + oil/filter intent, and links the topical 
     assert.match(title, /AMSOIL Synthetic Oil &amp; Filter for the /, `${f} title targets oil+filter`);
     assert.match(title, /Best for Tuned &amp; Towing/, `${f} title carries the niche superlative`);
     // Topical cluster: each vehicle page links the comparison + oil-guide hubs.
-    assert.ok(html.includes('href="amsoil-vs-oem-toyota-lexus-fluids.html"'), `${f} links the AMSOIL-vs-OEM page`);
-    assert.ok(html.includes('href="amsoil-synthetic-motor-oil-guide.html"'), `${f} links the oil guide`);
+    assert.ok(html.includes('href="/amsoil-vs-oem-toyota-lexus-fluids"'), `${f} links the AMSOIL-vs-OEM page`);
+    assert.ok(html.includes('href="/amsoil-synthetic-motor-oil-guide"'), `${f} links the oil guide`);
   }
 });
 

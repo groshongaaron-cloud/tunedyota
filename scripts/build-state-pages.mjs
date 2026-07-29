@@ -97,7 +97,7 @@ fbq("track", "PageView");
 src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel Code -->`;
 
-const NAV = `<header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>`;
+const NAV = `<header class="snav"><a class="snav-logo" href="/">Tuned Yota</a><nav class="snav-links"><a href="/">Home</a><a href="/find-your-exact-tune">Find Your Tune</a><a href="/#vehicles">Vehicles</a><a href="/ott-tune">OTT Tune</a><a href="/supercharger">Supercharger</a><a href="/amsoil-garage">AMSOIL</a><a href="/faq">FAQ</a><a href="/team">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>`;
 
 const FQSCRIPT = `<script>
 document.querySelectorAll('.lp-fqq').forEach(q=>q.addEventListener('click',()=>{
@@ -108,7 +108,7 @@ document.querySelectorAll('.lp-fqq').forEach(q=>q.addEventListener('click',()=>{
 </script>`;
 
 const FOOTER = `<footer class="sfoot"><div class="fmark">Tuned Yota</div><div class="ftag">Undeniable Performance</div>
-  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="returns.html">Returns</a></div>
+  <div class="frow"><a href="/">Home</a><a href="/find-your-exact-tune">Find Your Tune</a><a href="/ott-tune">OTT Tune</a><a href="/supercharger">Supercharger</a><a href="/amsoil-garage">AMSOIL</a><a href="/faq">FAQ</a><a href="/team">Team</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/returns">Returns</a></div>
   <div class="fcon">Call or text <a href="tel:+16124067117">(612) 406-7117</a> &nbsp;·&nbsp; <a href="mailto:info@tunedyota.com">info@tunedyota.com</a><br>
   Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
@@ -121,7 +121,7 @@ const FQA11Y = `<script>document.querySelectorAll('.lp-fq').forEach(function(it,
 // each local page into the 13 model pages (relevance + link equity).
 const VEHHUB = `  <h2>Popular Toyota &amp; Lexus tunes</h2>
   <p style="font-size:14.5px;line-height:1.6">Pick your platform to see model-specific results, supported engines, and pricing:</p>
-  <div class="lp-veh"><a href="toyota-tundra-ott-tune.html" aria-label="Toyota Tundra OTT Tune">Toyota Tundra</a><a href="toyota-tacoma-ott-tune.html" aria-label="Toyota Tacoma OTT Tune">Toyota Tacoma</a><a href="toyota-4runner-ott-tune.html" aria-label="Toyota 4Runner OTT Tune">Toyota 4Runner</a><a href="toyota-sequoia-ott-tune.html" aria-label="Toyota Sequoia OTT Tune">Toyota Sequoia</a><a href="toyota-land-cruiser-ott-tune.html" aria-label="Toyota Land Cruiser OTT Tune">Toyota Land Cruiser</a><a href="toyota-fj-cruiser-ott-tune.html" aria-label="Toyota FJ Cruiser OTT Tune">Toyota FJ Cruiser</a><a href="toyota-camry-ott-tune.html" aria-label="Toyota Camry OTT Tune">Toyota Camry</a><a href="toyota-highlander-ott-tune.html" aria-label="Toyota Highlander OTT Tune">Toyota Highlander</a><a href="toyota-rav4-ott-tune.html" aria-label="Toyota RAV4 OTT Tune">Toyota RAV4</a><a href="lexus-gx-ott-tune.html" aria-label="Lexus GX OTT Tune">Lexus GX</a><a href="lexus-lx570-ott-tune.html" aria-label="Lexus LX570 OTT Tune">Lexus LX570</a><a href="lexus-rx350-ott-tune.html" aria-label="Lexus RX350 OTT Tune">Lexus RX350</a><a href="lexus-ls460-ott-tune.html" aria-label="Lexus LS460 OTT Tune">Lexus LS460</a></div>`;
+  <div class="lp-veh"><a href="/toyota-tundra-ott-tune" aria-label="Toyota Tundra OTT Tune">Toyota Tundra</a><a href="/toyota-tacoma-ott-tune" aria-label="Toyota Tacoma OTT Tune">Toyota Tacoma</a><a href="/toyota-4runner-ott-tune" aria-label="Toyota 4Runner OTT Tune">Toyota 4Runner</a><a href="/toyota-sequoia-ott-tune" aria-label="Toyota Sequoia OTT Tune">Toyota Sequoia</a><a href="/toyota-land-cruiser-ott-tune" aria-label="Toyota Land Cruiser OTT Tune">Toyota Land Cruiser</a><a href="/toyota-fj-cruiser-ott-tune" aria-label="Toyota FJ Cruiser OTT Tune">Toyota FJ Cruiser</a><a href="/toyota-camry-ott-tune" aria-label="Toyota Camry OTT Tune">Toyota Camry</a><a href="/toyota-highlander-ott-tune" aria-label="Toyota Highlander OTT Tune">Toyota Highlander</a><a href="/toyota-rav4-ott-tune" aria-label="Toyota RAV4 OTT Tune">Toyota RAV4</a><a href="/lexus-gx-ott-tune" aria-label="Lexus GX OTT Tune">Lexus GX</a><a href="/lexus-lx570-ott-tune" aria-label="Lexus LX570 OTT Tune">Lexus LX570</a><a href="/lexus-rx350-ott-tune" aria-label="Lexus RX350 OTT Tune">Lexus RX350</a><a href="/lexus-ls460-ott-tune" aria-label="Lexus LS460 OTT Tune">Lexus LS460</a></div>`;
 
 function citySentence(cities) {
   if (cities.length === 1) return cities[0];
@@ -186,12 +186,12 @@ ${NAV}
   <h1>Toyota &amp; Lexus Engine Tuning in ${name}</h1>
   <div class="lp-answer">Tuned Yota brings professional Toyota and Lexus engine tuning to ${name} — in person at events in ${ESC(cityTxt)}. Every OTT calibration is built by a licensed VFTuner PRO Tuner, keeps factory emissions fully intact, and starts from $400. Your ${name} ${instWord} ${instLabel}.</div>
   <div class="lp-cta">
-    <a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a>
+    <a class="btn primary" href="/find-your-exact-tune">Find Your Exact Tune →</a>
     <a class="btn outline" href="tel:+16124067117">Call / Text (612) 406-7117</a>
   </div>
 
   <h2>Where we tune in ${name}</h2>
-  <p style="font-size:15px;line-height:1.65">Tuned Yota runs in-person tuning events across ${name}: ${ESC(cityTxt)}. Pick your city and the next event date in <a href="find-your-exact-tune.html" style="color:var(--brown);font-weight:700">Find Your Exact Tune</a>.</p>
+  <p style="font-size:15px;line-height:1.65">Tuned Yota runs in-person tuning events across ${name}: ${ESC(cityTxt)}. Pick your city and the next event date in <a href="/find-your-exact-tune" style="color:var(--brown);font-weight:700">Find Your Exact Tune</a>.</p>
 
   <h2>What we tune</h2>
   <ul class="lp-bul">
@@ -217,7 +217,7 @@ ${VEHHUB}
   <div class="lp-book">
     <h2>Get your ${name} price</h2>
     <p>Find Your Exact Tune shows your exact starting price and the next event near you. Prefer to talk? Call or text (612) 406-7117.</p>
-    <a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a>
+    <a class="btn primary" href="/find-your-exact-tune">Find Your Exact Tune →</a>
   </div>
 
   <h2>${name} tuning FAQ</h2>
@@ -225,9 +225,9 @@ ${faqVisible}
 
   <div class="lp-links">
     <strong>Explore:</strong><br>
-    <a href="ott-tune.html">What is the OTT Tune?</a><a href="ott-tune-cost.html">OTT Tune cost</a><a href="is-the-ott-tune-worth-it.html">Is it worth it?</a><a href="tune-warranty-emissions-legality.html">Warranty &amp; emissions</a><a href="supercharger.html">Superchargers</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a>
+    <a href="/ott-tune">What is the OTT Tune?</a><a href="/ott-tune-cost">OTT Tune cost</a><a href="/is-the-ott-tune-worth-it">Is it worth it?</a><a href="/tune-warranty-emissions-legality">Warranty &amp; emissions</a><a href="/supercharger">Superchargers</a><a href="/find-your-exact-tune">Find Your Exact Tune</a>
   </div>
-  <div class="lp-final"><a class="btn primary" href="find-your-exact-tune.html">Find Your Exact Tune →</a></div>
+  <div class="lp-final"><a class="btn primary" href="/find-your-exact-tune">Find Your Exact Tune →</a></div>
   <p class="lp-disc">In-person tuning at scheduled events; dates and availability vary — confirm in Find Your Exact Tune. Supported years, engines, and features vary by platform. All vehicles must retain fully intact, federally compliant emissions systems.</p>
 </div>
 ${FQSCRIPT}

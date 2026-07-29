@@ -106,6 +106,6 @@ test("returns page exists with AMSOIL-accurate terms and is footer-linked", () =
   assert.ok(html.includes('"hasShippingService"'), "returns.html business stub missing ShippingService markup");
   for (const f of PAGE_FILES) {
     const page = fs.readFileSync(path.join(SITE, f), "utf8");
-    assert.ok(page.includes('<a href="returns.html">Returns</a>'), `${f}: footer missing Returns link`);
+    assert.ok(page.includes('<a href="/returns">Returns</a>'), `${f}: footer missing Returns link`);
   }
 });

@@ -23,7 +23,7 @@ const { amsoilUrl } = require("../site/amsoil-referral.js");
 
 const ESC = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const slugOf = (make, model) => `${make} ${model}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const ottPage = (slug) => `${slug}-ott-tune.html`;
+const ottPage = (slug) => `/${slug}-ott-tune`;
 
 // Category for schema/labels, derived from product name keywords.
 function categoryOf(name) {
@@ -65,9 +65,9 @@ const FAVICON = `<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#3A2E26">`;
-const NAV = `<header class="snav"><a class="snav-logo" href="index.html">Tuned Yota</a><nav class="snav-links"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="index.html#vehicles">Vehicles</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>`;
+const NAV = `<header class="snav"><a class="snav-logo" href="/">Tuned Yota</a><nav class="snav-links"><a href="/">Home</a><a href="/find-your-exact-tune">Find Your Tune</a><a href="/#vehicles">Vehicles</a><a href="/ott-tune">OTT Tune</a><a href="/supercharger">Supercharger</a><a href="/amsoil-garage">AMSOIL</a><a href="/faq">FAQ</a><a href="/team">Team</a></nav><a class="snav-call" href="tel:+16124067117">Call / Text</a></header>`;
 const FOOTER = `<footer class="sfoot"><div class="fmark">Tuned Yota</div><div class="ftag">Undeniable Performance</div>
-  <div class="frow"><a href="index.html">Home</a><a href="find-your-exact-tune.html">Find Your Tune</a><a href="ott-tune.html">OTT Tune</a><a href="supercharger.html">Supercharger</a><a href="amsoil-garage.html">AMSOIL</a><a href="faq.html">FAQ</a><a href="team.html">Team</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="returns.html">Returns</a></div>
+  <div class="frow"><a href="/">Home</a><a href="/find-your-exact-tune">Find Your Tune</a><a href="/ott-tune">OTT Tune</a><a href="/supercharger">Supercharger</a><a href="/amsoil-garage">AMSOIL</a><a href="/faq">FAQ</a><a href="/team">Team</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/returns">Returns</a></div>
   <div class="fcon">Call or text <a href="tel:+16124067117">(612) 406-7117</a> &nbsp;·&nbsp; <a href="mailto:info@tunedyota.com">info@tunedyota.com</a><br>
   Serving Minnesota · Iowa · Wisconsin · North Dakota · South Dakota · Nebraska<br>
   <a href="https://www.facebook.com/TunedYota/" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.facebook.com/groups/501008078456222" target="_blank" rel="noopener">Midwest Tuning Group</a> · <a href="https://www.instagram.com/tunedyota/" target="_blank" rel="noopener">Instagram</a></div>
@@ -151,7 +151,7 @@ const TRACK = `<script src="/amsoil-track.js" defer></script>`;
 function vehHub(models, currentSlug) {
   const links = models
     .filter((m) => m.slug !== currentSlug)
-    .map((m) => `<a href="amsoil-${m.slug}.html" aria-label="AMSOIL for ${ESC(m.make)} ${ESC(m.model)}">${ESC(m.make)} ${ESC(m.model)}</a>`)
+    .map((m) => `<a href="/amsoil-${m.slug}" aria-label="AMSOIL for ${ESC(m.make)} ${ESC(m.model)}">${ESC(m.make)} ${ESC(m.model)}</a>`)
     .join("");
   return `  <h2>AMSOIL for other Toyota &amp; Lexus platforms</h2>
   <div class="lp-veh">${links}</div>`;
@@ -290,7 +290,7 @@ ${NAV}
   <h1>AMSOIL for the ${ESC(name)}</h1>
   <div class="lp-answer">The exact AMSOIL synthetic fluids for your ${ESC(name)} — ${ESC(oilPhrase)} engine oil, the right Ea oil filter, SEVERE GEAR gear lube, and synthetic ATF, dialed for tuned and towing builds. Tuned Yota is an Authorized AMSOIL Dealer: order below and it ships direct to your door.</div>
   <div class="lp-cta">
-    <a class="btn primary" href="amsoil-garage.html?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}">Open your AMSOIL Garage →</a>
+    <a class="btn primary" href="/amsoil-garage?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}">Open your AMSOIL Garage →</a>
     <a class="btn outline" target="_blank" rel="noopener" href="${amsoilUrl("/shop/")}">Shop the full catalog</a>
   </div>
 ${primaryOil ? `
@@ -321,9 +321,9 @@ ${vehHub(models, slug)}
 
   <div class="lp-links">
     <strong>More on the ${ESC(name)}:</strong><br>
-    <a href="${ottPage(slug)}">${ESC(name)} OTT Tune</a><a href="amsoil-garage.html">AMSOIL Garage</a><a href="amsoil-vs-oem-toyota-lexus-fluids.html">AMSOIL vs. OEM fluids</a><a href="amsoil-synthetic-motor-oil-guide.html">AMSOIL oil guide</a><a href="find-your-exact-tune.html">Find Your Exact Tune</a><a href="ott-tune.html">What is the OTT Tune?</a>
+    <a href="${ottPage(slug)}">${ESC(name)} OTT Tune</a><a href="/amsoil-garage">AMSOIL Garage</a><a href="/amsoil-vs-oem-toyota-lexus-fluids">AMSOIL vs. OEM fluids</a><a href="/amsoil-synthetic-motor-oil-guide">AMSOIL oil guide</a><a href="/find-your-exact-tune">Find Your Exact Tune</a><a href="/ott-tune">What is the OTT Tune?</a>
   </div>
-  <div class="lp-final"><a class="btn primary" href="amsoil-garage.html?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}">Open your AMSOIL Garage →</a></div>
+  <div class="lp-final"><a class="btn primary" href="/amsoil-garage?make=${encodeURIComponent(make)}&amp;model=${encodeURIComponent(model.model)}">Open your AMSOIL Garage →</a></div>
   <p class="lp-disc">Product, viscosity, and filter recommendations are from AMSOIL's official vehicle guide. Fill capacities and drain intervals shown in the interactive AMSOIL Garage are verified per configuration as our installers confirm them — check your owner's manual or contact us before service. Checkout completes on amsoil.com.</p>
 </div>
 ${FQSCRIPT}
@@ -452,7 +452,7 @@ export function buildGarageMegastore(html) {
 <div class="gaso-grid">
 ${cardsHtml.join("\n")}
 </div>
-<p class="mega-all"><a href="amsoil-${slug}-products.html">All AMSOIL ${ESC(c)} products, sizes &amp; pricing →</a></p>
+<p class="mega-all"><a href="/amsoil-${slug}-products">All AMSOIL ${ESC(c)} products, sizes &amp; pricing →</a></p>
 </details>` };
   }).filter(Boolean);
   const nav = groups.map((g) => `<a href="#ms-${g.slug}">${ESC(g.c)} (${g.count})</a>`).join("");
@@ -499,7 +499,7 @@ export function buildAmsoilGarageStore() {
   // Generator-injected so it self-maintains with the catalog + weekly prices.
   const prodLinks = Object.entries(CAT.products)
     .filter(([, p]) => priceOfP(p) != null)
-    .map(([, p]) => `<a href="${productSlug(p)}.html">${ESC(p.name)} — $${priceOfP(p).toFixed(2)}</a>`).join("");
+    .map(([, p]) => `<a href="/${productSlug(p)}">${ESC(p.name)} — $${priceOfP(p).toFixed(2)}</a>`).join("");
   const pBlock = `<!-- SEO:AMSOIL-PRODUCTS:START -->\n<div class="ag-veh">${prodLinks}</div>\n<!-- SEO:AMSOIL-PRODUCTS:END -->`;
   const pRe = /<!-- SEO:AMSOIL-PRODUCTS:START -->[\s\S]*?<!-- SEO:AMSOIL-PRODUCTS:END -->/;
   if (!pRe.test(html)) throw new Error("SEO:AMSOIL-PRODUCTS markers not found in amsoil-garage.html");
@@ -633,7 +633,7 @@ const GUIDES = [
     answer: "You can absolutely run AMSOIL in your Toyota or Lexus instead of OEM fluid — and for most owners it's the better choice. AMSOIL is formulated to <strong>meet and exceed the performance standards Toyota and Lexus require</strong>, it <strong>won't void your factory warranty</strong>, and its Signature Series delivers <strong>75% more wear protection</strong> with drain intervals up to <strong>25,000 miles</strong>. As a Toyota/Lexus specialist and Authorized AMSOIL Dealer, here's the straight comparison.",
     skus: ["SS-0W20-QT", "EA15K09"],
     sections: [
-      { h: "Is it safe to use AMSOIL instead of OEM?", html: "<p>Yes. AMSOIL synthetic motor oils and fluids are formulated to meet and exceed the performance standards your Toyota or Lexus calls for — the correct viscosity grade plus API, ILSAC and dexos performance where recommended. The <a href=\"amsoil-garage.html\">AMSOIL Garage</a> shows the exact oil, filter and capacity for your specific model and year, so you always install the right fluid.</p>" },
+      { h: "Is it safe to use AMSOIL instead of OEM?", html: "<p>Yes. AMSOIL synthetic motor oils and fluids are formulated to meet and exceed the performance standards your Toyota or Lexus calls for — the correct viscosity grade plus API, ILSAC and dexos performance where recommended. The <a href=\"/amsoil-garage\">AMSOIL Garage</a> shows the exact oil, filter and capacity for your specific model and year, so you always install the right fluid.</p>" },
       { h: "Will AMSOIL void my Toyota or Lexus warranty?", html: "<p><strong>No.</strong> Under the federal Magnuson-Moss Warranty Act, a manufacturer can't void your warranty simply because you used a different brand of oil — they would have to prove that oil caused a failure. Toyota and Lexus dealers recommend their own branded fluids because they sell them, not because a premium synthetic like AMSOIL is unsafe. On top of that, AMSOIL backs every lubricant and filter with the AMSOIL Limited Warranty.</p>" },
       { h: "OEM meets the minimum. AMSOIL goes further.", bullets: [
         "OEM fluids are built to meet the <em>minimum</em> standard; AMSOIL Signature Series is engineered to <strong>exceed</strong> it — <strong>75% more wear protection</strong>.<sup>1</sup>",
@@ -658,7 +658,7 @@ const GUIDES = [
     answer: "AMSOIL Signature Series <strong>0W-20</strong> is the grade most modern Toyota and Lexus engines call for — and it delivers <strong>75% more wear protection</strong>, <strong>100% LSPI protection</strong> and a guaranteed <strong>25,000-mile</strong> drain. Order it from Tuned Yota, an Authorized AMSOIL Dealer.",
     skus: ["SS-0W20-QT"],
     sections: [
-      { h: "Which vehicles use 0W-20?", html: "<p>0W-20 is the factory grade for a large share of modern Toyota and Lexus engines — including the Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, Camry, Highlander and many Lexus models. Always confirm your exact grade in the <a href=\"amsoil-garage.html\">AMSOIL Garage</a> or your owner's manual.</p>" },
+      { h: "Which vehicles use 0W-20?", html: "<p>0W-20 is the factory grade for a large share of modern Toyota and Lexus engines — including the Tundra, Tacoma, 4Runner, Sequoia, Land Cruiser, Camry, Highlander and many Lexus models. Always confirm your exact grade in the <a href=\"/amsoil-garage\">AMSOIL Garage</a> or your owner's manual.</p>" },
       { h: "Why AMSOIL Signature Series 0W-20", bullets: [
         "<strong>75% more wear protection</strong> for longer engine life.<sup>1</sup>",
         "<strong>100% protection against LSPI</strong> — critical for direct-injection and turbo engines.<sup>2</sup>",
@@ -680,7 +680,7 @@ const GUIDES = [
     answer: "AMSOIL Signature Series <strong>5W-30</strong> is a top-tier full synthetic delivering <strong>75% more wear protection</strong>, <strong>100% LSPI protection</strong> and a guaranteed <strong>25,000-mile</strong> drain — for the engines that specify 5W-30 and for added protection under load and heat. Order from Tuned Yota, an Authorized AMSOIL Dealer.",
     skus: ["SS-5W30-QT"],
     sections: [
-      { h: "Which vehicles use 5W-30?", html: "<p>5W-30 is specified for many Toyota, Lexus and other vehicles, and it's a common choice for towing, high-mileage and performance builds that call for a slightly heavier film. Confirm your exact grade in the <a href=\"amsoil-garage.html\">AMSOIL Garage</a> or your owner's manual.</p>" },
+      { h: "Which vehicles use 5W-30?", html: "<p>5W-30 is specified for many Toyota, Lexus and other vehicles, and it's a common choice for towing, high-mileage and performance builds that call for a slightly heavier film. Confirm your exact grade in the <a href=\"/amsoil-garage\">AMSOIL Garage</a> or your owner's manual.</p>" },
       { h: "Why AMSOIL Signature Series 5W-30", bullets: [
         "<strong>75% more wear protection</strong> for longer engine life.<sup>1</sup>",
         "<strong>100% protection against LSPI</strong> — protects modern turbo and direct-injection engines.<sup>2</sup>",
@@ -702,7 +702,7 @@ const GUIDES = [
     answer: "AMSOIL Signature Series <strong>5W-20</strong> is a top-tier full synthetic delivering <strong>75% more wear protection</strong>, <strong>100% LSPI protection</strong> and a guaranteed <strong>25,000-mile</strong> drain — the grade many Toyota and Lexus engines specify. Order from Tuned Yota, an Authorized AMSOIL Dealer.",
     skus: ["SS-5W20-QT"],
     sections: [
-      { h: "Which vehicles use 5W-20?", html: "<p>5W-20 is the factory grade for many Toyota and Lexus engines. Confirm your exact grade in the <a href=\"amsoil-garage.html\">AMSOIL Garage</a> or your owner's manual.</p>" },
+      { h: "Which vehicles use 5W-20?", html: "<p>5W-20 is the factory grade for many Toyota and Lexus engines. Confirm your exact grade in the <a href=\"/amsoil-garage\">AMSOIL Garage</a> or your owner's manual.</p>" },
       { h: "Why AMSOIL Signature Series 5W-20", bullets: [
         "<strong>75% more wear protection</strong> for longer engine life.<sup>1</sup>",
         "<strong>100% protection against LSPI</strong> — protects modern turbo and direct-injection engines.<sup>2</sup>",
@@ -721,7 +721,7 @@ const GUIDES = [
 function guideCards(skus) {
   return skus.map(prod).filter(Boolean).map((p) => {
     const price = priceOfP(p);
-    return `<div class="fl">${imgTagP(p, 50)}<div class="pinfo"><span class="sys">${ESC(categoryOf(p.name))}</span><span class="prd"><a href="${productSlug(p)}.html" style="color:inherit;text-decoration:none">${ESC(p.name)}</a></span></div><div class="pbuy">${price != null ? `<span class="price">$${price.toFixed(2)}</span>` : ""}<a class="ord" target="_blank" rel="noopener" href="${amsoilUrl(p.productPath)}">Order &#9658;</a></div></div>`;
+    return `<div class="fl">${imgTagP(p, 50)}<div class="pinfo"><span class="sys">${ESC(categoryOf(p.name))}</span><span class="prd"><a href="/${productSlug(p)}" style="color:inherit;text-decoration:none">${ESC(p.name)}</a></span></div><div class="pbuy">${price != null ? `<span class="price">$${price.toFixed(2)}</span>` : ""}<a class="ord" target="_blank" rel="noopener" href="${amsoilUrl(p.productPath)}">Order &#9658;</a></div></div>`;
   }).join("");
 }
 
@@ -739,7 +739,7 @@ function guidePage(g, vehModels) {
   const sections = g.sections.map((s) => s.bullets
     ? `  <h2>${ESC(s.h)}</h2>\n  <ul class="lp-bul">${s.bullets.map((b) => `<li>${b}</li>`).join("")}</ul>`
     : `  <h2>${ESC(s.h)}</h2>\n  ${s.html}`).join("\n");
-  const vehLinks = vehModels.slice(0, 8).map((m) => `<a href="amsoil-${m.slug}.html">${ESC(m.make)} ${ESC(m.model)}</a>`).join("") + `<a href="amsoil-garage.html">All vehicles →</a>`;
+  const vehLinks = vehModels.slice(0, 8).map((m) => `<a href="/amsoil-${m.slug}">${ESC(m.make)} ${ESC(m.model)}</a>`).join("") + `<a href="/amsoil-garage">All vehicles →</a>`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -830,7 +830,7 @@ const PRODUCT_COPY = {
       ["How do I get the best price?", "Enroll once as a Preferred Customer under Tuned Yota and save up to 25% on every order, for life. Or buy at retail with no account — either way it ships direct from AMSOIL."],
     ],
     footnotes: `<sup>1</sup> Based on independent testing of AMSOIL Signature Series 0W-20 (ASTM D6891). <sup>2</sup> Based on zero LSPI events in five consecutive GM dexos1 Gen 2 LSPI tests of Signature Series 5W-30.`,
-    guide: "amsoil-synthetic-motor-oil-guide.html", guideLabel: "AMSOIL synthetic motor oil guide",
+    guide: "/amsoil-synthetic-motor-oil-guide", guideLabel: "AMSOIL synthetic motor oil guide",
   },
   "Oil Filter": {
     tag: "Up to 99% efficiency at 20 microns; warranty-supported 15,000-mile change interval.",
@@ -846,7 +846,7 @@ const PRODUCT_COPY = {
       ["Why use an AMSOIL filter instead of FRAM or WIX?", "AMSOIL Ea filters are built for extended drains — up to 99% efficiency at 20 microns and high capacity — going beyond what many competing filters offer."],
     ],
     footnotes: "",
-    guide: "amsoil-ea-oil-filter-guide.html", guideLabel: "AMSOIL Ea oil filter guide",
+    guide: "/amsoil-ea-oil-filter-guide", guideLabel: "AMSOIL Ea oil filter guide",
   },
   "Gear Lube": {
     tag: "High film strength and extreme-temperature performance for towing, hauling and severe duty.",
@@ -862,7 +862,7 @@ const PRODUCT_COPY = {
       ["How do I get the best price?", "Enroll once as a Preferred Customer under Tuned Yota and save up to 25% on every order, for life — or buy at retail with no account."],
     ],
     footnotes: "",
-    guide: "amsoil-severe-gear-guide.html", guideLabel: "AMSOIL SEVERE GEAR guide",
+    guide: "/amsoil-severe-gear-guide", guideLabel: "AMSOIL SEVERE GEAR guide",
   },
   "Automatic Transmission Fluid": {
     tag: "Guaranteed for twice the OEM severe-service drain interval; proven over 100,000 severe miles.",
@@ -878,7 +878,7 @@ const PRODUCT_COPY = {
       ["Which vehicles use this fluid?", "The fitment list on this page shows the Toyota and Lexus applications we've matched it to — or pick your vehicle in the AMSOIL Garage."],
     ],
     footnotes: "Severe-service and 100,000-mile results are from AMSOIL's Las Vegas Taxi Cab Field Study.",
-    guide: "amsoil-synthetic-atf-guide.html", guideLabel: "AMSOIL synthetic ATF guide",
+    guide: "/amsoil-synthetic-atf-guide", guideLabel: "AMSOIL synthetic ATF guide",
   },
   // Claims below are from the AMSOIL Dealer Sales Briefs (Diesel Oils 8/23,
   // Gasoline Additives 10/24, Antifreeze/Coolants 1/16). tag/bullets/faqs/
@@ -907,7 +907,7 @@ const PRODUCT_COPY = {
       ["Can AMSOIL diesel oil be used in gasoline engines?", "Signature Series Max-Duty is suitable for applications specifying API SN+ and earlier, making it ideal for mixed fleets. Check your owner's manual for the specified viscosity and rating."],
     ],
     footnotes: "<sup>1</sup> Wear-protection comparisons are based on the requirements of the Detroit Diesel DD13 scuffing test.",
-    guide: "is-amsoil-worth-it.html", guideLabel: "Is AMSOIL worth it?",
+    guide: "/is-amsoil-worth-it", guideLabel: "Is AMSOIL worth it?",
   },
   "Fuel Additive": {
     tag: (p) => /performance improver/i.test(p.name)
@@ -933,7 +933,7 @@ const PRODUCT_COPY = {
     ],
     footnotes: (p) => /performance improver/i.test(p.name) ? ""
       : "<sup>1</sup> Based on independent testing of AMSOIL Upper Cylinder Lubricant, Lucas Upper Cylinder Lubricant and Sea Foam Motor Treatment obtained on 02/13/2019 using ASTM D6079 modified for use with gasoline.",
-    guide: "is-amsoil-worth-it.html", guideLabel: "Is AMSOIL worth it?",
+    guide: "/is-amsoil-worth-it", guideLabel: "Is AMSOIL worth it?",
   },
   "Antifreeze & Coolant": {
     tag: (p) => /heavy-duty/i.test(p.name)
@@ -957,7 +957,7 @@ const PRODUCT_COPY = {
       ["Which coolant should I choose for my Toyota or Lexus?", "Passenger Car & Light Truck Antifreeze & Coolant is the fit for the Toyota/Lexus lineup, with a 150,000-mile or 5-year service interval in passenger-vehicle use. Heavy-Duty is the pick for diesel and commercial equipment."],
     ],
     footnotes: "",
-    guide: "amsoil-vs-oem-toyota-lexus-fluids.html", guideLabel: "AMSOIL vs. OEM fluids",
+    guide: "/amsoil-vs-oem-toyota-lexus-fluids", guideLabel: "AMSOIL vs. OEM fluids",
   },
   // Claims from the European Motor Oil Dealer Product Brief (10/23) and the
   // High-Mileage Motor Oil Product Sales Brief (7/23).
@@ -976,7 +976,7 @@ const PRODUCT_COPY = {
       ["How often should I change the oil?", "European manufacturers commonly recommend long drain intervals, and AMSOIL recommends following them — check your owner's manual or change according to the oil-life monitor."],
     ],
     footnotes: "",
-    guide: "amsoil-synthetic-motor-oil-guide.html", guideLabel: "AMSOIL synthetic motor oil guide",
+    guide: "/amsoil-synthetic-motor-oil-guide", guideLabel: "AMSOIL synthetic motor oil guide",
   },
   "High-Mileage Motor Oil": {
     tag: "Purpose-built for vehicles past 75,000 miles — seal conditioners protect against leaks, boosted detergents fight deposits, API licensed, 12,000-mile protection.",
@@ -994,7 +994,7 @@ const PRODUCT_COPY = {
       ["What's the drain interval?", "Up to 12,000 miles or 1 year, whichever comes first, in normal service (see your owner's manual for severe-service schedules). Always change the filter when changing oil."],
     ],
     footnotes: "",
-    guide: "amsoil-synthetic-motor-oil-guide.html", guideLabel: "AMSOIL synthetic motor oil guide",
+    guide: "/amsoil-synthetic-motor-oil-guide", guideLabel: "AMSOIL synthetic motor oil guide",
   },
 };
 
@@ -1036,10 +1036,10 @@ function productPage(sku, p) {
   const img = `https://tunedyota.com${p.image}`;
   const faqSchema = faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
   const faqVisible = faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
-  const fitList = fits.map((f) => `<li><a href="amsoil-${f.slug}.html">${ESC(f.make)} ${ESC(f.model)} ${ESC(f.y)} ${ESC(f.e)}</a> — ${ESC(f.system)}${f.capacity ? ` (${ESC(f.capacity)})` : ""}</li>`).join("\n    ");
+  const fitList = fits.map((f) => `<li><a href="/amsoil-${f.slug}">${ESC(f.make)} ${ESC(f.model)} ${ESC(f.y)} ${ESC(f.e)}</a> — ${ESC(f.system)}${f.capacity ? ` (${ESC(f.capacity)})` : ""}</li>`).join("\n    ");
   const fitSection = fits.length
-    ? `  <h2>Fits these Toyota &amp; Lexus vehicles</h2>\n  <p>Applications we've matched from AMSOIL's fitment guide for our supported lineup:</p>\n  <ul class="lp-bul">\n    ${fitList}\n  </ul>\n  <p>Different vehicle? Pick it in the <a href="amsoil-garage.html">AMSOIL Garage</a> — or search all of AMSOIL from there.</p>`
-    : `  <h2>Find your fit</h2>\n  <p>Pick your vehicle in the <a href="amsoil-garage.html">AMSOIL Garage</a> to confirm the right AMSOIL products for your Toyota or Lexus.</p>`;
+    ? `  <h2>Fits these Toyota &amp; Lexus vehicles</h2>\n  <p>Applications we've matched from AMSOIL's fitment guide for our supported lineup:</p>\n  <ul class="lp-bul">\n    ${fitList}\n  </ul>\n  <p>Different vehicle? Pick it in the <a href="/amsoil-garage">AMSOIL Garage</a> — or search all of AMSOIL from there.</p>`
+    : `  <h2>Find your fit</h2>\n  <p>Pick your vehicle in the <a href="/amsoil-garage">AMSOIL Garage</a> to confirm the right AMSOIL products for your Toyota or Lexus.</p>`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1074,7 +1074,7 @@ ${NAV}
     <div style="flex:1;min-width:220px">
       <div style="font-size:27px;font-weight:900;color:var(--ink)">$${price.toFixed(2)}</div>
       <div style="font-size:13.5px;color:var(--sage-d);margin-top:2px">AMSOIL Stock&nbsp;#&nbsp;${ESC(p.stockNo)} · In stock — ships direct from AMSOIL</div>
-      ${ratingLine(p.stockNo, amsoilUrl(p.productPath))}<div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="returns.html">30-day returns</a></div>
+      ${ratingLine(p.stockNo, amsoilUrl(p.productPath))}<div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="/returns">30-day returns</a></div>
     </div>
   </div>
   <div class="lp-cta">
@@ -1098,7 +1098,7 @@ ${fitSection}
 ${faqVisible}
 
   <h2>Keep reading</h2>
-  <div class="lp-veh"><a href="${copy.guide}">${ESC(copy.guideLabel)}</a><a href="amsoil-vs-oem-toyota-lexus-fluids.html">AMSOIL vs. OEM fluids</a><a href="amsoil-garage.html">AMSOIL Garage — all vehicles</a><a href="returns.html">Shipping &amp; returns</a></div>
+  <div class="lp-veh"><a href="${copy.guide}">${ESC(copy.guideLabel)}</a><a href="/amsoil-vs-oem-toyota-lexus-fluids">AMSOIL vs. OEM fluids</a><a href="/amsoil-garage">AMSOIL Garage — all vehicles</a><a href="/returns">Shipping &amp; returns</a></div>
 
   <p class="lp-disc">${footnotes || ""} Price shown is AMSOIL's current online retail price, synced weekly. Checkout completes on amsoil.com; orders are sold, shipped and fulfilled by AMSOIL Inc. Tuned Yota is an Authorized AMSOIL Dealer.</p>
 </div>
@@ -1164,12 +1164,12 @@ export const AMSOIL_HUB_FILES = ["amsoil-products.html", ...HUB_CATS.map((c) => 
 
 // Category → deeper Tier-1 reading where we have it.
 const HUB_GUIDE = {
-  "Motor Oil": ["amsoil-synthetic-motor-oil-guide.html", "AMSOIL synthetic motor oil guide"],
-  "Gear Oil": ["amsoil-severe-gear-guide.html", "AMSOIL SEVERE GEAR guide"],
-  "Transmission Fluid": ["amsoil-synthetic-atf-guide.html", "AMSOIL synthetic ATF guide"],
-  "Filters": ["amsoil-ea-oil-filter-guide.html", "AMSOIL Ea oil filter guide"],
-  "High Mileage Motor Oil": ["is-amsoil-worth-it.html", "Is AMSOIL worth it?"],
-  "European Oil": ["amsoil-vs-oem-toyota-lexus-fluids.html", "AMSOIL vs. OEM fluids"],
+  "Motor Oil": ["/amsoil-synthetic-motor-oil-guide", "AMSOIL synthetic motor oil guide"],
+  "Gear Oil": ["/amsoil-severe-gear-guide", "AMSOIL SEVERE GEAR guide"],
+  "Transmission Fluid": ["/amsoil-synthetic-atf-guide", "AMSOIL synthetic ATF guide"],
+  "Filters": ["/amsoil-ea-oil-filter-guide", "AMSOIL Ea oil filter guide"],
+  "High Mileage Motor Oil": ["/is-amsoil-worth-it", "Is AMSOIL worth it?"],
+  "European Oil": ["/amsoil-vs-oem-toyota-lexus-fluids", "AMSOIL vs. OEM fluids"],
 };
 const HUBSTYLE = `<style>
 .htab{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
@@ -1189,7 +1189,7 @@ const HUBSTYLE = `<style>
 // stockNo (any variant) → internal Tier-1 page, for curated SKUs.
 function curatedByStock() {
   const m = {};
-  for (const p of Object.values(CAT.products)) if (p.stockNo && priceOfP(p) != null) m[p.stockNo] = `${productSlug(p)}.html`;
+  for (const p of Object.values(CAT.products)) if (p.stockNo && priceOfP(p) != null) m[p.stockNo] = `/${productSlug(p)}`;
   return m;
 }
 
@@ -1228,7 +1228,7 @@ function fullProductPage({ p, e, slug }) {
   const img = `https://tunedyota.com${e.image}`;
   const gtin = /^\d{12}$/.test(p.upc || "") ? `"gtin12":${JSON.stringify(p.upc)},` : "";
   const desc = `${name} (${p.stockNo}) — $${price.toFixed(2)} from Tuned Yota, an Authorized AMSOIL Dealer. Genuine AMSOIL ${p.category.toLowerCase()}, shipped direct from AMSOIL — free on orders $100+, 30-day returns.`;
-  const hub = `amsoil-${catSlug(p.category)}-products.html`;
+  const hub = `/amsoil-${catSlug(p.category)}-products`;
   const guide = HUB_GUIDE[p.category];
   const sizeRows = p.variants.map((v) => `<tr><td>${ESC(v.pkg)}</td><td>${ESC(v.stockNo)}</td><td class="hp">$${effVariantPrice(p, v).toFixed(2)}${v.pc ? `<div class="hpc">$${v.pc.toFixed(2)} P.C.</div>` : ""}</td></tr>`).join("\n");
   return `<!DOCTYPE html>
@@ -1264,7 +1264,7 @@ ${NAV}
       <div style="font-size:27px;font-weight:900;color:var(--ink)">$${price.toFixed(2)}</div>
       ${p.pc ? `<div style="font-size:13.5px;color:var(--sage-d)">$${p.pc.toFixed(2)} as a Preferred Customer</div>` : ""}
       <div style="font-size:13.5px;color:var(--sage-d);margin-top:2px">AMSOIL Stock&nbsp;#&nbsp;${ESC(p.stockNo)} · In stock — ships direct from AMSOIL</div>
-      ${ratingLine(p.stockNo, amsoilUrl(e.path))}<div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="returns.html">30-day returns</a></div>
+      ${ratingLine(p.stockNo, amsoilUrl(e.path))}<div style="font-size:13.5px;margin-top:4px">Free shipping on orders $100+ · <a href="/returns">30-day returns</a></div>
     </div>
   </div>
   <div class="lp-cta">
@@ -1286,7 +1286,7 @@ ${sizeRows}
   </div>
 
   <h2>Keep browsing</h2>
-  <div class="lp-veh"><a href="${hub}">All AMSOIL ${ESC(p.category)}</a><a href="amsoil-products.html">All AMSOIL products</a><a href="amsoil-garage.html">AMSOIL Garage — fluids for your Toyota/Lexus</a><a href="returns.html">Shipping &amp; returns</a></div>
+  <div class="lp-veh"><a href="${hub}">All AMSOIL ${ESC(p.category)}</a><a href="/amsoil-products">All AMSOIL products</a><a href="/amsoil-garage">AMSOIL Garage — fluids for your Toyota/Lexus</a><a href="/returns">Shipping &amp; returns</a></div>
 
   <p class="lp-disc">Prices are AMSOIL's published U.S. retail and Preferred Customer prices. Checkout completes on amsoil.com; orders are sold, shipped and fulfilled by AMSOIL Inc. Tuned Yota is an Authorized AMSOIL Dealer.</p>
 </div>
@@ -1339,7 +1339,7 @@ ${body}
     <p>Become a Preferred Customer under Tuned Yota — the P.C. prices shown above, points, exclusive promotions and free gear. The membership pays for itself in about two oil changes.</p>
     <a class="btn primary" target="_blank" rel="noopener" href="${amsoilUrl("/offers/pc/")}">Become a Preferred Customer →</a>
   </div>
-  <p class="lp-disc">Prices are AMSOIL's published U.S. retail (online/catalog) and Preferred Customer prices; checkout completes on amsoil.com with free shipping on orders $100+. Orders are sold, shipped and fulfilled by AMSOIL Inc. See <a href="returns.html">shipping &amp; returns</a>. Tuned Yota is an Authorized AMSOIL Dealer.</p>
+  <p class="lp-disc">Prices are AMSOIL's published U.S. retail (online/catalog) and Preferred Customer prices; checkout completes on amsoil.com with free shipping on orders $100+. Orders are sold, shipped and fulfilled by AMSOIL Inc. See <a href="/returns">shipping &amp; returns</a>. Tuned Yota is an Authorized AMSOIL Dealer.</p>
 </div>
 ${FOOTER}
 ${TRACK}
@@ -1370,8 +1370,8 @@ function hubRows(products, curated) {
 function internalByStock() {
   const m = curatedByStock();
   for (const { p, slug } of tier3List()) {
-    for (const v of p.variants) if (!m[v.stockNo]) m[v.stockNo] = `${slug}.html`;
-    if (!m[p.stockNo]) m[p.stockNo] = `${slug}.html`;
+    for (const v of p.variants) if (!m[v.stockNo]) m[v.stockNo] = `/${slug}`;
+    if (!m[p.stockNo]) m[p.stockNo] = `/${slug}`;
   }
   return m;
 }
@@ -1391,7 +1391,7 @@ export function buildAmsoilHubs() {
   <table class="htab"><thead><tr><th>Product &amp; sizes</th><th>Stock #</th><th>Price</th><th></th></tr></thead><tbody>
 ${hubRows(ps, curated)}
   </tbody></table>
-  <p><a href="amsoil-products.html">← All AMSOIL products</a> · <a href="amsoil-garage.html">AMSOIL Garage — fluids for your Toyota/Lexus</a></p>`;
+  <p><a href="/amsoil-products">← All AMSOIL products</a> · <a href="/amsoil-garage">AMSOIL Garage — fluids for your Toyota/Lexus</a></p>`;
     fs.writeFileSync(path.join(SITE, file), hubChrome({
       file, h1: `AMSOIL ${ESC(c)}`, eyebrow: "Tuned Yota · Authorized AMSOIL Dealer · Full product line",
       title: `AMSOIL ${ESC(c)} — All ${ps.length} Products, Prices &amp; Ordering | Tuned Yota`,
@@ -1409,14 +1409,14 @@ ${hubRows(ps, curated)}
   });
   const catLinks = HUB_CATS.map((c) => {
     const im = CAT_IMAGES.images[catSlug(c)];
-    return `<a href="amsoil-${catSlug(c)}-products.html">${im ? `<img src="${im}" alt="" width="26" height="26" loading="lazy" style="border-radius:50%;vertical-align:-7px;margin-right:6px">` : ""}${ESC(c)} (${FULL.products.filter((p) => p.category === c).length})</a>`;
+    return `<a href="/amsoil-${catSlug(c)}-products">${im ? `<img src="${im}" alt="" width="26" height="26" loading="lazy" style="border-radius:50%;vertical-align:-7px;margin-right:6px">` : ""}${ESC(c)} (${FULL.products.filter((p) => p.category === c).length})</a>`;
   }).join("");
   const idxBody = `  <div class="lp-answer">The <strong>complete AMSOIL product line — ${FULL.count} products</strong> — searchable below with AMSOIL's published pricing, and browsable by category. Every order ships direct from AMSOIL (free on orders $100+) through Tuned Yota, an Authorized AMSOIL Dealer.</div>
   <input id="hsearch" type="search" placeholder="Search all ${FULL.count} AMSOIL products — name or stock number…" autocomplete="off">
   <div id="hresults"></div>
   <h2>Browse by category</h2>
   <div class="hcats">${catLinks}</div>
-  <p><a href="amsoil-garage.html">Not sure what your Toyota or Lexus needs? Use the AMSOIL Garage →</a></p>
+  <p><a href="/amsoil-garage">Not sure what your Toyota or Lexus needs? Use the AMSOIL Garage →</a></p>
   <script id="hdata" type="application/json">${JSON.stringify(searchData)}</script>
   <script>
   (function(){
@@ -1496,7 +1496,7 @@ function geoPage(st, vehModels) {
   const faqSchema = faqs.map(([q, a]) => `{"@type":"Question","name":${JSON.stringify(q)},"acceptedAnswer":{"@type":"Answer","text":${JSON.stringify(a)}}}`).join(",");
   const faqVisible = faqs.map(([q, a]) => `  <div class="lp-fq"><button class="lp-fqq" aria-expanded="false">${ESC(q)}<span>+</span></button><div class="lp-fqa"><p>${ESC(a)}</p></div></div>`).join("\n");
   const servedBlock = st.served
-    ? `  <h2>Toyota &amp; Lexus tuning in ${ESC(st.name)}</h2>\n  <p>Beyond AMSOIL, Tuned Yota runs in-person OTT tuning events across ${ESC(st.name)}, including ${ESC(cityList)}. <a href="toyota-lexus-tuning-${st.slug}.html">See ${ESC(st.name)} tuning &amp; dates →</a></p>`
+    ? `  <h2>Toyota &amp; Lexus tuning in ${ESC(st.name)}</h2>\n  <p>Beyond AMSOIL, Tuned Yota runs in-person OTT tuning events across ${ESC(st.name)}, including ${ESC(cityList)}. <a href="/toyota-lexus-tuning-${st.slug}">See ${ESC(st.name)} tuning &amp; dates →</a></p>`
     : "";
   const title = `Buy AMSOIL in ${ESC(st.name)} — Synthetic Oil Shipped to Your Door | Tuned Yota`;
   const desc = `Buy genuine AMSOIL synthetic oil, filters, gear lube and ATF in ${ESC(st.name)} — shipped direct to your door from Tuned Yota, an Authorized AMSOIL Dealer. Real prices, and save up to 25% as a Preferred Customer.`;
@@ -1560,7 +1560,7 @@ ${faqVisible}
 
   <div class="lp-links">
     <strong>More:</strong><br>
-    <a href="amsoil-garage.html">AMSOIL Garage</a><a href="amsoil-synthetic-motor-oil-guide.html">AMSOIL oil guide</a><a href="amsoil-vs-oem-toyota-lexus-fluids.html">AMSOIL vs. OEM</a>
+    <a href="/amsoil-garage">AMSOIL Garage</a><a href="/amsoil-synthetic-motor-oil-guide">AMSOIL oil guide</a><a href="/amsoil-vs-oem-toyota-lexus-fluids">AMSOIL vs. OEM</a>
   </div>
   <p class="lp-disc">Product recommendations are from AMSOIL's official materials; checkout completes on amsoil.com. Tuned Yota is an Authorized AMSOIL Dealer shipping nationwide.</p>
 </div>

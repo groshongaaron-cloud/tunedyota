@@ -7,7 +7,7 @@ const HTML = fs.readFileSync(path.join(__dirname, "..", "site", "index.html"), "
 test("homepage shows both CTA buttons", () => {
   assert.ok(HTML.includes("Book Event Time Slot NOW"), "missing Book button");
   assert.ok(HTML.includes("Schedule my FREE OTT Update"), "missing Update button");
-  assert.ok(HTML.includes("find-your-exact-tune.html?intent=update"), "update button must deep-link intent=update");
+  assert.ok(HTML.includes("/find-your-exact-tune?intent=update"), "update button must deep-link intent=update");
 });
 test("CTA band sits above the main content sections", () => {
   const band = HTML.indexOf("Book Event Time Slot NOW");
