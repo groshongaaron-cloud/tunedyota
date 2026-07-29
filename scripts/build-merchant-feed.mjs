@@ -76,7 +76,9 @@ const items = [...bySku.values()].map(({ kit, apps }) => {
     `    <g:price>${kit.retail.toFixed(2)} USD</g:price>`,
     "    <g:availability>in_stock</g:availability>",
     "    <g:condition>new</g:condition>",
-    "    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>250.00 USD</g:price></g:shipping>",
+    // $310 = Magnuson dealer policy pass-through: $275 flat freight (contiguous
+    // US, policy §6.13) + $35 non-negotiable drop-ship fee (§6.9.1).
+    "    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>310.00 USD</g:price></g:shipping>",
     "    <g:brand>Magnuson Superchargers</g:brand>",
     `    <g:mpn>${ESC(kit.sku)}</g:mpn>`,
     "    <g:google_product_category>Vehicles &amp; Parts &gt; Vehicle Parts &amp; Accessories &gt; Motor Vehicle Parts &gt; Motor Vehicle Engine Parts</g:google_product_category>",
