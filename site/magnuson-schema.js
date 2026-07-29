@@ -10,6 +10,11 @@
      vehicle only.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
+  // Since 2026-07-29 the schema is rendered statically at build time
+  // (scripts/build-product-schema.mjs) — first-wave crawlable, no JS rendering
+  // needed. This injector stays as a fallback for any page added without
+  // running the build; it must skip when the static block is present.
+  if (document.querySelector('script[data-magnuson="static"]')) return;
   var C = window.MAGNUSON_CATALOG;
   if (!C) return;
 
