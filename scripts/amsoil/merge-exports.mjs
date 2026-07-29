@@ -13,30 +13,36 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..")
 const [slug, ...sources] = process.argv.slice(2);
 if (!slug || !sources.length) { console.error("usage: node merge-exports.mjs <category-slug> <url-or-file>..."); process.exit(1); }
 
+// Scraped names/sizes arrive HTML-escaped ("Antifreeze &amp; Coolant"); page
+// generators escape again, so decode here or "&amp;amp;" shows on the site.
+const unescapeHtml = (s) => typeof s === "string"
+  ? s.replace(/&amp;/g, "&").replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&reg;/g, "®").replace(/&trade;/g, "™")
+  : s;
+
 const normalize = (r) => {
   const out = {
-    product_url: r.product_url ?? r.page_url, product_name: r.product_name, page_title: r.page_title,
-    product_description: r.product_description, data_source_format: r.data_source_format ?? r.source_format,
+    product_url: r.product_url ?? r.page_url, product_name: unescapeHtml(r.product_name), page_title: unescapeHtml(r.page_title),
+    product_description: unescapeHtml(r.product_description), data_source_format: r.data_source_format ?? r.source_format,
     offer_price: r.offer_price ?? r.price_usd ?? r.base_price ?? r.price ?? null,
     all_available_prices: r.all_available_prices ?? r.all_prices_usd ?? r.all_prices ?? "",
-    available_sizes: r.available_sizes ?? r.package_size ?? r.product_size ?? "",
+    available_sizes: unescapeHtml(r.available_sizes ?? r.package_size ?? r.product_size ?? ""),
     variant_skus: r.variant_skus ?? "",
     customer_rating: r.customer_rating ?? (typeof r.average_rating === "string" ? r.average_rating : (r.average_rating != null && r.total_review_count != null ? `${r.average_rating} (${r.total_review_count})` : "")),
     total_reviews: r.total_reviews ?? r.total_review_count ?? null,
-    breadcrumb_navigation: r.breadcrumb_navigation ?? "",
-    main_product_image: r.main_product_image ?? r.product_image ?? "",
+    breadcrumb_navigation: unescapeHtml(r.breadcrumb_navigation ?? ""),
+    main_product_image: r.main_product_image ?? r.product_image ?? r.main_image_url ?? "",
   };
   // Raw JSON-LD is the ONLY trustworthy SKU→size→price mapping (the flattened
   // All Prices column is sorted ascending, NOT aligned to Variant SKUs — never
   // zip them). Parse the ProductGroup: hasVariant[] gives per-variant price +
   // size; aggregateRating gives the published rating verbatim.
-  const raw = r.raw_json_ld_data ?? r.s0_json_ld___raw_jsonld ?? r.raw_jsonld;
+  const raw = r.raw_json_ld_data ?? r.s0_json_ld___raw_jsonld ?? r.raw_jsonld ?? r.raw_json_ld ?? r.raw_schema_json;
   if (raw) {
     try {
       const ld = JSON.parse(raw);
       const nodes = Array.isArray(ld) ? ld : (ld["@graph"] || [ld]);
       const g = nodes.find((n) => n && /ProductGroup|Product/.test(String(n["@type"]))) || {};
-      out.product_name = g.name || out.product_name;
+      out.product_name = unescapeHtml(g.name) || out.product_name;
       const ar = g.aggregateRating;
       if (ar && ar.ratingValue != null) {
         const rc = ar.reviewCount ?? ar.ratingCount ?? 0;
@@ -49,7 +55,7 @@ const normalize = (r) => {
         if (o0.priceCurrency) out._currency = o0.priceCurrency;
         out.variants_ld = hv.map((v) => {
           const o = Array.isArray(v.offers) ? v.offers[0] : (v.offers || {});
-          return { sku: v.sku, size: v.size || v.name || "", price: parseFloat(o.price) || null };
+          return { sku: v.sku, size: unescapeHtml(v.size || v.name || ""), price: parseFloat(o.price) || null };
         }).filter((v) => v.sku);
         if (!out.variant_skus) out.variant_skus = out.variants_ld.map((v) => v.sku).join(", ");
         if (out.offer_price == null) {

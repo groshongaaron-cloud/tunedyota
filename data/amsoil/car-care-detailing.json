@@ -11,7 +11,7 @@
   "customer_rating": "5 (48)",
   "total_reviews": 48,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/hfbcn-ea.jpg?context=bWFzdGVyfGltYWdlc3wzMjk3M3xpbWFnZS9qcGVnfGFHTXdMMmcyTmk4eE5qQXhORGczTlRrMU1URXpOQzlvWm1KamJsOWxZUzVxY0djfGIxNGQwMDNiMmEwZTJhMjBjMWYxN2NjMmY4ZjdjZjlkODcxM2EyODY0NmJkNDczNGFlNDA5MThkNWM1OTZhMDk",
   "variants_ld": [
    {
     "sku": "HFBCN-EA",
@@ -37,7 +37,7 @@
   "customer_rating": "",
   "total_reviews": null,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/qdscn-ea.jpg?context=bWFzdGVyfGltYWdlc3w1MDg1MHxpbWFnZS9qcGVnfGFEVTBMMmcwTWk4eU5qY3hNVFk1T1RNMU56Y3lOaTl4WkhOamJsOWxZUzVxY0djfDY4OWY3M2NiYTljODljZTI0NGZkMGM2YjQzZWQ0NjYzNzcwYmE0YzBjMzBkNmRlOTkyZDA4NGFiNmNhMzVkMjg",
   "variants_ld": [
    {
     "sku": "QDSCN-EA",
@@ -63,7 +63,7 @@
   "customer_rating": "",
   "total_reviews": null,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/ttpcn-ea.jpg?context=bWFzdGVyfGltYWdlc3w0ODI2NXxpbWFnZS9qcGVnfGFESmlMMmczWXk4eU5qY3hNVGN3TkRJME1ERTFPQzkwZEhCamJsOWxZUzVxY0djfGMzMWQ1MzljOTA5ZmRmYjc2MzY0ZDVlZjc4NzkxOTYxNmMzZjQ1NGExYWJjYmIyODMwNDdkN2IyMjcwYWRkZWQ",
   "variants_ld": [
    {
     "sku": "TTPCN-EA",
@@ -89,7 +89,7 @@
   "customer_rating": "",
   "total_reviews": null,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/wtccn-ea.jpg?context=bWFzdGVyfGltYWdlc3w1MTU3NXxpbWFnZS9qcGVnfGFESTVMMmcxWkM4eU5qY3hNVGN3T1RZM09UWTBOaTkzZEdOamJsOWxZUzVxY0djfGY3ZTgwYzQ0MmJjNzk0NzA4ODI5YjlmYzM1MzI4NzA5ODdlNmYwMmFmNjA1Y2YyODI2Zjk5NGVhNzczOGMwMjE",
   "variants_ld": [
    {
     "sku": "WTCCN-EA",
@@ -115,7 +115,7 @@
   "customer_rating": "5 (35)",
   "total_reviews": 35,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/idncn-ea.jpg?context=bWFzdGVyfGltYWdlc3wzMDI4N3xpbWFnZS9qcGVnfGFEQTNMMmd3TUM4eE5qQXhORGczT1RVeU1qZzBOaTlwWkc1amJsOWxZUzVxY0djfGJhNmFiZDc3OGE3NjlkYjk4YTY1NjVkY2FkY2I3NTQ1NzMwMDYwYzQ3OTYwY2E4NzRiMjUyNGM0ZTM3ODk5ODQ",
   "variants_ld": [
    {
     "sku": "IDNCN-EA",
@@ -141,7 +141,7 @@
   "customer_rating": "5 (35)",
   "total_reviews": 35,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/idlcn-ea.jpg?context=bWFzdGVyfGltYWdlc3wzMDY5N3xpbWFnZS9qcGVnfGFHSTFMMmcwWVM4eE5qQXhORGc0TXpJeU5UWXpNQzlwWkd4amJsOWxZUzVxY0djfGY1MmI0YTM5YzM5Yzc3ODRiOWQyMjQzMTM5ZDA0Y2ExM2VkNmQxODY1MjYyODk3Nzg2YTU5NWVkMTdlNDFiZGU",
   "variants_ld": [
    {
     "sku": "IDLCN-EA",
@@ -167,7 +167,7 @@
   "customer_rating": "5 (98)",
   "total_reviews": 98,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/amsscmod-ea.jpg?context=bWFzdGVyfGltYWdlc3w2NDg4OXxpbWFnZS9qcGVnfGFERXhMMmd3WkM4eE16a3dOalUyTmpNeE5qQTJNaTloYlhOelkyMXZaRjlsWVM1cWNHY3xiODJkZWYyNmIzZGJkNjllNGI5OWQ1NjYyMzY1NjJhMjNmZDdkNTVjOTE4Y2YxZmIyZmViZGExNjFiNGYwMWE4",
   "variants_ld": [
    {
     "sku": "AMSSC-EA",
@@ -193,7 +193,7 @@
   "customer_rating": "5 (106)",
   "total_reviews": 106,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/agcscmod-ea.jpg?context=bWFzdGVyfGltYWdlc3w2NDAzN3xpbWFnZS9qcGVnfGFHWTRMMmhrTUM4eE16ZzNNREExTXpFNU5UZ3dOaTloWjJOelkyMXZaRjlsWVM1cWNHY3w1MmIzZWY2ZTM1ODQxZTk5NDkwMmVhN2ZhOTE3YTQwYzA1YjAxZDMxZDA5MDU2ZjcwNTc3ZDVlYTI5YmIzNjc5",
   "variants_ld": [
    {
     "sku": "AGCSC-EA",
@@ -219,7 +219,7 @@
   "customer_rating": "5 (60)",
   "total_reviews": 60,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/amwsc-ea.jpg?context=bWFzdGVyfGltYWdlc3w0ODgwNXxpbWFnZS9qcGVnfGFETXhMMmhsWVM4eU56RTJNRGswTURnek9EazBNaTloYlhkelkxOWxZUzVxY0djfGE4ZDYzYWFhNmE2MGNkOTNlYTExNjk2ZTZlMTQyZGZlMWRhOGZjOTI4YzU0YzBlZGY3MDQ3ZDA2ZmYzNjM4NjI",
   "variants_ld": [
    {
     "sku": "AMWSC-EA",
@@ -245,7 +245,7 @@
   "customer_rating": "",
   "total_reviews": null,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/g3911-ea.jpg?context=bWFzdGVyfGltYWdlc3w0NTgxMXxpbWFnZS9qcGVnfGFEUmxMMmd5TXk4eU56YzBOekF4TmpNME16VTRNaTluTXpreE1WOWxZUzVxY0djfDJhZmZmZDE3NDkwNjhlOTZmZjhiMGMyZGU5YjQ1YWFiN2RmZDg4ZjNlMDZiZDcyMDAxZWEwMGJmNjc2NDFhMmU",
   "variants_ld": [
    {
     "sku": "G3911-EA",
@@ -266,7 +266,7 @@
   "customer_rating": "",
   "total_reviews": null,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/g3912-ea.jpg?context=bWFzdGVyfGltYWdlc3w4MTc5MHxpbWFnZS9qcGVnfGFEZzNMMmcyTnk4eU56VTFNelEyTnpVNU5qZ3pNQzluTXpreE1sOWxZUzVxY0djfGRlYjJjMDAwZjEwZDJkMTdlNTFiY2RhOGJhMGRjNGU2ODM3ZDQyYzUwNTE4ODM2NzI0ZjkzYzFkNWMxMDVkMGU",
   "variants_ld": [
    {
     "sku": "G3912-EA",
@@ -287,7 +287,7 @@
   "customer_rating": "",
   "total_reviews": null,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/g3913-ea.jpg?context=bWFzdGVyfGltYWdlc3w4Mzk0M3xpbWFnZS9qcGVnfGFHWTJMMmhqT0M4eU56VTFNelEyT1RRek1UZ3pPQzluTXpreE0xOWxZUzVxY0djfDg0YzExMDdmOWVkOWVhNDBmYWMzN2VlNDc4OGNiOTQ0NWQ3NWI5YTExZGZiYTE3MmZjODIyZDYxMDk4NTI4OTg",
   "variants_ld": [
    {
     "sku": "G3913-EA",
@@ -308,12 +308,36 @@
   "customer_rating": "",
   "total_reviews": null,
   "breadcrumb_navigation": "",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/g3914-ea.jpg?context=bWFzdGVyfGltYWdlc3wxMjE2OTd8aW1hZ2UvanBlZ3xhRGsyTDJoaU1TOHlOelUxTXpRM01USXpOREEzT0M5bk16a3hORjlsWVM1cWNHY3w5OTA4Y2Y5ZWExYTQ5OTMzNjA1MTBkZGNhZmM1MjlkZjVkYzM0MThjZWJkZmE0MDc1NTk2MDU1OTdiODY5MWZh",
   "variants_ld": [
    {
     "sku": "G3914-EA",
     "size": "One",
     "price": 13.75
+   }
+  ]
+ },
+ {
+  "product_url": "https://www.amsoil.com/p/amsoil-exterior-ceramic-spray-csf/",
+  "product_name": "AMSOIL Exterior Ceramic Spray",
+  "offer_price": 21.89,
+  "all_available_prices": "",
+  "available_sizes": "",
+  "variant_skus": "CSFCN-EA, CSFCN-CA",
+  "customer_rating": "5 (51)",
+  "total_reviews": 51,
+  "breadcrumb_navigation": "",
+  "main_product_image": "https://www.amsoil.com/medias/csfcn-ea.jpg?context=bWFzdGVyfGltYWdlc3wzMDY5M3xpbWFnZS9qcGVnfGFEQXpMMmhpTWk4eE5qQXhORGczTVRVMk1ESXlNaTlqYzJaamJsOWxZUzVxY0djfGYyYzRiYTczMzRlOTYyNTQwMGIwMDNmYzY0YWVjY2UxMTNjMzI1YmE5YzQzNzM0ZGI0ZTIzNmYzOTgyYjg1ZTg",
+  "variants_ld": [
+   {
+    "sku": "CSFCN-EA",
+    "size": "16 oz. Bottle",
+    "price": 21.89
+   },
+   {
+    "sku": "CSFCN-CA",
+    "size": "16 oz. Bottle, Case of 12",
+    "price": 260.9
    }
   ]
  }

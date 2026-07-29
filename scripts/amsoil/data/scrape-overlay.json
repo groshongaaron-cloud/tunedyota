@@ -1,145 +1,456 @@
 {
  "updated": "2026-07-25",
  "files": [
-  "automatic-transmission-fluid.json",
+  "antifreeze-coolant.json",
+  "bearing-chassis-grease.json",
   "car-care-detailing.json",
   "compressor-oil.json",
   "fuel-additives.json",
   "gasoline-motor-oil.json",
   "gear-oil.json",
-  "hydraulic-oil.json"
+  "hydraulic-oil.json",
+  "steering-brake-suspension-fluid.json",
+  "transmission-fluid.json"
  ],
- "count": 108,
+ "count": 142,
  "products": {
-  "ATLQT-EA": {
-   "path": "/p/amsoil-signature-series-fuel-efficient-100-synthetic-automatic-transmission-fluid-atl/",
-   "price": 21.19,
-   "rating": null,
-   "reviews": 975,
-   "name": "AMSOIL Signature Series Fuel-Efficient 100% Synthetic Automatic Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "ULVPK-EA": {
-   "path": "/p/amsoil-signature-series-ulv-100-synthetic-automatic-transmission-fluid-ulv/",
-   "price": 25.89,
-   "rating": null,
-   "reviews": 975,
-   "name": "AMSOIL Signature Series ULV 100% Synthetic Automatic Transmission Fluid ",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "OTFQT-EA": {
-   "path": "/p/amsoil-oe-multi-vehicle-100-synthetic-automatic-transmission-fluid-otf/",
-   "price": 14.89,
-   "rating": null,
-   "reviews": 326,
-   "name": "AMSOIL OE Multi-Vehicle 100% Synthetic Automatic Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "OTLQT-EA": {
-   "path": "/p/amsoil-oe-fuel-efficient-100-synthetic-automatic-transmission-fluid-otl/",
-   "price": 14.99,
-   "rating": null,
-   "reviews": 326,
-   "name": "AMSOIL OE Fuel-Efficient 100% Synthetic Automatic Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "DCTQT-EA": {
-   "path": "/p/amsoil-100-synthetic-dct-fluid-dct/",
-   "price": 30.79,
-   "rating": null,
-   "reviews": 33,
-   "name": "AMSOIL 100% Synthetic DCT Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "ATD1G-EA": {
-   "path": "/p/amsoil-torque-drive-100-synthetic-automatic-transmission-fluid-atd/",
-   "price": 77.29,
-   "rating": null,
-   "reviews": 45,
-   "name": "AMSOIL Torque-Drive® 100% Synthetic Automatic Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "ARTQT-EA": {
-   "path": "/p/amsoil-super-shift-racing-transmission-fluid-art/",
-   "price": 20.39,
-   "rating": null,
-   "reviews": 25,
-   "name": "AMSOIL Super Shift® Racing Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "CTG05-EA": {
-   "path": "/p/amsoil-sae-10w-100-synthetic-powershift-transmission-fluid-ctg/",
-   "price": 324.95,
-   "rating": null,
-   "reviews": 4,
-   "name": "AMSOIL SAE 10W 100% Synthetic Powershift Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "CTJ05-EA": {
-   "path": "/p/amsoil-sae-30-100-synthetic-powershift-transmission-fluid-ctj/",
-   "price": 323.5,
-   "rating": null,
-   "reviews": 4,
-   "name": "AMSOIL SAE 30 100% Synthetic Powershift Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
-  },
-  "ADBPCN-EA": {
-   "path": "/p/amsoil-diesel-4-in-1-fuel-additive-adb/",
-   "price": 9.39,
+  "ANTPC1G-EA": {
+   "path": "/p/amsoil-passenger-car-light-truck-antifreeze-coolant-antpc/",
+   "price": 30.69,
    "rating": 5,
-   "reviews": 309,
-   "name": "AMSOIL Diesel 4-IN-1 Fuel Additive",
-   "source": "fuel-additives.json",
+   "reviews": 40,
+   "name": "AMSOIL Passenger Car & Light Truck Antifreeze & Coolant",
+   "source": "antifreeze-coolant.json",
    "variants": {
-    "ADBPCN-EA": {
-     "price": 9.39,
-     "size": "8 oz. Bottle"
-    },
-    "ADBPCN-CA": {
-     "price": 55.35,
-     "size": "8 oz. Bottles, Case of 6"
-    },
-    "ADBHG-EA": {
-     "price": 54.29,
-     "size": "64 oz. Bottle"
-    },
-    "ADBHG-CA": {
-     "price": 323.7,
-     "size": "64 oz. Bottles, Case of 6"
-    },
-    "ADBCN-EA": {
-     "price": 15.39,
-     "size": "16 oz. Bottle"
-    },
-    "ADBCN-CA": {
-     "price": 183.3,
-     "size": "16 oz. Bottles, Case of 12"
-    },
-    "ADB55-EA": {
-     "price": 4854.75,
+    "ANTPC55-EA": {
+     "price": 1371.75,
      "size": "55 Gallon Drum"
     },
-    "ADB05-EA": {
-     "price": 497.85,
-     "size": "5 Gallon Pail"
+    "ANTPC27-EA": {
+     "price": 6217.15,
+     "size": "275 Gallon Tote"
+    },
+    "ANTPC1G-EA": {
+     "price": 30.69,
+     "size": "Gallon Jug"
+    },
+    "ANTPC1G-CA": {
+     "price": 121.05,
+     "size": "Gallon Jugs, Case of 4"
     }
    }
   },
-  "CVTQT-EA": {
-   "path": "/p/amsoil-100-synthetic-cvt-fluid-cvt/",
-   "price": 20.39,
-   "rating": null,
-   "reviews": 217,
-   "name": "AMSOIL 100% Synthetic CVT Fluid",
-   "source": "automatic-transmission-fluid.json"
+  "ANTHD1G-EA": {
+   "path": "/p/amsoil-heavy-duty-antifreeze-coolant-anthd/",
+   "price": 32.39,
+   "rating": 5,
+   "reviews": 38,
+   "name": "AMSOIL Heavy-Duty Antifreeze & Coolant",
+   "source": "antifreeze-coolant.json",
+   "variants": {
+    "ANTHD55-EA": {
+     "price": 1446.9,
+     "size": "55 Gallon Drum"
+    },
+    "ANTHD27-EA": {
+     "price": 6594.3,
+     "size": "275 Gallon Tote"
+    },
+    "ANTHD1G-EA": {
+     "price": 32.39,
+     "size": "Gallon Jug"
+    },
+    "ANTHD1G-CA": {
+     "price": 127.75,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
-  "ATFQT-EA": {
-   "path": "/p/amsoil-signature-series-multi-vehicle-100-synthetic-automatic-transmission-fluid-atf/",
-   "price": 21.19,
+  "ANT1G-EA": {
+   "path": "/p/amsoil-propylene-glycol-antifreeze-and-engine-coolant-ant/",
+   "price": 64.99,
+   "rating": 5,
+   "reviews": 33,
+   "name": "AMSOIL Propylene Glycol Antifreeze and Engine Coolant",
+   "source": "antifreeze-coolant.json",
+   "variants": {
+    "ANT55-EA": {
+     "price": 2755.45,
+     "size": "55 Gallon Drum"
+    },
+    "ANT1G-EA": {
+     "price": 64.99,
+     "size": "Gallon Jug"
+    },
+    "ANT1G-CA": {
+     "price": 258.3,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "RDCBCN-EA": {
+   "path": "/p/amsoil-dominator-coolant-boost-rdcb/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 68,
+   "name": "AMSOIL DOMINATOR® Coolant Boost",
+   "source": "antifreeze-coolant.json",
+   "variants": {
+    "RDCBCN-EA": {
+     "price": 17.99,
+     "size": "16 oz. Bottle"
+    },
+    "RDCBCN-CA": {
+     "price": 106.9,
+     "size": "16 oz. Bottles, Case of 6"
+    }
+   }
+  },
+  "PSAFQT-EA": {
+   "path": "/p/amsoil-powersports-antifreeze-coolant-psaf/",
+   "price": 11.39,
+   "rating": 5,
+   "reviews": 12,
+   "name": "AMSOIL Powersports Antifreeze & Coolant",
+   "source": "antifreeze-coolant.json",
+   "variants": {
+    "PSAFQT-EA": {
+     "price": 11.39,
+     "size": "Quart Bottle"
+    },
+    "PSAFQT-CA": {
+     "price": 134.55,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "GLCCR-EA": {
+   "path": "/p/amsoil-synthetic-multi-purpose-grease-glc/",
+   "price": 14.1,
+   "rating": 5,
+   "reviews": 78,
+   "name": "AMSOIL Synthetic Multi-Purpose Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GLCCR-PK": {
+     "price": 521.95,
+     "size": "14 oz. Cartridges, Pack of 40"
+    },
+    "GLCCR-EA": {
+     "price": 14.1,
+     "size": "14 oz. Cartridge"
+    },
+    "GLCCR-CA": {
+     "price": 136.3,
+     "size": "14 oz. Cartridges, Case of 10"
+    },
+    "GLC99-EA": {
+     "price": 1513.25,
+     "size": "120 lb. Keg"
+    },
+    "GLC40-EA": {
+     "price": 4769.75,
+     "size": "400 lb. Drum"
+    },
+    "GLC35-EA": {
+     "price": 464.6,
+     "size": "35 lb. Lug"
+    }
+   }
+  },
+  "GWRCR-EA": {
+   "path": "/p/amsoil-synthetic-water-resistant-grease-gwr/",
+   "price": 14.75,
+   "rating": 5,
+   "reviews": 59,
+   "name": "AMSOIL Synthetic Water-Resistant Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GWRCR-PK": {
+     "price": 547.2,
+     "size": "14 oz. Cartridges, Pack of 40"
+    },
+    "GWRCR-EA": {
+     "price": 14.75,
+     "size": "14 oz. Cartridge"
+    },
+    "GWRCR-CA": {
+     "price": 142.75,
+     "size": "14 oz. Cartridges, Case of 10"
+    },
+    "GWR99-EA": {
+     "price": 1587.6,
+     "size": "120 lb. Keg"
+    },
+    "GWR35-EA": {
+     "price": 488.9,
+     "size": "35 lb. Lug"
+    }
+   }
+  },
+  "GPTR1CR-EA": {
+   "path": "/p/amsoil-nlgi-1-synthetic-polymeric-truck-chassis-and-equipment-grease-gptr1/",
+   "price": 13.45,
+   "rating": 5,
+   "reviews": 13,
+   "name": "AMSOIL NLGI #1 Synthetic Polymeric Truck, Chassis and Equipment Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GPTR1CR-PK": {
+     "price": 513.35,
+     "size": "14 oz. Cartridges, Pack of 40"
+    },
+    "GPTR1CR-EA": {
+     "price": 13.45,
+     "size": "14 oz. Cartridge"
+    },
+    "GPTR1CR-CA": {
+     "price": 129.55,
+     "size": "14 oz. Cartridges, Case of 10"
+    },
+    "GPTR199-EA": {
+     "price": 1562.1,
+     "size": "120 lb. Keg"
+    },
+    "GPTR140-EA": {
+     "price": 4901.6,
+     "size": "400 lb. Drum"
+    },
+    "GPTR135-EA": {
+     "price": 472.25,
+     "size": "35 lb. Lug"
+    }
+   }
+  },
+  "GPTR2CR-EA": {
+   "path": "/p/amsoil-nlgi-2-synthetic-polymeric-truck-chassis-and-equipment-grease-gptr2/",
+   "price": 14.4,
+   "rating": 5,
+   "reviews": 27,
+   "name": "AMSOIL NLGI #2 Synthetic Polymeric Truck, Chassis and Equipment Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GPTR2CR-PK": {
+     "price": 550.5,
+     "size": "14 oz. Cartridges, Pack of 40"
+    },
+    "GPTR2CR-EA": {
+     "price": 14.4,
+     "size": "14 oz. Cartridge"
+    },
+    "GPTR2CR-CA": {
+     "price": 138.8,
+     "size": "14 oz. Cartridges, Case of 10"
+    },
+    "GPTR299-EA": {
+     "price": 1682.8,
+     "size": "120 lb. Keg"
+    },
+    "GPTR240-EA": {
+     "price": 5288.3,
+     "size": "400 lb. Drum"
+    },
+    "GPTR235-EA": {
+     "price": 508,
+     "size": "35 lb. Lug"
+    }
+   }
+  },
+  "GPOR1CR-EA": {
+   "path": "/p/amsoil-nlgi-1-synthetic-polymeric-off-road-grease-gpor1/",
+   "price": 15.7,
+   "rating": 5,
+   "reviews": 4,
+   "name": "AMSOIL NLGI #1 Synthetic Polymeric Off-Road Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GPOR1CR-PK": {
+     "price": 599.3,
+     "size": "15 oz. Cartridges, Pack of 40"
+    },
+    "GPOR1CR-EA": {
+     "price": 15.7,
+     "size": "15 oz. Cartridge"
+    },
+    "GPOR1CR-CA": {
+     "price": 151.1,
+     "size": "15 oz. Cartridges, Case of 10"
+    },
+    "GPOR199-EA": {
+     "price": 1715.55,
+     "size": "120 lb. Keg"
+    },
+    "GPOR135-EA": {
+     "price": 517.7,
+     "size": "35 lb. Pail"
+    }
+   }
+  },
+  "GPOR2CR-EA": {
+   "path": "/p/amsoil-nlgi-2-synthetic-polymeric-off-road-grease-gpor2/",
+   "price": 16.4,
+   "rating": 5,
+   "reviews": 16,
+   "name": "AMSOIL NLGI #2 Synthetic Polymeric Off-Road Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GPOR2CR-PK": {
+     "price": 626.25,
+     "size": "15 oz. Cartridges, Pack of 40"
+    },
+    "GPOR2CR-EA": {
+     "price": 16.4,
+     "size": "15 oz. Cartridge"
+    },
+    "GPOR2CR-CA": {
+     "price": 157.85,
+     "size": "15 oz. Cartridges, Case of 10"
+    },
+    "GPOR299-EA": {
+     "price": 1797.25,
+     "size": "120 lb. Keg"
+    },
+    "GPOR240-EA": {
+     "price": 5654.85,
+     "size": "400 lb. Drum"
+    },
+    "GPOR235-EA": {
+     "price": 541.9,
+     "size": "35 lb. Pail"
+    }
+   }
+  },
+  "GRGCR-EA": {
+   "path": "/p/amsoil-dominator-synthetic-racing-grease-grg/",
+   "price": 21.2,
+   "rating": 5,
+   "reviews": 16,
+   "name": "AMSOIL DOMINATOR® Synthetic Racing Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GRGCR-PK": {
+     "price": 796.5,
+     "size": "14 oz. Cartridges, Pack of 40"
+    },
+    "GRGCR-EA": {
+     "price": 21.2,
+     "size": "14 oz. Cartridge"
+    },
+    "GRGCR-CA": {
+     "price": 206.5,
+     "size": "14 oz. Cartridges, Case of 10"
+    }
+   }
+  },
+  "EALTB-EA": {
+   "path": "/p/amsoil-engine-assembly-lube-ealtb/",
+   "price": 11.09,
+   "rating": 5,
+   "reviews": 18,
+   "name": "AMSOIL Engine Assembly Lube",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "EALTB-EA": {
+     "price": 11.09,
+     "size": "4 fl. oz. Tube"
+    },
+    "EALTB-CA": {
+     "price": 132.4,
+     "size": "4 fl. oz. Tubes, Case of 12"
+    }
+   }
+  },
+  "GXCCR-EA": {
+   "path": "/p/amsoil-x-treme-synthetic-food-grade-grease-gxc/",
+   "price": 19.15,
+   "rating": 5,
+   "reviews": 1,
+   "name": "AMSOIL X-Treme Synthetic Food-Grade Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GXCCR-PK": {
+     "price": 717.15,
+     "size": "14 oz. Cartridges, Pack of 40"
+    },
+    "GXCCR-EA": {
+     "price": 19.15,
+     "size": "14 oz. Cartridge"
+    },
+    "GXCCR-CA": {
+     "price": 186.2,
+     "size": "14 oz. Cartridges, Case of 10"
+    },
+    "GXC99-EA": {
+     "price": 2140.1,
+     "size": "120 lb. Keg"
+    },
+    "GXC35-EA": {
+     "price": 652.55,
+     "size": "35 lb. Lug"
+    }
+   }
+  },
+  "GVCCR-EA": {
+   "path": "/p/amsoil-synthetic-high-viscosity-lithium-complex-grease-gvc/",
+   "price": 15.55,
+   "rating": 5,
+   "reviews": 3,
+   "name": "AMSOIL Synthetic High-Viscosity Lithium-Complex Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GVCCR-PK": {
+     "price": 571.75,
+     "size": "14 oz. Cartridges, Pack of 40"
+    },
+    "GVCCR-EA": {
+     "price": 15.55,
+     "size": "14 oz. Cartridge"
+    },
+    "GVCCR-CA": {
+     "price": 149.05,
+     "size": "14 oz. Cartridges, Case of 10"
+    },
+    "GVC99-EA": {
+     "price": 1667.45,
+     "size": "120 lb. Keg"
+    },
+    "GVC35-EA": {
+     "price": 512.55,
+     "size": "35 lb. Lug"
+    }
+   }
+  },
+  "GSF35-EA": {
+   "path": "/p/amsoil-synthetic-ep-00-grease-gsf/",
+   "price": 661.75,
    "rating": null,
-   "reviews": 975,
-   "name": "AMSOIL Signature Series Multi-Vehicle 100% Synthetic Automatic Transmission Fluid",
-   "source": "automatic-transmission-fluid.json"
+   "reviews": null,
+   "name": "AMSOIL Synthetic EP #00 Grease ",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GSF35-EA": {
+     "price": 661.75,
+     "size": "35 lb. Pail"
+    }
+   }
+  },
+  "GSPSC-EA": {
+   "path": "/p/amsoil-spray-grease-gspsc/",
+   "price": 12.99,
+   "rating": 5,
+   "reviews": 21,
+   "name": "AMSOIL Spray Grease",
+   "source": "bearing-chassis-grease.json",
+   "variants": {
+    "GSPSC-EA": {
+     "price": 12.99,
+     "size": "10 oz. Spray Can"
+    },
+    "GSPSC-CA": {
+     "price": 154.8,
+     "size": "10 oz. Spray Can, Case of 12"
+    }
+   }
   },
   "HFBCN-EA": {
    "path": "/p/amsoil-high-foam-car-shampoo-hfb/",
@@ -359,6 +670,24 @@
     }
    }
   },
+  "CSFCN-EA": {
+   "path": "/p/amsoil-exterior-ceramic-spray-csf/",
+   "price": 21.89,
+   "rating": 5,
+   "reviews": 51,
+   "name": "AMSOIL Exterior Ceramic Spray",
+   "source": "car-care-detailing.json",
+   "variants": {
+    "CSFCN-EA": {
+     "price": 21.89,
+     "size": "16 oz. Bottle"
+    },
+    "CSFCN-CA": {
+     "price": 260.9,
+     "size": "16 oz. Bottle, Case of 12"
+    }
+   }
+  },
   "PCH05-EA": {
    "path": "/p/amsoil-iso-32-100-synthetic-compressor-oil-pch/",
    "price": 384.5,
@@ -407,6 +736,108 @@
    "name": "AMSOIL 100% Synthetic Air Tool Oil",
    "source": "compressor-oil.json"
   },
+  "APICN-EA": {
+   "path": "/p/amsoil-p-i-performance-improver-gasoline-additive-api/",
+   "price": 18.99,
+   "rating": 5,
+   "reviews": 1167,
+   "name": "AMSOIL P.i.® Performance Improver Gasoline Additive",
+   "source": "fuel-additives.json",
+   "variants": {
+    "APICN-EA": {
+     "price": 18.99,
+     "size": "12 oz. Bottle"
+    },
+    "APICN-CA": {
+     "price": 225.6,
+     "size": "12 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "UCLCN-EA": {
+   "path": "/p/amsoil-upper-cylinder-lubricant-corrosion-inhibitor-ucl/",
+   "price": 7.89,
+   "rating": 5,
+   "reviews": 381,
+   "name": "AMSOIL Upper Cylinder Lubricant Corrosion Inhibitor",
+   "source": "fuel-additives.json",
+   "variants": {
+    "UCLCN-EA": {
+     "price": 7.89,
+     "size": "6 oz. Bottle"
+    },
+    "UCLCN-CA": {
+     "price": 93.95,
+     "size": "6 oz. Bottle, Case of 12"
+    }
+   }
+  },
+  "AQSQT-EA": {
+   "path": "/p/amsoil-quickshot-gasoline-treatment-and-stabilizer-aqs/",
+   "price": 46.09,
+   "rating": 5,
+   "reviews": 353,
+   "name": "AMSOIL Quickshot® Gasoline Treatment and Stabilizer",
+   "source": "fuel-additives.json",
+   "variants": {
+    "AQSQT-EA": {
+     "price": 46.09,
+     "size": "Quart Bottle"
+    },
+    "AQSQT-CA": {
+     "price": 550.6,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AQSCN-EA": {
+     "price": 13.99,
+     "size": "8 oz. Bottle"
+    },
+    "AQSCN-CA": {
+     "price": 83,
+     "size": "8 oz. Bottles, Case of 6"
+    }
+   }
+  },
+  "ASTCN-EA": {
+   "path": "/p/amsoil-gasoline-stabilizer-ast/",
+   "price": 16.59,
+   "rating": 5,
+   "reviews": 171,
+   "name": "AMSOIL Gasoline Stabilizer",
+   "source": "fuel-additives.json",
+   "variants": {
+    "ASTCN-EA": {
+     "price": 16.59,
+     "size": "16 oz. Bottle"
+    },
+    "ASTCN-CA": {
+     "price": 98.75,
+     "size": "16 oz. Bottles, Case of 6"
+    },
+    "AST55-EA": {
+     "price": 4327.25,
+     "size": "55 Gallon Drum"
+    }
+   }
+  },
+  "AOBBE-EA": {
+   "path": "/p/amsoil-dominator-octane-boost-aob/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 122,
+   "name": "AMSOIL DOMINATOR® Octane Boost",
+   "source": "fuel-additives.json",
+   "variants": {
+    "AOBBE-EA": {
+     "price": 14.39,
+     "size": "12 oz. Bottle"
+    },
+    "AOBBE-CA": {
+     "price": 85.65,
+     "size": "12 oz. Bottles, Case of 6"
+    }
+   }
+  },
   "MOBCN-EA": {
    "path": "/p/amsoil-motorcycle-octane-boost-mob/",
    "price": 6.99,
@@ -422,6 +853,48 @@
     "MOBCN-CA": {
      "price": 83.1,
      "size": "4 oz. Bottles, Case of 12"
+    }
+   }
+  },
+  "ADBPCN-EA": {
+   "path": "/p/amsoil-diesel-4-in-1-fuel-additive-adb/",
+   "price": 9.39,
+   "rating": 5,
+   "reviews": 309,
+   "name": "AMSOIL Diesel 4-IN-1 Fuel Additive",
+   "source": "fuel-additives.json",
+   "variants": {
+    "ADBPCN-EA": {
+     "price": 9.39,
+     "size": "8 oz. Bottle"
+    },
+    "ADBPCN-CA": {
+     "price": 55.35,
+     "size": "8 oz. Bottles, Case of 6"
+    },
+    "ADBHG-EA": {
+     "price": 54.29,
+     "size": "64 oz. Bottle"
+    },
+    "ADBHG-CA": {
+     "price": 323.7,
+     "size": "64 oz. Bottles, Case of 6"
+    },
+    "ADBCN-EA": {
+     "price": 15.39,
+     "size": "16 oz. Bottle"
+    },
+    "ADBCN-CA": {
+     "price": 183.3,
+     "size": "16 oz. Bottles, Case of 12"
+    },
+    "ADB55-EA": {
+     "price": 4854.75,
+     "size": "55 Gallon Drum"
+    },
+    "ADB05-EA": {
+     "price": 497.85,
+     "size": "5 Gallon Pail"
     }
    }
   },
@@ -501,6 +974,28 @@
     }
    }
   },
+  "ADDCN-EA": {
+   "path": "/p/amsoil-diesel-cold-flow-fuel-additive-add/",
+   "price": 12.99,
+   "rating": 5,
+   "reviews": 309,
+   "name": "AMSOIL Diesel Cold Flow Fuel Additive",
+   "source": "fuel-additives.json",
+   "variants": {
+    "ADDCN-EA": {
+     "price": 12.99,
+     "size": "16 oz. Bottle"
+    },
+    "ADDCN-CA": {
+     "price": 153.95,
+     "size": "16 oz. Bottles, Case of 12"
+    },
+    "ADD05-EA": {
+     "price": 403.55,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
   "DRCQT-EA": {
    "path": "/p/amsoil-diesel-recovery-fuel-treatment-drc/",
    "price": 18.59,
@@ -560,54 +1055,6 @@
      "size": "5 Gallon Pail"
     }
    }
-  },
-  "APICN-EA": {
-   "path": "/p/amsoil-p-i-performance-improver-gasoline-additive-api/",
-   "price": 18.99,
-   "rating": 5,
-   "reviews": 1167,
-   "name": "AMSOIL P.i.® Performance Improver Gasoline Additive",
-   "source": "fuel-additives.json"
-  },
-  "UCLCN-EA": {
-   "path": "/p/amsoil-upper-cylinder-lubricant-corrosion-inhibitor-ucl/",
-   "price": 7.89,
-   "rating": 5,
-   "reviews": 381,
-   "name": "AMSOIL Upper Cylinder Lubricant Corrosion Inhibitor",
-   "source": "fuel-additives.json"
-  },
-  "AQSQT-EA": {
-   "path": "/p/amsoil-quickshot-gasoline-treatment-and-stabilizer-aqs/",
-   "price": 13.99,
-   "rating": 5,
-   "reviews": 353,
-   "name": "AMSOIL Quickshot® Gasoline Treatment and Stabilizer",
-   "source": "fuel-additives.json"
-  },
-  "ASTCN-EA": {
-   "path": "/p/amsoil-gasoline-stabilizer-ast/",
-   "price": 16.59,
-   "rating": 5,
-   "reviews": 171,
-   "name": "AMSOIL Gasoline Stabilizer",
-   "source": "fuel-additives.json"
-  },
-  "AOBBE-EA": {
-   "path": "/p/amsoil-dominator-octane-boost-aob/",
-   "price": 14.39,
-   "rating": 5,
-   "reviews": 122,
-   "name": "AMSOIL DOMINATOR® Octane Boost",
-   "source": "fuel-additives.json"
-  },
-  "ADDCN-EA": {
-   "path": "/p/amsoil-diesel-cold-flow-fuel-additive-add/",
-   "price": 12.99,
-   "rating": 5,
-   "reviews": 309,
-   "name": "AMSOIL Diesel Cold Flow Fuel Additive",
-   "source": "fuel-additives.json"
   },
   "AZSQT-EA": {
    "path": "/p/amsoil-signature-series-0w-16-100-synthetic-motor-oil-azs/",
@@ -1233,7 +1680,7 @@
    "rating": 5,
    "reviews": 535,
    "name": "AMSOIL 100% Synthetic V-Twin Primary Fluid",
-   "source": "gear-oil.json",
+   "source": "transmission-fluid.json",
    "variants": {
     "MVPQT-EA": {
      "price": 19.69,
@@ -1250,7 +1697,7 @@
    "price": 15.49,
    "rating": 5,
    "reviews": 34,
-   "name": "AMSOIL 100% Synthetic Chaincase &amp; Gear Oil",
+   "name": "AMSOIL 100% Synthetic Chaincase & Gear Oil",
    "source": "gear-oil.json",
    "variants": {
     "TCCCN-EA": {
@@ -1408,6 +1855,740 @@
    "reviews": null,
    "name": "AMSOIL ISO 68 100% Synthetic Multi-Viscosity Hydraulic Oil",
    "source": "hydraulic-oil.json"
+  },
+  "BFLVCN-EA": {
+   "path": "/p/amsoil-dot-3-and-dot-4-100-synthetic-brake-fluid-bflv/",
+   "price": 9.59,
+   "rating": 5,
+   "reviews": 108,
+   "name": "AMSOIL DOT 3 and DOT 4 100% Synthetic Brake Fluid",
+   "source": "steering-brake-suspension-fluid.json",
+   "variants": {
+    "BFLVCN-EA": {
+     "price": 9.59,
+     "size": "12 oz. Bottle"
+    },
+    "BFLVCN-CA": {
+     "price": 113.6,
+     "size": "12 oz. Bottles, Case of 12"
+    }
+   }
+  },
+  "BFRCN-EA": {
+   "path": "/p/amsoil-dominator-dot-4-100-synthetic-racing-brake-fluid-bfr/",
+   "price": 19.09,
+   "rating": 5,
+   "reviews": 25,
+   "name": "AMSOIL DOMINATOR® DOT 4 100% Synthetic Racing Brake Fluid",
+   "source": "steering-brake-suspension-fluid.json",
+   "variants": {
+    "BFRCN-EA": {
+     "price": 19.09,
+     "size": "12 oz. Bottle"
+    },
+    "BFRCN-CA": {
+     "price": 227.2,
+     "size": "12 oz. Bottles, Case of 12"
+    }
+   }
+  },
+  "PSFCN-EA": {
+   "path": "/p/amsoil-100-synthetic-multi-vehicle-power-steering-fluid-psf/",
+   "price": 12.09,
+   "rating": 5,
+   "reviews": 52,
+   "name": "AMSOIL 100% Synthetic Multi-Vehicle Power Steering Fluid",
+   "source": "steering-brake-suspension-fluid.json",
+   "variants": {
+    "PSFCN-EA": {
+     "price": 12.09,
+     "size": "16 oz. Bottle"
+    },
+    "PSFCN-CA": {
+     "price": 144.1,
+     "size": "16 oz. Bottles, Case of 12"
+    },
+    "PSF55-EA": {
+     "price": 3531.7,
+     "size": "55 Gallon Drum"
+    },
+    "PSF05-EA": {
+     "price": 366.25,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "STLQT-EA": {
+   "path": "/p/amsoil-shock-therapy-5-light-suspension-fluid-stl/",
+   "price": 21.89,
+   "rating": 5,
+   "reviews": 10,
+   "name": "AMSOIL Shock Therapy® #5 Light Suspension Fluid",
+   "source": "steering-brake-suspension-fluid.json",
+   "variants": {
+    "STLQT-EA": {
+     "price": 21.89,
+     "size": "Quart Bottle"
+    },
+    "STLQT-CA": {
+     "price": 260.45,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "STL55-EA": {
+     "price": 3824.3,
+     "size": "55 Gallon Drum"
+    },
+    "STL05-EA": {
+     "price": 420.6,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "STMQT-EA": {
+   "path": "/p/amsoil-shock-therapy-10-medium-suspension-fluid-stm/",
+   "price": 21.89,
+   "rating": 5,
+   "reviews": 11,
+   "name": "AMSOIL Shock Therapy® #10 Medium Suspension Fluid",
+   "source": "steering-brake-suspension-fluid.json",
+   "variants": {
+    "STMQT-EA": {
+     "price": 21.89,
+     "size": "Quart Bottle"
+    },
+    "STMQT-CA": {
+     "price": 261.35,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "STM55-EA": {
+     "price": 3836.55,
+     "size": "55 Gallon Drum"
+    },
+    "STM05-EA": {
+     "price": 422,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "ATLQT-EA": {
+   "path": "/p/amsoil-signature-series-fuel-efficient-100-synthetic-automatic-transmission-fluid-atl/",
+   "price": 21.19,
+   "rating": 5,
+   "reviews": 975,
+   "name": "AMSOIL Signature Series Fuel-Efficient 100% Synthetic Automatic Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "ATLTP-EA": {
+     "price": 204.7,
+     "size": "2.5 Gallon Jug"
+    },
+    "ATLTP-CA": {
+     "price": 407.4,
+     "size": "2.5 Gallon Jugs, Case of 2"
+    },
+    "ATLQT-EA": {
+     "price": 21.19,
+     "size": "Quart Bottle"
+    },
+    "ATLQT-CA": {
+     "price": 252.45,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ATLPK-EA": {
+     "price": 24.19,
+     "size": "Quart Easy-Pack"
+    },
+    "ATLPK-CA": {
+     "price": 288.7,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "ATL55-EA": {
+     "price": 3974.3,
+     "size": "55 Gallon Drum"
+    },
+    "ATL27-EA": {
+     "price": 19799.05,
+     "size": "275 Gallon Tote"
+    },
+    "ATL1G-EA": {
+     "price": 83.69,
+     "size": "Gallon Jug"
+    },
+    "ATL1G-CA": {
+     "price": 332.9,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "ATFQT-EA": {
+   "path": "/p/amsoil-signature-series-multi-vehicle-100-synthetic-automatic-transmission-fluid-atf/",
+   "price": 21.19,
+   "rating": 5,
+   "reviews": 975,
+   "name": "AMSOIL Signature Series Multi-Vehicle 100% Synthetic Automatic Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "ATFTP-EA": {
+     "price": 204.8,
+     "size": "2.5 Gallon Jug"
+    },
+    "ATFTP-CA": {
+     "price": 407.55,
+     "size": "2.5 Gallon Jugs, Case of 2"
+    },
+    "ATFQT-EA": {
+     "price": 21.19,
+     "size": "Quart Bottle"
+    },
+    "ATFQT-CA": {
+     "price": 252.55,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ATFPK-EA": {
+     "price": 24.19,
+     "size": "Quart Easy-Pack"
+    },
+    "ATFPK-CA": {
+     "price": 288.8,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "ATF55-EA": {
+     "price": 3975.7,
+     "size": "55 Gallon Drum"
+    },
+    "ATF27-EA": {
+     "price": 19806.2,
+     "size": "275 Gallon Tote"
+    },
+    "ATF1G-EA": {
+     "price": 83.69,
+     "size": "Gallon Jug"
+    },
+    "ATF1G-CA": {
+     "price": 333,
+     "size": "Gallon Jugs, Case of 4"
+    },
+    "ATF16-EA": {
+     "price": 1350.65,
+     "size": "16 Gallon Keg"
+    }
+   }
+  },
+  "ULVPK-EA": {
+   "path": "/p/amsoil-signature-series-ulv-100-synthetic-automatic-transmission-fluid-ulv/",
+   "price": 24.19,
+   "rating": 5,
+   "reviews": 975,
+   "name": "AMSOIL Signature Series ULV 100% Synthetic Automatic Transmission Fluid ",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "ULVPK-EA": {
+     "price": 24.19,
+     "size": "Quart Easy-Pack"
+    },
+    "ULVPK-CA": {
+     "price": 288.65,
+     "size": "Quart Easy-Pack, Case of 12"
+    },
+    "ULV55-EA": {
+     "price": 3973,
+     "size": "55 Gallon Drum"
+    },
+    "ULV1G-EA": {
+     "price": 83.69,
+     "size": "Gallon Jug"
+    },
+    "ULV1G-CA": {
+     "price": 332.8,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
+  },
+  "OTFQT-EA": {
+   "path": "/p/amsoil-oe-multi-vehicle-100-synthetic-automatic-transmission-fluid-otf/",
+   "price": 14.89,
+   "rating": 5,
+   "reviews": 326,
+   "name": "AMSOIL OE Multi-Vehicle 100% Synthetic Automatic Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "OTFTP-EA": {
+     "price": 144,
+     "size": "2.5 Gallon Jug"
+    },
+    "OTFTP-CA": {
+     "price": 285.9,
+     "size": "2.5 Gallon Jugs, Case of 2"
+    },
+    "OTFQT-EA": {
+     "price": 14.89,
+     "size": "Quart Bottle"
+    },
+    "OTFQT-CA": {
+     "price": 177.6,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "OTF55-EA": {
+     "price": 2829.1,
+     "size": "55 Gallon Drum"
+    },
+    "OTF27-EA": {
+     "price": 14073.25,
+     "size": "275 Gallon Tote"
+    },
+    "OTF1G-EA": {
+     "price": 58.99,
+     "size": "Gallon Jug"
+    },
+    "OTF1G-CA": {
+     "price": 234.2,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "OTLQT-EA": {
+   "path": "/p/amsoil-oe-fuel-efficient-100-synthetic-automatic-transmission-fluid-otl/",
+   "price": 14.99,
+   "rating": 5,
+   "reviews": 326,
+   "name": "AMSOIL OE Fuel-Efficient 100% Synthetic Automatic Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "OTLTP-EA": {
+     "price": 144.05,
+     "size": "2.5 Gallon Jug"
+    },
+    "OTLTP-CA": {
+     "price": 286.1,
+     "size": "2.5 Gallon Jugs, Case of 2"
+    },
+    "OTLQT-EA": {
+     "price": 14.99,
+     "size": "Quart Bottle"
+    },
+    "OTLQT-CA": {
+     "price": 177.75,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "OTL55-EA": {
+     "price": 2831.55,
+     "size": "55 Gallon Drum"
+    },
+    "OTL27-EA": {
+     "price": 14085.45,
+     "size": "275 Gallon Tote"
+    },
+    "OTL1G-EA": {
+     "price": 58.99,
+     "size": "Gallon Jug"
+    },
+    "OTL1G-CA": {
+     "price": 234.35,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "CVTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-cvt-fluid-cvt/",
+   "price": 20.39,
+   "rating": 5,
+   "reviews": 217,
+   "name": "AMSOIL 100% Synthetic CVT Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "CVTQT-EA": {
+     "price": 20.39,
+     "size": "Quart Bottle"
+    },
+    "CVTQT-CA": {
+     "price": 243.05,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "CVT55-EA": {
+     "price": 3792.45,
+     "size": "55 Gallon Drum"
+    },
+    "CVT1G-EA": {
+     "price": 80.49,
+     "size": "Gallon Jug"
+    },
+    "CVT1G-CA": {
+     "price": 320.25,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "DCTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-dct-fluid-dct/",
+   "price": 30.79,
+   "rating": 5,
+   "reviews": 33,
+   "name": "AMSOIL 100% Synthetic DCT Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "DCTQT-EA": {
+     "price": 30.79,
+     "size": "Quart Bottle"
+    },
+    "DCTQT-CA": {
+     "price": 368,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "ATD1G-EA": {
+   "path": "/p/amsoil-torque-drive-100-synthetic-automatic-transmission-fluid-atd/",
+   "price": 77.29,
+   "rating": 5,
+   "reviews": 45,
+   "name": "AMSOIL Torque-Drive® 100% Synthetic Automatic Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "ATDTP-EA": {
+     "price": 189.15,
+     "size": "2.5 Gallon Jug"
+    },
+    "ATDTP-CA": {
+     "price": 376.3,
+     "size": "2.5 Gallon Jugs, Case of 2"
+    },
+    "ATD55-EA": {
+     "price": 3657.4,
+     "size": "55 Gallon Drum"
+    },
+    "ATD27-EA": {
+     "price": 18214.7,
+     "size": "275 Gallon Tote"
+    },
+    "ATD1G-EA": {
+     "price": 77.29,
+     "size": "Gallon Jug"
+    },
+    "ATD1G-CA": {
+     "price": 307.6,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "ARTQT-EA": {
+   "path": "/p/amsoil-super-shift-racing-transmission-fluid-art/",
+   "price": 20.39,
+   "rating": 5,
+   "reviews": 25,
+   "name": "AMSOIL Super Shift® Racing Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "ARTQT-EA": {
+     "price": 20.39,
+     "size": "Quart Bottle"
+    },
+    "ARTQT-CA": {
+     "price": 242.55,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ART55-EA": {
+     "price": 3809.75,
+     "size": "55 Gallon Drum"
+    }
+   }
+  },
+  "CTG05-EA": {
+   "path": "/p/amsoil-sae-10w-100-synthetic-powershift-transmission-fluid-ctg/",
+   "price": 324.95,
+   "rating": 5,
+   "reviews": 4,
+   "name": "AMSOIL SAE 10W 100% Synthetic Powershift Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "CTG27-EA": {
+     "price": 15605.95,
+     "size": "275 Gallon Tote"
+    },
+    "CTG05-EA": {
+     "price": 324.95,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "CTJ05-EA": {
+   "path": "/p/amsoil-sae-30-100-synthetic-powershift-transmission-fluid-ctj/",
+   "price": 323.5,
+   "rating": 5,
+   "reviews": 4,
+   "name": "AMSOIL SAE 30 100% Synthetic Powershift Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "CTJ55-EA": {
+     "price": 3121.35,
+     "size": "55 Gallon Drum"
+    },
+    "CTJ05-EA": {
+     "price": 323.5,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "MTGQT-EA": {
+   "path": "/p/amsoil-75w-90-manual-transmission-transaxle-gear-lube-mtg/",
+   "price": 24.69,
+   "rating": 5,
+   "reviews": 119,
+   "name": "AMSOIL 75W-90 Manual Transmission & Transaxle Gear Lube",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "MTGQT-EA": {
+     "price": 24.69,
+     "size": "Quart Bottle"
+    },
+    "MTGQT-CA": {
+     "price": 295,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "MTGPK-EA": {
+     "price": 26.69,
+     "size": "Quart Easy-Pack"
+    },
+    "MTGPK-CA": {
+     "price": 318.8,
+     "size": "Quart Easy-Packs, Case of 12"
+    },
+    "MTG55-EA": {
+     "price": 4685.1,
+     "size": "55 Gallon Drum"
+    },
+    "MTG05-EA": {
+     "price": 477.3,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "MTFQT-EA": {
+   "path": "/p/amsoil-5w-30-manual-synchromesh-transmission-fluid-mtf/",
+   "price": 22.69,
+   "rating": 5,
+   "reviews": 153,
+   "name": "AMSOIL  5W-30 Manual Synchromesh Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "MTFQT-EA": {
+     "price": 22.69,
+     "size": "Quart Bottle"
+    },
+    "MTFQT-CA": {
+     "price": 269.9,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "MTF05-EA": {
+     "price": 436.05,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "CTL05-EA": {
+   "path": "/p/amsoil-sae-50-100-synthetic-powershift-transmission-fluid-ctl/",
+   "price": 340.7,
+   "rating": 5,
+   "reviews": 4,
+   "name": "AMSOIL SAE 50 100% Synthetic Powershift Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "CTL55-EA": {
+     "price": 3296.05,
+     "size": "55 Gallon Drum"
+    },
+    "CTL27-EA": {
+     "price": 16407.85,
+     "size": "275 Gallon Tote"
+    },
+    "CTL05-EA": {
+     "price": 340.7,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "FTF1G-EA": {
+   "path": "/p/amsoil-sae-50-long-life-100-synthetic-transmission-oil-ftf/",
+   "price": 74.19,
+   "rating": 4,
+   "reviews": 7,
+   "name": "AMSOIL SAE 50 Long Life 100% Synthetic Transmission Oil",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "FTF55-EA": {
+     "price": 3500.3,
+     "size": "55 Gallon Drum"
+    },
+    "FTF27-EA": {
+     "price": 17429.25,
+     "size": "275 Gallon Tote"
+    },
+    "FTF1G-EA": {
+     "price": 74.19,
+     "size": "Gallon Jug"
+    },
+    "FTF1G-CA": {
+     "price": 295,
+     "size": "Gallon Jugs, Case of 4"
+    },
+    "FTF16-EA": {
+     "price": 1206.65,
+     "size": "16 Gallon Keg"
+    },
+    "FTF05-EA": {
+     "price": 360.8,
+     "size": "5 Gallon Pail"
+    }
+   }
+  },
+  "MVTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-v-twin-transmission-fluid-mvt/",
+   "price": 22.69,
+   "rating": 5,
+   "reviews": 493,
+   "name": "AMSOIL 100% Synthetic V-Twin Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "MVTQT-EA": {
+     "price": 22.69,
+     "size": "Quart Bottle"
+    },
+    "MVTQT-CA": {
+     "price": 270.35,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "AUDTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-atv-utv-transmission-differential-fluid-audt/",
+   "price": 18.79,
+   "rating": 5,
+   "reviews": 83,
+   "name": "AMSOIL 100% Synthetic ATV/UTV Transmission & Differential Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "AUDTQT-EA": {
+     "price": 18.79,
+     "size": "Quart Bottle"
+    },
+    "AUDTQT-CA": {
+     "price": 223.05,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AUDTPK-EA": {
+     "price": 20.89,
+     "size": "Quart Easy-Pack"
+    },
+    "AUDTPK-CA": {
+     "price": 248.85,
+     "size": "Quart Easy-Packs, Case of 12"
+    }
+   }
+  },
+  "DBTFQT-EA": {
+   "path": "/p/amsoil-100-synthetic-dirt-bike-transmission-fluid-dbtf/",
+   "price": 18.49,
+   "rating": 5,
+   "reviews": 37,
+   "name": "AMSOIL 100% Synthetic Dirt Bike Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "DBTFQT-EA": {
+     "price": 18.49,
+     "size": "Quart Bottle"
+    },
+    "DBTFQT-CA": {
+     "price": 219.55,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "AUPTPK-EA": {
+   "path": "/p/amsoil-100-synthetic-atv-utv-powertrain-fluid-aupt/",
+   "price": 22.39,
+   "rating": 5,
+   "reviews": 98,
+   "name": "AMSOIL 100% Synthetic ATV/UTV Powertrain Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "AUPTPK-EA": {
+     "price": 22.39,
+     "size": "Quart Easy-Pack"
+    },
+    "AUPTPK-CA": {
+     "price": 265.55,
+     "size": "Quart Easy-Packs, Case of 12"
+    }
+   }
+  },
+  "AUDCTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-atv-utv-dual-clutch-transmission-fluid-audct/",
+   "price": 27.69,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL 100% Synthetic ATV/UTV Dual-Clutch Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "AUDCTQT-EA": {
+     "price": 27.69,
+     "size": "Quart Bottle"
+    },
+    "AUDCTQT-CA": {
+     "price": 330.6,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
+  },
+  "AUCVTQT-EA": {
+   "path": "/p/amsoil-100-synthetic-atv-utv-continuously-variable-transmission-fluid-aucvt/",
+   "price": 36.09,
+   "rating": null,
+   "reviews": null,
+   "name": "AMSOIL 100% SYNTHETIC ATV/UTV CONTINUOUSLY VARIABLE TRANSMISSION FLUID",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "AUCVTQT-EA": {
+     "price": 36.09,
+     "size": "Quart Bottle"
+    },
+    "AUCVTQT-CA": {
+     "price": 431.6,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
+  },
+  "AHFQT-EA": {
+   "path": "/p/amsoil-20w-50-100-synthetic-hydrostatic-transmission-fluid-ahf/",
+   "price": 18.09,
+   "rating": 5,
+   "reviews": 58,
+   "name": "AMSOIL 20W-50 100% Synthetic Hydrostatic Transmission Fluid",
+   "source": "transmission-fluid.json",
+   "variants": {
+    "AHFQT-EA": {
+     "price": 18.09,
+     "size": "Quart Bottle"
+    },
+    "AHFQT-CA": {
+     "price": 214.65,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AHF55-EA": {
+     "price": 3344.2,
+     "size": "55 Gallon Drum"
+    },
+    "AHF1G-EA": {
+     "price": 71.19,
+     "size": "Gallon Jug"
+    },
+    "AHF1G-CA": {
+     "price": 282.55,
+     "size": "Gallon Jugs, Case of 4"
+    },
+    "AHF05-EA": {
+     "price": 345.45,
+     "size": "5 Gallon Pail"
+    }
+   }
   }
  }
 }

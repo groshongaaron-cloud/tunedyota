@@ -288,7 +288,7 @@
   "customer_rating": "5 (44)",
   "total_reviews": 44,
   "breadcrumb_navigation": "HOME > Products > Gear Oil > AMSOIL 75W-90 Long Life 100% Synthetic Gear Lube",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/fgrqt.jpg?context=bWFzdGVyfGltYWdlc3w3NzU5fGltYWdlL2pwZWd8YVcxaFoyVnpMMmhoTUM5b09XTXZPVE00TXpJNE5EazVPREUzTkM1cWNHY3wyNzFhYjYzNTkxZmRhOWUxMjAxODc3NTQ0YWMyNGI3OWE1ZDc1ZGIzZjI5NjE5OTQ3ZjFhMzg4MDRhNzZjNDM3",
   "variants_ld": [
    {
     "sku": "FGRQT-EA",
@@ -344,7 +344,7 @@
   "customer_rating": "5 (44)",
   "total_reviews": 44,
   "breadcrumb_navigation": "HOME > Products > Gear Oil > AMSOIL 80W-140 Long Life 100% Synthetic Gear Lube",
-  "main_product_image": "",
+  "main_product_image": "https://www.amsoil.com/medias/generic-black-pail-ea.jpg?context=bWFzdGVyfGltYWdlc3w2MDQ2N3xpbWFnZS9qcGVnfGFHWmpMMmcwTkM4eU56VXdNalF5T1RZd01UZ3lNaTluWlc1bGNtbGpYMkpzWVdOclgzQmhhV3hmWldFdWFuQm58YTYzOTRjNTc2NGU5NTM1ZWM0Yjc3YmVkM2E2N2ZjYjZmMDhjM2YwODJmZmE4NzM5MzhjNGExYTlmNTBiYTYyMw",
   "variants_ld": [
    {
     "sku": "FGO55-EA",
@@ -419,9 +419,9 @@
  },
  {
   "product_url": "https://www.amsoil.com/p/amsoil-100-synthetic-chaincase-gear-oil-tcc/",
-  "product_name": "AMSOIL 100% Synthetic Chaincase &amp; Gear Oil",
+  "product_name": "AMSOIL 100% Synthetic Chaincase & Gear Oil",
   "page_title": "AMSOIL 100% Synthetic Chaincase & Gear Oil | TCC - AMSOIL",
-  "product_description": "Shop AMSOIL 100% Synthetic Chaincase &amp; Gear Oil at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
+  "product_description": "Shop AMSOIL 100% Synthetic Chaincase & Gear Oil at AMSOIL. Find premium synthetic oil, filters and more online. Fast, free shipping available.",
   "data_source_format": "json-ld, meta",
   "offer_price": "15.49",
   "all_available_prices": "15.49, 92.1, 405.2 USD",
