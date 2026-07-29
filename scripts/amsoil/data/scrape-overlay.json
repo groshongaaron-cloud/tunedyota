@@ -16,7 +16,7 @@
   "steering-brake-suspension-fluid.json",
   "transmission-fluid.json"
  ],
- "count": 157,
+ "count": 163,
  "products": {
   "AIRBA-EA": {
    "path": "/p/amsoil-100-synthetic-air-tool-oil-airba/",
@@ -1150,65 +1150,189 @@
    "path": "/p/amsoil-signature-series-0w-16-100-synthetic-motor-oil-azs/",
    "price": 17.99,
    "rating": 5,
-   "reviews": 6985,
+   "reviews": 6997,
    "name": "AMSOIL Signature Series 0W-16 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
-  },
-  "ASMQT-EA": {
-   "path": "/p/amsoil-signature-series-0w-20-100-synthetic-motor-oil-asm/",
-   "price": 17.99,
-   "rating": 5,
-   "reviews": 6985,
-   "name": "AMSOIL Signature Series 0W-20 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AZSQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "AZSQT-CA": {
+     "price": 213.6,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
   },
   "AZOQT-EA": {
    "path": "/p/amsoil-signature-series-0w-30-100-synthetic-motor-oil-azo/",
-   "price": 21.89,
+   "price": 17.99,
    "rating": 5,
-   "reviews": 6985,
+   "reviews": 6997,
    "name": "AMSOIL Signature Series 0W-30 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AZOQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "AZOQT-CA": {
+     "price": 213.6,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AZO55-EA": {
+     "price": 3278.1,
+     "size": "55 Gallon Drum"
+    },
+    "AZO27-EA": {
+     "price": 16318.3,
+     "size": "275 Gallon Tote"
+    },
+    "AZO1G-EA": {
+     "price": 67.79,
+     "size": "Gallon Jug"
+    },
+    "AZO1G-CA": {
+     "price": 269.2,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "AZFQT-EA": {
    "path": "/p/amsoil-signature-series-0w-40-100-synthetic-motor-oil-azf/",
    "price": 17.99,
    "rating": 5,
-   "reviews": 6985,
+   "reviews": 6997,
    "name": "AMSOIL Signature Series 0W-40 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AZFQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "AZFQT-CA": {
+     "price": 213.6,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AZF55-EA": {
+     "price": 3278.3,
+     "size": "55 Gallon Drum"
+    },
+    "AZF1G-EA": {
+     "price": 67.79,
+     "size": "Gallon Jug"
+    },
+    "AZF1G-CA": {
+     "price": 269.25,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
   },
   "ALMQT-EA": {
    "path": "/p/amsoil-signature-series-5w-20-100-synthetic-motor-oil-alm/",
    "price": 17.99,
    "rating": 5,
-   "reviews": 6985,
+   "reviews": 6997,
    "name": "AMSOIL Signature Series 5W-20 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ALMQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "ALMQT-CA": {
+     "price": 213.65,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ALMCN-EA": {
+     "price": 9.39,
+     "size": "Half Quart"
+    },
+    "ALM55-EA": {
+     "price": 3278.65,
+     "size": "55 Gallon Drum"
+    },
+    "ALM1G-EA": {
+     "price": 67.79,
+     "size": "Gallon Jug"
+    },
+    "ALM1G-CA": {
+     "price": 269.25,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "ASLQT-EA": {
    "path": "/p/amsoil-signature-series-5w-30-100-synthetic-motor-oil-asl/",
    "price": 17.99,
    "rating": 5,
-   "reviews": 6985,
+   "reviews": 6997,
    "name": "AMSOIL Signature Series 5W-30 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
-  },
-  "AMRQT-EA": {
-   "path": "/p/amsoil-signature-series-5w-50-100-synthetic-motor-oil-amr/",
-   "price": 17.99,
-   "rating": 5,
-   "reviews": 6985,
-   "name": "AMSOIL Signature Series 5W-50 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ASLQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "ASLQT-CA": {
+     "price": 213.65,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ASLCN-EA": {
+     "price": 9.39,
+     "size": "Half Quart"
+    },
+    "ASL55-EA": {
+     "price": 3279.1,
+     "size": "55 Gallon Drum"
+    },
+    "ASL27-EA": {
+     "price": 16323.25,
+     "size": "275 Gallon Tote"
+    },
+    "ASL1G-EA": {
+     "price": 67.79,
+     "size": "Gallon Jug"
+    },
+    "ASL1G-CA": {
+     "price": 269.3,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "ATMQT-EA": {
    "path": "/p/amsoil-signature-series-10w-30-100-synthetic-motor-oil-atm/",
    "price": 17.99,
    "rating": 5,
-   "reviews": 6985,
+   "reviews": 6997,
    "name": "AMSOIL Signature Series 10W-30 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ATMQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "ATMQT-CA": {
+     "price": 213.65,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ATM55-EA": {
+     "price": 3279,
+     "size": "55 Gallon Drum"
+    },
+    "ATM27-EA": {
+     "price": 16322.75,
+     "size": "275 Gallon Tote"
+    },
+    "ATM1G-EA": {
+     "price": 67.79,
+     "size": "Gallon Jug"
+    },
+    "ATM1G-CA": {
+     "price": 269.3,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "XLZQT-EA": {
    "path": "/p/amsoil-extended-life-0w-20-100-synthetic-motor-oil-xlz/",
@@ -1216,7 +1340,33 @@
    "rating": 5,
    "reviews": 1470,
    "name": "AMSOIL Extended-Life 0W-20 100% Synthetic Motor Oil ",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "XLZQT-EA": {
+     "price": 15.49,
+     "size": "Quart Bottle"
+    },
+    "XLZQT-CA": {
+     "price": 184.7,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "XLZ55-EA": {
+     "price": 2791.95,
+     "size": "55 Gallon Drum"
+    },
+    "XLZ27-EA": {
+     "price": 13887.4,
+     "size": "275 Gallon Tote"
+    },
+    "XLZ1G-EA": {
+     "price": 61.09,
+     "size": "Gallon Jug"
+    },
+    "XLZ1G-CA": {
+     "price": 242.3,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "XLFQT-EA": {
    "path": "/p/amsoil-extended-life-5w-30-100-synthetic-motor-oil-xlf/",
@@ -1224,7 +1374,33 @@
    "rating": 5,
    "reviews": 1470,
    "name": "AMSOIL Extended-Life 5W-30 100% Synthetic Motor Oil ",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "XLFQT-EA": {
+     "price": 15.59,
+     "size": "Quart Bottle"
+    },
+    "XLFQT-CA": {
+     "price": 184.75,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "XLF55-EA": {
+     "price": 2793.1,
+     "size": "55 Gallon Drum"
+    },
+    "XLF27-EA": {
+     "price": 13893.1,
+     "size": "275 Gallon Tote"
+    },
+    "XLF1G-EA": {
+     "price": 61.09,
+     "size": "Gallon Jug"
+    },
+    "XLF1G-CA": {
+     "price": 242.4,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "XLTQT-EA": {
    "path": "/p/amsoil-extended-life-10w-30-100-synthetic-motor-oil-xlt/",
@@ -1232,7 +1408,33 @@
    "rating": 5,
    "reviews": 1470,
    "name": "AMSOIL Extended-Life 10W-30 100% Synthetic Motor Oil ",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "XLTQT-EA": {
+     "price": 15.59,
+     "size": "Quart Bottle"
+    },
+    "XLTQT-CA": {
+     "price": 184.75,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "XLT55-EA": {
+     "price": 2793.6,
+     "size": "55 Gallon Drum"
+    },
+    "XLT27-EA": {
+     "price": 13895.7,
+     "size": "275 Gallon Tote"
+    },
+    "XLT1G-EA": {
+     "price": 61.09,
+     "size": "Gallon Jug"
+    },
+    "XLT1G-CA": {
+     "price": 242.45,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "XLOQT-EA": {
    "path": "/p/amsoil-extended-life-10w-40-100-synthetic-motor-oil-xlo/",
@@ -1240,47 +1442,201 @@
    "rating": 5,
    "reviews": 1470,
    "name": "AMSOIL Extended-Life 10W-40 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "XLOQT-EA": {
+     "price": 15.59,
+     "size": "Quart Bottle"
+    },
+    "XLOQT-CA": {
+     "price": 184.8,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "XLO55-EA": {
+     "price": 2793.85,
+     "size": "55 Gallon Drum"
+    },
+    "XLO27-EA": {
+     "price": 13896.95,
+     "size": "275 Gallon Tote"
+    },
+    "XLO1G-EA": {
+     "price": 61.09,
+     "size": "Gallon Jug"
+    },
+    "XLO1G-CA": {
+     "price": 242.45,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "OESQT-EA": {
    "path": "/p/amsoil-oe-0w-16-100-synthetic-motor-oil-oes/",
    "price": 12.59,
    "rating": 5,
-   "reviews": 1300,
+   "reviews": 1302,
    "name": "AMSOIL OE 0W-16 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "OESQT-EA": {
+     "price": 12.59,
+     "size": "Quart Bottle"
+    },
+    "OESQT-CA": {
+     "price": 149,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "OES55-EA": {
+     "price": 2324.35,
+     "size": "55 Gallon Drum"
+    }
+   }
   },
-  "OEZQT-EA": {
-   "path": "/p/amsoil-oe-0w-20-100-synthetic-motor-oil-oez/",
+  "OEGQT-EA": {
+   "path": "/p/amsoil-oe-0w-40-100-synthetic-motor-oil-oeg/",
    "price": 12.59,
    "rating": 5,
-   "reviews": 1300,
-   "name": "AMSOIL OE 0W-20 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "reviews": 1302,
+   "name": "AMSOIL OE 0W-40 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "OEGQT-EA": {
+     "price": 12.59,
+     "size": "Quart Bottle"
+    },
+    "OEGQT-CA": {
+     "price": 149.05,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "OEG55-EA": {
+     "price": 2324.95,
+     "size": "55 Gallon Drum"
+    },
+    "OEG1G-EA": {
+     "price": 49.49,
+     "size": "Gallon Jug"
+    },
+    "OEG1G-CA": {
+     "price": 196.35,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
   },
   "OEMQT-EA": {
    "path": "/p/amsoil-oe-5w-20-100-synthetic-motor-oil-oem/",
    "price": 12.59,
    "rating": 5,
-   "reviews": 1300,
+   "reviews": 1302,
    "name": "AMSOIL OE 5W-20 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "OEMQT-EA": {
+     "price": 12.59,
+     "size": "Quart Bottle"
+    },
+    "OEMQT-CA": {
+     "price": 149.05,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "OEM55-EA": {
+     "price": 2325.7,
+     "size": "55 Gallon Drum"
+    },
+    "OEM27-EA": {
+     "price": 11556.05,
+     "size": "275 Gallon Tote"
+    },
+    "OEM1G-EA": {
+     "price": 49.59,
+     "size": "Gallon Jug"
+    },
+    "OEM1G-CA": {
+     "price": 196.4,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "OEFQT-EA": {
    "path": "/p/amsoil-oe-5w-30-100-synthetic-motor-oil-oef/",
    "price": 12.59,
    "rating": 5,
-   "reviews": 1300,
+   "reviews": 1302,
    "name": "AMSOIL OE 5W-30 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "OEFQT-EA": {
+     "price": 12.59,
+     "size": "Quart Bottle"
+    },
+    "OEFQT-CA": {
+     "price": 149.1,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "OEF55-EA": {
+     "price": 2325.95,
+     "size": "55 Gallon Drum"
+    },
+    "OEF27-EA": {
+     "price": 11557.4,
+     "size": "275 Gallon Tote"
+    },
+    "OEF1G-EA": {
+     "price": 49.59,
+     "size": "Gallon Jug"
+    },
+    "OEF1G-CA": {
+     "price": 196.45,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "OETQT-EA": {
    "path": "/p/amsoil-oe-10w-30-100-synthetic-motor-oil-oet/",
    "price": 12.59,
    "rating": 5,
-   "reviews": 1300,
+   "reviews": 1302,
    "name": "AMSOIL OE 10W-30 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "OETQT-EA": {
+     "price": 12.59,
+     "size": "Quart Bottle"
+    },
+    "OETQT-CA": {
+     "price": 149.1,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "OET55-EA": {
+     "price": 2326,
+     "size": "55 Gallon Drum"
+    },
+    "OET27-EA": {
+     "price": 11557.65,
+     "size": "275 Gallon Tote"
+    }
+   }
+  },
+  "AFEQT-EA": {
+   "path": "/p/amsoil-0w-20-ls-100-synthetic-european-motor-oil-afe/",
+   "price": 16.59,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 0W-20 LS 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AFEQT-EA": {
+     "price": 16.59,
+     "size": "Quart Bottle"
+    },
+    "AFEQT-CA": {
+     "price": 197.2,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AFE55-EA": {
+     "price": 3051.85,
+     "size": "55 Gallon Drum"
+    }
+   }
   },
   "EZTQT-EA": {
    "path": "/p/amsoil-0w-20-ls-vw-100-synthetic-european-motor-oil-ezt/",
@@ -1288,7 +1644,21 @@
    "rating": 5,
    "reviews": 819,
    "name": "AMSOIL 0W-20 LS-VW 100% Synthetic European Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "EZTQT-EA": {
+     "price": 17.49,
+     "size": "Quart Bottle"
+    },
+    "EZTQT-CA": {
+     "price": 208.75,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "EZT55-EA": {
+     "price": 3244.7,
+     "size": "55 Gallon Drum"
+    }
+   }
   },
   "EOTQT-EA": {
    "path": "/p/amsoil-0w-30-ms-100-synthetic-european-motor-oil-eot/",
@@ -1296,7 +1666,39 @@
    "rating": 5,
    "reviews": 819,
    "name": "AMSOIL 0W-30 MS 100% Synthetic European Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "EOTQT-EA": {
+     "price": 17.19,
+     "size": "Quart Bottle"
+    },
+    "EOTQT-CA": {
+     "price": 203.3,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "EOT55-EA": {
+     "price": 3153.55,
+     "size": "55 Gallon Drum"
+    }
+   }
+  },
+  "EFOQT-EA": {
+   "path": "/p/amsoil-0w-40-fs-100-synthetic-european-motor-oil-efo/",
+   "price": 17.09,
+   "rating": 5,
+   "reviews": 819,
+   "name": "AMSOIL 0W-40 FS 100% Synthetic European Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "EFOQT-EA": {
+     "price": 17.09,
+     "size": "Quart Bottle"
+    },
+    "EFOQT-CA": {
+     "price": 203.5,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
   },
   "AELQT-EA": {
    "path": "/p/amsoil-5w-30-ls-100-synthetic-european-motor-oil-ael/",
@@ -1304,7 +1706,29 @@
    "rating": 5,
    "reviews": 819,
    "name": "AMSOIL 5W-30 LS 100% Synthetic European Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AELQT-EA": {
+     "price": 18.89,
+     "size": "Quart Bottle"
+    },
+    "AELQT-CA": {
+     "price": 223.55,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AEL55-EA": {
+     "price": 3491.75,
+     "size": "55 Gallon Drum"
+    },
+    "AEL1G-EA": {
+     "price": 73.99,
+     "size": "Gallon Jug"
+    },
+    "AEL1G-CA": {
+     "price": 294.1,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "AFLQT-EA": {
    "path": "/p/amsoil-5w-40-ms-100-synthetic-european-motor-oil-afl/",
@@ -1312,7 +1736,29 @@
    "rating": 5,
    "reviews": 819,
    "name": "AMSOIL 5W-40 MS 100% Synthetic European Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AFLQT-EA": {
+     "price": 17.89,
+     "size": "Quart Bottle"
+    },
+    "AFLQT-CA": {
+     "price": 213.2,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AFL55-EA": {
+     "price": 2961,
+     "size": "55 Gallon Drum"
+    },
+    "AFL1G-EA": {
+     "price": 70.69,
+     "size": "Gallon Jug"
+    },
+    "AFL1G-CA": {
+     "price": 280.6,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "EFMQT-EA": {
    "path": "/p/amsoil-5w-40-fs-100-synthetic-european-motor-oil-efm/",
@@ -1320,7 +1766,33 @@
    "rating": 5,
    "reviews": 819,
    "name": "AMSOIL 5W-40 FS 100% Synthetic European Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "EFMQT-EA": {
+     "price": 14.29,
+     "size": "Quart Bottle"
+    },
+    "EFMQT-CA": {
+     "price": 170.2,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "EFM55-EA": {
+     "price": 2326.75,
+     "size": "55 Gallon Drum"
+    },
+    "EFM27-EA": {
+     "price": 13455.8,
+     "size": "275 Gallon Tote"
+    },
+    "EFM1G-EA": {
+     "price": 56.49,
+     "size": "Gallon Jug"
+    },
+    "EFM1G-CA": {
+     "price": 224.3,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "ETSQT-EA": {
    "path": "/p/amsoil-10w-60-fs-100-synthetic-european-motor-oil-ets/",
@@ -1328,63 +1800,169 @@
    "rating": 5,
    "reviews": 819,
    "name": "AMSOIL 10W-60 FS 100% Synthetic European Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ETSQT-EA": {
+     "price": 15.49,
+     "size": "Quart Bottle"
+    },
+    "ETSQT-CA": {
+     "price": 183.15,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
   },
   "HM020QT-EA": {
    "path": "/p/amsoil-0w-20-100-synthetic-high-mileage-motor-oil-hm020/",
    "price": 14.39,
    "rating": 5,
-   "reviews": 411,
+   "reviews": 412,
    "name": "AMSOIL 0W-20 100% Synthetic High-Mileage Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "HM020QT-EA": {
+     "price": 14.39,
+     "size": "Quart Bottle"
+    },
+    "HM020QT-CA": {
+     "price": 171.65,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "HM02055-EA": {
+     "price": 2624.85,
+     "size": "55 Gallon Drum"
+    },
+    "HM0201G-EA": {
+     "price": 56.79,
+     "size": "Gallon Jug"
+    },
+    "HM0201G-CA": {
+     "price": 225.15,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
   },
   "HM520QT-EA": {
    "path": "/p/amsoil-5w-20-100-synthetic-high-mileage-motor-oil-hm520/",
    "price": 14.49,
    "rating": 5,
-   "reviews": 411,
+   "reviews": 412,
    "name": "AMSOIL 5W-20 100% Synthetic High-Mileage Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "HM520QT-EA": {
+     "price": 14.49,
+     "size": "Quart Bottle"
+    },
+    "HM520QT-CA": {
+     "price": 171.75,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "HM52055-EA": {
+     "price": 2625.85,
+     "size": "55 Gallon Drum"
+    },
+    "HM5201G-EA": {
+     "price": 56.79,
+     "size": "Gallon Jug"
+    },
+    "HM5201G-CA": {
+     "price": 225.25,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
   },
   "HM530QT-EA": {
    "path": "/p/amsoil-5w-30-100-synthetic-high-mileage-motor-oil-hm530/",
    "price": 14.49,
    "rating": 5,
-   "reviews": 411,
+   "reviews": 412,
    "name": "AMSOIL 5W-30 100% Synthetic High-Mileage Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "HM530QT-EA": {
+     "price": 14.49,
+     "size": "Quart Bottle"
+    },
+    "HM530QT-CA": {
+     "price": 171.75,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "HM53055-EA": {
+     "price": 2625.85,
+     "size": "55 Gallon Drum"
+    },
+    "HM5301G-EA": {
+     "price": 56.79,
+     "size": "Gallon Jug"
+    },
+    "HM5301G-CA": {
+     "price": 225.25,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
   },
   "HM1030QT-EA": {
    "path": "/p/amsoil-10w-30-100-synthetic-high-mileage-motor-oil-hm1030/",
    "price": 14.49,
    "rating": 5,
-   "reviews": 411,
+   "reviews": 412,
    "name": "AMSOIL 10W-30 100% Synthetic High-Mileage Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "HM1030QT-EA": {
+     "price": 14.49,
+     "size": "Quart Bottle"
+    },
+    "HM1030QT-CA": {
+     "price": 171.75,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "HM10301G-EA": {
+     "price": 56.79,
+     "size": "Gallon Jug"
+    },
+    "HM10301G-CA": {
+     "price": 225.25,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
+  },
+  "HE08QT-EA": {
+   "path": "/p/amsoil-0w-8-100-synthetic-hybrid-motor-oil-he08/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 57,
+   "name": "AMSOIL 0W-8 100% Synthetic Hybrid Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "HE08QT-EA": {
+     "price": 14.39,
+     "size": "Quart Bottle"
+    },
+    "HE08QT-CA": {
+     "price": 171.65,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
   },
   "HE016QT-EA": {
    "path": "/p/amsoil-0w-16-100-synthetic-hybrid-motor-oil-he016/",
    "price": 14.39,
    "rating": 5,
-   "reviews": 56,
+   "reviews": 57,
    "name": "AMSOIL 0W-16 100% Synthetic Hybrid Motor Oil",
-   "source": "gasoline-motor-oil.json"
-  },
-  "HE020QT-EA": {
-   "path": "/p/amsoil-0w-20-100-synthetic-hybrid-motor-oil-he020/",
-   "price": 14.39,
-   "rating": 5,
-   "reviews": 56,
-   "name": "AMSOIL 0W-20 100% Synthetic Hybrid Motor Oil",
-   "source": "gasoline-motor-oil.json"
-  },
-  "ZRTQT-EA": {
-   "path": "/p/amsoil-z-rod-10w-30-100-synthetic-motor-oil-zrt/",
-   "price": 17.69,
-   "rating": 5,
-   "reviews": 77,
-   "name": "AMSOIL Z-ROD® 10W-30 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "HE016QT-EA": {
+     "price": 14.39,
+     "size": "Quart Bottle"
+    },
+    "HE016QT-CA": {
+     "price": 171.65,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
   },
   "ZRDQT-EA": {
    "path": "/p/amsoil-z-rod-10w-40-100-synthetic-motor-oil-zrd/",
@@ -1392,23 +1970,17 @@
    "rating": 5,
    "reviews": 77,
    "name": "AMSOIL Z-ROD® 10W-40 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
-  },
-  "RD20QT-EA": {
-   "path": "/p/amsoil-dominator-5w-20-100-synthetic-racing-oil-rd20/",
-   "price": 21.09,
-   "rating": 5,
-   "reviews": 91,
-   "name": "AMSOIL DOMINATOR® 5W-20 100% Synthetic Racing Oil",
-   "source": "gasoline-motor-oil.json"
-  },
-  "RD30QT-EA": {
-   "path": "/p/amsoil-dominator-10w-30-100-synthetic-racing-oil-rd30/",
-   "price": 20.39,
-   "rating": 5,
-   "reviews": 91,
-   "name": "AMSOIL DOMINATOR® 10W-30 100% Synthetic Racing Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ZRDQT-EA": {
+     "price": 17.69,
+     "size": "Quart Bottle"
+    },
+    "ZRDQT-CA": {
+     "price": 209.8,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
   },
   "RD40QT-EA": {
    "path": "/p/amsoil-dominator-10w-40-100-synthetic-racing-oil-rd40/",
@@ -1416,7 +1988,17 @@
    "rating": 5,
    "reviews": 91,
    "name": "AMSOIL DOMINATOR® 10W-40 100% Synthetic Racing Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "RD40QT-EA": {
+     "price": 20.39,
+     "size": "Quart Bottle"
+    },
+    "RD40QT-CA": {
+     "price": 241.95,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
   },
   "RD50QT-EA": {
    "path": "/p/amsoil-dominator-15w-50-100-synthetic-racing-oil-rd50/",
@@ -1424,7 +2006,29 @@
    "rating": 5,
    "reviews": 91,
    "name": "AMSOIL DOMINATOR® 15W-50 100% Synthetic Racing Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "RD50QT-EA": {
+     "price": 21.19,
+     "size": "Quart Bottle"
+    },
+    "RD50QT-CA": {
+     "price": 251.65,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "RD5055-EA": {
+     "price": 3961.35,
+     "size": "55 Gallon Drum"
+    },
+    "RD501G-EA": {
+     "price": 83.39,
+     "size": "Gallon Jug"
+    },
+    "RD501G-CA": {
+     "price": 331.8,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "RD60QT-EA": {
    "path": "/p/amsoil-dominator-sae-60-100-synthetic-racing-oil-rd60/",
@@ -1432,7 +2036,21 @@
    "rating": 5,
    "reviews": 91,
    "name": "AMSOIL DOMINATOR® SAE 60 100% Synthetic Racing Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "RD60QT-EA": {
+     "price": 21.79,
+     "size": "Quart Bottle"
+    },
+    "RD60QT-CA": {
+     "price": 258.4,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "RD6055-EA": {
+     "price": 4074.6,
+     "size": "55 Gallon Drum"
+    }
+   }
   },
   "AMOQT-EA": {
    "path": "/p/amsoil-premium-protection-10w-40-100-synthetic-motor-oil-amo/",
@@ -1440,7 +2058,37 @@
    "rating": 5,
    "reviews": 148,
    "name": "AMSOIL Premium Protection 10W-40 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AMOTP-EA": {
+     "price": 171.65,
+     "size": "2.5 Gallon Jug"
+    },
+    "AMOTP-CA": {
+     "price": 341.25,
+     "size": "2.5 Gallon Jugs, Case of 2"
+    },
+    "AMOQT-EA": {
+     "price": 17.89,
+     "size": "Quart Bottle"
+    },
+    "AMOQT-CA": {
+     "price": 212.15,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AMO55-EA": {
+     "price": 3301.7,
+     "size": "55 Gallon Drum"
+    },
+    "AMO1G-EA": {
+     "price": 70.29,
+     "size": "Gallon Jug"
+    },
+    "AMO1G-CA": {
+     "price": 279.2,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
   },
   "AROQT-EA": {
    "path": "/p/amsoil-premium-protection-20w-50-100-synthetic-motor-oil-aro/",
@@ -1448,7 +2096,37 @@
    "rating": 5,
    "reviews": 148,
    "name": "AMSOIL Premium Protection 20W-50 100% Synthetic Motor Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AROQT-EA": {
+     "price": 18.49,
+     "size": "Quart Bottle"
+    },
+    "AROQT-CA": {
+     "price": 219.85,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ARO55-EA": {
+     "price": 3430.25,
+     "size": "55 Gallon Drum"
+    },
+    "ARO27-EA": {
+     "price": 17078.85,
+     "size": "275 Gallon Tote"
+    },
+    "ARO1G-EA": {
+     "price": 72.89,
+     "size": "Gallon Jug"
+    },
+    "ARO1G-CA": {
+     "price": 289.4,
+     "size": "Gallon Jugs, Case of 4"
+    },
+    "ARO16-EA": {
+     "price": 1185.45,
+     "size": "16 Gallon Keg"
+    }
+   }
   },
   "BRKQT-EA": {
    "path": "/p/amsoil-sae-30-break-in-oil-brk/",
@@ -1456,7 +2134,17 @@
    "rating": 5,
    "reviews": 77,
    "name": "AMSOIL SAE 30 Break-In Oil",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "BRKQT-EA": {
+     "price": 14.39,
+     "size": "Quart Bottle"
+    },
+    "BRKQT-CA": {
+     "price": 170.65,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
   },
   "SB020QT-EA": {
    "path": "/p/amsoil-0w-20-synthetic-blend-motor-oil-sb020/",
@@ -1464,7 +2152,29 @@
    "rating": 5,
    "reviews": 10,
    "name": "AMSOIL 0W-20 Synthetic-Blend Motor Oil ",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "SB020QT-EA": {
+     "price": 10.49,
+     "size": "Quart Bottle"
+    },
+    "SB020QT-CA": {
+     "price": 124.5,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "SB02055-EA": {
+     "price": 1834.85,
+     "size": "55 Gallon Drum"
+    },
+    "SB0201G-EA": {
+     "price": 41.29,
+     "size": "Gallon Jug"
+    },
+    "SB0201G-CA": {
+     "price": 163.35,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
   },
   "SB520QT-EA": {
    "path": "/p/amsoil-5w-20-synthetic-blend-motor-oil-sb520/",
@@ -1472,7 +2182,29 @@
    "rating": 5,
    "reviews": 10,
    "name": "AMSOIL 5W-20 Synthetic-Blend Motor Oil ",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "SB520QT-EA": {
+     "price": 10.59,
+     "size": "Quart Bottle"
+    },
+    "SB520QT-CA": {
+     "price": 124.6,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "SB52055-EA": {
+     "price": 1836.9,
+     "size": "55 Gallon Drum"
+    },
+    "SB5201G-EA": {
+     "price": 41.39,
+     "size": "Gallon Jug"
+    },
+    "SB5201G-CA": {
+     "price": 163.5,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
   },
   "SB530QT-EA": {
    "path": "/p/amsoil-5w-30-synthetic-blend-motor-oil-sb530/",
@@ -1480,7 +2212,243 @@
    "rating": 5,
    "reviews": 10,
    "name": "AMSOIL 5W-30 Synthetic-Blend Motor Oil ",
-   "source": "gasoline-motor-oil.json"
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "SB530QT-EA": {
+     "price": 10.59,
+     "size": "Quart Bottle"
+    },
+    "SB530QT-CA": {
+     "price": 124.6,
+     "size": "Quart Bottle, Case of 12"
+    },
+    "SB53055-EA": {
+     "price": 1837,
+     "size": "55 Gallon Drum"
+    },
+    "SB5301G-EA": {
+     "price": 41.39,
+     "size": "Gallon Jug"
+    },
+    "SB5301G-CA": {
+     "price": 163.5,
+     "size": "Gallon Jug, Case of 4"
+    }
+   }
+  },
+  "ASMQT-EA": {
+   "path": "/p/amsoil-signature-series-0w-20-100-synthetic-motor-oil-asm/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6997,
+   "name": "AMSOIL Signature Series 0W-20 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ASMQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "ASMQT-CA": {
+     "price": 213.6,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "ASMCN-EA": {
+     "price": 9.39,
+     "size": "Half Quart"
+    },
+    "ASM55-EA": {
+     "price": 3278,
+     "size": "55 Gallon Drum"
+    },
+    "ASM1G-EA": {
+     "price": 67.79,
+     "size": "Gallon Jug"
+    },
+    "ASM1G-CA": {
+     "price": 269.2,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "AMRQT-EA": {
+   "path": "/p/amsoil-signature-series-5w-50-100-synthetic-motor-oil-amr/",
+   "price": 17.99,
+   "rating": 5,
+   "reviews": 6997,
+   "name": "AMSOIL Signature Series 5W-50 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "AMRQT-EA": {
+     "price": 17.99,
+     "size": "Quart Bottle"
+    },
+    "AMRQT-CA": {
+     "price": 213.65,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "AMR55-EA": {
+     "price": 3278.75,
+     "size": "55 Gallon Drum"
+    }
+   }
+  },
+  "XLMQT-EA": {
+   "path": "/p/amsoil-extended-life-5w-20-100-synthetic-motor-oil-xlm/",
+   "price": 15.59,
+   "rating": 5,
+   "reviews": 1470,
+   "name": "AMSOIL Extended-Life 5W-20 100% Synthetic Motor Oil ",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "XLMQT-EA": {
+     "price": 15.59,
+     "size": "Quart Bottle"
+    },
+    "XLMQT-CA": {
+     "price": 184.75,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "XLM55-EA": {
+     "price": 2793,
+     "size": "55 Gallon Drum"
+    },
+    "XLM27-EA": {
+     "price": 13892.85,
+     "size": "275 Gallon Tote"
+    },
+    "XLM1G-EA": {
+     "price": 61.09,
+     "size": "Gallon Jug"
+    },
+    "XLM1G-CA": {
+     "price": 242.4,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "OEZQT-EA": {
+   "path": "/p/amsoil-oe-0w-20-100-synthetic-motor-oil-oez/",
+   "price": 12.59,
+   "rating": 5,
+   "reviews": 1302,
+   "name": "AMSOIL OE 0W-20 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "OEZQT-EA": {
+     "price": 12.59,
+     "size": "Quart Bottle"
+    },
+    "OEZQT-CA": {
+     "price": 149,
+     "size": "Quart Bottles, Case of 12"
+    },
+    "OEZ55-EA": {
+     "price": 2324.75,
+     "size": "55 Gallon Drum"
+    },
+    "OEZ27-EA": {
+     "price": 11551.5,
+     "size": "275 Gallon Tote"
+    },
+    "OEZ1G-EA": {
+     "price": 49.49,
+     "size": "Gallon Jug"
+    },
+    "OEZ1G-CA": {
+     "price": 196.35,
+     "size": "Gallon Jugs, Case of 4"
+    }
+   }
+  },
+  "HE020QT-EA": {
+   "path": "/p/amsoil-0w-20-100-synthetic-hybrid-motor-oil-he020/",
+   "price": 14.39,
+   "rating": 5,
+   "reviews": 57,
+   "name": "AMSOIL 0W-20 100% Synthetic Hybrid Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "HE020QT-EA": {
+     "price": 14.39,
+     "size": "Quart Bottle"
+    },
+    "HE020QT-CA": {
+     "price": 171.65,
+     "size": "Quart Bottle, Case of 12"
+    }
+   }
+  },
+  "ZRTQT-EA": {
+   "path": "/p/amsoil-z-rod-10w-30-100-synthetic-motor-oil-zrt/",
+   "price": 17.69,
+   "rating": 5,
+   "reviews": 77,
+   "name": "AMSOIL Z-ROD® 10W-30 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ZRTQT-EA": {
+     "price": 17.69,
+     "size": "Quart Bottle"
+    },
+    "ZRTQT-CA": {
+     "price": 209.75,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "ZRFQT-EA": {
+   "path": "/p/amsoil-z-rod-20w-50-100-synthetic-motor-oil-zrf/",
+   "price": 18.99,
+   "rating": 5,
+   "reviews": 77,
+   "name": "AMSOIL Z-ROD® 20W-50 100% Synthetic Motor Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "ZRFQT-EA": {
+     "price": 18.99,
+     "size": "Quart Bottle"
+    },
+    "ZRFQT-CA": {
+     "price": 224.9,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "RD20QT-EA": {
+   "path": "/p/amsoil-dominator-5w-20-100-synthetic-racing-oil-rd20/",
+   "price": 21.09,
+   "rating": 5,
+   "reviews": 91,
+   "name": "AMSOIL DOMINATOR® 5W-20 100% Synthetic Racing Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "RD20QT-EA": {
+     "price": 21.09,
+     "size": "Quart Bottle"
+    },
+    "RD20QT-CA": {
+     "price": 250.4,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
+  },
+  "RD30QT-EA": {
+   "path": "/p/amsoil-dominator-10w-30-100-synthetic-racing-oil-rd30/",
+   "price": 20.39,
+   "rating": 5,
+   "reviews": 91,
+   "name": "AMSOIL DOMINATOR® 10W-30 100% Synthetic Racing Oil",
+   "source": "gasoline-motor-oil.json",
+   "variants": {
+    "RD30QT-EA": {
+     "price": 20.39,
+     "size": "Quart Bottle"
+    },
+    "RD30QT-CA": {
+     "price": 242,
+     "size": "Quart Bottles, Case of 12"
+    }
+   }
   },
   "SVGQT-EA": {
    "path": "/p/amsoil-severe-gear-75w-90-100-synthetic-gear-lube-svg/",
