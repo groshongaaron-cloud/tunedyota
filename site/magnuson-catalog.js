@@ -41,7 +41,11 @@ window.MAGNUSON_CATALOG = {
         { sku: "01-99-34-103-BL", name: "Tune + Charge Air Cooler", retail: 2249, note: "black or red" },
         { sku: "01-99-34-104-BL", name: "Tune + CAC + Low-Temp Radiator", retail: 2798, note: "black or red" },
         { sku: "01-99-34-105-BL", name: "Tune + CAC + LTR + Cold Air Kit", retail: 3147, note: "black or red" },
-        { sku: "01-99-34-106-BL", name: "Tune + CAC + LTR + CAK + Cat-Back Exhaust", retail: 3846, note: "black or red" }
+        { sku: "01-99-34-106-BL", name: "Tune + CAC + LTR + CAK + Cat-Back Exhaust", retail: 3846, note: "black or red" },
+        { sku: "31-99-34-001-BL", name: "Magnuson Performance Charge Air Cooler Kit", retail: 1199, note: "standalone part · black or red" },
+        { sku: "31-99-34-005-BL", name: "Magnuson Performance Air Intake Kit", retail: 499, note: "standalone part" },
+        { sku: "31-99-34-015", name: "Magnuson Performance Low-Temp Radiator", retail: 649, note: "standalone part" },
+        { sku: "31-99-34-027-BL", name: "Magnuson Performance Cat-Back Exhaust", retail: 999, note: "standalone part · 3\" T-304 stainless" }
       ]
     },
     {
