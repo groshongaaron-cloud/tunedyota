@@ -39,6 +39,8 @@
   function send(text) {
     if (sending) return;
     sending = true; if (sendBtn) sendBtn.disabled = true;
+    // GA4: one chat_start per session, on the first message actually sent.
+    try { if (window.gtag && !sessionStorage.getItem("ty-chat-ga")) { sessionStorage.setItem("ty-chat-ga", "1"); gtag("event", "chat_start"); } } catch (e) {}
     addMsg("user", text); seen += 1;
     var typing = el("div", { class: "ty-msg ai", id: "ty-typing" }, "…"); log.appendChild(typing);
     fetch(FN, { method: "POST", headers: { "Content-Type": "application/json" },

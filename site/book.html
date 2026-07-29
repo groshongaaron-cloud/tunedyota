@@ -63,7 +63,9 @@ var slugify=function(c){return String(c||"").trim().toLowerCase().replace(/[^a-z
 // --- funnel-measurement beacons (same sid key as the funnel) ---
 var SID=(function(){var s="";try{s=sessionStorage.getItem("ty_sid")||"";}catch(e){}if(!s){s="s_"+Math.random().toString(36).slice(2)+Date.now().toString(36);try{sessionStorage.setItem("ty_sid",s);}catch(e){}}return s;})();
 var UTM=new URLSearchParams(location.search);
-function track(step,name){try{var p=JSON.stringify({sid:SID,step:step,name:name||"",utm_source:UTM.get("utm_source")||"",utm_medium:UTM.get("utm_medium")||"",utm_campaign:UTM.get("utm_campaign")||""});if(navigator.sendBeacon){navigator.sendBeacon("/.netlify/functions/track",p);}else{fetch("/.netlify/functions/track",{method:"POST",body:p,keepalive:true});}}catch(e){}}
+function track(step,name){try{var p=JSON.stringify({sid:SID,step:step,name:name||"",utm_source:UTM.get("utm_source")||"",utm_medium:UTM.get("utm_medium")||"",utm_campaign:UTM.get("utm_campaign")||""});if(navigator.sendBeacon){navigator.sendBeacon("/.netlify/functions/track",p);}else{fetch("/.netlify/functions/track",{method:"POST",body:p,keepalive:true});}}catch(e){}
+/* GA4 mirror of the same beacon — outcomes get their own (key-eventable) names. */
+try{if(window.gtag){var kn={booked:"book_tune",priority:"join_waitlist",lead:"generate_lead",call:"call_click"}[name];gtag("event",step===6&&kn?kn:"funnel_step",{step_index:step,step_name:name||""});}}catch(e){}}
 document.addEventListener("click",function(e){try{var a=e.target.closest&&e.target.closest('a[href^="tel:"]');if(a)track(6,"call");}catch(err){}},true);
 
 var STATE={avail:null,ev:null,slot:null,vehicles:null,cfg:null};

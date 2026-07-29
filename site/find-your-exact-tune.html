@@ -701,7 +701,9 @@ const prog=$("#prog"); for(let i=0;i<6;i++){let e=document.createElement("i");pr
 /* First-party funnel measurement: anonymous session id + step beacons. */
 const SID=(function(){ let s=""; try{ s=sessionStorage.getItem("ty_sid")||""; }catch(e){} if(!s){ s="s_"+Math.random().toString(36).slice(2)+Date.now().toString(36); try{ sessionStorage.setItem("ty_sid",s); }catch(e){} } return s; })();
 const STEP_NAMES=["make","model","config","goals","result","book"];
-function track(step,name){ try{ const p=JSON.stringify({sid:SID,step,name:name||STEP_NAMES[step]||"",utm_source:ATTR.utm_source||"",utm_medium:ATTR.utm_medium||"",utm_campaign:ATTR.utm_campaign||""}); if(navigator.sendBeacon){ navigator.sendBeacon("/.netlify/functions/track",p); } else { fetch("/.netlify/functions/track",{method:"POST",body:p,keepalive:true}); } }catch(e){} }
+function track(step,name){ try{ const p=JSON.stringify({sid:SID,step,name:name||STEP_NAMES[step]||"",utm_source:ATTR.utm_source||"",utm_medium:ATTR.utm_medium||"",utm_campaign:ATTR.utm_campaign||""}); if(navigator.sendBeacon){ navigator.sendBeacon("/.netlify/functions/track",p); } else { fetch("/.netlify/functions/track",{method:"POST",body:p,keepalive:true}); } }catch(e){}
+  /* GA4 mirror of the same beacon — outcomes get their own (key-eventable) names. */
+  try{ if(window.gtag){ const n=name||STEP_NAMES[step]||""; const key={booked:"book_tune",priority:"join_waitlist",lead:"generate_lead",call:"call_click"}[n]; gtag("event", step===6&&key?key:"funnel_step", {step_index:step, step_name:n}); } }catch(e){} }
 // Phone-intent outcome (2026-07-16): the funnel's own CTAs say "call to book faster",
 // so an untracked tel: tap looked like an abandon (July: book→outcome read −84% while
 // 25/63 real bookings arrived by phone as owner:reconcile). Count a tel: tap as

@@ -52,8 +52,15 @@
         else if (handlers.onError) handlers.onError(session.error || "unknown");
         return session;
       }
+      // GA4: begin_checkout when a session mints, purchase_approved on approval.
+      // root.gtag is absent in Node tests — both are no-ops there.
+      try { if (typeof root.gtag === "function") root.gtag("event", "begin_checkout", { sku: sku }); } catch (e) {}
+      var onApproval = handlers.onApproval || function () {};
       return openLightbox(session, {
-        onApproval: handlers.onApproval || function () {},
+        onApproval: function (r) {
+          try { if (typeof root.gtag === "function") root.gtag("event", "purchase_approved", { sku: sku }); } catch (e) {}
+          return onApproval(r);
+        },
         onDeclined: handlers.onDeclined || function () {},
         onCancelled: handlers.onCancelled || function () {},
         onError: handlers.onError || function () {}

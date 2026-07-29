@@ -43,6 +43,18 @@
   var api = { relTarget: relTarget, destOf: destOf, sourceOf: sourceOf, trackerHref: trackerHref, instrument: instrument };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof document !== "undefined") {
+    // GA4 mirror: outbound AMSOIL clicks are commission-relevant — count them.
+    // Capture phase so the event fires before navigation; matches both rewritten
+    // (amsoil-go) and direct amsoil.com links.
+    document.addEventListener("click", function (e) {
+      try {
+        var a = e.target.closest && e.target.closest("a[href]");
+        if (!a) return;
+        var href = a.getAttribute("href") || "";
+        if (href.indexOf("amsoil-go") < 0 && !relTarget(href, location)) return;
+        if (typeof gtag === "function") gtag("event", "amsoil_outbound", { link_source: sourceOf(location) });
+      } catch (err) {}
+    }, true);
     var run = function () { instrument(document, location); };
     if (document.readyState !== "loading") run();
     else document.addEventListener("DOMContentLoaded", run);
