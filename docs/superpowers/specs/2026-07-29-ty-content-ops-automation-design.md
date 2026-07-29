@@ -21,11 +21,12 @@ automatable.
    the publish step.
 2. **Autonomy:** pipeline auto-runs through **staging**; nothing deploys to the live site
    or social without Aaron's explicit "ship it."
-3. **Notifications:** Slack for real-time hand-offs (via existing n8n → Slack wiring),
-   Gmail for the digest layer that already exists (trend-scout routines).
+3. **Notifications:** Slack for real-time hand-offs, Gmail for the digest layer that
+   already exists (trend-scout routines). Transport amended during planning — see
+   Component 3: the existing Netlify notify relay, not a new n8n workflow.
 4. **Architecture:** Approach A — Claude Code owns files + judgment (skills + local
-   watcher cron), n8n owns messaging, cloud routines own scheduled research. n8n is
-   never the brain (it cannot see the local filesystem).
+   watcher cron), the existing notify relay owns messaging, cloud routines own
+   scheduled research. n8n is never the brain (it cannot see the local filesystem).
 
 ## Components
 
@@ -55,7 +56,7 @@ Encodes the publish loop from `TunedYota-NotebookLM\output\README.md` with three
   6. Social variants: 1:1 and 9:16 crops + hook-bank captions into `output\social\`,
      calibrator tags per TTN four-state list.
   7. Update `output\.pipeline-state.json` (batch → `staged`) and `.processed.json`.
-  8. POST summary to the n8n webhook → Slack `#ty-content-ops`.
+  8. POST summary to the notify relay → Slack.
 - **`ship`** (Aaron-triggered): merge staged branch to `master`, then follow the repo
   **ship skill** exactly (push, confirm Netlify `ready`, curl live pages). Mark batch
   `shipped`, notify Slack.
@@ -77,24 +78,25 @@ Idle runs exit silently. Runs only while the PC is on — acceptable because exp
 appear when Aaron is at the PC. Appends one line per run to `output\.watcher-log.txt`
 (timestamp, files seen, action taken).
 
-### 3. n8n workflow — "TY — Content Ops Notify"
+### 3. Slack notifications — existing Netlify relay (n8n workflow dropped)
 
-On tunedyota.app.n8n.cloud: **Webhook (POST, header-token auth) → format → Slack
-`#ty-content-ops`**. Error workflow: existing "TY — Shared Error → Slack"
-(`0DmOPOn7gpmmm2bN`). Payload contract:
+**Amended 2026-07-29 during planning.** Implementation discovery: the "Slack" nodes in
+the existing n8n workflows hold no Slack credential — they are HTTP calls to the site's
+own relay, `https://tunedyota.com/.netlify/functions/notify` (header `x-ty-notify`,
+body `{"text": ...}`, Slack webhook held server-side in `SLACK_WEBHOOK_URL`). A new n8n
+workflow would add a hop and a failure point while providing nothing the relay doesn't.
 
-```json
-{
-  "event": "staged | shipped | blocked | error | candidates",
-  "batch": "infographics-20260729",
-  "files": ["magnuson-fitment-matrix-v1.png"],
-  "summary": "1 infographic staged on content/infographics-20260729; npm test green.",
-  "next_action": "Reply 'ship it' in Claude to deploy."
-}
-```
+So: the skill and the cloud routines POST directly to the relay, messages prefixed
+`🖼️ CONTENT-OPS [staged|shipped|blocked|error|candidates]`. n8n is not touched.
 
-The webhook token lives in the skill's local config (`~\.claude\skills\ty-publish\config.json`,
-never committed to the site repo) and as a header-auth credential in n8n.
+Channel routing: `notify.js` gains an optional `topic` field — `"topic": "content-ops"`
+uses `SLACK_WEBHOOK_URL_CONTENT_OPS` when that env var is set, falling back to the
+default webhook otherwise. Today messages land in the existing owner channel; the day
+Aaron wants a dedicated `#ty-content-ops`, he mints one Slack incoming webhook and sets
+one env var — no code or skill changes.
+
+The relay token lives in the skill's local config (`~\.claude\skills\ty-publish\config.json`,
+never committed to the site repo).
 
 ### 4. `/ty-status` skill — `~\.claude\skills\ty-status\SKILL.md`
 
@@ -108,14 +110,14 @@ and merchant-feed check for a one-shot health report.
 Prompt update to the two existing cloud routines (daily 6:57am, Mon 7:03am): score each
 opportunity as a potential infographic for one of the four packs (magnuson / ott /
 amsoil / banks-power-PRIVATE); qualifying candidates get a "NotebookLM candidates"
-section in the existing Gmail digest **and** a POST (`event: candidates`) to the n8n
-webhook for the Slack nudge. Banks Power candidates are flagged private in the digest
+section in the existing Gmail digest **and** a POST (`CONTENT-OPS [candidates]`) to the
+notify relay for the Slack nudge. Banks Power candidates are flagged private in the digest
 and excluded from Slack.
 
 ## Data flow
 
 ```
-trend-scout routines ──candidates──► Gmail digest + n8n webhook → Slack
+trend-scout routines ──candidates──► Gmail digest + notify relay → Slack
 Aaron: NotebookLM generate → download → output\
 watcher cron (30 min) → /ty-publish check → new files?
   → stage: verify → optimize → embed → test → branch commit → crops
@@ -137,12 +139,12 @@ Aaron: "ship it" → /ty-publish ship → merge+push per ship skill → verify l
 - Webhook unreachable → pipeline still completes to staged state (Slack is a
   convenience, not a dependency); failure noted in watcher log and surfaced by
   `/ty-status`.
-- n8n workflow failure → existing shared error workflow posts to Slack.
+- Relay returns non-200 → noted in watcher log, surfaced by `/ty-status`; pipeline
+  never blocks on notification failure.
 
 ## Testing
 
-1. curl the n8n webhook with a sample `staged` payload → message appears in
-   `#ty-content-ops`.
+1. curl the notify relay with a sample `staged` payload → message appears in Slack.
 2. Drop `test-magnuson-dryrun-v1.png` in `output\` → run `/ty-publish check` manually →
    verify dry-run behavior (no commit, correct verification output).
 3. Force one cron fire → confirm headless run writes the watcher log.
