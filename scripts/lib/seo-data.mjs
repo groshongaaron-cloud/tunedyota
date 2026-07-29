@@ -3,6 +3,7 @@
 // except the AMSOIL_HUB_FILES import below, which loads the committed full-line
 // catalog JSON so the Tier-2 hub pages self-register in HEAD_PAGES.
 import { AMSOIL_HUB_FILES, AMSOIL_FULL_PRODUCT_FILES } from "../build-amsoil-pages.mjs";
+import { MAGNUSON_STORE_FILES } from "../magnuson/build-store-pages.mjs";
 
 export const SITE = "https://tunedyota.com";
 export const BIZ_ID = `${SITE}/#business`;
@@ -66,6 +67,8 @@ export const HEAD_PAGES = [
   ...AMSOIL_HUB_FILES,
   // Tier-3 long-tail product pages (one per enriched full-catalog SKU).
   ...AMSOIL_FULL_PRODUCT_FILES,
+  // Magnuson full-line store: master hub + one page per SKU.
+  ...MAGNUSON_STORE_FILES,
 ];
 export const SITEMAP_EXCLUDE = new Set(["links.html"]);
 

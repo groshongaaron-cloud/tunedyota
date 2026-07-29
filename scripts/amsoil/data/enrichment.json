@@ -1,6 +1,6 @@
 {
  "updated": "2026-07-25",
- "count": 270,
+ "count": 272,
  "products": {
   "ATPQT-EA": {
    "path": "/p/amsoil-saber-professional-100-synthetic-2-stroke-oil-atp/",
@@ -1351,6 +1351,16 @@
    "path": "/p/amsoil-diesel-injector-clean-cetane-boost-fuel-additive-ads/",
    "image": "/images/amsoil/full/adspcn-ea.jpg",
    "price": 7.89
+  },
+  "ACL4SC-EA": {
+   "path": "/p/amsoil-chain-lube-aclsc/",
+   "image": "/images/amsoil/full/acl4sc-ea.jpg",
+   "price": 8.99
+  },
+  "AMP4SC-EA": {
+   "path": "/p/amsoil-mp-metal-protector-amp/",
+   "image": "/images/amsoil/full/amp4sc-ea.jpg",
+   "price": 11.49
   }
  }
 }

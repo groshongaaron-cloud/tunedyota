@@ -1,0 +1,2323 @@
+{
+ "updated": "2026-07-01",
+ "source": "Magnuson Price File 07.01.26 v1 (retail/MSP level only)",
+ "superchargers": [
+  {
+   "sku": "01-19-36-007-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2017-2022",
+     "models": "Colorado/ Canyon",
+     "engines": "3.6L V6"
+    }
+   ],
+   "colorOptions": "Bright Blue (35-19-36-033-BB), Bright Green (35-19-36-033-BG), Bright Orange (35-19-36-033-BO), Bright Red (35-19-36-033-BR)"
+  },
+  {
+   "sku": "01-26-53-014-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Magnum Truck Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2014-2018",
+     "models": "Silverado, Sierra",
+     "engines": "5.3L L83 DI"
+    },
+    {
+     "years": "2015-2020",
+     "models": "Tahoe/ Suburban/ Yukon/ Escalade",
+     "engines": "5.3L L83 DI"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-014-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Magnum Truck Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2014-2018",
+     "models": "Silverado/Sierra",
+     "engines": "6.2L L86 DI"
+    },
+    {
+     "years": "2015-2020",
+     "models": "Tahoe/ Suburban/ Yukon/ Escalade",
+     "engines": "6.2L L86 DI"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-53-019-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Magnum Truck Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 7995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2019+",
+     "models": "Silverado, Sierra",
+     "engines": "5.3L L82/L84 DI"
+    },
+    {
+     "years": "2021+",
+     "models": "Tahoe/ Suburban/ Yukon/ Escalade",
+     "engines": "5.3L L82/L84  DI"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-019-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Magnum Truck Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 7995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2019+",
+     "models": "Silverado/Sierra",
+     "engines": "6.2L L87 DI"
+    },
+    {
+     "years": "2021+",
+     "models": "Tahoe/ Suburban/ Yukon/ Escalade",
+     "engines": "6.2L L87 DI"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-59-983-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2003",
+     "models": "Silverado/ Sierra/ Avalanche/ Tahoe/ Yukon",
+     "engines": "4.8L/5.3L/6.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-59-985-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2004-2007",
+     "models": "Silverado/ Sierra  (Classic)",
+     "engines": "4.8L/5.3L/6.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-59-987-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2004-2006",
+     "models": "Avalanche/ Tahoe/ Suburban/ Yukon/ Escalade",
+     "engines": "4.8L, 5.3L, 6.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-59-991-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2003-2004",
+     "models": "Silverado/ Sierra/ Tahoe/ Yukon",
+     "engines": "5.3L Flex Fuel"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-59-995-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2011-2013",
+     "models": "Silverado/Sierra",
+     "engines": "5.3L Flex Fuel"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-59-996-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2011-2014",
+     "models": "Avalanche/ Tahoe/ Suburban/ Yukon",
+     "engines": "4.8L/ 5.3L Flex Fuel"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-001-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2007-2010",
+     "models": "Silverado/ Sierra (New Body)",
+     "engines": "4.8L/ 5.3L"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-003-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Retro Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2007-2010",
+     "models": "Avalanche/ Tahoe/ Suburban/ Yukon (New Body)",
+     "engines": "4.8L/ 5.3L"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-015-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix MaxSupercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2009-2010",
+     "models": "Silverado/ Sierra",
+     "engines": "6.0L L96/ 6.2L LC8 Vertical Injection"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-016-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Max Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2009-2010",
+     "models": "Tahoe/ Yukon/ Escalade",
+     "engines": "6.0L L96, 6.2L LC8 Vertical Injection"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-018-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Max Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2011-2013",
+     "models": "Silverado/ Sierra",
+     "engines": "6.0L L96, 6.2L LC8 Vertical Injection"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-019-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Max Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2011-2014",
+     "models": "Yukon/ Escalade",
+     "engines": "6.0L L96, 6.2L LC8 Vertical Injection"
+    }
+   ]
+  },
+  {
+   "sku": "01-23-60-025-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Supercharger System",
+   "rotor": "TVS2300",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2015-2020",
+     "models": "Silverado/ Sierra HD",
+     "engines": "6.0L LZ1 Vertical Injection"
+    }
+   ]
+  },
+  {
+   "sku": "01-23-60-027-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix  Supercharger System",
+   "rotor": "TVS2300",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2015-2020",
+     "models": "Suburban HD",
+     "engines": "6.0L LZ1 Vertical Injection"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-031-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2009-2011",
+     "models": "Colorado/ Canyon",
+     "engines": "5.3L LH8"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-105-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2006-2009",
+     "models": "Trailblazer SS",
+     "engines": "6.0L LH6"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-60-023-BL",
+   "section": "GM Truck and SUV",
+   "detail": "Radix Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2008-2009",
+     "models": "Hummer H2",
+     "engines": "6.2L L92 Vertical Injection"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-175-BL",
+   "section": "GM LT Passenger Car",
+   "detail": "Magnum Performance Series Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 7495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Cadillac CT5-V Blackwing",
+     "engines": "6.2L LT4"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-085-BL",
+   "section": "GM LT Passenger Car",
+   "detail": "Magnum Performance Series Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 11995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2020+",
+     "models": "Corvette C8",
+     "engines": "6.2L LT2"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-087-BL",
+   "section": "GM LT Passenger Car",
+   "detail": "Magnum Performance Series Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 13995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2020+",
+     "models": "Corvette C8",
+     "engines": "6.2L LT2"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-171-BL",
+   "section": "GM LT Passenger Car",
+   "detail": "Magnum DI Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 9495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2014-2019",
+     "models": "Corvette C7",
+     "engines": "6.2L LT1"
+    }
+   ],
+   "colorOptions": "Bright Blue (35-26-62-043-BB), Bright Green (35-26-62-043-BG), Bright Orange (35-26-62-043-BO), Bright Red (35-26-62-043-BR), Gloss Black (35-26-62-043-GB)"
+  },
+  {
+   "sku": "01-26-62-174-BL",
+   "section": "GM LT Passenger Car",
+   "detail": "Magnum DI Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2014-2019",
+     "models": "Corvette C7 Z06",
+     "engines": "6.2L LT4/Z06"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-176-BL",
+   "section": "GM LT Passenger Car",
+   "detail": "Magnum DI Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2016-2024",
+     "models": "Camaro ZL1",
+     "engines": "6.2L LT4"
+    },
+    {
+     "years": "2016-2019",
+     "models": "Cadillac CTS-V",
+     "engines": "6.2L LT4"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-182-BL",
+   "section": "GM LT Passenger Car",
+   "detail": "Magnum DI Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2016-2022",
+     "models": "Camaro",
+     "engines": "6.2L LT1"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-370-BL",
+   "section": "GM LS Passenger Car",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 9195,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2010-2015",
+     "models": "Camaro",
+     "engines": "6.2L LS3"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-158-BL",
+   "section": "GM LS Passenger Car",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8095,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2012-2015",
+     "models": "Camaro ZL1/ CTS-V",
+     "engines": "LSA 6.2L"
+    }
+   ]
+  },
+  {
+   "sku": "01-23-60-151-BL",
+   "section": "GM LS Passenger Car",
+   "detail": "Supercharger System",
+   "rotor": "TVS2300",
+   "retail": 7995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2008-2009",
+     "models": "G8",
+     "engines": "L76"
+    }
+   ]
+  },
+  {
+   "sku": "01-23-60-153-BL",
+   "section": "GM LS Passenger Car",
+   "detail": "Supercharger System",
+   "rotor": "TVS2300",
+   "retail": 7995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2009.5",
+     "models": "G8",
+     "engines": "L76 6.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-23-60-155-BL",
+   "section": "GM LS Passenger Car",
+   "detail": "Supercharger System",
+   "rotor": "TVS2300",
+   "retail": 7995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2009",
+     "models": "G8 GXP",
+     "engines": "LS3 6.2L"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-50-011-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Magnum Coyote 5.0L / Voodo 5.2L Hot Rod Supercharger Kit (Single Inlet)",
+   "rotor": "TVS2650",
+   "retail": 6195,
+   "notes": [
+    1,
+    2,
+    3
+   ],
+   "apps": [
+    {
+     "years": "Coyote/Voodoo",
+     "models": "Mustang / F150",
+     "engines": "Coyote/Voodoo"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-50-012-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Magnum Coyote 5.0L / Voodo 5.2L Hot Rod Supercharger Kit (Dual Inlet)",
+   "rotor": "TVS2650",
+   "retail": 6395,
+   "notes": [
+    1,
+    2,
+    3
+   ],
+   "apps": [
+    {
+     "years": "Coyote/Voodoo",
+     "models": "Mustang / F150",
+     "engines": "Coyote/Voodoo"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-50-150-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Magnum Supercharger Hot Rod Kit",
+   "rotor": "TVS2650",
+   "retail": 7695,
+   "notes": [
+    2
+   ],
+   "apps": [
+    {
+     "years": "2015+",
+     "models": "F-150",
+     "engines": "5.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-59-013-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LS Swap MAG DRAG Supercharger Kit",
+   "rotor": "TVS2650",
+   "retail": 9395,
+   "notes": [
+    1,
+    2
+   ],
+   "apps": [
+    {
+     "years": "LS7/LSX",
+     "models": "5G Camaro* (10 rib)",
+     "engines": "LS"
+    }
+   ]
+  },
+  {
+   "sku": "05-00-23-003-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LS Swap Jack Shaft Hot Rod Supercharger Kit",
+   "rotor": "TVS2300",
+   "retail": 7495,
+   "notes": [
+    1,
+    2
+   ],
+   "apps": [
+    {
+     "years": "LS3/L99/L92/LSA",
+     "models": "C6 Corvette",
+     "engines": "LS"
+    }
+   ]
+  },
+  {
+   "sku": "05-00-26-153-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LS Swap Jack Shaft Hot Rod Supercharger Kit",
+   "rotor": "TVS2650",
+   "retail": 8395,
+   "notes": [
+    1,
+    2
+   ],
+   "apps": [
+    {
+     "years": "LS3/L99/L92/LSA",
+     "models": "5G Camaro/ LSA/ LS Truck",
+     "engines": "LS"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-62-174-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LT Swap MAGNUM Hot Rod Supercharger Kit",
+   "rotor": "TVS2650",
+   "retail": 6895,
+   "notes": [
+    1,
+    2,
+    3
+   ],
+   "apps": [
+    {
+     "years": "LT1/LT4",
+     "models": "C7 Corvette",
+     "engines": "LT"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-62-176-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LT Swap MAGNUM Hot Rod Supercharger Kit",
+   "rotor": "TVS2650",
+   "retail": 6895,
+   "notes": [
+    1,
+    2,
+    3
+   ],
+   "apps": [
+    {
+     "years": "LT1/LT4",
+     "models": "6G Camaro/ CTS-V",
+     "engines": "LT"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-62-157-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LS Swap MAGNUM Hot Rod Supercharger Kit",
+   "rotor": "TVS2650",
+   "retail": 7495,
+   "notes": [
+    1,
+    2,
+    3
+   ],
+   "apps": [
+    {
+     "years": "LS7/LSX",
+     "models": "5G Camaro/ LSA/ LS Truck",
+     "engines": "LS"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-62-163-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LS Swap MAGNUM Hot Rod Supercharger Kit",
+   "rotor": "TVS2650",
+   "retail": 7495,
+   "notes": [
+    1,
+    2,
+    3
+   ],
+   "apps": [
+    {
+     "years": "LS3/L99/L92/LSA",
+     "models": "5G Camaro/ LSA/ LS Truck",
+     "engines": "LS"
+    }
+   ]
+  },
+  {
+   "sku": "05-00-23-060-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Universal LS Swap Hot Rod Supercharger Kit",
+   "rotor": "TVS2300",
+   "retail": 4495,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "LS3/L99/L92/LSA",
+     "models": "5G Camaro/LS Truck",
+     "engines": "LS"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-57-057-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Magnum Supercharger Hot Rod Kit",
+   "rotor": "TVS2650",
+   "retail": 6495,
+   "notes": [
+    1,
+    2
+   ],
+   "apps": [
+    {
+     "years": "5.7L/6.1L",
+     "models": "Challenger/ Charger/ 300",
+     "engines": "HEMI"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-64-005-BL",
+   "section": "Hot Rod Kits",
+   "detail": "Magnum Supercharger Hot Rod Kit",
+   "rotor": "TVS2650",
+   "retail": 6495,
+   "notes": [
+    1,
+    2
+   ],
+   "apps": [
+    {
+     "years": "5.7L/6.4L",
+     "models": "Challenger/ Charger/ 300",
+     "engines": "HEMI"
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-639-BL",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Wrinkle Black",
+   "rotor": "TVS3100",
+   "retail": 4795,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "3.90\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-651-BL",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Wrinkle Black",
+   "rotor": "TVS3100",
+   "retail": 4795,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "5.15\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-659-BL",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Wrinkle Black",
+   "rotor": "TVS3100",
+   "retail": 4795,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "5.90\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-669-BL",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Wrinkle Black",
+   "rotor": "TVS3100",
+   "retail": 4795,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "6.90\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-679-BL",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Wrinkle Black",
+   "rotor": "TVS3100",
+   "retail": 4795,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "7.90\"",
+     "engines": ""
+    },
+    {
+     "years": "6-71/8-71",
+     "models": "7.90\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-639-PO",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Polished",
+   "rotor": "TVS3100",
+   "retail": 5095,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "3.90\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-651-PO",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Polished",
+   "rotor": "TVS3100",
+   "retail": 5095,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "5.15\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-659-PO",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Polished",
+   "rotor": "TVS3100",
+   "retail": 5095,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "5.90\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "10-00-31-669-PO",
+   "section": "Hot Rod Kits",
+   "detail": "M.O.A.B. Mother of All Blowers Polished",
+   "rotor": "TVS3100",
+   "retail": 5095,
+   "notes": [
+    1,
+    2,
+    4
+   ],
+   "apps": [
+    {
+     "years": "6-71/8-71",
+     "models": "6.90\"",
+     "engines": ""
+    }
+   ]
+  },
+  {
+   "sku": "01-26-50-150-BL",
+   "section": "Ford",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2024-2025",
+     "models": "F-150",
+     "engines": "5.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-50-101-BL",
+   "section": "Ford",
+   "detail": "Roush PH1",
+   "rotor": "TVS2650",
+   "retail": 9995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2024-2025",
+     "models": "Mustang",
+     "engines": "5.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-50-102-BL",
+   "section": "Ford",
+   "detail": "Roush PH2",
+   "rotor": "TVS2650",
+   "retail": 9995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2024-2025",
+     "models": "Mustang",
+     "engines": "5.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-50-103-BL",
+   "section": "Ford",
+   "detail": "Magnuson-Roush Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 10399,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2026",
+     "models": "Mustang",
+     "engines": "5.0L"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-64-033-BL",
+   "section": "Jeep",
+   "detail": "Magnum Performance Series Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 9495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2021-2023",
+     "models": "JL Wrangler Rubicon 392",
+     "engines": "HEMI 6.4L V8"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-64-023-BL",
+   "section": "Jeep",
+   "detail": "Magnum Performance Series Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2014-2021",
+     "models": "Grand Cherokee",
+     "engines": "HEMI 5.7L, 6.4L"
+    },
+    {
+     "years": "2014-2024",
+     "models": "Dodge Durango",
+     "engines": "HEMI 5.7L"
+    },
+    {
+     "years": "2018-2024",
+     "models": "Dodge Durango",
+     "engines": "HEMI 6.4L"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-36-003-BL",
+   "section": "Jeep",
+   "detail": "Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7895,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2018-2021.5",
+     "models": "JL Wrangler/ JT Gladiator",
+     "engines": "3.6L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-36-000-BL",
+   "section": "Jeep",
+   "detail": "Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7895,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2012-2018",
+     "models": "JK Wrangler",
+     "engines": "3.6L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-57-057-BL",
+   "section": "HEMI Car and Truck",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2009-2010",
+     "models": "Challenger/ Charger/ 300",
+     "engines": "5.7L"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-64-005-BL",
+   "section": "HEMI Car and Truck",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8995,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2011+",
+     "models": "Challenger/ Charger/ 300",
+     "engines": "5.7L/6.4L"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-62-502-BL",
+   "section": "HEMI Car and Truck",
+   "detail": "Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8195,
+   "notes": [
+    1,
+    2
+   ],
+   "apps": [
+    {
+     "years": "2015-2020",
+     "models": "Challenger/Charger",
+     "engines": "Hellcat 6.2L"
+    }
+   ]
+  },
+  {
+   "sku": "02-90-45-003-SL",
+   "section": "Toyota Truck",
+   "detail": "Magnuson Classic Series Supercharger System",
+   "rotor": "MP90",
+   "retail": 7995,
+   "notes": [
+    2
+   ],
+   "apps": [
+    {
+     "years": "1995-1997",
+     "models": "Land Cruiser",
+     "engines": "4.5L I6"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-57-107-BL",
+   "section": "Toyota Truck",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8295,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2007-2018",
+     "models": "Tundra",
+     "engines": "5.7L 3UR-FE"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-57-109-BL",
+   "section": "Toyota Truck",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8295,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2019-2021",
+     "models": "Tundra",
+     "engines": "5.7L 3UR-FE"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-57-113-BL",
+   "section": "Toyota Truck",
+   "detail": "Magnum Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8295,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2010-2018",
+     "models": "Tundra",
+     "engines": "5.7L 3UR-FBE Flex Fuel"
+    }
+   ]
+  },
+  {
+   "sku": "05-26-57-107-BL",
+   "section": "Toyota Truck",
+   "detail": "Magnum Supercharger Upgrade System",
+   "rotor": "TVS2650",
+   "retail": 5195,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2007-2021",
+     "models": "Tundra",
+     "engines": "5.7L 3UR-FE"
+    }
+   ]
+  },
+  {
+   "sku": "05-90-40-011-BL",
+   "section": "Toyota Truck",
+   "detail": "Magnum Supercharger System",
+   "rotor": "MP90",
+   "retail": 6495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2006-2009",
+     "models": "4Runner",
+     "engines": "4.0L 1GR-FE"
+    }
+   ]
+  },
+  {
+   "sku": "01-13-40-021-BL",
+   "section": "Toyota Truck",
+   "detail": "Supercharger System",
+   "rotor": "TVS1320",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2010-2019",
+     "models": "4Runner",
+     "engines": "4.0L 1GR-FE"
+    },
+    {
+     "years": "2010-2014",
+     "models": "FJ Cruiser",
+     "engines": "4.0L 1GR-FE"
+    }
+   ]
+  },
+  {
+   "sku": "01-13-40-023-BL",
+   "section": "Toyota Truck",
+   "detail": "Supercharger System",
+   "rotor": "TVS1320",
+   "retail": 7695,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2020-2023",
+     "models": "4Runner",
+     "engines": "4.0L 1GR-FE"
+    }
+   ]
+  },
+  {
+   "sku": "01-26-57-123-BL",
+   "section": "Toyota Truck",
+   "detail": "Supercharger System",
+   "rotor": "TVS2650",
+   "retail": 8395,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2008-2021",
+     "models": "Land Cruiser/ Lexus LX570",
+     "engines": "5.7L 3UR-FE"
+    }
+   ]
+  },
+  {
+   "sku": "01-19-35-005-BL",
+   "section": "Toyota Truck",
+   "detail": "Supercharger System",
+   "rotor": "TVS1900",
+   "retail": 7495,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2016-2023",
+     "models": "Tacoma",
+     "engines": "3.5L 2GR-FKS"
+    }
+   ]
+  },
+  {
+   "sku": "01-90-40-007-BL",
+   "section": "Toyota Truck",
+   "detail": "Supercharger System",
+   "rotor": "MP90",
+   "retail": 6595,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2005-2015",
+     "models": "Tacoma",
+     "engines": "4.0L 1GR-FE/VVT-I"
+    }
+   ]
+  },
+  {
+   "sku": "01-90-40-009-BL",
+   "section": "Toyota Truck",
+   "detail": "Supercharger System",
+   "rotor": "MP90",
+   "retail": 6595,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2007-2009",
+     "models": "FJ Cruiser",
+     "engines": "4.0L 1GR-FE/VVT-I"
+    }
+   ]
+  },
+  {
+   "sku": "01-13-34-003-BL",
+   "section": "Toyota Truck",
+   "detail": "Supercharger System",
+   "rotor": "TVS1320",
+   "retail": 4495,
+   "notes": [
+    2
+   ],
+   "apps": [
+    {
+     "years": "1996-2004",
+     "models": "4Runner",
+     "engines": "3.4L 5VZ-FE"
+    },
+    {
+     "years": "1997-2004",
+     "models": "Tacoma",
+     "engines": "3.4L 5VZ-FE"
+    },
+    {
+     "years": "1997-1998",
+     "models": "T100",
+     "engines": "3.4L 5VZ-FE"
+    },
+    {
+     "years": "2000-2003",
+     "models": "Tundra",
+     "engines": "3.4L 5VZ-FE"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-101",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Performance Tune",
+   "rotor": "",
+   "retail": 1500,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-102",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + Cold Air Kit",
+   "rotor": "",
+   "retail": 1599,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-103-BL",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + Charge Air Cooler (Black)",
+   "rotor": "",
+   "retail": 2249,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-103-RD",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + Charge Air Cooler (Red)",
+   "rotor": "",
+   "retail": 2249,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-104-BL",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + CAC (Black) + Low Temperature Radiator",
+   "rotor": "",
+   "retail": 2798,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-104-RD",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + CAC (Red) + Low Temperature Radiator",
+   "rotor": "",
+   "retail": 2798,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-105-BL",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + CAC (Black) + LTR + CAK",
+   "rotor": "",
+   "retail": 3147,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-105-RD",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + CAC (Red) + LTR + CAK",
+   "rotor": "",
+   "retail": 3147,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra, Sequoia",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-106-BL",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + CAC (Black) + LTR + CAK + Cat-Back Exhaust",
+   "rotor": "",
+   "retail": 3846,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra",
+     "engines": "3.4L V6"
+    }
+   ]
+  },
+  {
+   "sku": "01-99-34-106-RD",
+   "section": "Magnuson Performance Packs: Toyota Truck",
+   "detail": "Tune + CAC (Red) + LTR + CAK + Cat-Back Exhaust",
+   "rotor": "",
+   "retail": 3846,
+   "notes": [],
+   "apps": [
+    {
+     "years": "2022+",
+     "models": "Tundra",
+     "engines": "3.4L V6"
+    }
+   ]
+  }
+ ],
+ "parts": [
+  {
+   "sku": "31-99-34-001-BL",
+   "section": "Toyota Tundra Magnuson Performance Series (2022+ Tundra)",
+   "name": "Magnuson Performance Charge Air Cooler Kit (Gloss Black)",
+   "retail": 1199,
+   "notes": []
+  },
+  {
+   "sku": "31-99-34-001-RD",
+   "section": "Toyota Tundra Magnuson Performance Series (2022+ Tundra)",
+   "name": "Magnuson Performance Charge Air Cooler Kit (Gloss Magnuson Red)",
+   "retail": 1199,
+   "notes": []
+  },
+  {
+   "sku": "31-99-34-005-BL",
+   "section": "Toyota Tundra Magnuson Performance Series (2022+ Tundra)",
+   "name": "Magnuson Performance Air Intake Kit",
+   "retail": 499,
+   "notes": []
+  },
+  {
+   "sku": "31-99-34-015",
+   "section": "Toyota Tundra Magnuson Performance Series (2022+ Tundra)",
+   "name": "Magnuson Performance Low Temp Radiator",
+   "retail": 649,
+   "notes": []
+  },
+  {
+   "sku": "31-99-34-027-BL",
+   "section": "Toyota Tundra Magnuson Performance Series (2022+ Tundra)",
+   "name": "Magnuson Performance Cat-Back Exhaust",
+   "retail": 999,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-065-BL",
+   "section": "AIR INLETS",
+   "name": "S/A, Dual Throttle Inlet, No Flutes",
+   "retail": 499,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-067",
+   "section": "AIR INLETS",
+   "name": "S/A, Dual Throttle Inlet, With Dual Raw Billet Aluminum 90mm Flutes",
+   "retail": 650,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-067-RD",
+   "section": "AIR INLETS",
+   "name": "S/A, Dual Throttle Inlet, With Dual Red Anodized Billet Aluminum 90mm Flutes",
+   "retail": 650,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-061-BL",
+   "section": "AIR INLETS",
+   "name": "S/A 112mm \"Short\" Air Inlet for TVS2650 LS Jackshaft Hot Rod Superchargers",
+   "retail": 449,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-051-BL",
+   "section": "AIR INLETS",
+   "name": "S/A 120MM Inlet Upgrade for TVS2650 Magnum PI",
+   "retail": 449,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-049-BL",
+   "section": "AIR INLETS",
+   "name": "S/A 112MM Inlet Upgrade for TVS2650 Magnum DI",
+   "retail": 399,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-048-BL",
+   "section": "AIR INLETS",
+   "name": "S/A 103MM Inlet Upgrade for TVS2650 Magnum DI",
+   "retail": 349,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-047-BL",
+   "section": "AIR INLETS",
+   "name": "S/A 103MM Inlet and Barbs, 6.2L TVS2300 Heartbeat",
+   "retail": 399,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-017-BL",
+   "section": "AIR INLETS",
+   "name": "S/A Inlet and Barbs, 6.2L 6th Gen Camaro TVS2300 Heartbeat DI",
+   "retail": 330,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-018-BL",
+   "section": "AIR INLETS",
+   "name": "S/A Inlet and Barbs, 6.2L 5th Gen Camaro TVS2650 Magnum PI w/92mm stock throttle body",
+   "retail": 300,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-009-BL",
+   "section": "AIR INLETS",
+   "name": "S/A Inlet and Barbs, 6.0L LS3/GTO/Chevy SS TVS2650  Magnum PI w/92mm stock throttle body",
+   "retail": 300,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-013-BL",
+   "section": "AIR INLETS",
+   "name": "S/A Inlet and Barbs, 6.2L 5th Gen Camaro LSA / 2nd Gen CTS-V TVS2300 Heartbeat  w/92mm stock throttle body",
+   "retail": 379,
+   "notes": []
+  },
+  {
+   "sku": "31-19-60-011-BL",
+   "section": "AIR INLETS",
+   "name": "S/A Inlet and Barbs, 6.0L L76 G8 TVS2300",
+   "retail": 300,
+   "notes": []
+  },
+  {
+   "sku": "31-23-05-053",
+   "section": "AIR INLETS",
+   "name": "S/A Air Inlet Adapter 120/112mm to 103/90mm",
+   "retail": 110,
+   "notes": []
+  },
+  {
+   "sku": "31-99-07-005",
+   "section": "Cooling Systems",
+   "name": "Universal Supercharger Cooling Kit with Small LTR",
+   "retail": 1495,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "31-99-07-007",
+   "section": "Cooling Systems",
+   "name": "Universal Supercharger Cooling Kit with Medium LTR",
+   "retail": 1495,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "31-99-07-009",
+   "section": "Cooling Systems",
+   "name": "Universal Supercharger Cooling Kit with Large LTR",
+   "retail": 1495,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "31-19-57-215",
+   "section": "CALIBRATION AND TUNING KITS",
+   "name": "Toyota Tundra FFV HP Tuners RTD Upgrade (includes RTD Device, 1 vehicle calibration, set of 8 high flow injectors)",
+   "retail": 1299,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "88-85-59-005",
+   "section": "CALIBRATION AND TUNING KITS",
+   "name": "Orange Virus Tuner (includes handheld and 1 vehicle calibration)",
+   "retail": 799,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "88-85-59-009",
+   "section": "CALIBRATION AND TUNING KITS",
+   "name": "HP Tuners RTD (includes RTD Device and 1 vehicle calibration)",
+   "retail": 799,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "17-51-01-559",
+   "section": "Input Cartridge",
+   "name": "High Speed Cartridge for the LS Magnum 2650 (PI)",
+   "retail": 375,
+   "notes": []
+  },
+  {
+   "sku": "45-00-13-101",
+   "section": "BY-PASS ACTUATORS",
+   "name": "By-Pass Actuator Valve, W/Hardware 4th Gen, Right, Port Up, .035 Orfice",
+   "retail": 145,
+   "notes": []
+  },
+  {
+   "sku": "45-00-13-103",
+   "section": "BY-PASS ACTUATORS",
+   "name": "By-Pass Actuator Valve, W/Hardware 4th Gen, Right, Port Out, .035 Orfice",
+   "retail": 145,
+   "notes": []
+  },
+  {
+   "sku": "45-00-13-111",
+   "section": "BY-PASS ACTUATORS",
+   "name": "By-Pass Actuator Valve, W/Hardware 4th Gen, Left, Port Up, .035 Orfice",
+   "retail": 145,
+   "notes": []
+  },
+  {
+   "sku": "45-00-04-112",
+   "section": "BY-PASS ACTUATORS",
+   "name": "By-Pass Actuator Valve, W/Hardware 4th Gen, TRD 3.4L",
+   "retail": 145,
+   "notes": []
+  },
+  {
+   "sku": "45-00-13-113",
+   "section": "BY-PASS ACTUATORS",
+   "name": "By-Pass Actuator Valve, W/Hardware 4th Gen, Left, Port Out, .035 Orfice",
+   "retail": 145,
+   "notes": []
+  },
+  {
+   "sku": "79-83-00-680",
+   "section": "BELTS",
+   "name": "Auxiliary Drive Belt, Rear Cogged for TVS 2650 Jackshaft 680 length",
+   "retail": 113,
+   "notes": []
+  },
+  {
+   "sku": "79-83-00-720",
+   "section": "BELTS",
+   "name": "Auxiliary Drive Belt, Rear Cogged for TVS 2650 Jackshaft  720 length",
+   "retail": 113,
+   "notes": []
+  },
+  {
+   "sku": "31-23-64-010",
+   "section": "BELTS",
+   "name": "S/A Heavy-Duty Idler, Hemi 6.4L/Late 5.7L",
+   "retail": 404,
+   "notes": []
+  },
+  {
+   "sku": "57-08-30-031",
+   "section": "PULLEYS",
+   "name": "COG 30mm Wide 30 Tooth 8mm Pitch .050 Offset",
+   "retail": 225,
+   "notes": []
+  },
+  {
+   "sku": "57-08-30-032",
+   "section": "PULLEYS",
+   "name": "COG 30mm Wide 32 Tooth 8mm Pitch .050 Offset",
+   "retail": 225,
+   "notes": []
+  },
+  {
+   "sku": "57-08-30-034",
+   "section": "PULLEYS",
+   "name": "COG 30mm Wide 34 Tooth 8mm Pitch .050 Offset",
+   "retail": 225,
+   "notes": []
+  },
+  {
+   "sku": "57-08-30-036",
+   "section": "PULLEYS",
+   "name": "COG 30mm Wide 36 Tooth 8mm Pitch .050 Offset",
+   "retail": 225,
+   "notes": []
+  },
+  {
+   "sku": "57-08-30-038",
+   "section": "PULLEYS",
+   "name": "COG 30mm Wide 38 Tooth 8mm Pitch .050 Offset",
+   "retail": 225,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-128-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 2.800\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-129-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 2.900\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-130-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.000\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-131-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.100\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-132-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.200\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-133-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.300\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-134-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.400\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-136-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.600\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-137-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.700\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-138-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.800\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-139-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.900\" Diameter .400\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-232-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.200\" Diameter .440\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-06-234-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 3.400\" Diameter .440\" Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-066-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 66mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-072-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 72mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-075-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 75mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-078-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 78mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-081-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 81mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-084-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 84mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-087-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 87mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-090-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 90mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-093-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 93mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-03-06-096-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 6 Rib 96mm Diameter 15.57mm Offset",
+   "retail": 109,
+   "notes": []
+  },
+  {
+   "sku": "57-00-07-034",
+   "section": "PULLEYS",
+   "name": "Two-Piece 7 Rib 3.400\" Diameter .470\" Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-00-08-028",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 2.800\" Diameter .540\" Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-00-08-032",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 3.200\" Diameter .540\" Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-070-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 70mm Diameter 12.01mm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-075-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 75mm Diameter xxmm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-080-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 80mm Diameter xxmm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-095-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 95mm Diameter xxmm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-100-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 100mm Diameter xxmm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-085-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 85mm Diameter 85.0mm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-098-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 98mm Diameter 98.0mm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-03-08-105-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 105mm Diameter 105.0mm Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-00-10-030",
+   "section": "PULLEYS",
+   "name": "Two-Piece 10 Rib 3.000\" Diameter .015\" Offset",
+   "retail": 129,
+   "notes": []
+  },
+  {
+   "sku": "57-00-10-330-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 10 Rib 3.000\" Diameter .015\" Offset",
+   "retail": 129,
+   "notes": []
+  },
+  {
+   "sku": "57-00-10-332-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 10 Rib 3.250\" Diameter .015\" Offset",
+   "retail": 129,
+   "notes": []
+  },
+  {
+   "sku": "57-00-10-334-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 10 Rib 3.490\" Diameter .015\" Offset",
+   "retail": 129,
+   "notes": []
+  },
+  {
+   "sku": "57-03-10-085-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 10 Rib 85mm Diameter 8.46mm Offset",
+   "retail": 129,
+   "notes": []
+  },
+  {
+   "sku": "57-05-08-070-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 80mm Diameter Magnum DI Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-05-08-080-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 80mm Diameter Magnum DI Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-05-08-090-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 90mm Diameter Magnum DI Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-05-08-100-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 100mm Diameter Magnum DI Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-05-08-110-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 8 Rib 110mm Diameter Magnum DI Offset",
+   "retail": 119,
+   "notes": []
+  },
+  {
+   "sku": "57-05-10-070-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 10 Rib 70mm Diameter Magnum DI Offset",
+   "retail": 129,
+   "notes": []
+  },
+  {
+   "sku": "57-05-10-080-BL",
+   "section": "PULLEYS",
+   "name": "Two-Piece 10 Rib 80mm Diameter Magnum DI Offset",
+   "retail": 129,
+   "notes": []
+  },
+  {
+   "sku": "31-12-02-057",
+   "section": "TENSIONERS",
+   "name": "Tensioner Upgrade, GTO, SSR & Trailblazer SS",
+   "retail": 49,
+   "notes": []
+  },
+  {
+   "sku": "31-23-62-017",
+   "section": "TENSIONERS",
+   "name": "Tensioner Bracket, HB LS2, Early Model Water pump",
+   "retail": 570,
+   "notes": []
+  },
+  {
+   "sku": "31-14-59-041",
+   "section": "TENSIONERS",
+   "name": "Belt Tensioner, LS3 Corvette",
+   "retail": 341,
+   "notes": []
+  },
+  {
+   "sku": "31-12-00-082",
+   "section": "TENSIONERS",
+   "name": "Tensioner Upgrade for Radix Kits",
+   "retail": 309,
+   "notes": []
+  },
+  {
+   "sku": "31-14-59-039",
+   "section": "TENSIONERS",
+   "name": "Belt Tensioner, CTS-V, SSR & Trailblazer SS",
+   "retail": 214,
+   "notes": []
+  },
+  {
+   "sku": "31-12-00-084",
+   "section": "TENSIONERS",
+   "name": "Tensioner, Radix Max",
+   "retail": 599,
+   "notes": []
+  },
+  {
+   "sku": "31-26-50-035",
+   "section": "TENSIONERS",
+   "name": "Coyote Tensioner Assembly",
+   "retail": 569,
+   "notes": []
+  },
+  {
+   "sku": "31-23-64-010",
+   "section": "TENSIONERS",
+   "name": "Idler, Hemi, Heavy Duty 6.4L and Late 5.7L",
+   "retail": 404,
+   "notes": []
+  },
+  {
+   "sku": "31-26-64-005",
+   "section": "TENSIONERS",
+   "name": "Idler, Hemi, Assembly 5.7L, 6.1L and 6.4L",
+   "retail": 708,
+   "notes": []
+  },
+  {
+   "sku": "31-14-59-009",
+   "section": "PINNING KITS",
+   "name": "Crankshaft Pinning Kit, All LS GM",
+   "retail": 200,
+   "notes": []
+  },
+  {
+   "sku": "31-14-59-139",
+   "section": "PINNING KITS",
+   "name": "Crankshaft Pinning Kit, LS7 GM",
+   "retail": 200,
+   "notes": []
+  },
+  {
+   "sku": "31-26-61-102",
+   "section": "PINNING KITS",
+   "name": "Crankshaft Pulley Pinning Kit, Hellcat",
+   "retail": 305,
+   "notes": []
+  },
+  {
+   "sku": "98-05-40-007",
+   "section": "THROTTLE BODIES",
+   "name": "Throttle Body, 109MM Mechanical  - Mag Drag 2650/COPO Camaro",
+   "retail": 625,
+   "notes": []
+  },
+  {
+   "sku": "MAG-BANNER-RED",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Shop Banner-Small",
+   "retail": 60,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-BANNER-FLAG",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Shop Banner-Large",
+   "retail": 125,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-TSHIRT-ROTOR",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Supercharger Rotor T-Shirt",
+   "retail": 25,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-CHARGE-TSHIRT",
+   "section": "MERCHANDISE",
+   "name": "Magna Charger T-Shirt",
+   "retail": 25,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-TRUCKER-HAT",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Superchargers Hat",
+   "retail": 25,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-BASEBALL-HAT",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Superchargers Flexfit Hat",
+   "retail": 25,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-DECAL-8",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Superchargers 8\" x 1.5\" Decal",
+   "retail": 10,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-WINDSHIELD",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Superchargers Windshield Decal",
+   "retail": 50,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-GH-FLAG",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Grey Flag Hoodie",
+   "retail": 50,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-BH-FLAG",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Black Flag Hoodie",
+   "retail": 50,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-SHIRT-FLAG",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Flag T-Shirt",
+   "retail": 25,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-SHIRT-RATED",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Rated M T-Shirt",
+   "retail": 25,
+   "notes": [
+    5
+   ]
+  },
+  {
+   "sku": "MAG-STICKER-001",
+   "section": "MERCHANDISE",
+   "name": "Magnuson Supercharged Sticker Pack",
+   "retail": 5,
+   "notes": [
+    5
+   ]
+  }
+ ]
+}

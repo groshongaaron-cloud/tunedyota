@@ -147,6 +147,10 @@ const FQA11Y = `<script>document.querySelectorAll('.lp-fq').forEach(function(it,
 // direct links. See site/amsoil-track.js.
 const TRACK = `<script src="/amsoil-track.js" defer></script>`;
 
+// Shared page chrome, reused by the Magnuson store generator
+// (scripts/magnuson/build-store-pages.mjs) so both stores stay visually in sync.
+export const CHROME = { FONTS, SITECSS, FAVICON, NAV, FOOTER, STYLE, ESC };
+
 // Cross-link hub: all AMSOIL platform pages (built after the model list is known).
 function vehHub(models, currentSlug) {
   const links = models
