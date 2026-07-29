@@ -1,0 +1,2495 @@
+{
+ "updated": "2026-07-29",
+ "products": {
+  "13252": {
+   "sku": "13252",
+   "name": "Oil Cooler Upgrade Kit",
+   "retail": 549
+  },
+  "19249": {
+   "sku": "19249",
+   "name": "Ram-Air Differential Cover Kit — Satin Black/Machined",
+   "retail": 395
+  },
+  "19252": {
+   "sku": "19252",
+   "name": "Ram-Air® Differential Cover Kit — Satin Black/Machined",
+   "retail": 395
+  },
+  "19257": {
+   "sku": "19257",
+   "name": "AMSOIL 75w90 First Fill 4-Qt Easy Pack",
+   "retail": 88.88
+  },
+  "19258": {
+   "sku": "19258",
+   "name": "Ram-Air® Differential Cover Kit — Black Ops",
+   "retail": 395
+  },
+  "19259": {
+   "sku": "19259",
+   "name": "Ram-Air Differential Cover Kit — Open Box (Excellent) Natural",
+   "retail": 295
+  },
+  "19262": {
+   "sku": "19262",
+   "name": "Ram-Air® Differential Cover Kit — Open Box (Excellent) Natural",
+   "retail": 295
+  },
+  "19268": {
+   "sku": "19268",
+   "name": "AMSOIL 75w140 First Fill 4-Qt Easy Pack",
+   "retail": 88.88
+  },
+  "19269": {
+   "sku": "19269",
+   "name": "Ram-Air Differential Cover Kit — Black Ops",
+   "retail": 395
+  },
+  "19280": {
+   "sku": "19280",
+   "name": "Ram-Air® Differential Cover Kit — Satin Black/Machined",
+   "retail": 395
+  },
+  "19282": {
+   "sku": "19282",
+   "name": "Ram-Air® Differential Cover Kit — Black Ops",
+   "retail": 395
+  },
+  "19286": {
+   "sku": "19286",
+   "name": "Ram-Air® Differential Cover Kit — Satin Black/Machined",
+   "retail": 425
+  },
+  "19287": {
+   "sku": "19287",
+   "name": "Ram-Air® Differential Cover Kit — Open Box (Excellent) Natural",
+   "retail": 318
+  },
+  "19288": {
+   "sku": "19288",
+   "name": "Ram-Air® Differential Cover Kit — Black Ops",
+   "retail": 425
+  },
+  "19300": {
+   "sku": "19300",
+   "name": "AMSOIL 75w90 First Fill 5-Qt Easy Pack",
+   "retail": 111.1
+  },
+  "19301": {
+   "sku": "19301",
+   "name": "AMSOIL 75w140 First Fill 5-Qt Easy Pack",
+   "retail": 121.65
+  },
+  "19302": {
+   "sku": "19302",
+   "name": "AMSOIL 13qt 15W-40 Oil Kit with Filter",
+   "retail": 200
+  },
+  "19303": {
+   "sku": "19303",
+   "name": "AMSOIL Signature Series Transmission Fluid, 12-Qt Easy-Packs",
+   "retail": 260.28
+  },
+  "19304": {
+   "sku": "19304",
+   "name": "AMSOIL 13qt 15W-40 Oil Kit with Filter",
+   "retail": 200
+  },
+  "19306": {
+   "sku": "19306",
+   "name": "AMSOIL Signature Series Multi-Vehicle Transmission Fluid, 14-Qt Easy-Packs",
+   "retail": 303.66
+  },
+  "24401": {
+   "sku": "24401",
+   "name": "BigHead Actuator",
+   "retail": 228
+  },
+  "24440": {
+   "sku": "24440",
+   "name": "Turbo Upgrade",
+   "retail": 91
+  },
+  "24450": {
+   "sku": "24450",
+   "name": "Turbo Upgrade",
+   "retail": 509
+  },
+  "24456": {
+   "sku": "24456",
+   "name": "Turbo Upgrade — Housing & Compressor Wheel (1999.5-2003)",
+   "retail": 488
+  },
+  "24457": {
+   "sku": "24457",
+   "name": "Turbo Upgrade — Housing Only (1999-2003)",
+   "retail": 394
+  },
+  "24458": {
+   "sku": "24458",
+   "name": "Turbo Upgrade Kit",
+   "retail": 659
+  },
+  "25936": {
+   "sku": "25936",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 189
+  },
+  "25959": {
+   "sku": "25959",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 429
+  },
+  "25965": {
+   "sku": "25965",
+   "name": "Boost Tube Upgrade Kit — Natural Finish Set",
+   "retail": 389
+  },
+  "25970": {
+   "sku": "25970",
+   "name": "Intercooler Upgrade",
+   "retail": 1769
+  },
+  "25973": {
+   "sku": "25973",
+   "name": "Intercooler Upgrade",
+   "retail": 1649
+  },
+  "25974": {
+   "sku": "25974",
+   "name": "Intercooler Upgrade",
+   "retail": 1459
+  },
+  "25975": {
+   "sku": "25975",
+   "name": "Intercooler Upgrade",
+   "retail": 1459
+  },
+  "25977": {
+   "sku": "25977",
+   "name": "Intercooler Upgrade",
+   "retail": 1459
+  },
+  "25978": {
+   "sku": "25978",
+   "name": "Intercooler Upgrade",
+   "retail": 1459
+  },
+  "25980": {
+   "sku": "25980",
+   "name": "Intercooler Upgrade",
+   "retail": 1459
+  },
+  "25981": {
+   "sku": "25981",
+   "name": "Intercooler Upgrade",
+   "retail": 1459
+  },
+  "25982": {
+   "sku": "25982",
+   "name": "Intercooler Upgrade",
+   "retail": 1159
+  },
+  "25983": {
+   "sku": "25983",
+   "name": "Intercooler Upgrade",
+   "retail": 1539
+  },
+  "25984": {
+   "sku": "25984",
+   "name": "Intercooler Upgrade",
+   "retail": 1379
+  },
+  "25985": {
+   "sku": "25985",
+   "name": "Intercooler Upgrade",
+   "retail": 1539
+  },
+  "25986": {
+   "sku": "25986",
+   "name": "Intercooler Upgrade",
+   "retail": 2095
+  },
+  "25987": {
+   "sku": "25987",
+   "name": "Intercooler Upgrade — Red Powder-Coated",
+   "retail": 1829
+  },
+  "25988": {
+   "sku": "25988",
+   "name": "Intercooler Upgrade",
+   "retail": 1829
+  },
+  "25990": {
+   "sku": "25990",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 359
+  },
+  "25991": {
+   "sku": "25991",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 219
+  },
+  "25992": {
+   "sku": "25992",
+   "name": "Boost Tube Upgrade Kit — Red Powder-Coated Set",
+   "retail": 459
+  },
+  "25993": {
+   "sku": "25993",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 429
+  },
+  "25994": {
+   "sku": "25994",
+   "name": "Boost Tube Upgrade Kit — Red Powder- Coated",
+   "retail": 239
+  },
+  "25997": {
+   "sku": "25997",
+   "name": "Boost Tube Upgrade Kit — Red Powder-Coated",
+   "retail": 229
+  },
+  "25998": {
+   "sku": "25998",
+   "name": "Boost Tube Upgrade Kit — Red Powder-Coated Set",
+   "retail": 409
+  },
+  "25999": {
+   "sku": "25999",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 598
+  },
+  "26005": {
+   "sku": "26005",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 698
+  },
+  "26006": {
+   "sku": "26006",
+   "name": "Boost Tube Upgrade Kit — Natural Finish (Unpainted)",
+   "retail": 475
+  },
+  "26008": {
+   "sku": "26008",
+   "name": "Boost Tube System",
+   "retail": 598
+  },
+  "26012": {
+   "sku": "26012",
+   "name": "Boost Tube Upgrade Kit",
+   "retail": 498
+  },
+  "26014": {
+   "sku": "26014",
+   "name": "Boost Tube System (HO)",
+   "retail": 598
+  },
+  "26016": {
+   "sku": "26016",
+   "name": "Cold Side Boost Tube",
+   "retail": 329
+  },
+  "26017": {
+   "sku": "26017",
+   "name": "Hot Side Boost Tube (HO)",
+   "retail": 299
+  },
+  "26018": {
+   "sku": "26018",
+   "name": "Hot Side Boost Tube",
+   "retail": 269
+  },
+  "26019": {
+   "sku": "26019",
+   "name": "Cold Side Boost Tube",
+   "retail": 329
+  },
+  "26020": {
+   "sku": "26020",
+   "name": "Boost Tube System",
+   "retail": 598
+  },
+  "41023": {
+   "sku": "41023",
+   "name": "Air Filter Element",
+   "retail": 109
+  },
+  "41506": {
+   "sku": "41506",
+   "name": "Air Filter Element",
+   "retail": 56
+  },
+  "41801": {
+   "sku": "41801",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 429
+  },
+  "41816": {
+   "sku": "41816",
+   "name": "Banks Ram-Air®",
+   "retail": 339
+  },
+  "41829": {
+   "sku": "41829",
+   "name": "Replacement Air Filter Element — Oiled Filter",
+   "retail": 139
+  },
+  "41831": {
+   "sku": "41831",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 129
+  },
+  "41835": {
+   "sku": "41835",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 100
+  },
+  "41843": {
+   "sku": "41843",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 409
+  },
+  "41848": {
+   "sku": "41848",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 116
+  },
+  "41849": {
+   "sku": "41849",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 469
+  },
+  "41850": {
+   "sku": "41850",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 429
+  },
+  "41866": {
+   "sku": "41866",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 429
+  },
+  "41869": {
+   "sku": "41869",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 469
+  },
+  "41884": {
+   "sku": "41884",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 409
+  },
+  "41885": {
+   "sku": "41885",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 119
+  },
+  "41888": {
+   "sku": "41888",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 394
+  },
+  "41890": {
+   "sku": "41890",
+   "name": "Banks Ram-Air® — Oiled",
+   "retail": 449
+  },
+  "42019": {
+   "sku": "42019",
+   "name": "Air Filter Element",
+   "retail": 87
+  },
+  "42132": {
+   "sku": "42132",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 449
+  },
+  "42135": {
+   "sku": "42135",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 449
+  },
+  "42138": {
+   "sku": "42138",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 119
+  },
+  "42141": {
+   "sku": "42141",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 119
+  },
+  "42142": {
+   "sku": "42142",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 449
+  },
+  "42145": {
+   "sku": "42145",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 449
+  },
+  "42148": {
+   "sku": "42148",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 119
+  },
+  "42155": {
+   "sku": "42155",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 449
+  },
+  "42158": {
+   "sku": "42158",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 119
+  },
+  "42172": {
+   "sku": "42172",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 449
+  },
+  "42175": {
+   "sku": "42175",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 449
+  },
+  "42178": {
+   "sku": "42178",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 119
+  },
+  "42180": {
+   "sku": "42180",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 449
+  },
+  "42188": {
+   "sku": "42188",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 119
+  },
+  "42210": {
+   "sku": "42210",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 429
+  },
+  "42215": {
+   "sku": "42215",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 429
+  },
+  "42220": {
+   "sku": "42220",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 429
+  },
+  "42225": {
+   "sku": "42225",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 439
+  },
+  "42230": {
+   "sku": "42230",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 429
+  },
+  "42248": {
+   "sku": "42248",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 429
+  },
+  "42249": {
+   "sku": "42249",
+   "name": "Banks Ram-Air® — Oiled Filter Set",
+   "retail": 449
+  },
+  "42255": {
+   "sku": "42255",
+   "name": "Banks Ram-Air® — Oiled",
+   "retail": 449
+  },
+  "42259": {
+   "sku": "42259",
+   "name": "Air Filter Element — Oiled Filter",
+   "retail": 102
+  },
+  "42266": {
+   "sku": "42266",
+   "name": "Banks Ram-Air® — Oiled",
+   "retail": 495
+  },
+  "42279": {
+   "sku": "42279",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 469
+  },
+  "42285": {
+   "sku": "42285",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 495
+  },
+  "42291": {
+   "sku": "42291",
+   "name": "Banks Ram-Air®",
+   "retail": 398
+  },
+  "42297": {
+   "sku": "42297",
+   "name": "Banks Ram-Air® — Oiled Filter",
+   "retail": 495
+  },
+  "42643": {
+   "sku": "42643",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42645": {
+   "sku": "42645",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42650": {
+   "sku": "42650",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42652": {
+   "sku": "42652",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42653": {
+   "sku": "42653",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42658": {
+   "sku": "42658",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42659": {
+   "sku": "42659",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42660": {
+   "sku": "42660",
+   "name": "Pre-Filter",
+   "retail": 44.08
+  },
+  "42710": {
+   "sku": "42710",
+   "name": "Intake Manifold System",
+   "retail": 729
+  },
+  "42750": {
+   "sku": "42750",
+   "name": "High-Ram Intake System",
+   "retail": 459
+  },
+  "42751": {
+   "sku": "42751",
+   "name": "High-Ram Intake System",
+   "retail": 459
+  },
+  "42764": {
+   "sku": "42764",
+   "name": "Monster-Ram® Intake System",
+   "retail": 499
+  },
+  "42765": {
+   "sku": "42765",
+   "name": "Monster-Ram® Intake System — Without Boost Tube",
+   "retail": 349
+  },
+  "42766": {
+   "sku": "42766",
+   "name": "Monster-Ram® Intake System — With Boost Tube",
+   "retail": 498
+  },
+  "42797": {
+   "sku": "42797",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Natural",
+   "retail": 718
+  },
+  "42798": {
+   "sku": "42798",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Natural",
+   "retail": 718
+  },
+  "42799": {
+   "sku": "42799",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Natural",
+   "retail": 718
+  },
+  "42807": {
+   "sku": "42807",
+   "name": "Banks 750W or 1500W Billet Heater Kit — 1500 Watt Billet Heater Kit",
+   "retail": 298
+  },
+  "42809": {
+   "sku": "42809",
+   "name": "Banks 750W or 1500W Billet Heater Kit — 750 Watt Billet Heater Kit",
+   "retail": 198
+  },
+  "42810": {
+   "sku": "42810",
+   "name": "Banks Engine Cover with Revolver Billet Oil Cap — For Engines With EGR",
+   "retail": 168
+  },
+  "42813": {
+   "sku": "42813",
+   "name": "Banks Engine Cover with Revolver Billet Oil Cap — For Engines Without EGR (special bracket included)",
+   "retail": 188
+  },
+  "42830": {
+   "sku": "42830",
+   "name": "Heater Upgrade Kit for Monster-Ram — 750W Heater Upgrade",
+   "retail": 138
+  },
+  "42831": {
+   "sku": "42831",
+   "name": "Heater Upgrade Kit for Monster-Ram — 1500W Heater Upgrade",
+   "retail": 238
+  },
+  "48910": {
+   "sku": "48910",
+   "name": "Monster Exhaust System — Chrome",
+   "retail": 598
+  },
+  "48996": {
+   "sku": "48996",
+   "name": "Monster Exhaust System — Chrome Tip",
+   "retail": 549
+  },
+  "48997": {
+   "sku": "48997",
+   "name": "Monster Exhaust System — Chrome",
+   "retail": 628
+  },
+  "48998": {
+   "sku": "48998",
+   "name": "Monster Exhaust System — Chrome / Single Rear Wheel",
+   "retail": 599
+  },
+  "49168": {
+   "sku": "49168",
+   "name": "PowerPack System",
+   "retail": 3349
+  },
+  "49170": {
+   "sku": "49170",
+   "name": "Torque Tubes&reg; Exhaust Header System",
+   "retail": 1699
+  },
+  "49175": {
+   "sku": "49175",
+   "name": "Torque Tubes&reg; Exhaust Header System",
+   "retail": 1699
+  },
+  "49191": {
+   "sku": "49191",
+   "name": "Banks Ram-Air®",
+   "retail": 509
+  },
+  "49196": {
+   "sku": "49196",
+   "name": "Torque Tubes&reg; Exhaust Header System",
+   "retail": 2269
+  },
+  "49197": {
+   "sku": "49197",
+   "name": "Torque Tubes&reg; Exhaust Header System",
+   "retail": 1869
+  },
+  "49201": {
+   "sku": "49201",
+   "name": "Stinger Bundle — DRIVER-SIDE",
+   "retail": 1309
+  },
+  "49375": {
+   "sku": "49375",
+   "name": "Stinger Bundle — DRIVER-SIDE",
+   "retail": 1269
+  },
+  "49377": {
+   "sku": "49377",
+   "name": "PowerPack Bundle — Driver-Side",
+   "retail": 2769
+  },
+  "49379": {
+   "sku": "49379",
+   "name": "PowerPack Bundle — DRIVER-SIDE",
+   "retail": 2769
+  },
+  "49381": {
+   "sku": "49381",
+   "name": "PowerPack Bundle — DRIVER-SIDE",
+   "retail": 3269
+  },
+  "49383": {
+   "sku": "49383",
+   "name": "PowerPack Bundle — DRIVER-SIDE",
+   "retail": 2995
+  },
+  "49491": {
+   "sku": "49491",
+   "name": "Stinger Bundle — Driver-Side",
+   "retail": 1819
+  },
+  "49493": {
+   "sku": "49493",
+   "name": "PowerPack Bundle — DRIVER-SIDE",
+   "retail": 3239
+  },
+  "49777": {
+   "sku": "49777",
+   "name": "Monster Exhaust System — Crew Cab Short Bed / Chrome Tip",
+   "retail": 539
+  },
+  "49778": {
+   "sku": "49778",
+   "name": "Monster Exhaust System — Mega Cab Short Bed / Chrome Tip",
+   "retail": 539
+  },
+  "49779": {
+   "sku": "49779",
+   "name": "Monster Exhaust System — Chrome Tip",
+   "retail": 529
+  },
+  "49795": {
+   "sku": "49795",
+   "name": "Monster Exhaust System — Chrome",
+   "retail": 549
+  },
+  "49797": {
+   "sku": "49797",
+   "name": "Monster Exhaust System — Crew Cab Long Bed / Chrome Tip",
+   "retail": 539
+  },
+  "49798": {
+   "sku": "49798",
+   "name": "Monster Exhaust System — Chrome Tip | Crew Cab Short Bed (SRW)",
+   "retail": 628
+  },
+  "49799": {
+   "sku": "49799",
+   "name": "Monster Exhaust System — Chrome Tip | Mega Cab Short Bed (SRW)",
+   "retail": 628
+  },
+  "49807": {
+   "sku": "49807",
+   "name": "Monster Exhaust System — Chrome Tip | Crew Cab Long Bed (SRW)",
+   "retail": 628
+  },
+  "49808": {
+   "sku": "49808",
+   "name": "Monster Exhaust System — Crew Cab Long Bed (DRW) / Chrome Tip",
+   "retail": 639
+  },
+  "51306": {
+   "sku": "51306",
+   "name": "Exhaust Header System",
+   "retail": 569
+  },
+  "51313": {
+   "sku": "51313",
+   "name": "Monster Exhaust System — Chrome Tip",
+   "retail": 279
+  },
+  "51314": {
+   "sku": "51314",
+   "name": "Monster Exhaust System — Jeep Wrangler TJ / Chrome Tip",
+   "retail": 269
+  },
+  "51315": {
+   "sku": "51315",
+   "name": "Monster Exhaust System — Jeep Wrangler LJ Unlimited / Chrome Tip",
+   "retail": 289
+  },
+  "51327": {
+   "sku": "51327",
+   "name": "Exhaust Header System",
+   "retail": 499
+  },
+  "51330": {
+   "sku": "51330",
+   "name": "Stinger Bundle with Exhaust Tip — Chrome Tip",
+   "retail": 1039
+  },
+  "51331": {
+   "sku": "51331",
+   "name": "PowerPack Bundle — Chrome Tip",
+   "retail": 1549
+  },
+  "51332": {
+   "sku": "51332",
+   "name": "Stinger Bundle — Chrome Tip",
+   "retail": 1039
+  },
+  "51333": {
+   "sku": "51333",
+   "name": "PowerPack Bundle — Chrome Tip",
+   "retail": 1599
+  },
+  "51334": {
+   "sku": "51334",
+   "name": "Stinger Bundle — Jeep Wrangler TJ / Chrome Tip",
+   "retail": 1039
+  },
+  "51335": {
+   "sku": "51335",
+   "name": "PowerPack Bundle — Jeep Wrangler TJ / Chrome Tip",
+   "retail": 1599
+  },
+  "51336": {
+   "sku": "51336",
+   "name": "Stinger Bundle — Jeep Wrangler LJ Unlimited / Chrome Tip",
+   "retail": 1049
+  },
+  "51337": {
+   "sku": "51337",
+   "name": "PowerPack Bundle — Jeep Wranger LJ Unlimited / Chrome Tip",
+   "retail": 1609
+  },
+  "51360": {
+   "sku": "51360",
+   "name": "Monster Exhaust System",
+   "retail": 349
+  },
+  "51365": {
+   "sku": "51365",
+   "name": "Monster Exhaust System — 4-Door",
+   "retail": 429
+  },
+  "52255": {
+   "sku": "52255",
+   "name": "Weld Bung",
+   "retail": 9.89
+  },
+  "52405": {
+   "sku": "52405",
+   "name": "Exhaust Muffler",
+   "retail": 299
+  },
+  "52407": {
+   "sku": "52407",
+   "name": "Exhaust Muffler",
+   "retail": 239
+  },
+  "52636": {
+   "sku": "52636",
+   "name": "Exhaust Muffler",
+   "retail": 189
+  },
+  "52638": {
+   "sku": "52638",
+   "name": "Exhaust Muffler",
+   "retail": 189
+  },
+  "53804": {
+   "sku": "53804",
+   "name": "Straight Pipe Kit",
+   "retail": 69
+  },
+  "62560": {
+   "sku": "62560",
+   "name": "TransCommand",
+   "retail": 309
+  },
+  "62570": {
+   "sku": "62570",
+   "name": "TransCommand",
+   "retail": 309
+  },
+  "62904": {
+   "sku": "62904",
+   "name": "MAP Sensor - GM ACDelco 12707766",
+   "retail": 35
+  },
+  "63064": {
+   "sku": "63064",
+   "name": "Thermocouple",
+   "retail": 54
+  },
+  "63065": {
+   "sku": "63065",
+   "name": "Temperature Sensor",
+   "retail": 94
+  },
+  "63201": {
+   "sku": "63201",
+   "name": "Pillar Mount",
+   "retail": 59
+  },
+  "63341": {
+   "sku": "63341",
+   "name": "Gauge Pod Suction Mounts — Single Gauge Pod",
+   "retail": 39
+  },
+  "63344": {
+   "sku": "63344",
+   "name": "Gauge Pod Suction Mounts — Dual Gauge Pod",
+   "retail": 68
+  },
+  "63349": {
+   "sku": "63349",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63350": {
+   "sku": "63350",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63359": {
+   "sku": "63359",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63362": {
+   "sku": "63362",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63363": {
+   "sku": "63363",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63364": {
+   "sku": "63364",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63365": {
+   "sku": "63365",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63368": {
+   "sku": "63368",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63369": {
+   "sku": "63369",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63370": {
+   "sku": "63370",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63371": {
+   "sku": "63371",
+   "name": "Upper iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63372": {
+   "sku": "63372",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63373": {
+   "sku": "63373",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63374": {
+   "sku": "63374",
+   "name": "iDash Stealth Pod Mounts — Single Gauge",
+   "retail": 109
+  },
+  "63375": {
+   "sku": "63375",
+   "name": "iDash Stealth Pod Mounts — Dual Gauge",
+   "retail": 129
+  },
+  "63376": {
+   "sku": "63376",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63377": {
+   "sku": "63377",
+   "name": "Lower iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63378": {
+   "sku": "63378",
+   "name": "iDash Stealth Pod Mounts",
+   "retail": 109
+  },
+  "63380": {
+   "sku": "63380",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63381": {
+   "sku": "63381",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63382": {
+   "sku": "63382",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63383": {
+   "sku": "63383",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63384": {
+   "sku": "63384",
+   "name": "iDash Stealth Pod Mounts — Single Pod",
+   "retail": 109
+  },
+  "63385": {
+   "sku": "63385",
+   "name": "iDash Stealth Pod Mounts — Dual Pod",
+   "retail": 129
+  },
+  "63386": {
+   "sku": "63386",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63388": {
+   "sku": "63388",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63389": {
+   "sku": "63389",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63390": {
+   "sku": "63390",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63391": {
+   "sku": "63391",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63392": {
+   "sku": "63392",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63393": {
+   "sku": "63393",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 109
+  },
+  "63395": {
+   "sku": "63395",
+   "name": "iDash Stealth Pod",
+   "retail": 109
+  },
+  "63397": {
+   "sku": "63397",
+   "name": "iDash Stealth Pod",
+   "retail": 109
+  },
+  "63398": {
+   "sku": "63398",
+   "name": "iDash Stealth Pod Mount",
+   "retail": 90
+  },
+  "63735": {
+   "sku": "63735",
+   "name": "Universal OBD-II Splitter",
+   "retail": 30
+  },
+  "64212": {
+   "sku": "64212",
+   "name": "DynaFact Gauge Assembly",
+   "retail": 299
+  },
+  "64310": {
+   "sku": "64310",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64311": {
+   "sku": "64311",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64315": {
+   "sku": "64315",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64316": {
+   "sku": "64316",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64320": {
+   "sku": "64320",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64321": {
+   "sku": "64321",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64325": {
+   "sku": "64325",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64326": {
+   "sku": "64326",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash® install",
+   "retail": 295
+  },
+  "64330": {
+   "sku": "64330",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64331": {
+   "sku": "64331",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64335": {
+   "sku": "64335",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64336": {
+   "sku": "64336",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64340": {
+   "sku": "64340",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64341": {
+   "sku": "64341",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64345": {
+   "sku": "64345",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64346": {
+   "sku": "64346",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64350": {
+   "sku": "64350",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64351": {
+   "sku": "64351",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash® install",
+   "retail": 295
+  },
+  "64360": {
+   "sku": "64360",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64361": {
+   "sku": "64361",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash® install",
+   "retail": 295
+  },
+  "64370": {
+   "sku": "64370",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 359
+  },
+  "64371": {
+   "sku": "64371",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash® install",
+   "retail": 359
+  },
+  "64410": {
+   "sku": "64410",
+   "name": "MAP Sensor Relocation Kit (Upper Sensor Only)",
+   "retail": 69
+  },
+  "64411": {
+   "sku": "64411",
+   "name": "MAP Sensor Relocation Kit",
+   "retail": 69
+  },
+  "64412": {
+   "sku": "64412",
+   "name": "MAP Sensor Relocation Kit",
+   "retail": 69
+  },
+  "64413": {
+   "sku": "64413",
+   "name": "MAP Sensor Relocation Kit",
+   "retail": 69
+  },
+  "64414": {
+   "sku": "64414",
+   "name": "MAP Sensor Relocation Kit (Lower Sensor Only)",
+   "retail": 69
+  },
+  "64415": {
+   "sku": "64415",
+   "name": "Dual MAP Sensor Relocation Kit",
+   "retail": 129
+  },
+  "64416": {
+   "sku": "64416",
+   "name": "MAP Sensor Relocation Kit",
+   "retail": 69
+  },
+  "66062": {
+   "sku": "66062",
+   "name": "AutoMind Programmer",
+   "retail": 535.76
+  },
+  "66410": {
+   "sku": "66410",
+   "name": "AutoMind 2 Programmer",
+   "retail": 439
+  },
+  "66411": {
+   "sku": "66411",
+   "name": "AutoMind 2 Programmer",
+   "retail": 439
+  },
+  "66412": {
+   "sku": "66412",
+   "name": "AutoMind 2 Programmer",
+   "retail": 439
+  },
+  "66420": {
+   "sku": "66420",
+   "name": "AirMouse® sensor module",
+   "retail": 194
+  },
+  "66421": {
+   "sku": "66421",
+   "name": "Pressure Sensor Remote Mount Kits — Low Temp (220F or Less)",
+   "retail": 51
+  },
+  "66422": {
+   "sku": "66422",
+   "name": "Pressure Sensor Remote Mount Kits — High Temp (220F or Greater)",
+   "retail": 172
+  },
+  "66423": {
+   "sku": "66423",
+   "name": "Mounting Bracket kit",
+   "retail": 20
+  },
+  "66543": {
+   "sku": "66543",
+   "name": "4 Ch Thermocouple Module Kit",
+   "retail": 265
+  },
+  "66544": {
+   "sku": "66544",
+   "name": "4 Ch Analog Module Kit",
+   "retail": 305
+  },
+  "66556": {
+   "sku": "66556",
+   "name": "Starter Cable and Kit — Kit (Cable and Plug)",
+   "retail": 30
+  },
+  "66557": {
+   "sku": "66557",
+   "name": "Air Temperature Sensor",
+   "retail": 75
+  },
+  "66558": {
+   "sku": "66558",
+   "name": "Fluid Temperature Sensor — 3/8 NPT 0-300 deg F range",
+   "retail": 61
+  },
+  "66559": {
+   "sku": "66559",
+   "name": "Fluid Temperature Sensor — 1/8 NPT 0-300 deg F range",
+   "retail": 102
+  },
+  "66564": {
+   "sku": "66564",
+   "name": "Wideband O2 AFR Module",
+   "retail": 249
+  },
+  "66569": {
+   "sku": "66569",
+   "name": "Banks iDash Classic DataMonster",
+   "retail": 419
+  },
+  "66641": {
+   "sku": "66641",
+   "name": "Derringer Tuner — Requires iDash (not included)",
+   "retail": 490
+  },
+  "66652": {
+   "sku": "66652",
+   "name": "Derringer Tuner — Tuner Only (Requires Existing iDash Install)",
+   "retail": 490
+  },
+  "66653": {
+   "sku": "66653",
+   "name": "Derringer Tuner — Tuner Only (Requires Existing iDash Classic Install)",
+   "retail": 490
+  },
+  "66681": {
+   "sku": "66681",
+   "name": "Derringer Tuner — With iDash SuperGauge",
+   "retail": 769
+  },
+  "66692": {
+   "sku": "66692",
+   "name": "Derringer Tuner — With iDash SuperGauge",
+   "retail": 769
+  },
+  "66693": {
+   "sku": "66693",
+   "name": "Derringer Tuner — With iDash SuperGauge",
+   "retail": 769
+  },
+  "66700": {
+   "sku": "66700",
+   "name": "Banks Revolver Billet Diesel & DEF Caps",
+   "retail": 99
+  },
+  "66701": {
+   "sku": "66701",
+   "name": "Banks Revolver Billet Diesel & DEF Caps",
+   "retail": 99
+  },
+  "66702": {
+   "sku": "66702",
+   "name": "Banks Revolver Billet Diesel Oil Cap",
+   "retail": 69
+  },
+  "66710": {
+   "sku": "66710",
+   "name": "Banks iDash Pro® Standalone",
+   "retail": 419
+  },
+  "66711": {
+   "sku": "66711",
+   "name": "Banks iDash Data Pro® Standalone",
+   "retail": 499
+  },
+  "66712": {
+   "sku": "66712",
+   "name": "Banks iDash Pro® Expansion Gauge",
+   "retail": 419
+  },
+  "66713": {
+   "sku": "66713",
+   "name": "Banks iDash Data Pro® Expansion Gauge",
+   "retail": 499
+  },
+  "66714": {
+   "sku": "66714",
+   "name": "Banks iDash Pro® PedalMonster Upgrade Kit",
+   "retail": 419
+  },
+  "66715": {
+   "sku": "66715",
+   "name": "Banks iDash Data Pro® PedalMonster Upgrade Kit",
+   "retail": 499
+  },
+  "66716": {
+   "sku": "66716",
+   "name": "iDash Pro® Mounting Sleeve Kit",
+   "retail": 10
+  },
+  "66717": {
+   "sku": "66717",
+   "name": "iDash Pro® Non-OBD Kit",
+   "retail": 419
+  },
+  "66718": {
+   "sku": "66718",
+   "name": "iDash Data Pro® Non-OBD Kit",
+   "retail": 499
+  },
+  "66760": {
+   "sku": "66760",
+   "name": "Banks iDash Classic DataMonster",
+   "retail": 419
+  },
+  "66761": {
+   "sku": "66761",
+   "name": "Banks iDash Classic DataMonster",
+   "retail": 419
+  },
+  "66762": {
+   "sku": "66762",
+   "name": "Banks iDash Classic DataMonster",
+   "retail": 395
+  },
+  "66763": {
+   "sku": "66763",
+   "name": "Banks iDash Classic DataMonster",
+   "retail": 436
+  },
+  "66793": {
+   "sku": "66793",
+   "name": "Derringer Tuner — With iDash DataMonster",
+   "retail": 889
+  },
+  "66794": {
+   "sku": "66794",
+   "name": "Derringer Tuner — With iDash DataMonster",
+   "retail": 889
+  },
+  "66795": {
+   "sku": "66795",
+   "name": "Derringer Tuner — With iDash DataMonster",
+   "retail": 889
+  },
+  "66797": {
+   "sku": "66797",
+   "name": "Derringer Tuner — With iDash DataMonster",
+   "retail": 889
+  },
+  "66798": {
+   "sku": "66798",
+   "name": "Derringer Tuner — With iDash SuperGauge",
+   "retail": 769
+  },
+  "66799": {
+   "sku": "66799",
+   "name": "Derringer Tuner — Tuner Only (Requires Existing iDash installed)",
+   "retail": 490
+  },
+  "67106": {
+   "sku": "67106",
+   "name": "Derringer® High Output — With iDash Pro® (no data logging)",
+   "retail": 998
+  },
+  "67107": {
+   "sku": "67107",
+   "name": "Derringer® High Output — With iDash Pro® (no data logging)",
+   "retail": 998
+  },
+  "67108": {
+   "sku": "67108",
+   "name": "Derringer® High Output — With iDash Pro® (no data logging)",
+   "retail": 1398
+  },
+  "67126": {
+   "sku": "67126",
+   "name": "Derringer® High Output — With iDash Data Pro® (with data logging)",
+   "retail": 1078
+  },
+  "67127": {
+   "sku": "67127",
+   "name": "Derringer® High Output — With iDash Data Pro® (with data logging)",
+   "retail": 1078
+  },
+  "67128": {
+   "sku": "67128",
+   "name": "Derringer® High Output — With iDash Data Pro® (with data logging)",
+   "retail": 1478
+  },
+  "67137": {
+   "sku": "67137",
+   "name": "Derringer® High Output — Derringer ONLY (requires existing iDash Pro®)",
+   "retail": 978
+  },
+  "72302": {
+   "sku": "72302",
+   "name": "Dipstick Tube Kit",
+   "retail": 56
+  },
+  "92868": {
+   "sku": "92868",
+   "name": "Hose Clamp",
+   "retail": 5
+  },
+  "93152": {
+   "sku": "93152",
+   "name": "Molded Rubber Inlet Gasket",
+   "retail": 13.5
+  },
+  "96006": {
+   "sku": "96006",
+   "name": "Banks Urocal — Small (4.5\" X 1.5\")",
+   "retail": 2.92
+  },
+  "96007": {
+   "sku": "96007",
+   "name": "Banks Urocal — Large (6.5\" X 2.125\")",
+   "retail": 5.33
+  },
+  "96096": {
+   "sku": "96096",
+   "name": "Banner",
+   "retail": 30
+  },
+  "96103": {
+   "sku": "96103",
+   "name": "Banks Badge — Matte Black",
+   "retail": 39.99
+  },
+  "96104": {
+   "sku": "96104",
+   "name": "Banks Badge — Gloss Black",
+   "retail": 39.99
+  },
+  "96105": {
+   "sku": "96105",
+   "name": "Banks Badge — Chrome",
+   "retail": 39.99
+  },
+  "96106": {
+   "sku": "96106",
+   "name": "Banks Heatwave Vise Sunglasses — Standard",
+   "retail": 69
+  },
+  "96107": {
+   "sku": "96107",
+   "name": "Banks Heatwave Vise Sunglasses — XL",
+   "retail": 69
+  },
+  "96108": {
+   "sku": "96108",
+   "name": "Banks Lazer Face Sunglasses — Black Polarized",
+   "retail": 79
+  },
+  "96109": {
+   "sku": "96109",
+   "name": "Banks Lazer Face Sunglasses — Firestorm Polarized",
+   "retail": 79
+  },
+  "96119": {
+   "sku": "96119",
+   "name": "Banks Key Flag",
+   "retail": 9.99
+  },
+  "96123": {
+   "sku": "96123",
+   "name": "Banks Heatwave Vise Safety Glasses",
+   "retail": 69
+  },
+  "96134": {
+   "sku": "96134",
+   "name": "Banks Power Hat",
+   "retail": 18
+  },
+  "96135": {
+   "sku": "96135",
+   "name": "Banks Power Hat",
+   "retail": 18
+  },
+  "41890-D": {
+   "sku": "41890-D",
+   "name": "Banks Ram-Air® — Dry",
+   "retail": 449
+  },
+  "41835-D": {
+   "sku": "41835-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 100
+  },
+  "98000-25": {
+   "sku": "98000-25",
+   "name": "Banks Power Gift Card — $25.00",
+   "retail": 25
+  },
+  "98000-100": {
+   "sku": "98000-100",
+   "name": "Banks Power Gift Card — $100.00",
+   "retail": 100
+  },
+  "98000-300": {
+   "sku": "98000-300",
+   "name": "Banks Power Gift Card — $300.00",
+   "retail": 300
+  },
+  "98000-500": {
+   "sku": "98000-500",
+   "name": "Banks Power Gift Card — $500.00",
+   "retail": 500
+  },
+  "98000-1000": {
+   "sku": "98000-1000",
+   "name": "Banks Power Gift Card — $1,000.00",
+   "retail": 1000
+  },
+  "98000-2500": {
+   "sku": "98000-2500",
+   "name": "Banks Power Gift Card — $2,500.00",
+   "retail": 2500
+  },
+  "48998-B": {
+   "sku": "48998-B",
+   "name": "Monster Exhaust System — Black / Single Rear Wheel",
+   "retail": 599
+  },
+  "iDashClassic": {
+   "sku": "iDashClassic",
+   "name": "Banks iDash Classic DataMonster",
+   "retail": 419
+  },
+  "41866-D": {
+   "sku": "41866-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 429
+  },
+  "Tuning 2024 Dmax": {
+   "sku": "Tuning 2024 Dmax",
+   "name": "Tuning Bundle for 2024-2026 Duramax 6.6L",
+   "retail": 1598
+  },
+  "42297-D": {
+   "sku": "42297-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 495
+  },
+  "Tuning 2020 Dmax": {
+   "sku": "Tuning 2020 Dmax",
+   "name": "Tuning Bundle for 2020-2022 Duramax 6.6L",
+   "retail": 1299
+  },
+  "Tuning 2023 Dmax": {
+   "sku": "Tuning 2023 Dmax",
+   "name": "Tuning Bundle for 2023 Duramax 6.6L",
+   "retail": 1299
+  },
+  "4aba4761-6968-4c08-8664-4c56957b082c": {
+   "sku": "4aba4761-6968-4c08-8664-4c56957b082c",
+   "name": "PowerPack Bundle for 2023 Duramax 6.6L",
+   "retail": 3785.38
+  },
+  "35170-B": {
+   "sku": "35170-B",
+   "name": "68RFE Ram-Air Transmission Pan",
+   "retail": 429
+  },
+  "35146-B": {
+   "sku": "35146-B",
+   "name": "Ram-Air Transmission Pan",
+   "retail": 429
+  },
+  "35135-B": {
+   "sku": "35135-B",
+   "name": "CoolRunner Oil Pan",
+   "retail": 429
+  },
+  "35148-B": {
+   "sku": "35148-B",
+   "name": "Ram-Air Transmission Pan",
+   "retail": 429
+  },
+  "35137-B": {
+   "sku": "35137-B",
+   "name": "CoolRunner Oil Pan",
+   "retail": 429
+  },
+  "64342-P": {
+   "sku": "64342-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64343-P": {
+   "sku": "64343-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "cdb21f68-5b85-4d9e-95fb-8ff811afd208": {
+   "sku": "cdb21f68-5b85-4d9e-95fb-8ff811afd208",
+   "name": "Ultimate Fluid Cooling Bundle for 2020-2026 Chevy/GMC 6.6L Duramax",
+   "retail": 1195.01
+  },
+  "0ece61f9-44b8-4dee-894b-5cc62edf3663": {
+   "sku": "0ece61f9-44b8-4dee-894b-5cc62edf3663",
+   "name": "Fluid Cooling Bundle for 2020-2026 Chevy/GMC 6.6L Duramax",
+   "retail": 795
+  },
+  "8ab26747-e5dc-4da2-a966-be2118065a29": {
+   "sku": "8ab26747-e5dc-4da2-a966-be2118065a29",
+   "name": "Ultimate Fluid Cooling Bundle for 2017-2019 Chevy/GMC 6.6L Duramax",
+   "retail": 1167.07
+  },
+  "a22f8275-7356-4a2d-b13e-556a50bdb5d1": {
+   "sku": "a22f8275-7356-4a2d-b13e-556a50bdb5d1",
+   "name": "Fluid Cooling Bundle for 2017-2019 Chevy/GMC 6.6L Duramax",
+   "retail": 795
+  },
+  "64372-P": {
+   "sku": "64372-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 789
+  },
+  "64373-P": {
+   "sku": "64373-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 885
+  },
+  "64362-P": {
+   "sku": "64362-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64363-P": {
+   "sku": "64363-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64352-P": {
+   "sku": "64352-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64353-P": {
+   "sku": "64353-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "42792-R": {
+   "sku": "42792-R",
+   "name": "Monster-Ram® Turbo Inlet Elbow — Red",
+   "retail": 299
+  },
+  "42792-N": {
+   "sku": "42792-N",
+   "name": "Monster-Ram® Turbo Inlet Elbow — Natural",
+   "retail": 289
+  },
+  "e16ec990-a28e-49c7-b9a0-b986e37b3010": {
+   "sku": "e16ec990-a28e-49c7-b9a0-b986e37b3010",
+   "name": "PowerPack Bundle for 2017-2019 Duramax 6.6L",
+   "retail": 3368.02
+  },
+  "42806-R": {
+   "sku": "42806-R",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade (Chassis Cab) — Red",
+   "retail": 898
+  },
+  "42806-N": {
+   "sku": "42806-N",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade (Chassis Cab) — Natural",
+   "retail": 868
+  },
+  "38cce4d8-a24b-4f01-bb21-f972d51d7ab7": {
+   "sku": "38cce4d8-a24b-4f01-bb21-f972d51d7ab7",
+   "name": "PowerPack Bundle for 2020-2022 Ford 6.7L",
+   "retail": 1769.08
+  },
+  "d9e633b5-28aa-4833-83d5-982200c6fbf2": {
+   "sku": "d9e633b5-28aa-4833-83d5-982200c6fbf2",
+   "name": "PowerPack Bundle for 2017-2019 Ford 6.7L",
+   "retail": 2153.54
+  },
+  "c0acc8b0-4537-4fde-a09c-5c1d725eee99": {
+   "sku": "c0acc8b0-4537-4fde-a09c-5c1d725eee99",
+   "name": "PowerPack Bundle for 2019-2024 RAM 6.7L",
+   "retail": 3411.26
+  },
+  "4aba4761-6968-4c08-8664-4c56957b082b": {
+   "sku": "4aba4761-6968-4c08-8664-4c56957b082b",
+   "name": "PowerPack Bundle for 2020-2022 Duramax 6.6L",
+   "retail": 3785.38
+  },
+  "42804-R": {
+   "sku": "42804-R",
+   "name": "Monster-Ram®  Intake and Killer Grid Heater Upgrade (Chassis Cab) — Red",
+   "retail": 898
+  },
+  "42804-N": {
+   "sku": "42804-N",
+   "name": "Monster-Ram®  Intake and Killer Grid Heater Upgrade (Chassis Cab) — Natural",
+   "retail": 868
+  },
+  "42805-R": {
+   "sku": "42805-R",
+   "name": "Monster-Ram Intake and Killer Grid Heater Upgrade (Chassis Cab) — Red",
+   "retail": 898
+  },
+  "42805-N": {
+   "sku": "42805-N",
+   "name": "Monster-Ram Intake and Killer Grid Heater Upgrade (Chassis Cab) — Natural",
+   "retail": 868
+  },
+  "6958f9e6-b17f-4b6d-8ac7-7a3c484988cd": {
+   "sku": "6958f9e6-b17f-4b6d-8ac7-7a3c484988cd",
+   "name": "PowerPack Bundle for 2020-2023 Jeep 3.0L",
+   "retail": 1215.42
+  },
+  "41869-D": {
+   "sku": "41869-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 469
+  },
+  "48910-B": {
+   "sku": "48910-B",
+   "name": "Monster Exhaust System — Cerakote Black",
+   "retail": 598
+  },
+  "42285-D": {
+   "sku": "42285-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 495
+  },
+  "49808-B": {
+   "sku": "49808-B",
+   "name": "Monster Exhaust System — Crew Cab Long Bed (DRW) / Cerakote Black Tip",
+   "retail": 639
+  },
+  "49798-B": {
+   "sku": "49798-B",
+   "name": "Monster Exhaust System — Black Tip | Crew Cab Short Bed (SRW)",
+   "retail": 628
+  },
+  "49799-B": {
+   "sku": "49799-B",
+   "name": "Monster Exhaust System — Black Tip | Mega Cab Short Bed (SRW)",
+   "retail": 628
+  },
+  "49807-B": {
+   "sku": "49807-B",
+   "name": "Monster Exhaust System — Black Tip | Crew Cab Long Bed (SRW)",
+   "retail": 628
+  },
+  "41848-D": {
+   "sku": "41848-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 116
+  },
+  "61301-31": {
+   "sku": "61301-31",
+   "name": "6-Pin iDash to PedalMonster Harness",
+   "retail": 20
+  },
+  "26006-PC": {
+   "sku": "26006-PC",
+   "name": "Boost Tube Upgrade Kit — Red Powder-Coated",
+   "retail": 495
+  },
+  "41831-D": {
+   "sku": "41831-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 139
+  },
+  "iDash": {
+   "sku": "iDash",
+   "name": "Banks iDash Pro® & iDash Data Pro®",
+   "retail": 419
+  },
+  "61300-45": {
+   "sku": "61300-45",
+   "name": "4-Pin OBD-II Cable",
+   "retail": 19
+  },
+  "42248-D": {
+   "sku": "42248-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 429
+  },
+  "19249-2": {
+   "sku": "19249-2",
+   "name": "Sway Bar Spacer Kit",
+   "retail": 39
+  },
+  "41849-D": {
+   "sku": "41849-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 469
+  },
+  "96287-S": {
+   "sku": "96287-S",
+   "name": "Banks T-Shirt — S",
+   "retail": 23.75
+  },
+  "96287-M": {
+   "sku": "96287-M",
+   "name": "Banks T-Shirt — M",
+   "retail": 23.75
+  },
+  "96287-L": {
+   "sku": "96287-L",
+   "name": "Banks T-Shirt — L",
+   "retail": 23.75
+  },
+  "96287-XL": {
+   "sku": "96287-XL",
+   "name": "Banks T-Shirt — XL",
+   "retail": 23.75
+  },
+  "96287-2XL": {
+   "sku": "96287-2XL",
+   "name": "Banks T-Shirt — 2X",
+   "retail": 23.75
+  },
+  "96287-3XL": {
+   "sku": "96287-3XL",
+   "name": "Banks T-Shirt — 3X",
+   "retail": 25.55
+  },
+  "96287-4XL": {
+   "sku": "96287-4XL",
+   "name": "Banks T-Shirt — 4X",
+   "retail": 25.55
+  },
+  "96284-S": {
+   "sku": "96284-S",
+   "name": "Banks T-Shirt — S",
+   "retail": 23.75
+  },
+  "96284-M": {
+   "sku": "96284-M",
+   "name": "Banks T-Shirt — M",
+   "retail": 23.75
+  },
+  "96284-L": {
+   "sku": "96284-L",
+   "name": "Banks T-Shirt — L",
+   "retail": 23.75
+  },
+  "96284-XL": {
+   "sku": "96284-XL",
+   "name": "Banks T-Shirt — XL",
+   "retail": 23.75
+  },
+  "96284-2XL": {
+   "sku": "96284-2XL",
+   "name": "Banks T-Shirt — 2X",
+   "retail": 23.75
+  },
+  "96284-3XL": {
+   "sku": "96284-3XL",
+   "name": "Banks T-Shirt — 3X",
+   "retail": 25.55
+  },
+  "96284-4XL": {
+   "sku": "96284-4XL",
+   "name": "Banks T-Shirt — 4X",
+   "retail": 25.55
+  },
+  "64347-P": {
+   "sku": "64347-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64348-P": {
+   "sku": "64348-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64337-P": {
+   "sku": "64337-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64338-P": {
+   "sku": "64338-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64332-P": {
+   "sku": "64332-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64333-P": {
+   "sku": "64333-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64327-P": {
+   "sku": "64327-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64328-P": {
+   "sku": "64328-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64320-C": {
+   "sku": "64320-C",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64321-C": {
+   "sku": "64321-C",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64322-CP": {
+   "sku": "64322-CP",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64323-CP": {
+   "sku": "64323-CP",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64322-P": {
+   "sku": "64322-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64323-P": {
+   "sku": "64323-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64317-P": {
+   "sku": "64317-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64318-P": {
+   "sku": "64318-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64310-C": {
+   "sku": "64310-C",
+   "name": "PedalMonster — PedalMonster, Standalone",
+   "retail": 295
+  },
+  "64311-C": {
+   "sku": "64311-C",
+   "name": "PedalMonster — PedalMonster Upgrade Kit, for existing iDash install",
+   "retail": 295
+  },
+  "64312-CP": {
+   "sku": "64312-CP",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64313-CP": {
+   "sku": "64313-CP",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "64312-P": {
+   "sku": "64312-P",
+   "name": "PedalMonster — PedalMonster with iDash Pro®",
+   "retail": 714
+  },
+  "64313-P": {
+   "sku": "64313-P",
+   "name": "PedalMonster — PedalMonster with iDash Data Pro®",
+   "retail": 755
+  },
+  "48997-B": {
+   "sku": "48997-B",
+   "name": "Monster Exhaust System — Cerakote Black",
+   "retail": 628
+  },
+  "42188-D": {
+   "sku": "42188-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 119
+  },
+  "42141-D": {
+   "sku": "42141-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 119
+  },
+  "63085-15G": {
+   "sku": "63085-15G",
+   "name": "PSIG Pressure Sensors — 0-15 PSIG",
+   "retail": 72
+  },
+  "63085-50G": {
+   "sku": "63085-50G",
+   "name": "PSIG Pressure Sensors — 0-50 PSIG",
+   "retail": 72
+  },
+  "63085-100G": {
+   "sku": "63085-100G",
+   "name": "PSIG Pressure Sensors — 0-100 PSIG",
+   "retail": 72
+  },
+  "63085-150G": {
+   "sku": "63085-150G",
+   "name": "PSIG Pressure Sensors — 0-150 PSIG",
+   "retail": 72
+  },
+  "63085-15A": {
+   "sku": "63085-15A",
+   "name": "PSIA Pressure Sensors — 0-15 PSIA",
+   "retail": 72
+  },
+  "63085-50A": {
+   "sku": "63085-50A",
+   "name": "PSIA Pressure Sensors — 0-50 PSIA",
+   "retail": 72
+  },
+  "63085-100A": {
+   "sku": "63085-100A",
+   "name": "PSIA Pressure Sensors — 0-100 PSIA",
+   "retail": 72
+  },
+  "63085-150A": {
+   "sku": "63085-150A",
+   "name": "PSIA Pressure Sensors — 0-150 PSIA",
+   "retail": 72
+  },
+  "63085-232A": {
+   "sku": "63085-232A",
+   "name": "PSIA Pressure Sensors — 0-232 PSIA",
+   "retail": 72
+  },
+  "61301-36": {
+   "sku": "61301-36",
+   "name": "Power Cable, iDash",
+   "retail": 38
+  },
+  "61301-28": {
+   "sku": "61301-28",
+   "name": "3 Pin Sensor Extension Cables — 3-Foot",
+   "retail": 28
+  },
+  "61301-29": {
+   "sku": "61301-29",
+   "name": "3 Pin Sensor Extension Cables — 6-Foot",
+   "retail": 35
+  },
+  "61301-24": {
+   "sku": "61301-24",
+   "name": "6-Pin iDash Extension Cables — 24in",
+   "retail": 20
+  },
+  "61301-25": {
+   "sku": "61301-25",
+   "name": "6-Pin iDash Extension Cables — 48in",
+   "retail": 22
+  },
+  "61301-32": {
+   "sku": "61301-32",
+   "name": "4Pin to 6-Pin B-Bus Adapter Cable — Banks OBD-II to PedalMonster Adapter (4-Pin to 6-Pin)",
+   "retail": 11.25
+  },
+  "61301-22": {
+   "sku": "61301-22",
+   "name": "6-Pin Y-Splitter",
+   "retail": 17
+  },
+  "61301-20": {
+   "sku": "61301-20",
+   "name": "Starter Cable and Kit — Cable Only",
+   "retail": 23
+  },
+  "61301-18": {
+   "sku": "61301-18",
+   "name": "Frequency Input Pigtail",
+   "retail": 24
+  },
+  "61301-15": {
+   "sku": "61301-15",
+   "name": "Universal Analog Input Pigtail",
+   "retail": 14
+  },
+  "61300-30": {
+   "sku": "61300-30",
+   "name": "Jumper, in Cab",
+   "retail": 5
+  },
+  "61300-23": {
+   "sku": "61300-23",
+   "name": "Underhood Extension Cables — 2-Foot",
+   "retail": 24
+  },
+  "61300-24": {
+   "sku": "61300-24",
+   "name": "Underhood Extension Cables — 4-Foot",
+   "retail": 29
+  },
+  "61300-25": {
+   "sku": "61300-25",
+   "name": "Underhood Extension Cables — 6-Foot",
+   "retail": 34
+  },
+  "61300-22": {
+   "sku": "61300-22",
+   "name": "Terminator Plug, underhood",
+   "retail": 8
+  },
+  "42266-D": {
+   "sku": "42266-D",
+   "name": "Banks Ram-Air® — Dry",
+   "retail": 495
+  },
+  "42279-D": {
+   "sku": "42279-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 469
+  },
+  "42799-PC": {
+   "sku": "42799-PC",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Red",
+   "retail": 748
+  },
+  "42799-B": {
+   "sku": "42799-B",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Black",
+   "retail": 748
+  },
+  "41843-D": {
+   "sku": "41843-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 409
+  },
+  "49795-B": {
+   "sku": "49795-B",
+   "name": "Monster Exhaust System — Cerakote Black",
+   "retail": 569
+  },
+  "41829-D": {
+   "sku": "41829-D",
+   "name": "Replacement Air Filter Element — Dry Filter",
+   "retail": 139
+  },
+  "48996-B": {
+   "sku": "48996-B",
+   "name": "Monster Exhaust System — Cerakote Black Tip",
+   "retail": 549
+  },
+  "42259-D": {
+   "sku": "42259-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 102
+  },
+  "42249-D": {
+   "sku": "42249-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 449
+  },
+  "41888-D": {
+   "sku": "41888-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 394
+  },
+  "41884-D": {
+   "sku": "41884-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 409
+  },
+  "41885-D": {
+   "sku": "41885-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 119
+  },
+  "49777-B": {
+   "sku": "49777-B",
+   "name": "Monster Exhaust System — Crew Cab Short Bed / Cerakote Black Tip",
+   "retail": 559
+  },
+  "49778-B": {
+   "sku": "49778-B",
+   "name": "Monster Exhaust System — Mega Cab Short Bed / Cerakote Black Tip",
+   "retail": 559
+  },
+  "49797-B": {
+   "sku": "49797-B",
+   "name": "Monster Exhaust System — Crew Cab Long Bed / Cerakote Black Tip",
+   "retail": 559
+  },
+  "42255-D": {
+   "sku": "42255-D",
+   "name": "Banks Ram-Air® — Dry",
+   "retail": 449
+  },
+  "42798-PC": {
+   "sku": "42798-PC",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Red",
+   "retail": 748
+  },
+  "42798-B": {
+   "sku": "42798-B",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Black",
+   "retail": 748
+  },
+  "42230-D": {
+   "sku": "42230-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 429
+  },
+  "42215-D": {
+   "sku": "42215-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 439
+  },
+  "42220-D": {
+   "sku": "42220-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 429
+  },
+  "49779-B": {
+   "sku": "49779-B",
+   "name": "Monster Exhaust System — Cerakote Black Tip",
+   "retail": 549
+  },
+  "42180-D": {
+   "sku": "42180-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 449
+  },
+  "41850-D": {
+   "sku": "41850-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 429
+  },
+  "42797-PC": {
+   "sku": "42797-PC",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Red",
+   "retail": 748
+  },
+  "42797-B": {
+   "sku": "42797-B",
+   "name": "Monster-Ram® Intake and Killer Grid Heater Upgrade — Black",
+   "retail": 748
+  },
+  "42178-D": {
+   "sku": "42178-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 119
+  },
+  "42172-D": {
+   "sku": "42172-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 449
+  },
+  "42175-D": {
+   "sku": "42175-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 449
+  },
+  "42142-D": {
+   "sku": "42142-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 449
+  },
+  "51335-B": {
+   "sku": "51335-B",
+   "name": "PowerPack Bundle — Jeep Wrangler TJ / Cerakote Black Tip",
+   "retail": 1599
+  },
+  "51337-B": {
+   "sku": "51337-B",
+   "name": "PowerPack Bundle — Jeep Wranger LJ Unlimited / Cerakote Black Tip",
+   "retail": 1609
+  },
+  "51334-B": {
+   "sku": "51334-B",
+   "name": "Stinger Bundle — Jeep Wrangler TJ / Cerakote Black Tip",
+   "retail": 1039
+  },
+  "51336-B": {
+   "sku": "51336-B",
+   "name": "Stinger Bundle — Jeep Wrangler LJ Unlimited / Cerakote Black Tip",
+   "retail": 1049
+  },
+  "51314-B": {
+   "sku": "51314-B",
+   "name": "Monster Exhaust System — Jeep Wrangler TJ / Cerakote Black Tip",
+   "retail": 279
+  },
+  "51315-B": {
+   "sku": "51315-B",
+   "name": "Monster Exhaust System — Jeep Wrangler LJ Unlimited / Cerakote Black Tip",
+   "retail": 289
+  },
+  "42135-D": {
+   "sku": "42135-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 449
+  },
+  "42158-D": {
+   "sku": "42158-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 119
+  },
+  "42155-D": {
+   "sku": "42155-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 449
+  },
+  "42148-D": {
+   "sku": "42148-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 119
+  },
+  "42145-D": {
+   "sku": "42145-D",
+   "name": "Banks Ram-Air® — Dry Filter",
+   "retail": 449
+  },
+  "42132-D": {
+   "sku": "42132-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 449
+  },
+  "51333-B": {
+   "sku": "51333-B",
+   "name": "PowerPack Bundle — Cerakote Black Tip",
+   "retail": 1599
+  },
+  "51332-B": {
+   "sku": "51332-B",
+   "name": "Stinger Bundle — Cerakote Black Tip",
+   "retail": 1039
+  },
+  "51313-B": {
+   "sku": "51313-B",
+   "name": "Monster Exhaust System — Cerakote Black Tip",
+   "retail": 279
+  },
+  "42138-D": {
+   "sku": "42138-D",
+   "name": "Air Filter Element — Dry Filter",
+   "retail": 119
+  },
+  "41801-D": {
+   "sku": "41801-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 429
+  },
+  "42210-D": {
+   "sku": "42210-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 429
+  },
+  "51331-B": {
+   "sku": "51331-B",
+   "name": "PowerPack Bundle — Cerakote Black Tip",
+   "retail": 1549
+  },
+  "51330-B": {
+   "sku": "51330-B",
+   "name": "Stinger Bundle with Exhaust Tip — Cerakote Black Tip",
+   "retail": 1039
+  },
+  "42225-D": {
+   "sku": "42225-D",
+   "name": "Banks Ram-Air® — Dry Filter Set",
+   "retail": 439
+  }
+ }
+}

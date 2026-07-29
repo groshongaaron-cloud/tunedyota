@@ -1,0 +1,330 @@
+// Full Banks Power store — one crawlable product page per catalogue product
+// plus the master hub (/banks-products), generated from the committed site
+// scrape data/banks-site-scrape.json (public bankspower.com retail pricing).
+// Mirrors the Magnuson store architecture.
+//
+// Business rules:
+// - Reserve mode: Tuned Yota is onboarding as a Banks dealer; pages carry
+//   text/email CTAs (no online checkout until the dealer price sheet lands
+//   and Converge flips on).
+// - Toyota & Lexus lead everywhere: vehicle-specific Toyota/Lexus products
+//   get the first hub sections and cross-link the OTT vehicle pages.
+// - Coming-soon products (Banks `In_Development`, unpriced) still get pages —
+//   first-to-rank when the part launches — with no Offer in schema.
+// - Fitment tables list Toyota/Lexus applications in full; other makes
+//   collapse to a count (PedalMonster fits 50+ makes — a 300-row table
+//   serves no one).
+//
+// Import-safe: module top level only computes lists (seo-data.mjs imports
+// BANKS_STORE_FILES for HEAD_PAGES). Page writes happen in main() only.
+//
+// Run via `npm run build:banks-store` — writes site/*.html and
+// site/banks-slugs.json (sku -> slug, read by build-catalog.mjs for app
+// deep-links).
+import fs from "node:fs";
+import path from "node:path";
+import { CHROME } from "../build-amsoil-pages.mjs";
+
+const { FONTS, SITECSS, FAVICON, NAV, FOOTER, ESC, STYLE } = CHROME;
+const SITE = "site";
+const BASE = "https://tunedyota.com";
+const SCRAPE = JSON.parse(fs.readFileSync(path.join("data", "banks-site-scrape.json"), "utf8"));
+
+const slugify = (s) => String(s).toLowerCase()
+  .replace(/["'’.®™]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").replace(/-{2,}/g, "-");
+
+// ---- Assemble product list with slugs and hub sections ----------------------
+const TY_MAKES = new Set(["Toyota", "Lexus"]);
+
+function primarySku(p) {
+  const v = (p.variants || []).find((x) => x.sku) || {};
+  return v.sku || slugify(p.handle).toUpperCase();
+}
+
+function sectionFor(p) {
+  const makes = p.makes || [];
+  const tyOnly = makes.length && makes.every((m) => TY_MAKES.has(m));
+  if (tyOnly) return "Toyota & Lexus";
+  if (makes.includes("Toyota") || makes.includes("Lexus")) return `${p.category || "Universal"} (fits Toyota & Lexus + more)`;
+  return p.category || "Universal & Accessories";
+}
+
+function assignSlugs(products) {
+  const used = new Set();
+  for (const p of products) {
+    let s = slugify(`banks ${p.title}`);
+    if (used.has(s)) s = `${s}-${slugify(primarySku(p))}`;
+    if (used.has(s)) throw new Error(`slug collision: ${s}`);
+    used.add(s);
+    p.slug = s;
+    p.section = sectionFor(p);
+  }
+  return products;
+}
+
+export const STORE_ITEMS = assignSlugs(SCRAPE.products.map((p) => ({ ...p })));
+export const BANKS_HUB_FILE = "banks-products.html";
+export const BANKS_STORE_FILES = [BANKS_HUB_FILE, ...STORE_ITEMS.map((i) => `${i.slug}.html`)];
+
+// ---- Fitment helpers --------------------------------------------------------
+function yearRuns(years) {
+  const ys = [...new Set(years)].sort((a, b) => a - b);
+  const runs = [];
+  for (const y of ys) {
+    const last = runs[runs.length - 1];
+    if (last && y === last[1] + 1) last[1] = y;
+    else runs.push([y, y]);
+  }
+  return runs.map(([a, b]) => (a === b ? String(a) : `${a}–${b}`)).join(", ");
+}
+
+function fitmentRows(p) {
+  const groups = new Map(); // "make|model|engine" -> years
+  for (const f of p.fitment || []) {
+    const k = `${f.make}|${f.model}|${f.engine}`;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(f.year);
+  }
+  const ty = [], other = new Set();
+  for (const [k, years] of groups) {
+    const [make, model, engine] = k.split("|");
+    if (TY_MAKES.has(make)) ty.push({ make, model, engine, years: yearRuns(years) });
+    else other.add(make);
+  }
+  ty.sort((a, b) => (a.make === b.make ? a.model.localeCompare(b.model) : a.make === "Toyota" ? -1 : 1));
+  return { ty, otherMakes: [...other].sort() };
+}
+
+// ---- Pricing helpers --------------------------------------------------------
+function pricedVariants(p) { return (p.variants || []).filter((v) => v.sku && v.price != null); }
+function priceLabel(p) {
+  const vs = pricedVariants(p);
+  if (!vs.length) return null;
+  const prices = vs.map((v) => v.price);
+  const lo = Math.min(...prices), hi = Math.max(...prices);
+  return lo === hi ? `$${lo.toLocaleString("en-US")}` : `$${lo.toLocaleString("en-US")}–$${hi.toLocaleString("en-US")}`;
+}
+
+// ---- Schema -----------------------------------------------------------------
+function productLd(p, url, name, desc) {
+  const vs = pricedVariants(p);
+  const ld = {
+    "@context": "https://schema.org", "@type": "Product", "@id": `${url}#product`,
+    name, sku: primarySku(p), mpn: primarySku(p),
+    brand: { "@type": "Brand", name: "Banks Power" },
+    category: p.category || "Vehicle Performance Parts",
+    image: p.image || `${BASE}/og-image.png`, description: desc, url,
+  };
+  if (vs.length) {
+    const prices = vs.map((v) => v.price);
+    const anyAvail = vs.some((v) => v.available);
+    const seller = { "@type": "AutomotiveBusiness", "@id": `${BASE}/#business`, name: "Tuned Yota", telephone: "+1-612-406-7117", url: `${BASE}/` };
+    const availability = anyAvail ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+    ld.offers = vs.length === 1
+      ? { "@type": "Offer", url, priceCurrency: "USD", price: vs[0].price.toFixed(2), priceValidUntil: "2026-12-31", availability, itemCondition: "https://schema.org/NewCondition", seller }
+      : { "@type": "AggregateOffer", url, priceCurrency: "USD", lowPrice: Math.min(...prices).toFixed(2), highPrice: Math.max(...prices).toFixed(2), offerCount: vs.length, availability, seller };
+  }
+  return JSON.stringify(ld);
+}
+
+function breadcrumbLd(url, name) {
+  return JSON.stringify({
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "Banks Power Store", item: `${BASE}/banks-products` },
+      { "@type": "ListItem", position: 3, name, item: url },
+    ],
+  });
+}
+
+// ---- Templates --------------------------------------------------------------
+const TABLESTYLE = `<style>
+.mtab{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+.mtab th{font-family:'Spectral SC',serif;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage-d);text-align:left;padding:8px 8px;border-bottom:1.6px solid var(--line)}
+.mtab td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.mtab .pr{white-space:nowrap;font-weight:900;color:var(--ink)}
+.mnav{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.mnav a{font-size:13px;border:1.2px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--brown);text-decoration:none;font-weight:700}
+</style>`;
+
+const CONTACT_CTA = `
+  <div class="lp-cta">
+    <a class="btn primary" href="sms:+16124067117">Text us to reserve — (612) 406-7117</a>
+    <a class="btn outline" href="mailto:info@tunedyota.com">Email info@tunedyota.com</a>
+  </div>`;
+
+const VEHICLE_PAGE = {
+  Tundra: "/toyota-tundra-ott-tune", Tacoma: "/toyota-tacoma-ott-tune",
+  "4Runner": "/toyota-4runner-ott-tune", Sequoia: "/toyota-sequoia-ott-tune",
+  "Land Cruiser": "/toyota-land-cruiser-ott-tune", "FJ Cruiser": "/toyota-fj-cruiser-ott-tune",
+  Highlander: "/toyota-highlander-ott-tune", RAV4: "/toyota-rav4-ott-tune", Camry: "/toyota-camry-ott-tune",
+  GX: "/lexus-gx-ott-tune", LX: "/lexus-lx570-ott-tune", RX: "/lexus-rx350-ott-tune",
+};
+function vehicleLinks(fit) {
+  const seen = new Map();
+  for (const r of fit.ty) {
+    for (const [m, href] of Object.entries(VEHICLE_PAGE)) {
+      if (r.model === m || r.model.startsWith(m)) { seen.set(m, href); break; }
+    }
+  }
+  return [...seen.entries()];
+}
+
+function productPage(p) {
+  const url = `${BASE}/${p.slug}`;
+  const sku = primarySku(p);
+  const name = `Banks ${p.title}`;
+  const price = priceLabel(p);
+  const fit = fitmentRows(p);
+  const tyFit = fit.ty.length > 0;
+  const desc = (p.description
+    ? p.description.slice(0, 250).replace(/\s+\S*$/, "")
+    : `${name}, genuine Banks Power part #${sku}.`) +
+    ` Reserve through Tuned Yota${tyFit ? " — Toyota & Lexus install and OTT calibration available in the Upper Midwest" : ""}.`;
+  const vlinks = vehicleLinks(fit);
+
+  const variantRows = (p.variants || []).filter((v) => v.sku).map((v) =>
+    `<tr><td>${ESC(v.sku)}</td><td>${ESC(v.title || "—")}</td><td class="pr">${v.price != null ? `$${v.price.toLocaleString("en-US")}` : "Coming soon"}</td><td>${v.price == null ? "Announced" : v.available ? "In stock at Banks" : "Backordered"}</td></tr>`).join("\n");
+
+  const fitRows = fit.ty.map((r) =>
+    `<tr><td>${ESC(r.years)}</td><td>${ESC(`${r.make} ${r.model}`)}</td><td>${ESC(r.engine)}</td></tr>`).join("\n");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${ESC(name)}${price ? ` — ${price}` : " — Coming Soon"} | Banks ${ESC(sku)} | Tuned Yota</title>
+<meta name="description" content="${ESC(desc)}">
+<link rel="canonical" href="${url}">
+<script type="application/ld+json">
+${productLd(p, url, name, desc)}
+</script>
+<script type="application/ld+json">
+${breadcrumbLd(url, name)}
+</script>
+${FONTS}
+${SITECSS}
+${FAVICON}
+${STYLE}
+${TABLESTYLE}
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+${NAV}
+<a id="main" tabindex="-1"></a>
+<div class="lp">
+  <div class="lp-eyebrow">Tuned Yota · Banks Power Dealer (Onboarding) · ${ESC(p.section)}</div>
+  <h1>${ESC(name)}</h1>
+  <div class="lp-answer" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+    ${p.image ? `<img src="${ESC(p.image)}" alt="${ESC(name)}" loading="lazy" width="160" height="160" style="border-radius:12px;object-fit:contain;background:#fff">` : ""}
+    <div style="flex:1;min-width:220px">
+      <div style="font-size:27px;font-weight:900;color:var(--ink)">${price || "Coming soon"}</div>
+      <div style="font-size:13.5px;color:var(--sage-d);margin-top:2px">Banks part&nbsp;#&nbsp;${ESC(sku)} · ${price ? "Banks' published retail pricing" : "Announced by Banks — priced on release"}</div>
+    </div>
+  </div>
+${CONTACT_CTA}
+  ${p.description ? `<p style="margin:14px 0 0">${ESC(p.description)}</p>` : ""}
+  <p style="margin:14px 0 0">Genuine <strong>Banks Power</strong> hardware reserved through Tuned Yota${tyFit ? ", the Upper Midwest's Toyota &amp; Lexus performance shop — add professional install and OTT calibration in one stop" : ""}. ${price ? "You pay Banks' published retail price; we confirm personally before anything is charged." : "Banks has announced this part but not priced it yet — reserve interest now and be first in line at launch."}</p>
+${fitRows ? `
+  <h2>Toyota &amp; Lexus fitment</h2>
+  <table class="mtab"><thead><tr><th>Years</th><th>Vehicle</th><th>Engine</th></tr></thead><tbody>
+${fitRows}
+  </tbody></table>` : ""}
+${fit.otherMakes.length ? `  <p class="lp-disc" style="margin-top:4px">Also fits ${fit.otherMakes.length} other makes (${ESC(fit.otherMakes.slice(0, 6).join(", "))}${fit.otherMakes.length > 6 ? "…" : ""}) — text us your vehicle and we'll confirm.</p>` : ""}
+${variantRows ? `
+  <h2>Options &amp; part numbers</h2>
+  <table class="mtab"><thead><tr><th>Part #</th><th>Option</th><th>Retail</th><th>Status</th></tr></thead><tbody>
+${variantRows}
+  </tbody></table>` : ""}
+  <h2>Keep browsing</h2>
+  <div class="lp-veh">${vlinks.map(([m, href]) => `<a href="${href}">${ESC(m)} tuning overview</a>`).join("")}<a href="/banks-products">Every Banks Power product</a><a href="/supercharger">Superchargers at Tuned Yota</a><a href="/find-your-exact-tune">Find Your Exact Tune</a></div>
+  <p class="lp-disc">Prices are Banks Power's published retail pricing as of ${ESC(SCRAPE.scraped)} and are subject to change. Tuned Yota is completing Banks dealer onboarding; reservations are confirmed personally with no online payment, and install/calibration is quoted before you commit.</p>
+</div>
+${FOOTER}
+<script src="/chat.js" defer></script>
+</body>
+</html>
+`;
+}
+
+function hubPage() {
+  const url = `${BASE}/banks-products`;
+  const bySection = new Map();
+  for (const p of STORE_ITEMS) {
+    if (!bySection.has(p.section)) bySection.set(p.section, []);
+    bySection.get(p.section).push(p);
+  }
+  // Toyota & Lexus first, then fits-Toyota crossovers, then everything else A→Z.
+  const sectionNames = [...bySection.keys()].sort((a, b) => {
+    const rank = (s) => (s === "Toyota & Lexus" ? 0 : /fits Toyota/.test(s) ? 1 : 2);
+    return rank(a) - rank(b) || a.localeCompare(b);
+  });
+  const total = STORE_ITEMS.length;
+  const desc = `Every current Banks Power product — ${total} products with Banks' published retail pricing — reserved through Tuned Yota. Cold air intakes, iDash gauges, PedalMonster, exhausts and more for Toyota, Lexus and beyond, with install and OTT calibration in the Upper Midwest.`;
+
+  const row = (p) => {
+    const price = priceLabel(p);
+    return `<tr><td><a href="/${p.slug}">${ESC(`Banks ${p.title}`)}</a>${p.comingSoon ? ' <span style="font-size:11.5px;color:var(--sage-d)">(coming soon)</span>' : ""}</td><td>${ESC(primarySku(p))}</td><td class="pr">${price || "TBA"}</td></tr>`;
+  };
+
+  const sections = sectionNames.map((name) => ({
+    id: slugify(name), title: name,
+    rows: bySection.get(name).sort((a, b) => a.title.localeCompare(b.title)).map(row),
+  }));
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banks Power Catalog — All ${total} Products &amp; 2026 Prices | Tuned Yota</title>
+<meta name="description" content="${ESC(desc)}">
+<link rel="canonical" href="${url}">
+<script type="application/ld+json">
+${JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` }, { "@type": "ListItem", position: 2, name: "Banks Power Store", item: url }] })}
+</script>
+${FONTS}
+${SITECSS}
+${FAVICON}
+${STYLE}
+${TABLESTYLE}
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+${NAV}
+<a id="main" tabindex="-1"></a>
+<div class="lp">
+  <div class="lp-eyebrow">Tuned Yota · Banks Power Dealer (Onboarding) · Full Catalog</div>
+  <h1>Banks Power — Every Product, 2026 Retail Pricing</h1>
+  <div class="lp-answer">All <strong>${total} current Banks Power products</strong> at Banks' published retail pricing — Ram-Air cold air intakes, iDash gauges and Stealth Pods, PedalMonster throttle controllers, Monster exhausts, and the full diesel line. Toyota &amp; Lexus applications lead, and Upper-Midwest builds can add professional install and OTT calibration in one stop.</div>
+${CONTACT_CTA}
+  <div class="mnav">
+${sections.map((s) => `    <a href="#${s.id}">${ESC(s.title)}</a>`).join("\n")}
+  </div>
+${sections.map((s) => `  <h2 id="${s.id}">${ESC(s.title)}</h2>
+  <table class="mtab"><thead><tr><th>Product</th><th>Part #</th><th>Retail</th></tr></thead><tbody>
+${s.rows.join("\n")}
+  </tbody></table>`).join("\n")}
+  <h2>Keep browsing</h2>
+  <div class="lp-veh"><a href="/toyota-tacoma-ott-tune">2024+ Tacoma tuning</a><a href="/toyota-4runner-ott-tune">4Runner tuning</a><a href="/magnuson-products">Magnuson supercharger catalog</a><a href="/find-your-exact-tune">Find Your Exact Tune</a></div>
+  <p class="lp-disc">Prices are Banks Power's published retail pricing as of ${ESC(SCRAPE.scraped)}, subject to change without notice. Tuned Yota is completing Banks dealer onboarding; reservations confirm personally with no online payment.</p>
+</div>
+${FOOTER}
+<script src="/chat.js" defer></script>
+</body>
+</html>
+`;
+}
+
+function main() {
+  for (const it of STORE_ITEMS) fs.writeFileSync(path.join(SITE, `${it.slug}.html`), productPage(it));
+  fs.writeFileSync(path.join(SITE, BANKS_HUB_FILE), hubPage());
+  const slugMap = {};
+  for (const it of STORE_ITEMS) for (const v of it.variants || []) if (v.sku) slugMap[v.sku] = it.slug;
+  fs.writeFileSync(path.join(SITE, "banks-slugs.json"), JSON.stringify(slugMap, null, 1));
+  console.log(`banks store: ${STORE_ITEMS.length} product pages + hub written`);
+}
+
+if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) main();

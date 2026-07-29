@@ -9,6 +9,7 @@
     "build:seo": "node scripts/build-seo.mjs && node scripts/build-redirects.mjs && node scripts/build-product-schema.mjs && node scripts/build-merchant-feed.mjs",
     "build:merchant-feed": "node scripts/build-merchant-feed.mjs",
     "build:magnuson-store": "node scripts/magnuson/build-store-pages.mjs",
+    "build:banks-store": "node scripts/banks/build-store-pages.mjs && node scripts/banks/build-catalog.mjs",
     "ingest:magnuson-prices": "node scripts/magnuson/ingest-price-file.mjs",
     "build:redirects": "node scripts/build-redirects.mjs",
     "build:product-schema": "node scripts/build-product-schema.mjs",
