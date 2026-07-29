@@ -181,7 +181,7 @@ window.BANKS_CATALOG = {
           "name": "Banks Ram-Air®",
           "retail": 398,
           "note": "Cold Air Intakes and Manifolds",
-          "slug": "banks-banks-ram-air-42291"
+          "slug": "banks-ram-air-42291"
         }
       ]
     },
@@ -2531,7 +2531,7 @@ window.BANKS_CATALOG = {
           "name": "Banks Ram-Air®",
           "retail": 398,
           "note": "Cold Air Intakes and Manifolds",
-          "slug": "banks-banks-ram-air-42291"
+          "slug": "banks-ram-air-42291"
         },
         {
           "sku": "63380",
@@ -2594,7 +2594,7 @@ window.BANKS_CATALOG = {
           "name": "Banks Ram-Air®",
           "retail": 398,
           "note": "Cold Air Intakes and Manifolds",
-          "slug": "banks-banks-ram-air-42291"
+          "slug": "banks-ram-air-42291"
         }
       ]
     },

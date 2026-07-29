@@ -33,6 +33,9 @@ const SCRAPE = JSON.parse(fs.readFileSync(path.join("data", "banks-site-scrape.j
 const slugify = (s) => String(s).toLowerCase()
   .replace(/["'’.®™]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").replace(/-{2,}/g, "-");
 
+// "Ram-Air Intake" → "Banks Ram-Air Intake"; "Banks Ram-Air®" stays as-is.
+const brandName = (title) => (/^banks\b/i.test(String(title).trim()) ? String(title).trim() : `Banks ${title}`);
+
 // ---- Assemble product list with slugs and hub sections ----------------------
 const TY_MAKES = new Set(["Toyota", "Lexus"]);
 
@@ -52,7 +55,7 @@ function sectionFor(p) {
 function assignSlugs(products) {
   const used = new Set();
   for (const p of products) {
-    let s = slugify(`banks ${p.title}`);
+    let s = slugify(brandName(p.title));
     if (used.has(s)) s = `${s}-${slugify(primarySku(p))}`;
     if (used.has(s)) throw new Error(`slug collision: ${s}`);
     used.add(s);
@@ -174,7 +177,7 @@ function vehicleLinks(fit) {
 function productPage(p) {
   const url = `${BASE}/${p.slug}`;
   const sku = primarySku(p);
-  const name = `Banks ${p.title}`;
+  const name = brandName(p.title);
   const price = priceLabel(p);
   const fit = fitmentRows(p);
   const tyFit = fit.ty.length > 0;
@@ -266,7 +269,7 @@ function hubPage() {
 
   const row = (p) => {
     const price = priceLabel(p);
-    return `<tr><td><a href="/${p.slug}">${ESC(`Banks ${p.title}`)}</a>${p.comingSoon ? ' <span style="font-size:11.5px;color:var(--sage-d)">(coming soon)</span>' : ""}</td><td>${ESC(primarySku(p))}</td><td class="pr">${price || "TBA"}</td></tr>`;
+    return `<tr><td><a href="/${p.slug}">${ESC(brandName(p.title))}</a>${p.comingSoon ? ' <span style="font-size:11.5px;color:var(--sage-d)">(coming soon)</span>' : ""}</td><td>${ESC(primarySku(p))}</td><td class="pr">${price || "TBA"}</td></tr>`;
   };
 
   const sections = sectionNames.map((name) => ({
