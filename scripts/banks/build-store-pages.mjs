@@ -420,6 +420,29 @@ function garagePage() {
     pl.id = slugify(`${pl.make}-${pl.model}`);
   }
 
+  // Tuned Yota leads truck/SUV: these core Toyota/Lexus platforms render first
+  // as full sections, in this exact order. Everything else (cars, vans, other
+  // Lexus) moves into ONE collapsed <details> at the bottom — nothing deleted,
+  // every fitment and product stays reachable, it just stops competing with the
+  // trucks. Matched case-insensitively against the canonical platform label so
+  // e.g. "LC 250"/"LC250" would fall in with Land Cruiser if the catalog adds it.
+  const CORE_ORDER = [
+    { make: "Toyota", match: /^tacoma$/i },
+    { make: "Toyota", match: /^tundra$/i },
+    { make: "Toyota", match: /^4runner$/i },
+    { make: "Toyota", match: /^sequoia$/i },
+    { make: "Toyota", match: /^(land ?cruiser|lc ?250)$/i },
+    { make: "Lexus", match: /^gx$/i },
+    { make: "Lexus", match: /^lx$/i },
+  ];
+  const corePlatforms = [];
+  for (const spec of CORE_ORDER) {
+    for (const pl of platformList) {
+      if (pl.make === spec.make && spec.match.test(pl.model) && !corePlatforms.includes(pl)) corePlatforms.push(pl);
+    }
+  }
+  const restPlatforms = platformList.filter((pl) => !corePlatforms.includes(pl));
+
   const desc = `Banks Power for your Toyota or Lexus — Ram-Air intakes, PedalMonster throttle response controllers, iDash gauges and more, organized by platform with Banks' published retail pricing. ${DEALER_CLAIM} Install and OTT calibration available in the Upper Midwest.`;
 
   const platformSection = (pl) => `  <h2 id="${pl.id}">${ESC(`${pl.make} ${pl.model}`)}</h2>
@@ -443,6 +466,11 @@ ${SITECSS}
 ${FAVICON}
 ${STYLE}
 ${TABLESTYLE}
+<style>
+.more-fitments{margin:26px 0 0;border-top:1.6px solid var(--line);padding-top:10px}
+.more-fitments>summary{font-family:'Spectral SC',serif;font-size:15px;letter-spacing:.04em;color:var(--brown);cursor:pointer;padding:8px 0;font-weight:700}
+.more-fitments[open]>summary{margin-bottom:6px}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -451,12 +479,19 @@ ${NAV}
 <div class="lp">
   <div class="lp-eyebrow">${DEALER_EYEBROW} · Toyota &amp; Lexus</div>
   <h1>Banks Power for Your Toyota &amp; Lexus</h1>
-  <div class="lp-answer">${DEALER_CLAIM} Every Banks Power part with a Toyota or Lexus application — <strong>${tyProducts} products across ${platformList.length} platforms</strong> — organized by vehicle with Banks' published retail pricing. Fitment year ranges are shown exactly as Banks lists them. Add professional install and OTT calibration in one stop in the Upper Midwest.</div>
+  <div class="lp-answer">${DEALER_CLAIM} Every Banks Power part with a Toyota or Lexus application — <strong>${tyProducts} products across ${platformList.length} platforms</strong> — organized by vehicle with Banks' published retail pricing. The Toyota and Lexus trucks and SUVs we build lead below; every other Toyota &amp; Lexus fitment is in the collapsed section at the bottom. Fitment year ranges are shown exactly as Banks lists them. Add professional install and OTT calibration in one stop in the Upper Midwest.</div>
 ${CONTACT_CTA}
   <div class="mnav">
-${platformList.map((pl) => `    <a href="#${pl.id}">${ESC(`${pl.make} ${pl.model}`)}</a>`).join("\n")}
+${corePlatforms.map((pl) => `    <a href="#${pl.id}">${ESC(`${pl.make} ${pl.model}`)}</a>`).join("\n")}
   </div>
-${platformList.map(platformSection).join("\n")}
+${corePlatforms.map(platformSection).join("\n")}
+${restPlatforms.length ? `  <details class="more-fitments">
+    <summary>More Toyota &amp; Lexus fitments (PedalMonster &amp; universal parts)</summary>
+    <div class="mnav">
+${restPlatforms.map((pl) => `      <a href="#${pl.id}">${ESC(`${pl.make} ${pl.model}`)}</a>`).join("\n")}
+    </div>
+${restPlatforms.map(platformSection).join("\n")}
+  </details>` : ""}
   <h2>Every Banks Power product</h2>
   <p><a href="/banks-products"><strong>Or browse the complete Banks Power line — every product, searchable →</strong></a></p>
   <h2>Keep browsing</h2>
