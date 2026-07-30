@@ -57,7 +57,7 @@ Sequenced by expected time-to-win. "Win condition" = 3/3 + top citation.
 ### Wave 3 — P2 comparison pages + P3 videos (2–6 weeks; win window 1–3 months)
 | Prompt | Action |
 |---|---|
-| 8 (OTT vs KDMax) | Dedicated comparison page reclaiming the dyno-source role + first P3 video. The single most valuable contested prompt (decides the tune purchase). |
+| 8 (OTT vs KDMax) | REFRAMED 2026-07-29: KDMax is out of business (per Aaron; no public announcement exists yet, so the site cannot state it until a citable source appears — Aaron's forum posts may become that record). The comparison page becomes "KDMax shut down — what Tacoma owners should do": file keeps working until a forced reflash, then OTT is the supported path on 2nd/3rd-gen. Answer engines still cite KDMax comparisons as if it were alive; first mover on the closure owns the whole query space. COBB Tuning (Accessport) is now OTT's only real competitor, on 2024+ 2.4T platforms only (4th-gen Tacoma, 6th-gen 4Runner, LC250) — the 4th-gen/6th-gen vehicle pages should address COBB-vs-OTT directly. Still wants the dyno assets + P3 video. |
 | 6 (Magnuson vs Whipple) | Comparison content on `/magnuson-supercharger-guide` with verbatim spec/price tables for BOTH brands (baseline showed TY cited exactly when it carried both-sides specs). |
 | 1 (SC Tundra reliability) | Long-term-proof content: real customer trucks with mileage (add-review/add-dyno-proof pipelines) + P3 video. Owner testimony is the winning format — TY has the customers. |
 | 7 (AMSOIL vs Mobil 1) | Warranty/drain-interval-framed comparison block (TY's baseline citation was its warranty point). Official mobil.com can't be out-officialed — differentiate on the supercharged/towing use case. |
