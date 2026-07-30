@@ -51,7 +51,9 @@
 
   // Banks Power — same application shape as Magnuson (the catalog generator
   // merges Banks' per-year fitment tags into ranged applications). Reserve
-  // mode until the dealer price sheet lands; kits deep-link their store page.
+  // mode until the dealer price sheet lands. Mirrors the AMSOIL line: items
+  // link to the vehicle-centric page (/banks-garage); the full line lives at
+  // /banks-products.
   function banksItems(vehicle, catalog) {
     if (!vehicle || !catalog || !Array.isArray(catalog.applications)) return [];
     var name = (String(vehicle.make || "") + " " + String(vehicle.model || "")).trim().toLowerCase();
@@ -69,7 +71,7 @@
           name: k.name,
           price: k.retail,
           blurb: k.note || ((app.engine ? app.engine + " · " : "") + (app.years || "")),
-          url: k.slug ? "/" + k.slug : "/banks-products"
+          url: "/banks-garage"
         });
       });
     });
