@@ -177,7 +177,7 @@ test("summarize counts a Qualified lead with nextFollowup <= today as dueOrOverd
     { stage: "Qualified", channel: "email", nextFollowup: "" },         // no follow-up → not counted
     { stage: "Booked",    channel: "sms",   nextFollowup: yesterday },  // terminal → not counted
   ];
-  const s = summarize(leads);
+  const s = summarize(leads, today);
   assert.equal(s.dueOrOverdue, 2, "Qualified leads with nextFollowup <= today must be counted dueOrOverdue");
 });
 
