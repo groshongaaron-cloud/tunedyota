@@ -6,6 +6,7 @@
 // Converge's modal — no card data ever touches tunedyota.com.
 (function (root) {
   var SESSION_FN = "/.netlify/functions/create-payment-session";
+  var RECORD_FN = "/.netlify/functions/record-payment";
   var SCRIPTS = {
     prod: "https://www.convergepay.com/hosted-payments/PayWithConverge.js",
     demo: "https://demo.convergepay.com/hosted-payments/PayWithConverge.js"
@@ -42,6 +43,18 @@
     });
   }
 
+  // Fire-and-forget: report an approval to the server for Slack alert + lead
+  // pipeline. Never throws — the customer already paid; the thank-you UI must
+  // render no matter what happens here.
+  function reportApproval(sku, approval, fetchImpl) {
+    return (fetchImpl || fetch)(RECORD_FN, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sku: sku, approval: approval })
+    }).then(function (r) { return r.json(); })
+      .catch(function () { return { status: "error" }; });
+  }
+
   // Full flow: token -> modal. onUnavailable fires for payments-not-configured
   // (the page should quietly keep its reservation flow).
   function startCheckout(sku, handlers, deps) {
@@ -68,7 +81,7 @@
     });
   }
 
-  var api = { scriptUrlFor: scriptUrlFor, requestSession: requestSession, openLightbox: openLightbox, startCheckout: startCheckout, SESSION_FN: SESSION_FN };
+  var api = { scriptUrlFor: scriptUrlFor, requestSession: requestSession, openLightbox: openLightbox, startCheckout: startCheckout, reportApproval: reportApproval, SESSION_FN: SESSION_FN, RECORD_FN: RECORD_FN };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   if (typeof window !== "undefined") window.TYPayment = api;
 })(typeof globalThis !== "undefined" ? globalThis : this);

@@ -63,6 +63,7 @@ src="https://www.facebook.com/tr?id=1307227328237229&ev=PageView&noscript=1"/></
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"ImageObject","contentUrl":"https://tunedyota.com/images/dyno/tundra-2022-magnuson-performance-pack-dyno.png","caption":"Magnuson's published 2022+ Toyota Tundra dyno — stock versus Performance Pack tune (i-FORCE hybrid and non-hybrid).","creditText":"Magnuson Superchargers"}</script>
 <!-- Product/Offer schema is injected by /magnuson-schema.js from the same catalog that renders the page, so prices never drift. -->
 <script defer src="/magnuson-catalog.js"></script>
+<script defer src="/payment-checkout.js"></script>
 <script defer src="/magnuson-schema.js"></script>
 
 <style>
@@ -373,14 +374,35 @@ document.addEventListener('DOMContentLoaded', function(){
     $('#qbQuote').classList.add('show');
     $('#qbText').href = 'sms:+16124067117?body=' + encodeURIComponent('Hi Tuned Yota — quoting a ' + k.name + ' for my ' + app.years + ' ' + veh + ' (' + app.engine + '). Site price ' + fmt(k.retail) + '. Part ' + k.sku + '.');
     $('#qbQuote').scrollIntoView({behavior:'smooth', block:'nearest'});
-    /* ── STRIPE (OPEN ITEM) ──
-       When Stripe is live, map SKUs to Payment Links in window.MAGNUSON_CHECKOUT
-       (see /magnuson-catalog.js). If a link exists for this SKU, the reserve
-       button becomes a real checkout button automatically. */
+    /* ── ELAVON CONVERGE CHECKOUT ──
+       Armed via window.MAGNUSON_CHECKOUT (see /magnuson-catalog.js). Card entry
+       happens entirely inside Converge's Lightbox modal — no card data ever
+       touches this page. While the server reports payments-not-configured,
+       onUnavailable quietly falls back to the reservation flow. */
     const links = window.MAGNUSON_CHECKOUT || {};
     const btn = $('#qbReserve');
-    if (links[k.sku]) { btn.textContent = 'Checkout securely →'; btn.onclick = () => location.href = links[k.sku]; }
-    else { btn.textContent = 'Reserve this kit →'; btn.onclick = () => $('#rsvPanel').classList.add('show'); }
+    const showReserve = () => { btn.textContent = 'Reserve this kit →'; btn.onclick = () => $('#rsvPanel').classList.add('show'); };
+    if ((links['*'] || links[k.sku]) && window.TYPayment) {
+      btn.textContent = 'Checkout securely →';
+      btn.onclick = () => startConvergeCheckout(k, btn, showReserve);
+    } else showReserve();
+  }
+
+  function startConvergeCheckout(k, btn, showReserve){
+    btn.disabled = true; btn.textContent = 'Opening secure checkout…';
+    const restore = () => { btn.disabled = false; btn.textContent = 'Checkout securely →'; };
+    TYPayment.startCheckout(k.sku, {
+      onUnavailable: () => { btn.disabled = false; showReserve(); $('#rsvPanel').classList.add('show'); },
+      onApproval: (r) => {
+        TYPayment.reportApproval(k.sku, r);
+        $('#qbPrice').textContent = 'Paid ✓';
+        $('#qbDetail').textContent = k.name + ' (' + k.sku + ') — payment received. We\'ll call or text within 1 business day to schedule delivery or install. A receipt comes from Converge.';
+        btn.textContent = 'Payment complete'; btn.onclick = null;
+      },
+      onDeclined: () => { restore(); $('#qbDetail').textContent = 'Card declined — no charge went through. Try another card, or reserve the kit and we\'ll sort payment out together.'; },
+      onCancelled: restore,
+      onError: () => { restore(); showReserve(); $('#rsvPanel').classList.add('show'); }
+    });
   }
 
   $('#rsvSend').onclick = function(){

@@ -146,8 +146,18 @@ Shipped ahead of the account so go-live is a config change, not a build:
   enabled on the account** (401 = bad creds; 403 = authenticated but forbidden).
   Fix: "Hosted API User" checkbox under Settings → Employees, or an Elavon rep
   request: *enable Hosted Payments / PayWithConverge on AID 2828441, TID 102*.
+- Aaron wrote Converge support 2026-07-30 (no "Hosted API User" checkbox visible
+  in his portal, so enablement is on Elavon's side).
+- **Approval recording + CTA wiring prebuilt 2026-07-30** (the "wait for the
+  sandbox payload" plan died with the no-demo-account reality — built defensively
+  instead): `netlify/functions/record-payment.js` (Slack alert always — flags
+  amount-mismatch vs catalog and says *verify in Converge before fulfillment*
+  since the browser report is unauthenticated; buyer → lead pipeline as source
+  `magnuson-purchase` when contact info exists), `TYPayment.reportApproval`,
+  pricing-page CTA wired via `MAGNUSON_CHECKOUT = { "*": true }` with
+  onUnavailable falling back to the reservation flow. Tests green (1387).
 - Next after a token mints: set `CONVERGE_*` Netlify env vars (no
-  `CONVERGE_DEMO` — production only), deploy, wire the pricing CTA, build
-  approval recording (Airtable + Slack via `lib/alert.js`), one real-card test
-  + refund/void in Converge. Aaron may rotate the PIN after go-live (it transited
-  chat during setup).
+  `CONVERGE_DEMO` — production only) with the pair that mints, redeploy, retest,
+  one real-card test (verify Slack alert + lead + Converge record) + refund/void
+  in Converge. Aaron may rotate the PIN after go-live (it transited chat during
+  setup).

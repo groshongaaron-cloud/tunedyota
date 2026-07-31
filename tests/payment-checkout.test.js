@@ -40,6 +40,20 @@ test("startCheckout: ok session -> loads script for env and opens with the token
   assert.equal(typeof openArgs.cbs.onApproval, "function");
 });
 
+test("reportApproval posts the sku + full approval payload to record-payment", async () => {
+  let got;
+  await P.reportApproval("01-26-57-107-BL", { ssl_txn_id: "TXN-1" }, async (url, opts) => {
+    got = { url, opts }; return { json: async () => ({ status: "ok" }) };
+  });
+  assert.equal(got.url, P.RECORD_FN);
+  assert.deepEqual(JSON.parse(got.opts.body), { sku: "01-26-57-107-BL", approval: { ssl_txn_id: "TXN-1" } });
+});
+
+test("reportApproval swallows network failures — the thank-you UI must never break", async () => {
+  const out = await P.reportApproval("SKU", { ssl_txn_id: "T" }, async () => { throw new Error("offline"); });
+  assert.equal(out.status, "error");
+});
+
 test("startCheckout: gateway error -> onError with the code", async () => {
   let err;
   await P.startCheckout("SKU", { onError: (e) => { err = e; } }, {

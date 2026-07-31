@@ -173,6 +173,8 @@ window.MAGNUSON_CATALOG = {
    read prices from THIS catalog server-side — never from the browser. The
    pricing page keeps its reservation flow until the Converge credentials exist;
    go-live steps: docs/operations/online-payments-go-live.md.
-   MAGNUSON_CHECKOUT stays as the page's activation map: any SKU set truthy here
-   turns "Reserve this kit" into checkout once payments are configured. */
-window.MAGNUSON_CHECKOUT = {};
+   MAGNUSON_CHECKOUT is the page's activation map: "*" arms Converge checkout
+   for every catalog SKU. Still gated server-side — until the CONVERGE_* env
+   vars exist, create-payment-session returns payments-not-configured and the
+   page falls back to the reservation flow (TYPayment onUnavailable). */
+window.MAGNUSON_CHECKOUT = { "*": true };
