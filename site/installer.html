@@ -1899,6 +1899,12 @@
     // leave the stage lists entirely so Active stays a clean read of the pipeline,
     // and the Overdue view is a focused, oldest-first action list.
     var over=visible.filter(isOverdueLead).sort(function(a,b){ return (a.nextFollowup||'').localeCompare(b.nextFollowup||''); });
+    // Deep-links (calendar follow-up chips) must land on the sub-tab that actually
+    // holds the lead — an overdue lead lives only under ⏰ Overdue.
+    if(STATE.leadOpenId){
+      var target=STATE.leads.filter(function(l){ return l.id===STATE.leadOpenId; })[0];
+      if(target) STATE.leadTab = isOverdueLead(target) ? 'overdue' : 'active';
+    }
     var st=document.createElement('div'); st.style.cssText='display:flex;gap:8px;margin:8px 0';
     [['active','Active'],['overdue','⏰ Overdue'+(over.length?' ('+over.length+')':'')]].forEach(function(t){
       var b=document.createElement('button'); b.className='tabbtn'+(STATE.leadTab===t[0]?' on':''); b.textContent=t[1];
@@ -1944,7 +1950,9 @@
     }
     var det=leadCard(l);
     var ds=det.querySelector('summary');
-    if(ds) ds.innerHTML='<span class="edate">Full lead — stages · notes · convert ›</span>';
+    // Keep the name inside the details card: calendar deep-links (and the
+    // flash/scroll they trigger) identify the card by the lead's name.
+    if(ds) ds.innerHTML='<span class="edate">'+esc(l.name)+' — full lead · stages · notes · convert ›</span>';
     wrap.appendChild(det);
     return wrap;
   }
