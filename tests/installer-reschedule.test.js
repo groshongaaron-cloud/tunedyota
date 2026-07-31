@@ -78,3 +78,35 @@ test("an empty address leaves the stored Address untouched and echoes the existi
   assert.equal("Address" in patched, false);
   assert.equal(out.address, "44 Oak Ave");
 });
+
+test("owner can correct the customer name (Aaron ask 2026-07-30: placeholder names on real bookings)", async () => {
+  let patched;
+  const out = await processReschedule({ recordId: "rec1", name: "  Mike Larson  " },
+    { env, key: "noah", get: async () => recFor("noah", { Name: "Text 763-516-4782" }), update: async (a) => { patched = a.fields; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal(patched.Name, "Mike Larson");
+  assert.equal(out.name, "Mike Larson");
+});
+
+test("name-only update counts as a change; unchanged name is not written", async () => {
+  let patched;
+  const out = await processReschedule({ recordId: "rec1", name: "Jane" },
+    { env, key: "noah", get: async () => recFor("noah"), update: async (a) => { patched = a.fields; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal("Name" in (patched || {}), false);
+});
+
+test("overlong name rejected", async () => {
+  const out = await processReschedule({ recordId: "rec1", name: "x".repeat(81) },
+    { env, key: "noah", get: async () => recFor("noah"), update: async () => ({}) });
+  assert.equal(out.status, "error");
+  assert.equal(out.error, "bad-name");
+});
+
+test("console Edit panel wires the name field into the reschedule call", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const HTML = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
+  assert.ok(HTML.includes("rn_'+b.id"), "name input rendered");
+  assert.ok(/name:nameChanged\?n:''/.test(HTML), "name sent only when changed");
+});
