@@ -241,6 +241,28 @@ function applyLeadUpdate(lead, action, payload = {}, now = new Date()) {
   return { error: "bad-action" };
 }
 
+// Field patch for linking a lead to an EXISTING booking — same end-state as
+// convert (Stage Booked + link + audit line), minus creating the record.
+function buildLinkPatch(lead, booking, now = new Date()) {
+  const when = [booking.city, booking.dateISO, booking.scheduledTime || booking.slot].filter(Boolean).join(" ");
+  return {
+    Booking: [booking.id],
+    "Converted Booking": booking.id,
+    Stage: "Booked",
+    "Activity Log": appendActivity(lead.activity, logLine(now, `linked → existing booking ${booking.id} (${when})`)),
+  };
+}
+
+// Mislink recovery. Clears both link fields; Stage is left for the installer to
+// correct with the existing stage buttons (the unlink reason decides the stage).
+function buildUnlinkPatch(lead, now = new Date()) {
+  return {
+    Booking: [],
+    "Converted Booking": "",
+    "Activity Log": appendActivity(lead.activity, logLine(now, "unlinked from booking")),
+  };
+}
+
 const STALE_AFTER_DAYS = 30;
 
 // The fell-through-the-cracks bucket: active stage, nothing scheduled (a future
@@ -307,6 +329,7 @@ module.exports = {
   validChannel, validStage,
   normalizeChannel, normalizePhone, normalizeEmail,
   toLeadView, scopeLeads, toBookingSummary, bookingMatchesForLead, clientForLead,
+  buildLinkPatch, buildUnlinkPatch,
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, staleLeads, STALE_AFTER_DAYS, installerKeyForPhone,
 };

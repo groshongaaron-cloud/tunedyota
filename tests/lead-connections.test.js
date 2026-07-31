@@ -4,6 +4,7 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const {
   toLeadView, toBookingSummary, bookingMatchesForLead, clientForLead, staleLeads,
+  buildLinkPatch, buildUnlinkPatch,
 } = require("../netlify/functions/lib/leads.js");
 
 const bk = (id, f) => toBookingSummary({ id, fields: f });
@@ -107,4 +108,22 @@ test("staleLeads: non-active stages excluded; createdTime is the no-contact fall
   assert.deepEqual(out.map((l) => l.id), ["older", "young"]);
   assert.equal(out[0].staleDays, 90);
   assert.equal(out[1].staleDays, 59);
+});
+
+test("buildLinkPatch links, books, and logs — mirror of what convert writes", () => {
+  const lead = { activity: "old line" };
+  const booking = { id: "recB1", city: "Madison", dateISO: "2026-08-01", scheduledTime: "", slot: "10:20" };
+  const p = buildLinkPatch(lead, booking, new Date("2026-07-30T12:00:00Z"));
+  assert.deepEqual(p.Booking, ["recB1"]);
+  assert.equal(p["Converted Booking"], "recB1");
+  assert.equal(p.Stage, "Booked");
+  assert.match(p["Activity Log"], /^old line\n2026-07-30 12:00 — linked → existing booking recB1 \(Madison 2026-08-01 10:20\)$/);
+});
+
+test("buildUnlinkPatch clears both link fields and logs, leaves Stage alone", () => {
+  const p = buildUnlinkPatch({ activity: "" }, new Date("2026-07-30T12:00:00Z"));
+  assert.deepEqual(p.Booking, []);
+  assert.equal(p["Converted Booking"], "");
+  assert.equal(p.Stage, undefined);
+  assert.match(p["Activity Log"], /unlinked from booking/);
 });
