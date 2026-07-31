@@ -2374,6 +2374,79 @@
   // Any name tap opens the customer's 360 view — same affordance on every card.
   function wireCust(c,b){ var a=c.querySelector('[data-cust]');
     if(a) a.onclick=function(ev){ ev.preventDefault(); openCustomerView({phone:b.phone||'',email:b.email||'',name:b.name||''}); }; }
+  // A record whose "name" is really just the phone number: channel adapters mint
+  // "Text (xxx) xxx-xxxx" / "Caller …" bookings and leads when only a number is known.
+  function isPlaceholderName(rec){
+    var n=String(rec.name||'').trim();
+    if(!n) return true;
+    if(/^(text|caller|unknown)\b/i.test(n)) return true;
+    var nd=n.replace(/\D/g,''), pd=callDigits(rec.phone||'');
+    return !!pd && nd.length>=7 && pd.indexOf(nd.slice(-7))>=0;
+  }
+  // Best known identity for a phone across everything loaded: roster bookings win
+  // (newest real-named match), leads fill the gap. Excludes the record being resolved.
+  function knownIdentityFor(phone, excludeId){
+    var pd=callDigits(phone); if(!pd) return null;
+    var best=null;
+    (STATE.bookings||[]).forEach(function(x){
+      if(x.id===excludeId || callDigits(x.phone)!==pd || isPlaceholderName(x)) return;
+      if(!best || String(x.dateISO||'')>String(best.dateISO||'')) best={name:x.name,vehicle:x.vehicle||'',email:x.email||''};
+    });
+    if(!best){ (STATE.leads||[]).forEach(function(l){
+      if(l.id===excludeId || callDigits(l.phone)!==pd || isPlaceholderName(l) || best) return;
+      best={name:l.name,vehicle:l.vehicle||'',email:l.email||''};
+    }); }
+    return best;
+  }
+  // "Who is this?" resolver (owner ask 2026-07-30): a number-only booking can pull
+  // its identity from an existing contact, or mint a market-routed lead so the
+  // person exists for future bookings.
+  function renderWhoStrip(c,b){
+    var host=c.querySelector('#who_'+b.id); if(!host) return;
+    if(!STATE.leadsLoaded && !STATE.leadsLoading){ STATE.leadsLoading=true; loadLeads(); }
+    var t=document.createElement('div'); t.textContent='❓ Only the number is known for this booking.'; host.appendChild(t);
+    var m=knownIdentityFor(b.phone, b.id);
+    var row=document.createElement('div'); row.className='row-actions';
+    if(m){
+      var use=document.createElement('button'); use.className='btn'; use.type='button';
+      use.textContent='Use existing: '+m.name;
+      use.onclick=async function(){
+        use.disabled=true;
+        try{
+          var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:b.id,name:m.name})});
+          var out=await res.json().catch(function(){return{};});
+          if(res.ok&&out.status==='ok'){ b.name=m.name; succeed('✓ Booking is now '+m.name+'.'); renderAll(); }
+          else { fail('Could not apply the name.'); use.disabled=false; }
+        }catch(e){ fail('Network error — try again.'); use.disabled=false; }
+      };
+      row.appendChild(use);
+    }
+    var mk=document.createElement('button'); mk.className='btn ns'; mk.type='button'; mk.textContent='＋ New contact / lead';
+    row.appendChild(mk); host.appendChild(row);
+    var form=document.createElement('div'); form.className='walkmini hidden';
+    var n=mkInput('Name (leave blank if unknown)'), v=mkInput('Vehicle — optional'), ct=mkInput('City / market (routes the lead)');
+    var cities=knownCities();
+    if(cities.length){ var dl=document.createElement('datalist'); dl.id='who_cities_'+(b.id||'').replace(/[^a-z0-9]/gi,''); dl.innerHTML=cities.map(function(x){return '<option value="'+esc(x)+'"></option>';}).join(''); ct.setAttribute('list',dl.id); form.appendChild(dl); }
+    var save=document.createElement('button'); save.className='btn addwalk'; save.type='button'; save.textContent='Save contact';
+    form.appendChild(n); form.appendChild(v); form.appendChild(ct); form.appendChild(save);
+    host.appendChild(form);
+    mk.onclick=function(){ form.classList.toggle('hidden'); };
+    save.onclick=async function(){
+      save.disabled=true;
+      // Blank name → the adapters' "Caller (xxx) xxx-xxxx" convention, so the
+      // ingest name-backfill upgrades it the moment a real name ever arrives.
+      var typed=(n.value||'').trim();
+      var name=typed || ('Caller '+fmtCallPhone(b.phone));
+      try{
+        if(typed){
+          // A real name fixes THIS booking too, not just the new lead.
+          try{ var r=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:b.id,name:typed})}); if(r.ok) b.name=typed; }catch(e){}
+        }
+        await ingestLead({name:name, vehicle:v.value, phone:b.phone, email:b.email||'', channel:'sms', city:ct.value, message:'contact created from booking '+(b.city||'')+' '+(b.dateISO||'')});
+        if(typed) renderAll();
+      } finally { save.disabled=false; }
+    };
+  }
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
     var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+(b.scheduledTime?esc(b.scheduledTime)+' · ':'')+'<a href="#" data-cust style="color:inherit;text-decoration:underline dotted">'+esc(b.name)+'</a>'+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
@@ -2424,6 +2497,7 @@
     }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+calOptions(b).map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+contact+
+      (isPlaceholderName(b)?'<div id="who_'+b.id+'" class="ffnote"></div>':'')+
       '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✏️ Edit'+(b.scheduledTime?' — '+esc(b.scheduledTime):' name / date / time / address')+'</summary>'+
       '<div class="row-actions" style="margin-top:6px">'+
       '<input id="rn_'+b.id+'" autocomplete="off" placeholder="Customer name" value="'+esc(b.name||'')+'">'+
@@ -2457,6 +2531,7 @@
     nsb.onclick=function(){ if(cb.checked) closeout(b.id,{action:'noshow',confirmed:true}); };
     var vinEl = c.querySelector('#vin_'+b.id);
     if(vinEl) vinEl.oninput = function(){ scheduleVinCheck(b.id); };
+    renderWhoStrip(c,b);
     wireCust(c,b);
     return c;
   }
