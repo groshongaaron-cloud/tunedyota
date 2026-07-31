@@ -35,15 +35,19 @@ function renderRosterEmail(event, bookings, waitlist) {
     : "";
   const flexText = flexRows.length ? `\n\n⚠ FLEX FUEL TUNDRA — ${FLEX_FUEL_NOTE}\nApplies to: ${flexNames.join(", ")}.` : "";
 
-  // Protocol Selection Guide: bookings whose PCM entry carries a handling note
-  // (separate TCM flash, ECU direct-connect cable, K-Line CUW) get a callout.
-  const pcmNoteRows = sorted.map((b) => ({ b, p: pcmOf(b) })).filter((x) => x.p && x.p.note);
+  // Protocol Selection Guide: every matched booking gets its full flash data —
+  // the guide's PCM Flash module string and VFT WiFlash column — plus the start
+  // throttle and any handling note (separate TCM, direct-connect cable, K-Line CUW).
+  const pcmNoteRows = sorted.map((b) => ({ b, p: pcmOf(b) })).filter((x) => x.p && x.p.pcmFlash);
+  const flashLine = (x) =>
+    `${x.b.Slot ? formatSlot(x.b.Slot) + " " : ""}${x.b.Name || ""} — PCM Flash ${x.p.pcmFlash}${x.p.fid ? ` (${x.p.fid})` : ""} · VFT ${x.p.vft}` +
+    `${x.p.throttle ? ` · start: ${x.p.throttle}` : ""}${x.p.note ? ` — ⚠ ${x.p.note}` : ""}`;
   const pcmHtml = pcmNoteRows.length
-    ? `<div style="margin:16px 0;padding:10px 12px;background:#eef4fb;border:1px solid #b7cfe8;border-radius:8px;color:#1f4e79;font-size:13px"><strong>🔧 PCM flash notes</strong><br>` +
-      pcmNoteRows.map((x) => esc(`${x.b.Slot ? formatSlot(x.b.Slot) + " " : ""}${x.b.Name || ""} — ${x.p.pcm}: ${x.p.note}`)).join("<br>") + `</div>`
+    ? `<div style="margin:16px 0;padding:10px 12px;background:#eef4fb;border:1px solid #b7cfe8;border-radius:8px;color:#1f4e79;font-size:13px"><strong>🔧 Flash data — Protocol Selection Guide</strong><br>` +
+      pcmNoteRows.map((x) => esc(flashLine(x))).join("<br>") + `</div>`
     : "";
   const pcmText = pcmNoteRows.length
-    ? `\n\n🔧 PCM FLASH NOTES\n` + pcmNoteRows.map((x) => `${x.b.Slot ? formatSlot(x.b.Slot) + " " : ""}${x.b.Name || ""} — ${x.p.pcm}: ${x.p.note}`).join("\n")
+    ? `\n\n🔧 FLASH DATA (Protocol Selection Guide)\n` + pcmNoteRows.map(flashLine).join("\n")
     : "";
 
   const th = head.map((h) => `<th style="text-align:left;padding:4px 12px 4px 0;color:#7c8472;border-bottom:1px solid #ccc">${h}</th>`).join("");

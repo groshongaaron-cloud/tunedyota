@@ -46,6 +46,38 @@ test("roster shows no flex-fuel callout when there are no Tundras", () => {
   const { html } = renderRosterEmail(event, bookings, []);   // Tacoma + 4Runner only
   assert.doesNotMatch(html, /Flex Fuel Tundra/);
 });
+test("roster gives every booking a flash-data note: full PCM Flash + VFT WiFlash + start throttle", () => {
+  const b = [
+    { Slot: "9:00", Name: "Tim Tundra", Vehicle: "2007-2017 Toyota Tundra 5.7L V8", "Model Year": "2015", Phone: "p1", Email: "t@x.com" },
+    { Slot: "9:20", Name: "Tara Taco", Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2019", Phone: "p2", Email: "ta@x.com" },
+    { Slot: "9:40", Name: "Gen Four", Vehicle: "2024+ Toyota Tacoma 2.4L-T I4", Phone: "p3", Email: "g@x.com" },
+  ];
+  const { html, text } = renderRosterEmail(event, b, []);
+  assert.match(html, /Flash data/);
+  // Tundra: Gen 1 module string + VFT line
+  assert.ok(html.includes("76F0038/39/40/70/85"), "full Gen 1 PCM Flash module data");
+  assert.ok(html.includes("Toyota Gen 1 496k/736k/992k CAN"), "Gen 1 VFT WiFlash data");
+  // 3rd-gen Tacoma: PS-CAN module string, FID 27, PCM Flash software
+  assert.ok(html.includes("76F0196/198/199/219 PS-CAN"), "Gen 2 PS-CAN PCM Flash module data");
+  assert.ok(html.includes("Toyota Gen 2 1.5/2.0MB CAN"), "Gen 2 VFT WiFlash data");
+  assert.ok(html.includes("FID 27"), "Bitbox FID shown");
+  // Gen-4 turbo: VFTuner platform string + cable note stays visible
+  assert.ok(html.includes("T2A-FTS/R7F702002"), "Gen 4 platform data");
+  assert.match(html, /direct-connect cable/);
+  // Per-booking lines are labeled with slot + name, in both formats
+  assert.ok(html.includes("9:00 AM Tim Tundra"), "booking labeled in flash block");
+  assert.match(text, /FLASH DATA/);
+  assert.ok(text.includes("76F0196/198/199/219 PS-CAN"));
+  assert.ok(text.includes("Toyota Gen 2 1.5/2.0MB CAN"));
+});
+
+test("roster shows no flash-data block when no booking matches the guide", () => {
+  const b = [{ Slot: "9:00", Name: "Cam Camry", Vehicle: "2020 Toyota Camry 2.5L", Phone: "p1", Email: "c@x.com" }];
+  const { html, text } = renderRosterEmail(event, b, []);
+  assert.doesNotMatch(html, /Flash data/);
+  assert.doesNotMatch(text, /FLASH DATA/);
+});
+
 test("roster handles empty bookings + empty waitlist", () => {
   const { html } = renderRosterEmail(event, [], []);
   assert.ok(/no bookings/i.test(html));

@@ -126,12 +126,19 @@ into the right day/OTT month. Full detail: [Playbook §3](installer-dashboard-pl
 
 ---
 
-## 7. PCM flash protocol selection (OTT Protocol Selection Guide, transcribed 2026-07-22)
+## 7. PCM flash protocol selection (OTT Protocol Selection Guide, transcribed 2026-07-22, re-verified 2026-07-30)
 
 Source of truth: `Dropbox/Overland Tailor 3rd Party Calibrators/Instructions/Protocol
 Selection Guide.pdf`. The console day view and the roster email show each booking's
-protocol automatically (the 🔧 PCM line / PCM Flash column) — this table is the
-reference behind that, and the fallback if you're working off paper.
+protocol automatically — since 2026-07-30 that includes the guide's **full PCM Flash
+module string and VFT WiFlash data** per booking (console 🔧 card note + roster
+"Flash data" block), so the installer never has to look the module up. This table is
+the reference behind that, and the fallback if you're working off paper.
+
+**All third-gen Tacomas (2016–2023) run PCM Flash (Tactrix)** — the engine decides
+the Bitbox path: 3.5L = FID 27 **PS-CAN**, 2.7L = FID 28 **CAN-bus**. Picking the
+wrong FID/bus fails the flash; if the console says "confirm engine," check
+displacement before connecting.
 
 | Vehicle | Years | PCM Flash | Bitbox | Software | Max throttle to start |
 |---|---|---|---|---|---|

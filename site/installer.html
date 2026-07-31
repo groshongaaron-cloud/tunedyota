@@ -2383,7 +2383,8 @@
       (b.address?'<div class="meta">📍 '+esc(b.address)+' · <a class="link" href="'+esc(mapsHref(b.address))+'" target="_blank" rel="noopener">🧭 Navigate</a></div>'
         : b.city?'<div class="meta">📍 '+esc(b.city)+'</div>':'')+
       (b.flexFuelNote?'<div class="ffnote">⚠ '+esc(b.flexFuelNote)+'</div>':'')+
-      (b.pcm?'<div class="ffnote" style="color:#1f4e79;border-color:#b7cfe8;background:#eef4fb">🔧 PCM '+esc(b.pcm.pcm)+(b.pcm.fid?' · '+esc(b.pcm.fid):'')+(b.pcm.throttle?' · start: '+esc(b.pcm.throttle):'')+(b.pcm.note?' — '+esc(b.pcm.note):'')+'</div>':'');
+      (b.pcm?'<div class="ffnote" style="color:#1f4e79;border-color:#b7cfe8;background:#eef4fb">🔧 PCM '+esc(b.pcm.pcm)+(b.pcm.fid?' · '+esc(b.pcm.fid):'')+(b.pcm.throttle?' · start: '+esc(b.pcm.throttle):'')+
+        (b.pcm.pcmFlash?'<br>PCM Flash: '+esc(b.pcm.pcmFlash):'')+(b.pcm.vft?'<br>VFT: '+esc(b.pcm.vft):'')+(b.pcm.note?'<br>⚠ '+esc(b.pcm.note):'')+'</div>':'');
     var overdue = isOpen(b) && b.dateISO < STATE.today;
     if(overdue){ head += '<div class="ffnote">⚠ Not closed out — this customer has no certificate yet. Close it out (VIN + calibration) to send it.</div>'; }
     // Reach the client from the booking — same TY-line thread motion as leads.
