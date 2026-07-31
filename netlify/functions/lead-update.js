@@ -80,7 +80,7 @@ async function handler(event, ctx = {}) {
   if (built.error) return { statusCode: 400, body: JSON.stringify({ error: built.error }) };
   try {
     await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: built.fields },
-      ["Stage", "Channel", "Next Follow-up", "Last Contact", "Activity Log", "Installer", "City"]);
+      ["Stage", "Channel", "Next Follow-up", "Follow-up Message", "Last Contact", "Activity Log", "Installer", "City"]);
   } catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
   return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", fields: built.fields }) };
 }

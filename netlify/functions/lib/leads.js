@@ -41,6 +41,7 @@ function toLeadView(rec) {
     source: f.Source || "",
     modifications: f.Modifications || "", modelYear: f["Model Year"] || "",
     nextFollowup: (f["Next Follow-up"] || "").slice(0, 10),
+    followupMessage: f["Follow-up Message"] || "",
     lastContact: (f["Last Contact"] || "").slice(0, 10),
     activity: f["Activity Log"] || "",
     convertedBooking: f["Converted Booking"] || "",
@@ -163,7 +164,16 @@ function applyLeadUpdate(lead, action, payload = {}, now = new Date()) {
   if (action === "setFollowup") {
     const date = String(payload.date || "");
     if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "bad-date" };
-    return { fields: { "Next Follow-up": date, "Activity Log": add(date ? `follow-up set ${date}` : "follow-up cleared") } };
+    // The optional message rides along with the date and dies with it — a cleared
+    // follow-up must never leave a stale draft that fires months later.
+    const message = date ? String(payload.message || "").trim().slice(0, 500) : "";
+    return { fields: { "Next Follow-up": date, "Follow-up Message": message,
+      "Activity Log": add(date ? `follow-up set ${date}${message ? ` — "${message.slice(0, 80)}"` : ""}` : "follow-up cleared") } };
+  }
+  if (action === "followupSent") {
+    const note = String(payload.note || "").trim().slice(0, 200);
+    return { fields: { "Last Contact": today, "Next Follow-up": "", "Follow-up Message": "",
+      "Activity Log": add(`follow-up sent${note ? `: "${note}"` : ""}`) } };
   }
   if (action === "reassign") {
     return { fields: { City: String(payload.city || ""), Installer: String(payload.installer || ""),
