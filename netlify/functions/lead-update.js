@@ -5,7 +5,7 @@
 // (walk-in-style, any date) and links it back to the lead.
 const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant, deleteRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { toLeadView, applyLeadUpdate, logLine, appendActivity } = require("./lib/leads.js");
+const { toLeadView, applyLeadUpdate, logLine, appendActivity, toBookingSummary, buildLinkPatch, buildUnlinkPatch } = require("./lib/leads.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 
@@ -74,6 +74,35 @@ async function handler(event, ctx = {}) {
       mods: "", status: "Booked", isWalkin: false, calibration: "", vin: "", tuningPlatform: "",
       calibrationType: "", ecuId: "", gearSize: "", mileage: "" };
     return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", bookingId: bk && bk.id, stage: "Booked", booking }) };
+  }
+
+  // Link to an EXISTING booking — the dedupe motion. Same end-state as convert
+  // (Stage Booked, link, audit line) without creating a record. The response
+  // carries the booking so the console can jump-and-flash it (no silent outcomes).
+  if (action === "link") {
+    const bookingId = String(body.bookingId || "").trim();
+    if (!bookingId) return { statusCode: 400, body: JSON.stringify({ error: "missing-booking-id" }) };
+    let bkRec;
+    try { bkRec = await getImpl({ token: c.token, baseId: c.baseId, table: c.bookings, id: bookingId }); }
+    catch (e) {
+      const notFound = /40[34]/.test(String(e && e.message));
+      return { statusCode: notFound ? 400 : 502, body: JSON.stringify({ error: notFound ? "booking-not-found" : "store-unavailable" }) };
+    }
+    const booking = toBookingSummary(bkRec);
+    try {
+      await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: buildLinkPatch(lead, booking, now) },
+        ["Booking", "Converted Booking", "Stage", "Activity Log"]);
+    } catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
+    return { statusCode: 200, headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "ok", stage: "Booked", bookingId: booking.id, booking }) };
+  }
+
+  if (action === "unlink") {
+    try {
+      await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: buildUnlinkPatch(lead, now) },
+        ["Booking", "Converted Booking", "Activity Log"]);
+    } catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
+    return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", unlinked: true }) };
   }
 
   const built = applyLeadUpdate(lead, action, body, now);
