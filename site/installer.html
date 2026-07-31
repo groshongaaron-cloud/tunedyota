@@ -355,6 +355,7 @@
     , jobTab: 'all'      // 'all' | '<city>' | 'done'
     , doneCity: ''       // optional city filter applied inside the Done view
     , theme: '', me: ''
+    , leadTab:'active', followupPending:null
     , chats:[], chatOpen:null, chatsLoaded:false
     , calls:[], callsLoaded:false, callsError:false };
   var CHAT_POLL = null;
@@ -381,6 +382,7 @@
   }
   function ym(iso){ return (iso||'').slice(0,7); }
   function isOpen(b){ return b.status!=='Completed' && b.status!=='No-show' && b.status!=='Cancelled'; }
+  function isOverdueLead(l){ return ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && !!l.nextFollowup && l.nextFollowup<=STATE.today; }
   function cap(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):''; }
   function money(n){ return '$' + Math.round(n || 0).toLocaleString('en-US'); }
   // The installer's LOCAL date (Central), not server UTC — UTC rolls to tomorrow in
@@ -1160,7 +1162,18 @@
       var replyId = STATE.chatOpen;
       var btn = form.querySelector('button[type="submit"]');
       tin.disabled = true; if(btn) btn.disabled = true;
-      try{ await chatApi({op:'reply', session:replyId, text:tin.value}); tin.value='';
+      var sentText=tin.value;
+      try{ await chatApi({op:'reply', session:replyId, text:sentText}); tin.value='';
+        var fp=STATE.followupPending;
+        if(fp && fp.sessionId===replyId){
+          STATE.followupPending=null;
+          // Mark the follow-up handled: stamps Last Contact, clears date + message.
+          // Fire-and-forget; the Overdue list refreshes on the next Leads load.
+          fetch('/.netlify/functions/lead-update',{method:'POST',
+            headers:{'Content-Type':'application/json','x-installer-token':tok()},
+            body:JSON.stringify({id:fp.leadId,action:'followupSent',note:sentText.slice(0,200)})})
+            .then(function(){ STATE.leadsLoaded=false; }).catch(function(){});
+        }
         // Sending always jumps to your new message, even if you'd scrolled up.
         var lg=document.getElementById('chatlog'); if(lg) lg.scrollTop=lg.scrollHeight;
         if(STATE.tab==='chats' && STATE.chatOpen===replyId) renderChatThread(host);
@@ -1182,7 +1195,7 @@
     if(!host){ host=document.createElement('div'); host.id='tabs'; host.style.cssText='display:flex;gap:8px;margin:6px 0 10px';
       var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
     function tab(id,label,badge){ return '<button class="tabbtn'+(STATE.tab===id?' on':'')+'" data-tab="'+id+'">'+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
-    var due=STATE.leads.filter(function(l){ return ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today; }).length;
+    var due=STATE.leads.filter(isOverdueLead).length;
     host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chats.length?String(STATE.chats.length):'')+tab('calls','Calls','');
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){
       STATE.tab=b.getAttribute('data-tab');
@@ -1789,18 +1802,76 @@
     host.appendChild(box);
     var qi=document.getElementById('leadq'); qi.value=STATE.leadQ; qi.oninput=function(){ STATE.leadQ=this.value; renderLeads(); };
     var visible=STATE.leads.filter(leadMatchesQ);
+    // Overdue lives in its OWN sub-tab (owner decision 2026-07-30): due follow-ups
+    // leave the stage lists entirely so Active stays a clean read of the pipeline,
+    // and the Overdue view is a focused, oldest-first action list.
+    var over=visible.filter(isOverdueLead).sort(function(a,b){ return (a.nextFollowup||'').localeCompare(b.nextFollowup||''); });
+    var st=document.createElement('div'); st.style.cssText='display:flex;gap:8px;margin:8px 0';
+    [['active','Active'],['overdue','⏰ Overdue'+(over.length?' ('+over.length+')':'')]].forEach(function(t){
+      var b=document.createElement('button'); b.className='tabbtn'+(STATE.leadTab===t[0]?' on':''); b.textContent=t[1];
+      b.onclick=function(){ STATE.leadTab=t[0]; renderLeads(); }; st.appendChild(b);
+    });
+    host.appendChild(st);
+    if(STATE.leadTab==='overdue'){
+      if(!over.length){ var oe=document.createElement('div'); oe.className='empty'; oe.textContent='Nothing overdue — every follow-up is handled. 🎉'; host.appendChild(oe); return; }
+      over.forEach(function(l){ host.appendChild(reminderCard(l)); });
+      return;
+    }
     LEAD_STAGES.forEach(function(stage){
-      var inStage=visible.filter(function(l){ return (l.stage||'New')===stage; });
+      var inStage=visible.filter(function(l){ return (l.stage||'New')===stage && !isOverdueLead(l); });
       if(!inStage.length) return;
-      inStage.sort(function(a,b){
-        var ao=(ACTIVE_LEAD_STAGES.indexOf(a.stage)>=0 && a.nextFollowup && a.nextFollowup<=STATE.today)?0:1;
-        var bo=(ACTIVE_LEAD_STAGES.indexOf(b.stage)>=0 && b.nextFollowup && b.nextFollowup<=STATE.today)?0:1;
-        if(ao!==bo) return ao-bo; return (b.lastContact||'').localeCompare(a.lastContact||'');
-      });
+      inStage.sort(function(a,b){ return (b.lastContact||'').localeCompare(a.lastContact||''); });
       host.appendChild(secHead(stage+' ('+inStage.length+')',''));
       inStage.forEach(function(l){ host.appendChild(leadCard(l)); });
     });
-    if(!visible.length){ var em=document.createElement('div'); em.className='empty'; em.textContent='No leads yet. Use "＋ Log a lead" above.'; host.appendChild(em); }
+    var anyActive=visible.some(function(l){ return !isOverdueLead(l); });
+    if(!anyActive){ var em=document.createElement('div'); em.className='empty';
+      em.textContent = over.length ? 'All caught up here — '+over.length+' lead'+(over.length>1?'s':'')+' waiting under ⏰ Overdue.' : 'No leads yet. Use "＋ Log a lead" above.';
+      host.appendChild(em); }
+  }
+  // Overdue view: one focused reminder per lead — who, how late, what you planned
+  // to say, one primary action. The full lead card stays reachable underneath.
+  function reminderCard(l){
+    var wrap=document.createElement('div'); wrap.className='card';
+    var days=daysBetween(STATE.today, l.nextFollowup||STATE.today);
+    var when=days<=0?'due today':(days===1?'1 day overdue':days+' days overdue');
+    var head=document.createElement('div');
+    head.innerHTML='<div class="top"><span class="who">'+(CHAN_ICON[l.channel]||'•')+' '+esc(l.name)+'</span>'+
+      '<span class="pill hasopen">⏰ '+esc(when)+'</span></div>'+
+      '<div class="meta">'+esc(l.vehicle||'—')+' · '+esc(l.city||'—')+' · '+esc(l.stage)+
+      (l.installer&&STATE.admin?' · <span class="installer-tag">'+esc(l.installer)+'</span>':'')+'</div>'+
+      (l.followupMessage?'<div class="meta" style="font-style:italic">“'+esc(l.followupMessage)+'”</div>':'');
+    wrap.appendChild(head);
+    if(l.phone){
+      var send=document.createElement('button'); send.className='btn'; send.style.cssText='width:100%;margin:6px 0 2px';
+      send.textContent='💬 Send follow-up'; send.onclick=function(){ send.disabled=true; sendFollowup(l); };
+      wrap.appendChild(send);
+    } else {
+      var noP=document.createElement('div'); noP.className='empty'; noP.textContent='No phone on file — follow up by email below.'; wrap.appendChild(noP);
+    }
+    var det=leadCard(l);
+    var ds=det.querySelector('summary');
+    if(ds) ds.innerHTML='<span class="edate">Full lead — stages · notes · convert ›</span>';
+    wrap.appendChild(det);
+    return wrap;
+  }
+  // Approved flow (2026-07-30): prefilled draft, one tap to send. Opens/creates the
+  // client's SMS thread with the saved message in the composer; the follow-up is
+  // only marked handled when a send actually succeeds in that thread.
+  async function sendFollowup(l){
+    try{
+      var r=await chatApi({op:'openSms', phone:l.phone, name:l.name, vehicle:l.vehicle});
+      if(!(r&&r.session)){ fail('Could not open the chat — try again.'); return; }
+      var msg=(l.followupMessage||'').trim();
+      if(!msg){
+        var first=(l.name||'').trim().split(/\s+/)[0]||'there';
+        var me=STATE.me?cap(STATE.me):'Tuned Yota';
+        msg='Hi '+first+", it's "+me+' with Tuned Yota'+(l.vehicle?' about your '+l.vehicle:'')+' — ';
+      }
+      STATE.chatPrefill=msg;
+      STATE.followupPending={leadId:l.id, sessionId:r.session};
+      STATE.tab='chats'; STATE.chatOpen=r.session; renderAll();
+    }catch(e){ fail('Could not open the chat — try again.'); }
   }
   function leadCard(l){
     var overdue=(ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
@@ -1857,8 +1928,15 @@
     LEAD_STAGES.forEach(function(s){ if(s!==l.stage){ stagesRow.appendChild(act('→ '+s,function(){ leadUpdate(l.id,{action:'setStage',stage:s}); })); } });
     body.appendChild(stagesRow);
     var fu=document.createElement('div'); fu.className='walkmini';
-    [['Today',0],['Tomorrow',1],['+3d',3],['+1wk',7]].forEach(function(p){ fu.appendChild(act('Follow-up '+p[0],function(){ leadUpdate(l.id,{action:'setFollowup',date:addDays(STATE.today,p[1])}); })); });
-    body.appendChild(fu);
+    var fuMsg=document.createElement('textarea'); fuMsg.placeholder='Message to send with the follow-up (optional)';
+    fuMsg.rows=2; fuMsg.style.cssText='width:100%;padding:9px;font:inherit;font-size:14px;border:1px solid var(--t-line,#d8d2ca);border-radius:8px;margin:5px 0;resize:vertical;background:var(--t-input,#fff);color:inherit';
+    fuMsg.value=l.followupMessage||'';
+    function setFu(date){ leadUpdate(l.id,{action:'setFollowup',date:date,message:fuMsg.value}); }
+    [['Today',0],['Tomorrow',1],['+3d',3],['+1wk',7]].forEach(function(p){ fu.appendChild(act('Follow-up '+p[0],function(){ setFu(addDays(STATE.today,p[1])); })); });
+    var fuDate=document.createElement('input'); fuDate.type='date'; fuDate.value=l.nextFollowup||'';
+    fuDate.onchange=function(){ if(fuDate.value) setFu(fuDate.value); };
+    fu.appendChild(fuDate);
+    body.appendChild(fu); body.appendChild(fuMsg);
     var note=mkInput('Log a contact note'); var logb=act('Log contact',function(){ leadUpdate(l.id,{action:'logContact',note:note.value}); });
     // Permanent delete — spam/dupes/test records only; real "not interested"
     // people go to Not now so the history survives.
