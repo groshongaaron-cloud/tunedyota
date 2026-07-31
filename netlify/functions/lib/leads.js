@@ -61,6 +61,39 @@ function toLeadView(rec) {
   };
 }
 
+// Compact view of a Bookings record for match suggestions + linked display.
+function toBookingSummary(rec) {
+  const f = (rec && rec.fields) || {};
+  return {
+    id: rec && rec.id,
+    name: f.Name || "", phone: f.Phone || "", email: f.Email || "",
+    city: f.City || "", dateISO: String(f["Event Date"] || "").slice(0, 10),
+    slot: f.Slot || "", scheduledTime: f["Scheduled Time"] || "",
+    status: f.Status || "Booked",
+    installer: normalizeInstallerKey(f.Installer),
+    vehicle: f.Vehicle || "",
+  };
+}
+
+// "Looks booked already" suggestions: non-Cancelled bookings sharing a contact
+// point with an unlinked lead. Completed bookings match too — a repeat customer
+// texting in is exactly what this should catch. Upcoming soonest first, then
+// most recent past.
+function bookingMatchesForLead(lead, summaries, todayISO) {
+  if (lead.bookingId) return [];
+  const pKey = normalizePhone(lead.phone), eKey = normalizeEmail(lead.email);
+  if (!pKey && !eKey) return [];
+  const hits = (summaries || []).filter((b) => {
+    if (b.status === "Cancelled") return false;
+    return (pKey && normalizePhone(b.phone) === pKey) || (eKey && normalizeEmail(b.email) === eKey);
+  });
+  const bucket = (b) => (b.dateISO && b.dateISO >= todayISO ? 0 : 1);
+  hits.sort((a, b) => bucket(a) - bucket(b) ||
+    (bucket(a) === 0 ? String(a.dateISO).localeCompare(String(b.dateISO))
+                     : String(b.dateISO).localeCompare(String(a.dateISO))));
+  return hits;
+}
+
 // Apply visibility. A regular installer sees only their own leads; an admin sees all,
 // or a single installer via `filter`, or the blank-installer bucket via filter "unassigned".
 function scopeLeads(leads, { key, admin, filter } = {}) {
@@ -234,7 +267,7 @@ module.exports = {
   CHANNELS, STAGES, ACTIVE_STAGES,
   validChannel, validStage,
   normalizeChannel, normalizePhone, normalizeEmail,
-  toLeadView, scopeLeads,
+  toLeadView, scopeLeads, toBookingSummary, bookingMatchesForLead,
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, installerKeyForPhone,
 };
