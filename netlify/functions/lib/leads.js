@@ -94,6 +94,21 @@ function bookingMatchesForLead(lead, summaries, todayISO) {
   return hits;
 }
 
+// The client-portal account behind a lead, if any — matched by the lead's email
+// or, once linked, the booking's email (SMS leads often carry no email).
+function clientForLead(lead, linkedBooking, clientRecords) {
+  const eKey = normalizeEmail(lead.email) || normalizeEmail(linkedBooking && linkedBooking.email);
+  if (!eKey) return null;
+  const rec = (clientRecords || []).find((r) => normalizeEmail((r.fields || {}).Email) === eKey);
+  if (!rec) return null;
+  let vehicles = [];
+  try {
+    const parsed = JSON.parse((rec.fields || {}).Vehicles || "[]");
+    if (Array.isArray(parsed)) vehicles = parsed;
+  } catch { /* bad JSON → empty garage, never a crash */ }
+  return { email: eKey, vehicles };
+}
+
 // Apply visibility. A regular installer sees only their own leads; an admin sees all,
 // or a single installer via `filter`, or the blank-installer bucket via filter "unassigned".
 function scopeLeads(leads, { key, admin, filter } = {}) {
@@ -267,7 +282,7 @@ module.exports = {
   CHANNELS, STAGES, ACTIVE_STAGES,
   validChannel, validStage,
   normalizeChannel, normalizePhone, normalizeEmail,
-  toLeadView, scopeLeads, toBookingSummary, bookingMatchesForLead,
+  toLeadView, scopeLeads, toBookingSummary, bookingMatchesForLead, clientForLead,
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, installerKeyForPhone,
 };

@@ -3,7 +3,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const {
-  toLeadView, toBookingSummary, bookingMatchesForLead,
+  toLeadView, toBookingSummary, bookingMatchesForLead, clientForLead,
 } = require("../netlify/functions/lib/leads.js");
 
 const bk = (id, f) => toBookingSummary({ id, fields: f });
@@ -63,4 +63,24 @@ test("bookingMatchesForLead sorts upcoming-soonest first, then most recent past"
   ];
   const ids = bookingMatchesForLead({ phone: "6194176865", email: "", bookingId: "" }, rows, "2026-07-30").map((b) => b.id);
   assert.deepEqual(ids, ["up1", "up2", "past1", "past2"]);
+});
+
+test("clientForLead matches by lead email, parses garage", () => {
+  const clients = [{ id: "c1", fields: { Email: "eli@x.com", Vehicles: '[{"year":"2019","make":"Toyota","model":"Tacoma"}]' } }];
+  const c = clientForLead({ email: "Eli@X.com" }, null, clients);
+  assert.equal(c.email, "eli@x.com");
+  assert.equal(c.vehicles[0].model, "Tacoma");
+});
+
+test("clientForLead falls back to the linked booking's email (SMS leads carry none)", () => {
+  const clients = [{ id: "c1", fields: { Email: "eli@x.com", Vehicles: "[]" } }];
+  const c = clientForLead({ email: "" }, { email: "eli@x.com" }, clients);
+  assert.equal(c.email, "eli@x.com");
+});
+
+test("clientForLead survives bad Vehicles JSON and returns null on no match", () => {
+  const clients = [{ id: "c1", fields: { Email: "eli@x.com", Vehicles: "{not json" } }];
+  assert.deepEqual(clientForLead({ email: "eli@x.com" }, null, clients).vehicles, []);
+  assert.equal(clientForLead({ email: "nobody@x.com" }, null, clients), null);
+  assert.equal(clientForLead({ email: "" }, null, clients), null);
 });
