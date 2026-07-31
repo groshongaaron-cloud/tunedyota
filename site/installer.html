@@ -2016,7 +2016,7 @@
     // Waitlist context (original Priority List schema) — why they're waiting.
     if(l.reason){
       var wl=document.createElement('div'); wl.className='ffnote';
-      wl.textContent='⏳ Waitlist — '+l.reason+(l.eventDate?' · '+l.eventDate:'')+(l.requestedSlot?' · wanted '+l.requestedSlot:'');
+      wl.textContent='⏳ Waitlist — '+l.reason+(l.eventDate?' · '+l.eventDate:'')+(l.requestedSlot?' · '+(/multi-truck/i.test(l.reason)?'back-to-back: ':'wanted ')+l.requestedSlot:'');
       body.appendChild(wl);
     }
     // Linked booking: where this person landed. Tap = jump-and-flash the card.

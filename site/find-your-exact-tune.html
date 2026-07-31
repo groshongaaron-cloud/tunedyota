@@ -1073,6 +1073,15 @@ $("#fSubmit").onclick=async()=>{
     const out=await r.json();
     if(out.status==="booked"){ try{if(window.fbq)fbq('track','Schedule',{content_name:'Tune Booking'});}catch(e){} track(6,"booked"); const tail=out.emailFailed?"We'll confirm the details by phone/text shortly.":"Check your email for a calendar invite."; bookSuccess("You're booked.",`You're set for ${out.eventLabel||out.eventDateISO} at ${out.slot}. ${tail}`); }
     else if(out.status==="priority"){ try{if(window.fbq)fbq('track','Lead',{content_name:'Priority Wait List'});}catch(e){} track(6,"priority"); bookSuccess("You're on the Priority Wait List.",`We'll reach out the moment a slot opens in ${(a&&a.city)||S.marketCity}${BOOK.slot?` for your preferred time, ${BOOK.slot}`:""}.`); }
+    else if(out.status==="multi-truck"){
+      // One booking per client per event: the second truck is a request the
+      // installer grants (back-to-back when open), not an automatic second slot.
+      try{if(window.fbq)fbq('track','Lead',{content_name:'Multi-Truck Request'});}catch(e){}
+      track(6,"priority");
+      bookSuccess("You're already booked for this event.",
+        `Your ${out.existingSlot?`${out.existingSlot} `:""}appointment stands. Bringing a second truck? We've flagged it for ${out.installerName||"your installer"}`+
+        (out.suggestedSlot?` — ${out.suggestedSlot} looks open back-to-back and he'll confirm.`:" — he'll find the closest slot and confirm."));
+    }
     else if(out.status==="conflict"){
       const ce=BOOK.events[BOOK.eventIdx];
       if(ce){ const all=Object.keys(ce.slotLabels||{}); ce.openSlots=out.openSlots||[]; ce.takenSlots=all.filter(s=>!ce.openSlots.includes(s)); ce.full=!ce.openSlots.length; BOOK.slot=null;
