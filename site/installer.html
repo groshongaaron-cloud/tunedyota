@@ -2498,9 +2498,10 @@
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+calOptions(b).map(function(o){return '<option>'+o+'</option>';}).join('');
     c.innerHTML=head+contact+
       (isPlaceholderName(b)?'<div id="who_'+b.id+'" class="ffnote"></div>':'')+
-      '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✏️ Edit'+(b.scheduledTime?' — '+esc(b.scheduledTime):' name / date / time / address')+'</summary>'+
+      '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✏️ Edit'+(b.scheduledTime?' — '+esc(b.scheduledTime):' name / vehicle / date / time / address')+'</summary>'+
       '<div class="row-actions" style="margin-top:6px">'+
       '<input id="rn_'+b.id+'" autocomplete="off" placeholder="Customer name" value="'+esc(b.name||'')+'">'+
+      '<input id="rv_'+b.id+'" autocomplete="off" placeholder="Vehicle (e.g. 2021 Tundra 5.7L)" value="'+esc(b.vehicle||'')+'">'+
       '<input type="date" id="rd_'+b.id+'" value="'+esc(b.dateISO||'')+'">'+
       '<input id="rt_'+b.id+'" autocomplete="off" placeholder="Time (e.g. 10:30 AM)" value="'+esc(b.scheduledTime||'')+'">'+
       '<input id="ra_'+b.id+'" autocomplete="off" placeholder="Install address (for navigation)" value="'+esc(b.address||'')+'">'+
@@ -2557,24 +2558,28 @@
   // any installer on their own bookings.
   async function reschedule(id){
     clearMsg();
-    var d=val('rd_'+id), t=val('rt_'+id), a=val('ra_'+id), n=val('rn_'+id);
+    var d=val('rd_'+id), t=val('rt_'+id), a=val('ra_'+id), n=val('rn_'+id), veh=val('rv_'+id);
     var b0=STATE.bookings.filter(function(x){return x.id===id;})[0];
-    // Only send the name when it actually changed — an untouched prefill is not an edit.
+    // Only send name/vehicle when they actually changed — an untouched prefill is not an edit.
     var nameChanged = n && (!b0 || n!==(b0.name||''));
-    if(!d && !t && !a && !nameChanged){ fail('Change the name, pick a date, enter a time, or add the install address.'); return; }
+    var vehChanged = veh && (!b0 || veh!==(b0.vehicle||''));
+    if(!d && !t && !a && !nameChanged && !vehChanged){ fail('Change the name or vehicle, pick a date, enter a time, or add the install address.'); return; }
     try{
-      var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,dateISO:d,time:t,address:a,name:nameChanged?n:''})});
+      var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,dateISO:d,time:t,address:a,name:nameChanged?n:'',vehicle:vehChanged?veh:''})});
       if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
       var out=await res.json().catch(function(){return{};});
       if(res.ok && out.status==='ok'){
         var b=b0;
-        if(b){ if(d) b.dateISO=d; if(t) b.scheduledTime=t; if(a) b.address=a; if(nameChanged) b.name=n; }
+        if(b){ if(d) b.dateISO=d; if(t) b.scheduledTime=t; if(a) b.address=a; if(nameChanged) b.name=n; if(vehChanged) b.vehicle=veh; }
+        // A vehicle change alters server-derived data (flex-fuel note, PCM protocol,
+        // stage-tier cal options) — refresh the roster so those recompute.
+        if(vehChanged) load();
         // Confidence, not just a toast (console rule: every booking action ends
         // with the booking visibly highlighted). A date change relocates the
         // card to another day group, which read as "my update vanished"
         // (Noah, 2026-07-28) — so say exactly what saved, then jump-and-flash
         // the card at its NEW location, same as delete/undo already do.
-        var what=[]; if(nameChanged) what.push('name → '+n); if(d) what.push(fmtMD(d)); if(t) what.push(t); if(a) what.push('address saved');
+        var what=[]; if(nameChanged) what.push('name → '+n); if(vehChanged) what.push('vehicle → '+veh); if(d) what.push(fmtMD(d)); if(t) what.push(t); if(a) what.push('address saved');
         succeed('✓ '+((b&&b.name)||'Booking')+' updated — '+what.join(' · ')+'.');
         if(b) jumpToBooking(b); else renderAll();
       } else { fail('Could not update: '+(out.error||res.status)); }

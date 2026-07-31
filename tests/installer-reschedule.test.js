@@ -109,4 +109,31 @@ test("console Edit panel wires the name field into the reschedule call", () => {
   const HTML = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
   assert.ok(HTML.includes("rn_'+b.id"), "name input rendered");
   assert.ok(/name:nameChanged\?n:''/.test(HTML), "name sent only when changed");
+  assert.ok(HTML.includes("rv_'+b.id"), "vehicle input rendered");
+  assert.ok(/vehicle:vehChanged\?veh:''/.test(HTML), "vehicle sent only when changed");
+  assert.ok(/if\(vehChanged\) load\(\);/.test(HTML), "vehicle change refreshes derived roster data");
+});
+
+test("owner can correct the vehicle", async () => {
+  let patched;
+  const out = await processReschedule({ recordId: "rec1", vehicle: "  2021 Tundra 5.7L  " },
+    { env, key: "noah", get: async () => recFor("noah", { Vehicle: "" }), update: async (a) => { patched = a.fields; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal(patched.Vehicle, "2021 Tundra 5.7L");
+  assert.equal(out.vehicle, "2021 Tundra 5.7L");
+});
+
+test("unchanged vehicle is not written; vehicle-only update counts as a change", async () => {
+  let patched;
+  const out = await processReschedule({ recordId: "rec1", vehicle: "2020 4Runner" },
+    { env, key: "noah", get: async () => recFor("noah", { Vehicle: "2020 4Runner" }), update: async (a) => { patched = a.fields; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal("Vehicle" in (patched || {}), false);
+});
+
+test("overlong vehicle rejected", async () => {
+  const out = await processReschedule({ recordId: "rec1", vehicle: "x".repeat(121) },
+    { env, key: "noah", get: async () => recFor("noah"), update: async () => ({}) });
+  assert.equal(out.status, "error");
+  assert.equal(out.error, "bad-vehicle");
 });

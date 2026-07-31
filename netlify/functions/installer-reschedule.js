@@ -23,11 +23,13 @@ async function processReschedule(body, deps) {
   // Customer name correction (owner ask 2026-07-30): channel adapters create
   // bookings named "Text (xxx) xxx-xxxx" — the installer fixes them here.
   const name = String(d.name || "").trim();
+  const vehicle = String(d.vehicle || "").trim();
   if (dateISO && !/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) return { status: "error", error: "bad-date" };
   if (time.length > 40) return { status: "error", error: "bad-time" };
   if (address.length > 200) return { status: "error", error: "bad-address" };
   if (name.length > 80) return { status: "error", error: "bad-name" };
-  if (!dateISO && !time && !address && !name) return { status: "error", error: "nothing-to-change" };
+  if (vehicle.length > 120) return { status: "error", error: "bad-vehicle" };
+  if (!dateISO && !time && !address && !name && !vehicle) return { status: "error", error: "nothing-to-change" };
 
   const c = cfg(env);
   let rec;
@@ -43,11 +45,12 @@ async function processReschedule(body, deps) {
   if (time) fields["Scheduled Time"] = time;
   if (address) fields.Address = address;
   if (name && name !== String(f.Name || "").trim()) fields.Name = name;
+  if (vehicle && vehicle !== String(f.Vehicle || "").trim()) fields.Vehicle = vehicle;
   try {
     await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields }, ["Scheduled Time", "Address"]);
   } catch (e) { if (log.error) log.error("reschedule update", e.message); return { status: "error", error: "store-unavailable" }; }
   return { status: "ok", dateISO: dateISO || String(f["Event Date"] || "").slice(0, 10), time: time || String(f["Scheduled Time"] || ""),
-    address: address || String(f.Address || ""), name: name || String(f.Name || "") };
+    address: address || String(f.Address || ""), name: name || String(f.Name || ""), vehicle: vehicle || String(f.Vehicle || "") };
 }
 
 async function handler(event) {
