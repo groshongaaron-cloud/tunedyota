@@ -130,5 +130,24 @@ Shipped ahead of the account so go-live is a config change, not a build:
    approval payload shape from sandbox).
 3. Flip `CONVERGE_DEMO` off, run one real card test, done.
 
-**Waiting on:** Aaron to open the Elavon/Converge merchant account and provide
-the four credentials above (+ demo creds).
+**Waiting on:** Elavon enabling Hosted Payments / PayWithConverge on the account
+(see status below).
+
+## Status 2026-07-30 — account boarded, creds verified, enablement pending
+
+- Account manually boarded on Converge: **AID 2828441, Internet, USD, settle 9 PM,
+  TID 102**. Production credentials only — no demo account issued.
+- Two credential pairs **authenticate** against
+  `api.convergepay.com/hosted-payments/transaction_token` but return **403**
+  (user `8047260701web` and user `apiuser401411`, each with its own 64-char PIN —
+  PINs live with Aaron + Netlify env once verified, never in this repo).
+  `ADMIN` is Aaron's portal login only, not an API user.
+- 403 on both valid pairs ⇒ **Hosted Payments / PayWithConverge feature not
+  enabled on the account** (401 = bad creds; 403 = authenticated but forbidden).
+  Fix: "Hosted API User" checkbox under Settings → Employees, or an Elavon rep
+  request: *enable Hosted Payments / PayWithConverge on AID 2828441, TID 102*.
+- Next after a token mints: set `CONVERGE_*` Netlify env vars (no
+  `CONVERGE_DEMO` — production only), deploy, wire the pricing CTA, build
+  approval recording (Airtable + Slack via `lib/alert.js`), one real-card test
+  + refund/void in Converge. Aaron may rotate the PIN after go-live (it transited
+  chat during setup).
