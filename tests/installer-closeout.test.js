@@ -48,7 +48,8 @@ test("complete requires a valid calibration", async () => {
 });
 
 test("complete accepts the 2024+ turbo-truck Stage calibrations", async () => {
-  for (const cal of ["Stage 1 Enhanced", "Stage 2", "Stage 3"]) {
+  // "Stage 1 Enhanced" is the legacy no-dash spelling, still accepted server-side
+  for (const cal of ["Stage 1 - Basic", "Stage 1 - Enhanced", "Stage 1 Enhanced", "Stage 2", "Stage 3"]) {
     const updates = [];
     const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: cal },
       { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),

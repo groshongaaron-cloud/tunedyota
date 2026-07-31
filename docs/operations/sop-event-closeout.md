@@ -47,7 +47,7 @@ For each customer, after the calibration is written and road-verified:
    **Light · Mild · Medium · Spicy · SS**, or an adjacent combo
    (**Light and Mild · Mild and Medium · Medium and Spicy · Spicy and SS**).
    On the 2024+ turbo trucks (Tacoma 2024+, 4Runner 2025+, LC250) the dropdown
-   also offers **Stage 1 Enhanced · Stage 2 · Stage 3**.
+   also offers **Stage 1 - Basic · Stage 1 - Enhanced · Stage 2 · Stage 3**.
 3. Enter the **OTT commission fields** for the monthly report (SOP 9):
    **Tuning Platform, Calibration Type, ECU ID, Gear Size, Mileage**. These are stored on the
    booking for OTT reporting only — they never appear on the customer certificate.
