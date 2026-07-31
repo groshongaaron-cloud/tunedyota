@@ -57,3 +57,15 @@ test("unlink clears both link fields and logs", async () => {
   assert.equal(writes[0].fields["Converted Booking"], "");
   assert.equal(writes[0].fields.Stage, undefined);
 });
+
+test("convert also writes the Booking linked field", async () => {
+  const writes = [];
+  const ctx = { env, now: new Date("2026-07-30T12:00:00Z"),
+    getImpl: async () => leadRec("noah"),
+    updateImpl: async (a) => { writes.push(a); return {}; },
+    createBookingImpl: async () => ({ id: "recNEW" }) };
+  const res = await handler(ev("ntok", { id: "recL1", action: "convert", dateISO: "2026-08-02" }), ctx);
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(writes[0].fields.Booking, ["recNEW"]);
+  assert.equal(writes[0].fields["Converted Booking"], "recNEW");
+});

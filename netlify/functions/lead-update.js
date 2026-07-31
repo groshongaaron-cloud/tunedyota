@@ -63,9 +63,9 @@ async function handler(event, ctx = {}) {
     let bk;
     try { bk = await createTolerant(createBookingImpl, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Goals", "Scheduled Time"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
-    const patch = { "Converted Booking": bk && bk.id, Stage: "Booked",
+    const patch = { "Converted Booking": bk && bk.id, Booking: bk && bk.id ? [bk.id] : [], Stage: "Booked",
       "Activity Log": appendActivity(lead.activity, logLine(now, `converted → booking ${bk && bk.id} (${bookCity} ${dateISO}${time ? " " + time : ""})`)) };
-    try { await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: patch }, ["Converted Booking", "Stage", "Activity Log"]); }
+    try { await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: patch }, ["Converted Booking", "Booking", "Stage", "Activity Log"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
     // The booking payload tells the console exactly WHERE this landed so it can take
     // the user there — a converted lead must never just vanish from view.
