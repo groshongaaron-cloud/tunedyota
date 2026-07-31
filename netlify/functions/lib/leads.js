@@ -27,6 +27,13 @@ function normalizeChannel(source, reason) {
 function normalizePhone(p) { return String(p == null ? "" : p).replace(/\D/g, "").slice(-10); }
 function normalizeEmail(e) { return String(e == null ? "" : e).trim().toLowerCase(); }
 
+// A lead's linked booking id: the real linked-record field first (array of rec
+// ids), else the legacy Converted Booking text id until backfill retires it.
+function linkedBookingId(f) {
+  if (Array.isArray(f.Booking) && f.Booking.length) return String(f.Booking[0] || "");
+  return String(f["Converted Booking"] || "");
+}
+
 // Flatten an Airtable Priority List record into the shape the app + endpoints use.
 function toLeadView(rec) {
   const f = (rec && rec.fields) || {};
@@ -45,6 +52,10 @@ function toLeadView(rec) {
     lastContact: (f["Last Contact"] || "").slice(0, 10),
     activity: f["Activity Log"] || "",
     convertedBooking: f["Converted Booking"] || "",
+    bookingId: linkedBookingId(f),
+    eventDate: String(f["Event Date"] || "").slice(0, 10),
+    requestedSlot: f["Requested Slot"] || "",
+    notified: !!f.Notified,
     reason: f.Reason || "",
     createdTime: f["Created Time"] || "",
   };
