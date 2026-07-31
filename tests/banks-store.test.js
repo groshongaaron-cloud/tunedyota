@@ -17,7 +17,7 @@ function loadBanksCatalog() {
   return w.BANKS_CATALOG;
 }
 
-test("every store product page exists with canonical + Product schema; priced pages carry an Offer", () => {
+test("every store product page exists with canonical; Product schema only when an Offer backs it", () => {
   const pages = new Set(Object.values(SLUGS));
   assert.ok(pages.size >= 300, `expected 300+ unique product pages, got ${pages.size}`);
   let offers = 0, comingSoon = 0;
@@ -26,10 +26,18 @@ test("every store product page exists with canonical + Product schema; priced pa
     assert.ok(fs.existsSync(p), `missing page ${slug}.html`);
     const html = fs.readFileSync(p, "utf8");
     assert.ok(html.includes(`<link rel="canonical" href="https://tunedyota.com/${slug}">`), `${slug}: canonical wrong`);
-    assert.ok(/"@type":\s*"Product"/.test(html), `${slug}: no Product schema`);
     assert.ok(/"@type":\s*"BreadcrumbList"/.test(html), `${slug}: no breadcrumb schema`);
-    if (/"@type":\s*"(Offer|AggregateOffer)"/.test(html)) offers++;
-    else { comingSoon++; assert.ok(/Coming soon/i.test(html), `${slug}: unpriced page must say coming soon`); }
+    const hasProduct = /"@type":\s*"Product"/.test(html);
+    const hasOffer = /"@type":\s*"(Offer|AggregateOffer)"/.test(html);
+    if (hasProduct) {
+      // Google Product snippets require offers, review, or aggregateRating —
+      // a bare Product node is a GSC critical issue, so unpriced pages emit none.
+      assert.ok(hasOffer, `${slug}: Product schema without offers`);
+      offers++;
+    } else {
+      comingSoon++;
+      assert.ok(/Coming soon/i.test(html), `${slug}: unpriced page must say coming soon`);
+    }
   }
   assert.ok(offers >= 280, `expected 280+ pages with offers, got ${offers}`);
 });

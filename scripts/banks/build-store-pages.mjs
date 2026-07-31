@@ -117,6 +117,9 @@ function priceLabel(p) {
 // ---- Schema -----------------------------------------------------------------
 function productLd(p, url, name, desc) {
   const vs = pricedVariants(p);
+  // Google Product snippets require offers, review, or aggregateRating; with no
+  // priced variants we can honestly supply none, so emit no Product node at all.
+  if (!vs.length) return null;
   const ld = {
     "@context": "https://schema.org", "@type": "Product", "@id": `${url}#product`,
     name, sku: primarySku(p), mpn: primarySku(p),
@@ -237,6 +240,8 @@ function productPage(p) {
   const fitRows = fit.ty.map((r) =>
     `<tr><td>${ESC(r.years)}</td><td>${ESC(`${r.make} ${r.model}`)}</td><td>${ESC(r.engine)}</td></tr>`).join("\n");
 
+  const prodLd = productLd(p, url, name, desc);
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -245,10 +250,7 @@ function productPage(p) {
 <title>${ESC(name)}${price ? ` — ${price}` : " — Coming Soon"} | Banks ${ESC(sku)} | Tuned Yota</title>
 <meta name="description" content="${ESC(desc)}">
 <link rel="canonical" href="${url}">
-<script type="application/ld+json">
-${productLd(p, url, name, desc)}
-</script>
-<script type="application/ld+json">
+${prodLd ? `<script type="application/ld+json">\n${prodLd}\n</script>\n` : ""}<script type="application/ld+json">
 ${breadcrumbLd(url, name)}
 </script>
 ${FONTS}
