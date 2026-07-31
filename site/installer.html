@@ -587,6 +587,91 @@
     }catch(e){ fail('Could not load the signature.'); }
   }
 
+  // Customer 360 (2026-07-30): one timeline for one human — bookings, lead
+  // history, chats, calls — reachable from any name tap in the console.
+  async function openCustomerView(p){
+    var ov=document.getElementById('custov');
+    if(!ov){
+      ov=document.createElement('div'); ov.id='custov'; ov.className='reviewov';
+      ov.innerHTML='<div class="reviewbox" style="max-width:560px;width:92%;max-height:88vh;overflow:auto;text-align:left">'+
+        '<div id="custbody"></div>'+
+        '<div style="height:10px"></div><button class="btn" id="custclose" style="width:100%">Close</button></div>';
+      document.body.appendChild(ov);
+      ov.addEventListener('click',function(e){ if(e.target===ov) ov.style.display='none'; });
+      document.getElementById('custclose').onclick=function(){ ov.style.display='none'; };
+    }
+    ov.style.display='flex';
+    var body=document.getElementById('custbody');
+    body.innerHTML='<div class="reviewh" style="text-align:left">'+esc(p.name||'Customer')+'</div><div class="empty">Loading history…</div>';
+    var ctrl=new AbortController(), timer=setTimeout(function(){ ctrl.abort(); },15000);
+    var qs=[]; if(p.phone) qs.push('phone='+encodeURIComponent(p.phone)); if(p.email) qs.push('email='+encodeURIComponent(p.email));
+    try{
+      var res=await fetch('/.netlify/functions/customer-view?'+qs.join('&'),{headers:{'x-installer-token':tok()},signal:ctrl.signal});
+      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(!res.ok) throw new Error('http '+res.status);
+      renderCustomer(body, p, await res.json());
+    }catch(e){
+      body.innerHTML='<div class="reviewh" style="text-align:left">'+esc(p.name||'Customer')+'</div><div class="empty">Couldn’t load the history — check the connection.</div>';
+      var rb=document.createElement('button'); rb.className='btn'; rb.style.width='100%'; rb.textContent='Retry';
+      rb.onclick=function(){ openCustomerView(p); }; body.appendChild(rb);
+    }finally{ clearTimeout(timer); }
+  }
+  function custClose(){ var ov=document.getElementById('custov'); if(ov) ov.style.display='none'; }
+  function renderCustomer(body, p, d){
+    var name=p.name||'', vehicle='', phone=p.phone||'', email=p.email||'';
+    (d.bookings||[]).concat(d.leads||[]).forEach(function(x){
+      if(!name&&x.name) name=x.name; if(!vehicle&&x.vehicle) vehicle=x.vehicle;
+      if(!phone&&x.phone) phone=x.phone; if(!email&&x.email) email=x.email; });
+    var done=(d.bookings||[]).filter(function(b){ return b.status==='Completed'; }).length;
+    body.innerHTML='<div class="reviewh" style="text-align:left">'+esc(name||'Customer')+'</div>'+
+      '<div class="meta">'+esc(vehicle||'')+(phone?' · '+esc(phone):'')+(email?' · '+esc(email):'')+'</div>'+
+      '<div class="tally"><span><b>'+(d.bookings||[]).length+'</b> bookings</span><span class="g"><b>'+done+'</b> completed</span>'+
+      '<span><b>'+(d.chats||[]).length+'</b> chats</span><span><b>'+(d.calls||[]).length+'</b> calls</span></div>'+
+      '<div class="walkmini" id="custact" style="display:flex;gap:8px;flex-wrap:wrap"></div>'+
+      (d.partial?'<div class="ffnote">Some history sources didn’t load — this view may be incomplete.</div>':'')+
+      '<div class="sec"><span class="lbl">Timeline</span></div><div id="custtl"></div>';
+    var ar=document.getElementById('custact');
+    if(phone){ ar.appendChild(linkBtn('Call','tel:'+phone)); ar.appendChild(linkBtn('Text','sms:'+phone)); }
+    if(email){ ar.appendChild(linkBtn('Email','mailto:'+email)); }
+    if(phone){
+      var oc=document.createElement('button'); oc.className='btn'; oc.textContent='💬 Open chat';
+      oc.onclick=async function(){ oc.disabled=true;
+        try{ var r=await chatApi({op:'openSms', phone:phone, name:name, vehicle:vehicle});
+          if(r&&r.session){ custClose(); STATE.tab='chats'; STATE.chatOpen=r.session; renderAll(); return; }
+        }catch(e){}
+        oc.disabled=false; oc.textContent='Chat failed — retry'; };
+      ar.appendChild(oc);
+    }
+    var items=[];
+    (d.bookings||[]).forEach(function(b){ items.push({t:b.dateISO||'', html:
+      '<div class="card"><div class="top"><span class="who">🔧 '+esc(b.city||'Booking')+'</span><span class="edate">'+esc(relDate(b.dateISO))+'</span></div>'+
+      '<div class="meta">'+esc(((b.modelYear?b.modelYear+' ':'')+(b.vehicle||'')).trim())+'</div>'+
+      '<div class="meta">'+(b.status==='Completed'
+        ? '<span class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+'</span>'+(b.certSent?' · 📜 cert sent':'')
+        : (b.status==='No-show'?'<span class="noshow">✗ No-show</span>':esc(b.status)))+'</div>'+
+      (b.signed?'<a href="#" class="link" data-custsig="'+esc(b.id)+'">✍ Signed — view</a>':'')+'</div>'}); });
+    (d.leads||[]).forEach(function(l){ items.push({t:l.lastContact||(l.createdTime||'').slice(0,10), html:
+      '<div class="card"><div class="top"><span class="who">'+(CHAN_ICON[l.channel]||'🧲')+' Lead — '+esc(l.stage)+'</span><span class="edate">'+esc(l.lastContact||'')+'</span></div>'+
+      (l.nextFollowup?'<div class="meta">⏰ follow-up '+esc(l.nextFollowup)+(l.followupMessage?' — “'+esc(l.followupMessage)+'”':'')+'</div>':'')+
+      (l.activity?'<div class="edate" style="white-space:pre-wrap;margin-top:4px">'+esc(l.activity)+'</div>':'')+'</div>'}); });
+    (d.chats||[]).forEach(function(s){ items.push({t:(s.lastActivity||'').slice(0,10), html:
+      '<div class="card" style="cursor:pointer" data-custchat="'+esc(s.id)+'"><div class="top"><span class="who">'+chanBadge(s.id)+' Chat'+(s.status==='closed'?' · closed':'')+'</span><span class="edate">'+esc(relTime(s.lastActivity))+'</span></div>'+
+      '<div class="csnip">'+esc(s.lastText||'')+'</div><div class="edate">tap to open ›</div></div>'}); });
+    (d.calls||[]).forEach(function(cl){
+      var missed=cl.direction==='inbound'&&['no-answer','busy','failed','canceled'].indexOf(cl.status)>=0;
+      var dd=new Date(cl.startTime), iso=isNaN(dd)?'':dd.toISOString().slice(0,10);
+      items.push({t:iso, html:
+      '<div class="card"><div class="top"><span class="who">📞 '+(cl.direction==='inbound'?'Incoming call':'Outgoing call')+(missed?' · <span class="noshow">missed</span>':'')+'</span><span class="edate">'+esc(relTime(cl.startTime))+'</span></div>'+
+      (cl.duration&&!missed?'<div class="meta">'+fmtCallDur(cl.duration)+'</div>':'')+'</div>'}); });
+    items.sort(function(a,b){ return String(b.t).localeCompare(String(a.t)); });
+    var tl=document.getElementById('custtl');
+    tl.innerHTML=items.length?items.map(function(x){ return x.html; }).join(''):'<div class="empty">No history for this contact yet.</div>';
+    Array.prototype.forEach.call(tl.querySelectorAll('[data-custsig]'),function(a2){
+      a2.onclick=function(e){ e.preventDefault(); viewSignature(a2.getAttribute('data-custsig')); }; });
+    Array.prototype.forEach.call(tl.querySelectorAll('[data-custchat]'),function(cel){
+      cel.onclick=function(){ custClose(); STATE.tab='chats'; STATE.chatOpen=cel.getAttribute('data-custchat'); renderAll(); }; });
+  }
+
   function urlB64ToUint8Array(base64String){
     var padding = '='.repeat((4 - base64String.length % 4) % 4);
     var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -979,7 +1064,7 @@
           (c.duration&&!missed ? ' · '+fmtCallDur(c.duration) : '') + (missed ? ' · <span style="color:#c66;font-weight:700">Missed</span>' : '');
         return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(128,128,128,.15)">'+
           '<div style="font-size:18px;width:22px;text-align:center;'+(missed?'color:#c66':'color:#7c8472')+'">'+icon+'</div>'+
-          '<div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(title)+(m&&m.kind==='booking'?' <span style="font-size:11px;color:#7c8472;font-weight:400">booking</span>':'')+'</div>'+
+          '<div style="flex:1;min-width:0"><div style="font-weight:700"><a href="#" data-custcall="'+i+'" style="color:inherit;text-decoration:underline dotted">'+esc(title)+'</a>'+(m&&m.kind==='booking'?' <span style="font-size:11px;color:#7c8472;font-weight:400">booking</span>':'')+'</div>'+
           (detail?'<div style="font-size:12.5px;color:#aaa">'+esc(detail)+'</div>':'')+
           '<div style="font-size:12px;color:#888">'+meta+'</div></div>'+
           (d ? '<button class="tabbtn" data-callmsg="'+i+'">💬 Open chat</button><button class="tabbtn" data-callback="'+i+'">Call as TY</button>' : '')+
@@ -1015,6 +1100,12 @@
           } else { b.textContent='Failed'; }
         }catch(e){ b.textContent='Failed'; }
         setTimeout(function(){ b.textContent='💬 Open chat'; b.disabled=false; },4000);
+      }; });
+      Array.prototype.forEach.call(host.querySelectorAll('[data-custcall]'),function(a){ a.onclick=function(e){
+        e.preventDefault();
+        var c=STATE.calls[Number(a.getAttribute('data-custcall'))]; if(!c) return;
+        var m=who[callDigits(callParty(c))]||{};
+        openCustomerView({phone:callParty(c), name:m.name||''});
       }; });
     }
     var rf=document.getElementById('callsRefresh'); if(rf) rf.onclick=function(){ STATE.callsLoaded=false; renderCalls(); loadCalls(); };
@@ -1103,7 +1194,7 @@
         : ' · <a href="#" id="chatclaim">'+(j.installer?'take over ('+esc(j.installer)+'’s)':'claim chat')+'</a>';
     }
     var html =
-      '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <b>'+esc(j.customerName||'Customer')+'</b> '+chanBadge(j.id||'')+' '+esc(j.vehicle||'')+
+      '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <a href="#" id="chatcust" style="color:inherit"><b>'+esc(j.customerName||'Customer')+'</b></a> '+chanBadge(j.id||'')+' '+esc(j.vehicle||'')+
       (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+
       assignHtml+
       ' · <a href="#" id="chatai" title="Toggle AI auto-replies for this chat">AI: '+(j.aiActive?'on':'off')+'</a>'+
@@ -1132,6 +1223,8 @@
     if(!CHAT_POLL) CHAT_POLL = setInterval(function(){ if(STATE.tab==='chats' && STATE.chatOpen) renderChatThread(host); }, 5000);
     var back = document.getElementById('chatback');
     if(back) back.onclick = function(e){ e.preventDefault(); STATE.chatOpen=null; if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; } loadChats(); };
+    var cc = document.getElementById('chatcust');
+    if(cc) cc.onclick = function(e){ e.preventDefault(); openCustomerView({phone:j.phone||'',name:j.customerName||''}); };
     async function doAssign(target){
       try{
         var r=await chatApi({op:'assign', session:openId, installer:target});
@@ -1883,10 +1976,13 @@
       setTimeout(function(){ det.classList.remove('flash'); },3000);
     }
     var sum=document.createElement('summary');
-    sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' '+esc(l.name)+'</span>'+(l.channel==='ott-national'?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
+    sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' <a href="#" data-cust style="color:inherit;text-decoration:underline dotted">'+esc(l.name)+'</a></span>'+(l.channel==='ott-national'?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
       '<br><span class="edate">'+esc(l.vehicle||'—')+' · '+esc(l.city||'—')+'</span></span>'+
       '<span class="pill'+(overdue?' hasopen':'')+'">'+(overdue?'⏰ due':(l.nextFollowup?('→ '+esc(l.nextFollowup)):esc(l.stage)))+'</span>';
     det.appendChild(sum);
+    // stopPropagation so a name tap opens the 360 view without toggling the card.
+    var custA=sum.querySelector('[data-cust]');
+    if(custA) custA.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); openCustomerView({phone:l.phone||'',email:l.email||'',name:l.name||''}); };
     var body=document.createElement('div'); body.className='ebody';
     var row=document.createElement('div'); row.className='walkmini';
     function act(label,fn){ var b=document.createElement('button'); b.className='btn'; b.textContent=label; b.onclick=fn; return b; }
@@ -2189,9 +2285,12 @@
   // location (native maps app on mobile, web on desktop).
   function mapsHref(a){ return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(a); }
 
+  // Any name tap opens the customer's 360 view — same affordance on every card.
+  function wireCust(c,b){ var a=c.querySelector('[data-cust]');
+    if(a) a.onclick=function(ev){ ev.preventDefault(); openCustomerView({phone:b.phone||'',email:b.email||'',name:b.name||''}); }; }
   function rowCard(b){
     var c=document.createElement('div'); c.className='card'; c.id='c_'+b.id;
-    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+(b.scheduledTime?esc(b.scheduledTime)+' · ':'')+esc(b.name)+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
+    var head='<div class="top"><span class="who">'+(b.slotLabel?esc(b.slotLabel)+' · ':'')+(b.scheduledTime?esc(b.scheduledTime)+' · ':'')+'<a href="#" data-cust style="color:inherit;text-decoration:underline dotted">'+esc(b.name)+'</a>'+(b.ott?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(b.isWalkin?' · walk-in':'')+(b.pendingSync?' <span style="color:#8a6d3b">· ⏳ pending sync</span>':'')+'</span><span>'+esc(b.vehicle)+'</span></div>'+
       '<div class="meta">'+esc(b.phone)+(b.mods?' · '+esc(b.mods):'')+(STATE.admin&&b.installer?' · <b>'+esc(b.installer)+'</b>':'')+'</div>'+
       // Install location: the full address (with tap-to-navigate) when we have it,
       // else the city so the market is always visible on the card.
@@ -2217,6 +2316,7 @@
       };
       var sv=c.querySelector('#sig_'+b.id);
       if(sv) sv.onclick=function(e){ e.preventDefault(); viewSignature(b.id); };
+      wireCust(c,b);
       return c;
     }
     if(b.status==='No-show'){
@@ -2226,6 +2326,7 @@
       c.innerHTML=head+'<div class="noshow">No-show · waitlisted</div>'+
         '<div class="row-actions" style="margin-top:6px"><button type="button" class="btn ns" id="del_'+b.id+'" title="Remove this no-show from the list. Undo available for 10s.">🗑 Delete booking</button></div>';
       var ndb=c.querySelector('#del_'+b.id); if(ndb) ndb.onclick=function(){ ndb.disabled=true; cancelBooking(b.id).finally(function(){ ndb.disabled=false; }); };
+      wireCust(c,b);
       return c;
     }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+calOptions(b).map(function(o){return '<option>'+o+'</option>';}).join('');
@@ -2261,6 +2362,7 @@
     nsb.onclick=function(){ if(cb.checked) closeout(b.id,{action:'noshow',confirmed:true}); };
     var vinEl = c.querySelector('#vin_'+b.id);
     if(vinEl) vinEl.oninput = function(){ scheduleVinCheck(b.id); };
+    wireCust(c,b);
     return c;
   }
 
