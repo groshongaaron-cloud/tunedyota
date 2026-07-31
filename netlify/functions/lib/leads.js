@@ -241,6 +241,30 @@ function applyLeadUpdate(lead, action, payload = {}, now = new Date()) {
   return { error: "bad-action" };
 }
 
+const STALE_AFTER_DAYS = 30;
+
+// The fell-through-the-cracks bucket: active stage, nothing scheduled (a future
+// follow-up is being worked; an overdue one already shows in the due queue),
+// and no touch for STALE_AFTER_DAYS. Single source of truth — the console and
+// any future notification routine must both call this. Oldest-quiet first.
+function staleLeads(leads, todayISO) {
+  const today = new Date(todayISO + "T00:00:00Z").getTime();
+  const out = [];
+  for (const l of leads) {
+    if (!ACTIVE_STAGES.includes(l.stage || "New")) continue;
+    if (l.nextFollowup) continue;
+    const lastISO = l.lastContact || String(l.createdTime || "").slice(0, 10);
+    if (!lastISO) continue;
+    const t = new Date(lastISO + "T00:00:00Z").getTime();
+    if (isNaN(t)) continue;
+    const days = Math.floor((today - t) / 86400000);
+    if (days < STALE_AFTER_DAYS) continue;
+    out.push({ ...l, staleDays: days });
+  }
+  out.sort((a, b) => b.staleDays - a.staleDays);
+  return out;
+}
+
 // Active leads whose Next Follow-up is today or earlier, grouped by installer key.
 function dueLeads(leads, todayISO) {
   const out = {};
@@ -284,5 +308,5 @@ module.exports = {
   normalizeChannel, normalizePhone, normalizeEmail,
   toLeadView, scopeLeads, toBookingSummary, bookingMatchesForLead, clientForLead,
   logLine, appendActivity, processLeadIngest,
-  applyLeadUpdate, dueLeads, installerKeyForPhone,
+  applyLeadUpdate, dueLeads, staleLeads, STALE_AFTER_DAYS, installerKeyForPhone,
 };

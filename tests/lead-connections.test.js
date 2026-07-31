@@ -3,7 +3,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const {
-  toLeadView, toBookingSummary, bookingMatchesForLead, clientForLead,
+  toLeadView, toBookingSummary, bookingMatchesForLead, clientForLead, staleLeads,
 } = require("../netlify/functions/lib/leads.js");
 
 const bk = (id, f) => toBookingSummary({ id, fields: f });
@@ -83,4 +83,28 @@ test("clientForLead survives bad Vehicles JSON and returns null on no match", ()
   assert.deepEqual(clientForLead({ email: "eli@x.com" }, null, clients).vehicles, []);
   assert.equal(clientForLead({ email: "nobody@x.com" }, null, clients), null);
   assert.equal(clientForLead({ email: "" }, null, clients), null);
+});
+
+test("staleLeads: 30d quiet active lead is stale; 29d is not", () => {
+  const mk = (lastContact) => ({ id: "L", stage: "New", nextFollowup: "", lastContact, createdTime: "" });
+  assert.equal(staleLeads([mk("2026-06-30")], "2026-07-30").length, 1);
+  assert.equal(staleLeads([mk("2026-07-01")], "2026-07-30").length, 0);
+});
+
+test("staleLeads: any follow-up (future OR overdue) excludes — those are worked/due, not lost", () => {
+  const base = { id: "L", stage: "New", lastContact: "2026-05-01", createdTime: "" };
+  assert.equal(staleLeads([{ ...base, nextFollowup: "2026-08-05" }], "2026-07-30").length, 0);
+  assert.equal(staleLeads([{ ...base, nextFollowup: "2026-06-01" }], "2026-07-30").length, 0);
+});
+
+test("staleLeads: non-active stages excluded; createdTime is the no-contact fallback; oldest first with staleDays", () => {
+  const rows = [
+    { id: "booked", stage: "Booked", nextFollowup: "", lastContact: "2026-01-01", createdTime: "" },
+    { id: "young",  stage: "New", nextFollowup: "", lastContact: "", createdTime: "2026-06-01T10:00:00.000Z" },
+    { id: "older",  stage: "New", nextFollowup: "", lastContact: "2026-05-01", createdTime: "" },
+  ];
+  const out = staleLeads(rows, "2026-07-30");
+  assert.deepEqual(out.map((l) => l.id), ["older", "young"]);
+  assert.equal(out[0].staleDays, 90);
+  assert.equal(out[1].staleDays, 59);
 });
