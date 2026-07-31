@@ -27,7 +27,7 @@ function harness({ events, taken = [] }) {
   };
   return { deps, created, jobs };
 }
-const base = { city: "Sioux Falls", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "Tacoma", goals: "Power" };
+const base = { city: "Sioux Falls", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "2016-2023 Toyota Tacoma 3.5L V6", modelYear: "2019", goals: "Power" };
 const EV = "Market,Date,Active\nSioux Falls,2026-07-12,yes\n";
 
 test("honeypot ignored — no record, no job scheduled", async () => {
@@ -47,6 +47,40 @@ test("missing contact errors — no job", async () => {
   assert.equal((await processBooking({ city: "Sioux Falls", name: "Jane", slot: "9:00" }, h.deps)).status, "error");
   assert.equal(h.jobs.length, 0);
 });
+// Protocol Selection Guide gate: bookings must pin the flash protocol, so a
+// guide vehicle whose engine/year can't disambiguate it is rejected before any
+// record is created. Non-guide vehicles (no protocol to pick) are unaffected.
+test("guide vehicle without engine -> missing-engine error, nothing created", async () => {
+  const h = harness({ events: EV });
+  const r = await processBooking({ ...base, vehicle: "Toyota Tundra", modelYear: "2019", slot: "9:00" }, h.deps);
+  assert.equal(r.status, "error");
+  assert.equal(r.error, "missing-engine");
+  assert.equal(h.created.length, 0);
+  assert.equal(h.jobs.length, 0);
+});
+test("guide vehicle without engine is also blocked from the priority list", async () => {
+  const h = harness({ events: "Market,Date,Active\nSioux Falls,nope,yes\n" });
+  const r = await processBooking({ ...base, vehicle: "Toyota Tundra", modelYear: "2019", slot: "9:00" }, h.deps);
+  assert.equal(r.error, "missing-engine");
+  assert.equal(h.created.length, 0);
+});
+test("engine + exact year books even on a protocol-split range (2018+ Tundra 5.7)", async () => {
+  const h = harness({ events: EV });
+  const r = await processBooking({ ...base, vehicle: "Toyota Tundra (2007-2021 5.7L V8)", modelYear: "2019", slot: "9:00" }, h.deps);
+  assert.equal(r.status, "booked");
+});
+test("non-guide vehicle books without an engine gate", async () => {
+  const h = harness({ events: EV });
+  const r = await processBooking({ ...base, vehicle: "2020 Toyota Camry 2.5L", modelYear: "2020", slot: "9:00" }, h.deps);
+  assert.equal(r.status, "booked");
+});
+test("handler maps missing-engine to HTTP 400", async () => {
+  const { handler } = require("../netlify/functions/book.js");
+  const res = await handler({ body: JSON.stringify({ city: "Sioux Falls", name: "Jane", phone: "1", vehicle: "Toyota Tundra", modelYear: "2019" }) });
+  assert.equal(res.statusCode, 400);
+  assert.equal(JSON.parse(res.body).error, "missing-engine");
+});
+
 test("no event -> priority (no-event), schedules a priority job", async () => {
   const h = harness({ events: "Market,Date,Active\nSioux Falls,nope,yes\n" });
   const r = await processBooking({ ...base, slot: "9:00" }, h.deps);
@@ -122,7 +156,7 @@ test("booking source defaults when flag absent", async () => {
 test("mods field persisted on booking record", async () => {
   const EV_OMAHA = "Market,Date,Active\nOmaha,2026-08-15,yes\n";
   const h = harness({ events: EV_OMAHA });
-  const r = await processBooking({ city: "Omaha", name: "Bob", phone: "(402) 555-1234", email: "bob@x.com", vehicle: "Tundra", goals: "Power", slot: "9:00", mods: "3in lift, 35s" }, h.deps);
+  const r = await processBooking({ city: "Omaha", name: "Bob", phone: "(402) 555-1234", email: "bob@x.com", vehicle: "2007-2017 Toyota Tundra 5.7L V8", modelYear: "2015", goals: "Power", slot: "9:00", mods: "3in lift, 35s" }, h.deps);
   assert.equal(r.status, "booked");
   assert.equal(h.created[0].fields.Modifications, "3in lift, 35s");
 });
@@ -184,7 +218,7 @@ test("booking survives a missing Model Year column (retries without it)", async 
 });
 
 const EV_TWO = "Market,Date,Active\nTwin Cities,2026-08-29,yes\nTwin Cities,2026-10-16,yes\n";
-const tcBase = { city: "Twin Cities", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "Tacoma", goals: "Power" };
+const tcBase = { city: "Twin Cities", name: "Jane", phone: "(612) 406-7117", email: "jane@x.com", vehicle: "2016-2023 Toyota Tacoma 3.5L V6", modelYear: "2019", goals: "Power" };
 
 test("no dateISO books the soonest date", async () => {
   const h = harness({ events: EV_TWO });

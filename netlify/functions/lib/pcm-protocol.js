@@ -56,11 +56,13 @@ const RULES = [
   R(["land cruiser", "lx570", "lx 570"], ["5.7"], 2008, 2015, { ...G24, throttle: "mild/medium" }),
   R(["land cruiser", "lx570", "lx 570"], ["5.7"], 2016, 2021, { ...G28, throttle: "mild/medium" }),
   R(["lc 250", "lc250", "land cruiser"], ["2.4"], 2024, 9999, { ...G95T, throttle: "enhanced" }),
-  // GX
-  R(["gx470", "gx 470"], [], 2003, 2004, { ...GKL, throttle: "medium" }),
-  R(["gx470", "gx 470"], [], 2005, 2009, { ...G24, throttle: "medium" }),
-  R(["gx460", "gx 460"], [], 2010, 2024, { ...G24, throttle: "medium" }),
-  R(["gx550", "gx 550"], [], 2022, 9999, { ...G95HV, throttle: "TBD" }),
+  // GX — the booking wizard's model name is plain "GX" (engine/year pick the
+  // trim), so each rule also carries the generic "gx" alias. Specific aliases
+  // ("gx550") outrank the generic one — see the specificity pass in pcmProtocol.
+  R(["gx470", "gx 470", "gx"], ["4.7"], 2003, 2004, { ...GKL, throttle: "medium" }),
+  R(["gx470", "gx 470", "gx"], ["4.7"], 2005, 2009, { ...G24, throttle: "medium" }),
+  R(["gx460", "gx 460", "gx"], ["4.6"], 2010, 2024, { ...G24, throttle: "medium" }),
+  R(["gx550", "gx 550", "gx"], ["3.4", "3.5"], 2022, 9999, { ...G95HV, throttle: "TBD" }),
 ];
 
 // Per the guide's Note column: 2013-2019 4Runner needs its TCM flashed separately.
@@ -73,11 +75,17 @@ function pcmProtocol(vehicle, modelYear) {
   if (!v) return null;
   const year = parseInt(modelYear, 10) || parseInt((v.match(/\b(19|20)\d{2}\b/) || [])[0], 10) || 0;
   const engine = (v.match(/\b(\d\.\d)\s*l/) || [])[1] || "";
-  const hits = RULES.filter((r) =>
+  let hits = RULES.filter((r) =>
     r.models.some((m) => v.includes(m)) &&
     (!year || (year >= r.y0 && year <= r.y1)) &&
     (r.engines.length === 0 || !engine || r.engines.includes(engine)));
   if (!hits.length) return null;
+  // Prefer rules matched via their most specific alias: "2023 Lexus GX550" hits
+  // both the gx550 rule and (through the generic "gx" alias) the gx460 rule —
+  // keep only the rules whose best-matching alias is the longest.
+  const spec = (r) => Math.max(...r.models.filter((m) => v.includes(m)).map((m) => m.length));
+  const best = Math.max(...hits.map(spec));
+  hits = hits.filter((r) => spec(r) === best);
   const distinct = [...new Set(hits.map((h) => h.out.pcm))];
   if (distinct.length === 1) {
     const h = hits[0];
@@ -88,7 +96,7 @@ function pcmProtocol(vehicle, modelYear) {
   }
   // Candidates disagree (engine unreadable from the booking): list alternatives.
   const alts = hits.map((h) => `${h.out.pcm} (${h.engines.join("/") || "?"}L)`).join(" or ");
-  return { pcm: alts + " — confirm engine", fid: "", software: "", throttle: "confirm engine on-site", note: "" };
+  return { pcm: alts + " — confirm engine", fid: "", software: "", throttle: "confirm engine on-site", note: "", pcmFlash: "", vft: "", confirm: true };
 }
 
 module.exports = { pcmProtocol };

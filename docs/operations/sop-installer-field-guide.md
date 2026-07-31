@@ -185,3 +185,8 @@ displacement before connecting.
   3.5L/2.4L Turbo (P5-UDS).
 - If the console shows "confirm engine" (booking didn't capture displacement), check
   the engine on-site before choosing between the listed protocols.
+- **Engine size is required at booking (since 2026-07-30):** the web funnels always
+  send engine + exact year, the server rejects guide vehicles that would leave the
+  protocol ambiguous, and the chat agent collects engine size before a transfer.
+  "Confirm engine" should now only appear on free-text walk-ins/call-ins — when
+  logging one, include the engine (e.g. "2019 Tundra 5.7") and it resolves itself.

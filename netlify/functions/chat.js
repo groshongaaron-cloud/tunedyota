@@ -25,6 +25,13 @@ async function defaultLogEscalation(fields, { env, fetchImpl = fetch }) {
   await createRecord({ fetchImpl, token: c.token, baseId: c.baseId, table: ESC_TABLE(env), fields });
 }
 
+// Lead vehicle string incl. engine size (needed to pin the flash protocol at
+// booking); the agent sends "unknown" when the customer genuinely can't say.
+function transferVehicle(t) {
+  const eng = String(t.engineSize || "").trim();
+  return `${t.modelYear} ${t.vehicleMake} ${t.vehicleModel}` + (eng && !/^unknown$/i.test(eng) ? ` ${eng}` : "");
+}
+
 // Route + fan-out. Every side effect individually guarded; always returns installer.
 async function escalate({ transfer, sess }, deps) {
   const { env = process.env, log = console,
@@ -37,7 +44,7 @@ async function escalate({ transfer, sess }, deps) {
   // picks the chat owner — the dispatcher does.
   const inst = keyToInstaller(dispatcherKey(env));
   const others = Object.keys(INSTALLERS).filter((k) => k !== inst.key).map((k) => "@" + k).join(" / ");
-  const vehicle = `${transfer.modelYear} ${transfer.vehicleMake} ${transfer.vehicleModel}`;
+  const vehicle = transferVehicle(transfer);
   const contact = `${transfer.contactMethod}: ${transfer.contactValue}`;
   const transcriptTail = (sess.turns || []).slice(-12).map((t) => `${t.role}: ${t.text}`).join("\n");
   const ctx = String(sess.pageContext || "");
@@ -209,7 +216,7 @@ async function processChat(body, deps) {
     sess.status = "escalated";
     sess.customerName = out.transfer.customerName;
     sess.phone = out.transfer.contactMethod === "phone" ? out.transfer.contactValue : "";
-    sess.vehicle = `${out.transfer.modelYear} ${out.transfer.vehicleMake} ${out.transfer.vehicleModel}`;
+    sess.vehicle = transferVehicle(out.transfer);
     sess.city = out.transfer.city;
     sess.installer = "";                                   // dispatcher-first: dispatch assigns
     sess.lastRelayedAt = new Date().toISOString();          // escalation SMS = first relay

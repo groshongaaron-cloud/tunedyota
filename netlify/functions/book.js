@@ -7,6 +7,7 @@ const { cfg, listRecords, createRecord, createTolerant } = require("./lib/airtab
 const { isValidSlot, computeOpen, windowSlots, slotsFor } = require("./lib/slots.js");
 const { triggerBackground } = require("./lib/background.js");
 const { verifyReferral } = require("./lib/client-auth.js");
+const { pcmProtocol } = require("./lib/pcm-protocol.js");
 
 // book.js is the SYNCHRONOUS critical path: validate -> check slots -> create the
 // Airtable record -> return a status the booking UI depends on (booked/conflict/
@@ -21,6 +22,13 @@ async function processBooking(body, deps) {
   const market = getMarket(d.city);
   if (!market) return { status: "error", error: "unknown-city" };
   if (!d.name || (!d.phone && !d.email)) return { status: "error", error: "missing-contact" };
+  // Protocol Selection Guide gate: every booking must pin its flash protocol, so
+  // a guide vehicle whose engine (or exact year, on split ranges) can't
+  // disambiguate it is rejected up front. Non-guide vehicles have no protocol to
+  // pick and pass through. The web funnels always send engine + exact year, so
+  // this only stops hand-crafted or degraded submissions.
+  const proto = pcmProtocol(d.vehicle, d.modelYear);
+  if (proto && proto.confirm) return { status: "error", error: "missing-engine" };
   const inst = keyToInstaller(market.inst);
   // Referral attribution (no-reward, gratitude-based): a signed ref token in the
   // funnel link identifies the referrer by email. Ignore a self-referral (same
@@ -96,7 +104,7 @@ async function handler(event) {
   let body = {};
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, body: "bad json" }; }
   const out = await processBooking(body, { fetchImpl: fetch, env: process.env, now: icsStamp });
-  const code = out.status === "error" ? 502 : out.status === "conflict" ? 409 : 200;
+  const code = out.error === "missing-engine" ? 400 : out.status === "error" ? 502 : out.status === "conflict" ? 409 : 200;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 module.exports = { handler, processBooking };

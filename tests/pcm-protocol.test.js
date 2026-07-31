@@ -83,6 +83,32 @@ test("ambiguous match (unreadable engine) returns no flash data — confirm on-s
   const r = pcmProtocol("Toyota Tundra", "2019");
   assert.equal(r.pcmFlash || "", "");
   assert.equal(r.vft || "", "");
+  assert.equal(r.confirm, true, "ambiguous result carries a structured confirm flag");
+});
+
+test("resolved matches do not carry the confirm flag", () => {
+  assert.ok(!pcmProtocol("2016-2023 Toyota Tacoma 3.5L V6", "2019").confirm);
+});
+
+// The booking wizard's Lexus GX model is plain "GX" (engine + year distinguish
+// GX470/GX460/GX550) — the rules must match it, not just the trim names.
+test("wizard-style Lexus GX 4.6L resolves to GX460 protocol", () => {
+  const r = pcmProtocol("2010-2018 Lexus GX 4.6L V8", "2015");
+  assert.equal(r.pcm, "[35]");
+  assert.equal(r.fid, "FID 24");
+});
+test("wizard-style Lexus GX 4.7L resolves to GX470 protocol", () => {
+  const r = pcmProtocol("2005-2009 Lexus GX 4.7L V8", "2007");
+  assert.equal(r.pcm, "[35]");
+  assert.equal(r.fid, "FID 24");
+});
+test("explicit GX550 still resolves uniquely despite the generic GX alias", () => {
+  const r = pcmProtocol("2023 Lexus GX550", "2023");
+  assert.equal(r.pcm, "[95]");
+});
+test("bare Lexus GX in a GX460/GX550 overlap year asks to confirm engine", () => {
+  const r = pcmProtocol("Lexus GX", "2022");
+  assert.equal(r.confirm, true);
 });
 
 test("non-guide vehicles and empty input return null", () => {

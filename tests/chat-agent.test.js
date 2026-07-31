@@ -18,6 +18,14 @@ test("system prompt carries greeting, guardrails, and NEPQ material", () => {
   assert.match(p, /NEPQ/);
 });
 
+test("transfer tool requires engine size and the prompt explains how to collect it", () => {
+  assert.ok(TRANSFER_TOOL.input_schema.properties.engineSize, "engineSize property exists");
+  assert.ok(TRANSFER_TOOL.input_schema.required.includes("engineSize"), "engineSize is required");
+  const p = buildSystemPrompt("default");
+  assert.match(p, /engine size/i);
+  assert.match(p, /unknown/i);
+});
+
 test("runChat returns text reply from a text response", async () => {
   const fetchImpl = async () => ({ ok: true, json: async () => ({ content: [{ type: "text", text: "Great question — ..." }] }) });
   const out = await runChat({ turns: [{ role: "user", text: "hi" }], pageContext: "default" },

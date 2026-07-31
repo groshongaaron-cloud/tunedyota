@@ -39,11 +39,12 @@ const TRANSFER_TOOL = {
       contactMethod: { type: "string", enum: ["phone", "email"] },
       contactValue: { type: "string", description: "The phone number or email address" },
       vehicleMake: { type: "string" }, vehicleModel: { type: "string" }, modelYear: { type: "string" },
+      engineSize: { type: "string", description: "Engine displacement like \"3.5L\" or \"5.7L\" — required to pick the flash protocol at the install. \"unknown\" only if the customer genuinely doesn't know after being asked." },
       city: { type: "string" }, state: { type: "string" },
       questionSummary: { type: "string", description: "One-sentence summary of what they need" },
       reason: { type: "string", enum: ["asked-for-human", "guardrail", "no-answer"] },
     },
-    required: ["customerName", "contactMethod", "contactValue", "vehicleMake", "vehicleModel", "modelYear", "city", "state", "questionSummary", "reason"],
+    required: ["customerName", "contactMethod", "contactValue", "vehicleMake", "vehicleModel", "modelYear", "engineSize", "city", "state", "questionSummary", "reason"],
   },
 };
 
@@ -60,7 +61,7 @@ function buildSystemPrompt(pageContext) {
     "3. NEVER book, move, or cancel appointments. Link to the booking page instead.",
     "4. NEVER make warranty, legal, or emissions-compliance claims.",
     "5. NEVER state or confirm any address, location, or meeting spot other than the published event addresses on the booking page. If a customer asks where to come, says they are coming to you, or claims an in-person meeting was arranged outside a listed event, do NOT keep deflecting — switch to TRANSFER MODE immediately with whatever fields you already have.",
-    "When a guardrail applies OR the customer asks for a live person OR you cannot answer properly, switch to TRANSFER MODE. In transfer mode the one-question-at-a-time rule is OFF: send ONE message asking for everything still missing as a single compact list — name, best way to reach them (phone or email; if they're texting, offer to just use this number), that phone/email, vehicle year/make/model (engine too if they know it), and city/state. Explain you're asking so you can connect them with their NEAREST OTT installer. Only ask for what the conversation hasn't already given you; the moment every required field is known, call transfer_to_installer immediately — no extra confirmation round.",
+    "When a guardrail applies OR the customer asks for a live person OR you cannot answer properly, switch to TRANSFER MODE. In transfer mode the one-question-at-a-time rule is OFF: send ONE message asking for everything still missing as a single compact list — name, best way to reach them (phone or email; if they're texting, offer to just use this number), that phone/email, vehicle year/make/model AND engine size (like 3.5L or 5.7L — booking requires it because the engine picks the flash protocol; if they don't know it after you ask, pass \"unknown\" and the installer will confirm), and city/state. Explain you're asking so you can connect them with their NEAREST OTT installer. Only ask for what the conversation hasn't already given you; the moment every required field is known, call transfer_to_installer immediately — no extra confirmation round.",
     "",
     "== NEPQ PLAYBOOK ==", PLAYBOOK.slice(0, 12000),
     "== VOICE ==", VOICE.slice(0, 3000),

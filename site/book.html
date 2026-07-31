@@ -41,6 +41,7 @@
       <select id="bkMake"><option value="">Make…</option></select>
       <select id="bkModel" disabled><option value="">Model…</option></select>
       <select id="bkConfig" disabled><option value="">Year / engine…</option></select>
+      <select id="bkYear" disabled style="display:none"><option value="">Exact model year…</option></select>
       <div id="bkPrice"></div>
       <div class="err" id="bkErr"></div>
       <button id="bkSubmit" disabled>Confirm booking</button>
@@ -68,7 +69,7 @@ function track(step,name){try{var p=JSON.stringify({sid:SID,step:step,name:name|
 try{if(window.gtag){var kn={booked:"book_tune",priority:"join_waitlist",lead:"generate_lead",call:"call_click"}[name];gtag("event",step===6&&kn?kn:"funnel_step",{step_index:step,step_name:name||""});}}catch(e){}}
 document.addEventListener("click",function(e){try{var a=e.target.closest&&e.target.closest('a[href^="tel:"]');if(a)track(6,"call");}catch(err){}},true);
 
-var STATE={avail:null,ev:null,slot:null,vehicles:null,cfg:null};
+var STATE={avail:null,ev:null,slot:null,vehicles:null,cfg:null,yearNeeded:false};
 
 function fallback(html){ $("#hdr").style.display="none"; $("#flow").style.display="none";
   var f=$("#fallback"); f.innerHTML=html; f.style.display="block"; }
@@ -118,18 +119,38 @@ function populateMakes(){
   var mk=$("#bkMake"); Object.keys(STATE.vehicles||{}).forEach(function(k){ var o=document.createElement("option"); o.value=k; o.textContent=k; mk.appendChild(o); });
   mk.onchange=function(){ var md=$("#bkModel"); md.innerHTML='<option value="">Model…</option>'; md.disabled=!mk.value;
     if(mk.value) Object.keys(STATE.vehicles[mk.value]).forEach(function(k){ var o=document.createElement("option"); o.value=k; o.textContent=k; md.appendChild(o); });
-    $("#bkConfig").innerHTML='<option value="">Year / engine…</option>'; $("#bkConfig").disabled=true; STATE.cfg=null; update(); };
+    $("#bkConfig").innerHTML='<option value="">Year / engine…</option>'; $("#bkConfig").disabled=true; STATE.cfg=null; populateYear(); update(); };
   $("#bkModel").onchange=function(){ var md=$("#bkModel"), cf=$("#bkConfig"); cf.innerHTML='<option value="">Year / engine…</option>'; cf.disabled=!md.value; STATE.cfg=null;
     if(md.value) (STATE.vehicles[$("#bkMake").value][md.value]||[]).forEach(function(c,i){ var o=document.createElement("option"); o.value=String(i); o.textContent=c.y+" · "+c.e; cf.appendChild(o); });
-    update(); };
-  $("#bkConfig").onchange=function(){ var i=$("#bkConfig").value; STATE.cfg=i===""?null:STATE.vehicles[$("#bkMake").value][$("#bkModel").value][Number(i)]; update(); };
+    populateYear(); update(); };
+  $("#bkConfig").onchange=function(){ var i=$("#bkConfig").value; STATE.cfg=i===""?null:STATE.vehicles[$("#bkMake").value][$("#bkModel").value][Number(i)]; populateYear(); update(); };
   ["bkName","bkPhone","bkEmail"].forEach(function(id){ document.getElementById(id).oninput=update; });
+  $("#bkYear").onchange=update;
+}
+
+// Exact model year is required whenever the config spans a range ("2016-2023",
+// "2024+") — the year + engine pin the flash protocol for the installer.
+function parseYearRange(str){
+  if(!str) return null;
+  var CUR=new Date().getFullYear();
+  var m=String(str).match(/((?:19|20)\d{2})\s*(?:-|–|—|to)\s*((?:19|20)\d{2})/i);
+  if(m) return {lo:Math.min(+m[1],+m[2]), hi:Math.max(+m[1],+m[2])};
+  m=String(str).match(/((?:19|20)\d{2})\s*(?:\+|present|current|newer|now)/i);
+  if(m) return {lo:+m[1], hi:CUR};
+  return null;
+}
+function populateYear(){
+  var sel=$("#bkYear"); sel.innerHTML='<option value="">Exact model year…</option>';
+  var r=STATE.cfg?parseYearRange(STATE.cfg.y):null;
+  if(!r||r.hi<=r.lo){ sel.style.display="none"; sel.disabled=true; STATE.yearNeeded=false; return; }
+  for(var y=r.hi;y>=r.lo;y--){ var o=document.createElement("option"); o.value=String(y); o.textContent=String(y); sel.appendChild(o); }
+  sel.style.display=""; sel.disabled=false; STATE.yearNeeded=true;
 }
 
 function update(){
   var p=$("#bkPrice");
   p.textContent = STATE.cfg ? ("Your OTT tune: from $"+STATE.cfg.base) : "";
-  var ok=STATE.slot&&$("#bkName").value.trim()&&$("#bkPhone").value.trim()&&STATE.cfg;
+  var ok=STATE.slot&&$("#bkName").value.trim()&&$("#bkPhone").value.trim()&&STATE.cfg&&(!STATE.yearNeeded||$("#bkYear").value);
   $("#bkSubmit").disabled=!ok;
 }
 
@@ -138,7 +159,7 @@ $("#bkSubmit").onclick=function(){
   var vehicle=($("#bkMake").value+" "+$("#bkModel").value+" ("+STATE.cfg.y+" "+STATE.cfg.e+")");
   var payload={ city:STATE.avail.city, dateISO:dateISO, slot:STATE.slot,
     name:$("#bkName").value.trim(), phone:$("#bkPhone").value.trim(), email:$("#bkEmail").value.trim(),
-    vehicle:vehicle, modelYear:"", mods:"", goals:"Booked via event link", installer_key:"", bot_field:"",
+    vehicle:vehicle, modelYear:(STATE.yearNeeded?$("#bkYear").value:""), mods:"", goals:"Booked via event link", installer_key:"", bot_field:"",
     source:"event-link", utm_source:UTM.get("utm_source")||"", utm_medium:UTM.get("utm_medium")||"", utm_campaign:UTM.get("utm_campaign")||"", ref:UTM.get("ref")||"" };
   fetch("/.netlify/functions/book",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
     .then(function(r){return r.json();}).then(function(out){

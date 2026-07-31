@@ -129,6 +129,20 @@ test("escalate: notify failures never throw; customer still gets installer info"
   assert.equal(r.installer.key, "aaron"); // dispatcher — city no longer picks the chat owner
 });
 
+test("escalate: engineSize lands in the lead's vehicle string; 'unknown' is omitted", async () => {
+  const mk = (engineSize) => ({ transfer: { customerName: "Ty", contactMethod: "phone", contactValue: "5075550101",
+      vehicleMake: "Toyota", vehicleModel: "Tundra", modelYear: "2019", engineSize, city: "Rochester", state: "MN",
+      questionSummary: "fitment", reason: "no-answer" },
+    sess: { id: "s1", turns: [], pageContext: "default" } });
+  let lead;
+  const deps = { env: ENV, log: { error: () => {} }, ingest: async (b) => { lead = b; return { ok: true }; },
+    sms: async () => ({}), push: async () => ({}), logEscalation: async () => {} };
+  await escalate(mk("5.7L"), deps);
+  assert.equal(lead.vehicle, "2019 Toyota Tundra 5.7L");
+  await escalate(mk("unknown"), deps);
+  assert.equal(lead.vehicle, "2019 Toyota Tundra");
+});
+
 test("escalate: facebook pageContext → lead gets channel 'facebook' and source 'chat:facebook'", async () => {
   let capturedLead;
   await escalate({ transfer: { customerName: "Ty", contactMethod: "phone", contactValue: "5075550101",

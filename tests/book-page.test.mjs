@@ -71,6 +71,11 @@ test("tap a time → form → confirm books through /book with Source event-link
   await page.selectOption("#bkModel", "Tundra");
   await page.waitForSelector("#bkConfig option:nth-child(2)", { state: "attached" });
   await page.selectOption("#bkConfig", { index: 1 });
+  // Config ranges require the exact model year (it pins the flash protocol) —
+  // submit must stay disabled until it's picked.
+  assert.equal(await page.isDisabled("#bkSubmit"), true, "submit gated on exact year");
+  await page.waitForSelector("#bkYear", { state: "visible" });
+  await page.selectOption("#bkYear", "2007");
   await page.click("#bkSubmit");
   await page.waitForSelector("#done", { state: "visible" });
   assert.equal(booked.length, 1);
@@ -79,6 +84,8 @@ test("tap a time → form → confirm books through /book with Source event-link
   assert.equal(booked[0].slot, "9:20");
   assert.equal(booked[0].source, "event-link");
   assert.ok(booked[0].vehicle.includes("Tundra"));
+  assert.match(booked[0].vehicle, /\d\.\dL/, "vehicle string carries the engine size");
+  assert.equal(booked[0].modelYear, "2007");
   await page.close();
 });
 
