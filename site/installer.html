@@ -1905,8 +1905,17 @@
       var target=STATE.leads.filter(function(l){ return l.id===STATE.leadOpenId; })[0];
       if(target) STATE.leadTab = isOverdueLead(target) ? 'overdue' : 'active';
     }
-    var st=document.createElement('div'); st.style.cssText='display:flex;gap:8px;margin:8px 0';
-    [['active','Active'],['overdue','⏰ Overdue'+(over.length?' ('+over.length+')':'')]].forEach(function(t){
+    // Stale = the fell-through-the-cracks bucket (server-computed staleDays,
+    // single source of truth in lib/leads.js); Waitlist = event-waitlist-born
+    // rows (Reason present). Both get their own focus tab only when non-empty.
+    var staleList=visible.filter(function(l){ return l.staleDays!=null; }).sort(function(a,b){ return b.staleDays-a.staleDays; });
+    var wlList=visible.filter(function(l){ return !!l.reason; });
+    if((STATE.leadTab==='stale'&&!staleList.length)||(STATE.leadTab==='waitlist'&&!wlList.length)) STATE.leadTab='active';
+    var st=document.createElement('div'); st.style.cssText='display:flex;gap:8px;margin:8px 0;flex-wrap:wrap';
+    var leadTabs=[['active','Active'],['overdue','⏰ Overdue'+(over.length?' ('+over.length+')':'')]];
+    if(staleList.length) leadTabs.push(['stale','🕸 Stale ('+staleList.length+')']);
+    if(wlList.length) leadTabs.push(['waitlist','⏳ Waitlist ('+wlList.length+')']);
+    leadTabs.forEach(function(t){
       var b=document.createElement('button'); b.className='tabbtn'+(STATE.leadTab===t[0]?' on':''); b.textContent=t[1];
       b.onclick=function(){ STATE.leadTab=t[0]; renderLeads(); }; st.appendChild(b);
     });
@@ -1914,6 +1923,17 @@
     if(STATE.leadTab==='overdue'){
       if(!over.length){ var oe=document.createElement('div'); oe.className='empty'; oe.textContent='Nothing overdue — every follow-up is handled. 🎉'; host.appendChild(oe); return; }
       over.forEach(function(l){ host.appendChild(reminderCard(l)); });
+      return;
+    }
+    if(STATE.leadTab==='stale'){
+      host.appendChild(secHead('Stale — quiet 30+ days, nothing scheduled ('+staleList.length+')',''));
+      staleList.forEach(function(l){ host.appendChild(leadCard(l)); });
+      return;
+    }
+    if(STATE.leadTab==='waitlist'){
+      host.appendChild(secHead('Waitlist ('+wlList.length+')',''));
+      wlList.sort(function(a,b){ return String(a.eventDate||'9999').localeCompare(String(b.eventDate||'9999')); });
+      wlList.forEach(function(l){ host.appendChild(leadCard(l)); });
       return;
     }
     LEAD_STAGES.forEach(function(stage){
@@ -1984,16 +2004,51 @@
       setTimeout(function(){ det.classList.remove('flash'); },3000);
     }
     var sum=document.createElement('summary');
-    sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' <a href="#" data-cust style="color:inherit;text-decoration:underline dotted">'+esc(l.name)+'</a></span>'+(l.channel==='ott-national'?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
-      '<br><span class="edate">'+esc(l.vehicle||'—')+' · '+esc(l.city||'—')+'</span></span>'+
+    sum.innerHTML='<span><span class="etitle">'+(CHAN_ICON[l.channel]||'•')+' <a href="#" data-cust style="color:inherit;text-decoration:underline dotted">'+esc(l.name)+'</a></span>'+(l.channel==='ott-national'?' <span class="tabbadge" style="background:#2f4f6f">OTT</span>':'')+((!l.bookingId&&(l.matches||[]).length)?' <span class="tabbadge" style="background:#8a6d3b">🔗 match</span>':'')+(l.installer&&STATE.admin?' <span class="installer-tag">'+esc(l.installer)+'</span>':'')+
+      '<br><span class="edate">'+esc(l.vehicle||'—')+' · '+esc(l.city||'—')+(l.staleDays!=null?' · '+l.staleDays+'d quiet':'')+'</span></span>'+
       '<span class="pill'+(overdue?' hasopen':'')+'">'+(overdue?'⏰ due':(l.nextFollowup?('→ '+esc(l.nextFollowup)):esc(l.stage)))+'</span>';
     det.appendChild(sum);
     // stopPropagation so a name tap opens the 360 view without toggling the card.
     var custA=sum.querySelector('[data-cust]');
     if(custA) custA.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); openCustomerView({phone:l.phone||'',email:l.email||'',name:l.name||''}); };
     var body=document.createElement('div'); body.className='ebody';
-    var row=document.createElement('div'); row.className='walkmini';
     function act(label,fn){ var b=document.createElement('button'); b.className='btn'; b.textContent=label; b.onclick=fn; return b; }
+    // Waitlist context (original Priority List schema) — why they're waiting.
+    if(l.reason){
+      var wl=document.createElement('div'); wl.className='ffnote';
+      wl.textContent='⏳ Waitlist — '+l.reason+(l.eventDate?' · '+l.eventDate:'')+(l.requestedSlot?' · wanted '+l.requestedSlot:'');
+      body.appendChild(wl);
+    }
+    // Linked booking: where this person landed. Tap = jump-and-flash the card.
+    if(l.booking){
+      var lbRow=document.createElement('div'); lbRow.className='walkmini';
+      lbRow.appendChild(act('📅 '+(l.booking.city||'—')+' · '+relDate(l.booking.dateISO)+(l.booking.scheduledTime?' · '+l.booking.scheduledTime:(l.booking.slot?' · '+l.booking.slot:''))+(l.booking.status!=='Booked'?' · '+l.booking.status:''),function(){
+        var full=(STATE.bookings||[]).filter(function(x){ return x.id===l.booking.id; })[0];
+        jumpToBooking(full||l.booking);
+      }));
+      lbRow.appendChild(act('Unlink',function(){
+        if(confirm('Unlink this lead from the booking? (Stage stays Booked — change it after if needed.)')) leadUpdate(l.id,{action:'unlink'});
+      }));
+      body.appendChild(lbRow);
+    }
+    // "Looks booked already" — same phone/email as an existing booking. One tap links.
+    if(!l.bookingId && (l.matches||[]).length){
+      var sg=document.createElement('div'); sg.className='ffnote';
+      var sgt=document.createElement('div'); sgt.textContent='Looks booked already:'; sg.appendChild(sgt);
+      l.matches.forEach(function(m){
+        sg.appendChild(act('🔗 Link: '+(m.name||'client')+' — '+(m.city||'—')+' · '+relDate(m.dateISO)+(m.scheduledTime?' · '+m.scheduledTime:(m.slot?' · '+m.slot:''))+(m.status!=='Booked'?' · '+m.status:''),function(){
+          leadUpdate(l.id,{action:'link',bookingId:m.id});
+        }));
+      });
+      body.appendChild(sg);
+    }
+    // Client-portal account behind this lead (matched by email).
+    if(l.client){
+      var clRow=document.createElement('div'); clRow.className='edate'; clRow.style.marginTop='4px';
+      clRow.textContent='👤 tunedyota.com account · '+l.client.email+((l.client.vehicles||[]).length?' · garage: '+l.client.vehicles.map(function(v){ return [v.year,v.make,v.model].filter(Boolean).join(' '); }).join(', '):'');
+      body.appendChild(clRow);
+    }
+    var row=document.createElement('div'); row.className='walkmini';
     if(l.phone){
       row.appendChild(linkBtn('Call','tel:'+l.phone)); row.appendChild(linkBtn('Text','sms:'+l.phone));
       // Click-to-call through the business line: rings YOUR cell first (shows the
@@ -2010,21 +2065,7 @@
       }));
       // Text through the business line: opens (or creates) this client's thread
       // in Chats. New threads prefill a personal, self-identifying first message.
-      row.appendChild(act('💬 Open chat',async function(ev){
-        var b=ev.target; b.disabled=true;
-        try{
-          var r=await chatApi({op:'openSms', phone:l.phone, name:l.name, vehicle:l.vehicle});
-          if(r && r.session){
-            if(r.isNew){
-              var first=(l.name||'').trim().split(/\s+/)[0]||'there';
-              var me=STATE.me ? STATE.me.charAt(0).toUpperCase()+STATE.me.slice(1) : 'Tuned Yota';
-              STATE.chatPrefill='Hi '+first+", it's "+me+' with Tuned Yota'+(l.vehicle?' about your '+l.vehicle:'')+' — ';
-            }
-            STATE.tab='chats'; STATE.chatOpen=r.session; renderAll();
-          } else { b.textContent='Failed'; }
-        }catch(e){ b.textContent='Failed'; }
-        finally{ setTimeout(function(){ b.textContent='💬 Open chat'; b.disabled=false; },4000); }
-      }));
+      row.appendChild(act('💬 Open chat',function(ev){ openTyThread(l.phone,l.name,l.vehicle,ev.target,'💬 Open chat'); }));
     }
     if(l.email){ row.appendChild(linkBtn('Email','mailto:'+l.email)); }
     body.appendChild(row);
@@ -2074,10 +2115,40 @@
         city:(ccity.value||'').trim(),installer:cinst?cinst.value:''});
     }));
     body.appendChild(conv);
+    // Link to an EXISTING booking (dedupe: this person already booked directly).
+    if(!l.bookingId && (STATE.bookings||[]).length){
+      var lkRow=document.createElement('div'); lkRow.className='walkmini';
+      var lkSel=document.createElement('select');
+      var cands=(STATE.bookings||[]).slice().sort(function(a,b){ return String(b.dateISO||'').localeCompare(String(a.dateISO||'')); });
+      lkSel.innerHTML='<option value="">Link to existing booking…</option>'+cands.map(function(b){
+        return '<option value="'+esc(b.id)+'">'+esc((b.dateISO||'—')+(b.slotLabel?' '+b.slotLabel:(b.scheduledTime?' '+b.scheduledTime:''))+' — '+(b.name||'')+' ('+(b.city||'—')+')')+'</option>';
+      }).join('');
+      lkRow.appendChild(lkSel);
+      lkRow.appendChild(act('Link',function(){ if(lkSel.value) leadUpdate(l.id,{action:'link',bookingId:lkSel.value}); }));
+      body.appendChild(lkRow);
+    }
     if(l.activity){ var log=document.createElement('div'); log.className='edate'; log.style.whiteSpace='pre-wrap'; log.style.marginTop='6px'; log.textContent=l.activity; body.appendChild(log); }
     det.appendChild(body); return det;
   }
   function linkBtn(label,href){ var a=document.createElement('a'); a.className='btn'; a.textContent=label; a.href=href; a.style.textAlign='center'; return a; }
+  // Open (or create) this person's SMS thread through the TY business line and
+  // land in Chats with it open. Shared by lead cards and booking cards.
+  async function openTyThread(phone,name,vehicle,btn,label){
+    btn.disabled=true;
+    try{
+      var r=await chatApi({op:'openSms', phone:phone, name:name, vehicle:vehicle});
+      if(r && r.session){
+        if(r.isNew){
+          var first=(name||'').trim().split(/\s+/)[0]||'there';
+          var me=STATE.me ? STATE.me.charAt(0).toUpperCase()+STATE.me.slice(1) : 'Tuned Yota';
+          STATE.chatPrefill='Hi '+first+", it's "+me+' with Tuned Yota'+(vehicle?' about your '+vehicle:'')+' — ';
+        }
+        STATE.tab='chats'; STATE.chatOpen=r.session; renderAll(); return;
+      }
+      btn.textContent='Failed';
+    }catch(e){ btn.textContent='Failed'; }
+    finally{ setTimeout(function(){ btn.textContent=label; btn.disabled=false; },4000); }
+  }
   function addDays(iso,n){ var d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); var p=function(x){return String(x).padStart(2,'0');}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
   async function leadUpdate(id,payload){
     clearMsg();
@@ -2095,6 +2166,13 @@
           succeed('✓ Booked '+(bk.name||'client')+' — '+(bk.city||'no city')+' · '+relDate(bk.dateISO)+
             (bk.scheduledTime?' · '+bk.scheduledTime:'')+
             (STATE.admin&&bk.installer?' · assigned to '+cap(bk.installer):'')+'. Card highlighted below.');
+        } else if(payload.action==='link' && out.booking){
+          // Linking lands the user on the (already existing) booking card,
+          // highlighted — a linked lead must never just vanish from the list.
+          loadLeads();
+          var lbk=(STATE.bookings||[]).filter(function(x){ return x.id===out.booking.id; })[0]||out.booking;
+          jumpToBooking(lbk);
+          succeed('✓ Linked to '+(out.booking.name||'booking')+' — '+(out.booking.city||'—')+' · '+relDate(out.booking.dateISO)+'. Card highlighted below.');
         } else {
           succeed(payload.action==='convert'?'✓ Converted to a booking.':(payload.action==='delete'?'✓ Lead deleted.':'✓ Updated.'));
           loadLeads();
@@ -2308,8 +2386,14 @@
       (b.pcm?'<div class="ffnote" style="color:#1f4e79;border-color:#b7cfe8;background:#eef4fb">🔧 PCM '+esc(b.pcm.pcm)+(b.pcm.fid?' · '+esc(b.pcm.fid):'')+(b.pcm.throttle?' · start: '+esc(b.pcm.throttle):'')+(b.pcm.note?' — '+esc(b.pcm.note):'')+'</div>':'');
     var overdue = isOpen(b) && b.dateISO < STATE.today;
     if(overdue){ head += '<div class="ffnote">⚠ Not closed out — this customer has no certificate yet. Close it out (VIN + calibration) to send it.</div>'; }
+    // Reach the client from the booking — same TY-line thread motion as leads.
+    var contact = b.phone ? '<div class="row-actions" style="margin-top:6px">'+
+      '<a class="btn" style="text-align:center" href="tel:'+esc(b.phone)+'">Call</a>'+
+      '<button type="button" class="btn" id="chat_'+b.id+'">💬 Text via TY</button></div>' : '';
+    function wireChat(){ var cbtn=c.querySelector('#chat_'+b.id);
+      if(cbtn) cbtn.onclick=function(){ openTyThread(b.phone,b.name,b.vehicle,cbtn,'💬 Text via TY'); }; }
     if(b.status==='Completed'){
-      c.innerHTML=head+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'+
+      c.innerHTML=head+contact+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'+
         (b.certDelivery==='installer-fallback' ? '<div class="ffnote">No customer email on file — this certificate went to you. Re-open and add the email to send it to the customer.</div>' : '')+
         '<a href="#" class="link" id="cert_'+b.id+'">View / download certificate</a>'+
         (b.signed ? '<a href="#" class="link" id="sig_'+b.id+'" style="margin-left:14px">✍ Signed — view</a>' : '');
@@ -2324,7 +2408,7 @@
       };
       var sv=c.querySelector('#sig_'+b.id);
       if(sv) sv.onclick=function(e){ e.preventDefault(); viewSignature(b.id); };
-      wireCust(c,b);
+      wireCust(c,b); wireChat();
       return c;
     }
     if(b.status==='No-show'){
@@ -2338,7 +2422,7 @@
       return c;
     }
     var opts='<option value="" disabled selected>Choose OTT Calibration…</option>'+calOptions(b).map(function(o){return '<option>'+o+'</option>';}).join('');
-    c.innerHTML=head+
+    c.innerHTML=head+contact+
       '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✏️ Edit'+(b.scheduledTime?' — '+esc(b.scheduledTime):' date / time / address')+'</summary>'+
       '<div class="row-actions" style="margin-top:6px">'+
       '<input type="date" id="rd_'+b.id+'" value="'+esc(b.dateISO||'')+'">'+
@@ -2362,6 +2446,7 @@
       '<label class="nsconfirm"><input type="checkbox" id="nsc_'+b.id+'"> Customer didn\'t show — add to waitlist</label>'+
       '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
+    wireChat();
     c.querySelector('#rs_'+b.id).onclick=function(){ reschedule(b.id); };
     var db=c.querySelector('#del_'+b.id); if(db) db.onclick=function(){ db.disabled=true; cancelBooking(b.id).finally(function(){ db.disabled=false; }); };
     if(canScan()){ var sb=c.querySelector('#scan_'+b.id); if(sb) sb.onclick=function(){ startScan(b.id); }; }
