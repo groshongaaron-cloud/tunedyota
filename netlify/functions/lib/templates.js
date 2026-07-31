@@ -123,7 +123,10 @@ function buildBookingInstallerEmail(d, inst, market, event, referredBy) {
     `<table style="border-collapse:collapse;font-size:14px">${rows.map((r) => r.html).join("")}</table></div>`;
   return { subject, html, text };
 }
-function priorityWord(reason) { return reason === "full" ? "the event is currently full" : "no event is scheduled in your city yet"; }
+function priorityWord(reason) {
+  if (reason === "multi-truck") return "we got your second-truck request — you're already booked at this event";
+  return reason === "full" ? "the event is currently full" : "no event is scheduled in your city yet";
+}
 function buildPriorityCustomerEmail(d, inst, market, reason) {
   const first = (d.name || "there").split(" ")[0];
   const pref = (reason === "full" && d.slot) ? ` We noted your preferred time of ${d.slot}, and you'll be first in line if it opens.` : "";
@@ -138,8 +141,8 @@ function buildPriorityCustomerEmail(d, inst, market, reason) {
   return { subject, html, text };
 }
 function buildPriorityInstallerEmail(d, inst, market, reason) {
-  const rows = [...(d.source === "OTT Update" ? [row("Request type", "Free OTT Update (existing customer re-flash)")] : []), row("Name", d.name), row("Phone", d.phone), row("Email", d.email), row("City", market.city), row("Requested time", reason === "full" ? (d.slot || "") : ""), row("Vehicle", d.vehicle), row("Model year", d.modelYear), row("Goals", d.goals), row("Reason", reason === "full" ? "Event full" : "No event scheduled"), row("Attribution", attribution(d))];
-  const subject = `New Priority Wait List signup, ${market.city}`;
+  const rows = [...(d.source === "OTT Update" ? [row("Request type", "Free OTT Update (existing customer re-flash)")] : []), row("Name", d.name), row("Phone", d.phone), row("Email", d.email), row("City", market.city), row("Requested time", reason === "full" ? (d.slot || "") : ""), row("Vehicle", d.vehicle), row("Model year", d.modelYear), row("Goals", d.goals), row("Reason", reason === "full" ? "Event full" : reason === "multi-truck" ? "Multi-truck request" : "No event scheduled"), ...(reason === "multi-truck" && d.suggestedSlot ? [row("Back-to-back suggestion", d.suggestedSlot)] : []), row("Attribution", attribution(d))];
+  const subject = reason === "multi-truck" ? `Multi-truck request, ${market.city}` : `New Priority Wait List signup, ${market.city}`;
   const text = `New Priority Wait List signup routed to ${inst.name}.\n\n` + rows.map((r) => r.text).join("");
   const html = `<div style="font-family:Arial,sans-serif;color:#3A2E26;max-width:560px"><h2 style="color:#5B4B42;margin:0 0 4px">Priority Wait List signup</h2>` +
     `<table style="border-collapse:collapse;font-size:14px">${rows.map((r) => r.html).join("")}</table></div>`;

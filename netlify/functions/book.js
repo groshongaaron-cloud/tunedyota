@@ -4,10 +4,24 @@ const { keyToInstaller } = require("./lib/routing.js");
 const { getEventsForCity } = require("./lib/events.js");
 const EVENTS = require("./lib/events-data.js");
 const { cfg, listRecords, createRecord, createTolerant } = require("./lib/airtable.js");
-const { isValidSlot, computeOpen, windowSlots, slotsFor } = require("./lib/slots.js");
+const { isValidSlot, computeOpen, windowSlots, slotsFor, slotMode } = require("./lib/slots.js");
+const { normalizePhone, normalizeEmail } = require("./lib/leads.js");
 const { triggerBackground } = require("./lib/background.js");
 const { verifyReferral } = require("./lib/client-auth.js");
 const { pcmProtocol } = require("./lib/pcm-protocol.js");
+
+// The back-to-back suggestion for a second truck: the open slot adjacent to the
+// client's existing one (later preferred). Meaningless in generic slot mode —
+// Noah assigns real times from the console — so it stays blank there.
+function adjacentOpen(existingSlot, open, instKey) {
+  if (slotMode(instKey) === "generic") return "";
+  const grid = slotsFor(instKey);
+  const i = grid.indexOf(String(existingSlot || ""));
+  if (i < 0) return "";
+  if (open.includes(grid[i + 1])) return grid[i + 1];
+  if (open.includes(grid[i - 1])) return grid[i - 1];
+  return "";
+}
 
 // book.js is the SYNCHRONOUS critical path: validate -> check slots -> create the
 // Airtable record -> return a status the booking UI depends on (booked/conflict/
@@ -46,35 +60,53 @@ async function processBooking(body, deps) {
     catch (e) { if (log.error) log.error("trigger book-background", e.message); }
   }
 
-  async function priority(reason) {
+  async function priority(reason, extra = {}) {
     const pfields = {
       City: market.city, Name: d.name, Phone: d.phone || "", Email: d.email || "",
       Vehicle: d.vehicle || "", "Model Year": d.modelYear || "", Goals: d.goals || "", Modifications: d.mods || "", Installer: inst.key,
-      Reason: reason === "full" ? "Event full" : "No event scheduled",
+      Reason: reason === "full" ? "Event full" : reason === "multi-truck" ? "Multi-truck request" : "No event scheduled",
       "Event Date": event ? event.dateISO : "",
       ...(referredBy ? { "Referred By": referredBy } : {}),
     };
     if (reason === "full" && isValidSlot(d.slot, market.inst)) pfields["Requested Slot"] = d.slot; // only set when a preference was picked
+    if (reason === "multi-truck" && extra.suggestedSlot) pfields["Requested Slot"] = extra.suggestedSlot; // the back-to-back plan
     let pid;
     try {
       const rec = await createTolerant(createRecord, { fetchImpl, token: c.token, baseId: c.baseId, table: c.priority, fields: pfields }, ["Modifications", "Model Year", "Referred By"]);
       pid = rec && rec.id;
     } catch (e) { if (log.error) log.error("priority create", e.message); return { status: "error", error: "store-unavailable" }; }
-    await fire({ kind: "priority", d, inst, market, reason, recordId: pid });
+    await fire({ kind: "priority", d: reason === "multi-truck" ? { ...d, suggestedSlot: extra.suggestedSlot || "" } : d, inst, market, reason, recordId: pid });
     return { status: "priority", reason };
   }
 
   if (!event) return priority("no-event");
 
-  let taken = [];
+  let recs = [];
   try {
     const formula = `AND({City}="${market.city}",{Event Date}="${event.dateISO}",{Status}!="Cancelled")`;
-    const recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula: formula, fields: ["Slot"] });
-    taken = recs.map((r) => r.fields.Slot).filter(Boolean);
+    recs = await listRecords({ fetchImpl, token: c.token, baseId: c.baseId, table: c.bookings, filterByFormula: formula, fields: ["Slot", "Phone", "Email"] });
   } catch (e) { if (log.error) log.error("list", e.message); return { status: "error", error: "store-unavailable" }; }
+  const taken = recs.map((r) => r.fields.Slot).filter(Boolean);
 
   const eventSlots = windowSlots(slotsFor(market.inst), event);
   const open = computeOpen(taken, market.inst).filter((s) => eventSlots.includes(s));
+
+  // One booking per client per event (owner rule 2026-07-30). A duplicate attempt
+  // becomes a Multi-truck request the installer grants from the console — never a
+  // silent second booking eating event capacity.
+  const pKey = normalizePhone(d.phone), eKey = normalizeEmail(d.email);
+  const dupe = recs.find((r) => {
+    const f = r.fields || {};
+    return (pKey && normalizePhone(f.Phone) === pKey) || (eKey && normalizeEmail(f.Email) === eKey);
+  });
+  if (dupe) {
+    const suggestedSlot = adjacentOpen(dupe.fields.Slot, open, market.inst);
+    const p = await priority("multi-truck", { suggestedSlot });
+    if (p.status === "error") return p;
+    return { status: "multi-truck", existingSlot: dupe.fields.Slot || "", suggestedSlot,
+      installerName: (inst.name || "").split(" ")[0], city: market.city, eventDateISO: event.dateISO };
+  }
+
   if (open.length === 0) return priority("full");
   if (!d.slot || !isValidSlot(d.slot, market.inst) || !open.includes(d.slot)) return { status: "conflict", openSlots: open };
 

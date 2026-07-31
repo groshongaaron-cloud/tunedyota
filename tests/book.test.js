@@ -303,3 +303,75 @@ test("a tampered referral token is ignored (no attribution)", async () => {
   assert.equal(out.status, "booked");
   assert.equal("Referred By" in d._created[0].fields, false);
 });
+
+/* ---- multi-truck exception: one booking per client per event ---- */
+// Harness whose Airtable list returns full booking records (Slot+Phone+Email),
+// so the duplicate-client guard has contact fields to match against.
+function harness2({ events, bookings = [] }) {
+  const created = [];
+  const fetchImpl = async (url, opts) => {
+    if (url.includes("docs.google.com")) return { ok: true, text: async () => events };
+    if (url.includes("api.airtable.com")) {
+      if (opts && opts.method === "POST") { const b = JSON.parse(opts.body); created.push({ url, fields: b.fields }); return { ok: true, json: async () => ({ id: "r1" }) }; }
+      return { ok: true, json: async () => ({ records: bookings.map((f) => ({ fields: f })) }) };
+    }
+    throw new Error("unexpected " + url);
+  };
+  const jobs = [];
+  const deps = { fetchImpl, env: { EVENTS_SHEET_ID: "x", AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" },
+    trigger: async (a) => { jobs.push(a); return { ok: true }; }, now: () => "20260101T000000Z",
+    nowDate: new Date("2026-07-01T00:00:00Z"), log: { warn() {}, error() {} } };
+  return { deps, created, jobs };
+}
+const MTEV = "Market,Date,Active\nSioux Falls,2026-07-12,yes\n";
+const eli = { Slot: "10:20", Phone: "6194176865", Email: "e@x.com" };
+
+test("multi-truck: duplicate phone (+1 format) at same event -> request row with back-to-back slot", async () => {
+  const h = harness2({ events: MTEV, bookings: [eli] });
+  const out = await processBooking({ ...base, phone: "+16194176865", email: "", slot: "9:00" }, h.deps);
+  assert.equal(out.status, "multi-truck");
+  assert.equal(out.existingSlot, "10:20");
+  assert.equal(out.suggestedSlot, "10:40");
+  assert.equal(out.installerName, "Cody");
+  assert.equal(h.created.length, 1);
+  assert.ok(h.created[0].url.includes("Priority%20List"));
+  assert.equal(h.created[0].fields.Reason, "Multi-truck request");
+  assert.equal(h.created[0].fields["Requested Slot"], "10:40");
+  assert.equal(h.jobs[0].payload.reason, "multi-truck");
+  assert.equal(h.jobs[0].payload.d.suggestedSlot, "10:40");
+});
+
+test("multi-truck: duplicate email matches too", async () => {
+  const h = harness2({ events: MTEV, bookings: [eli] });
+  const out = await processBooking({ ...base, phone: "", email: "E@X.com", slot: "9:00" }, h.deps);
+  assert.equal(out.status, "multi-truck");
+});
+
+test("multi-truck: later neighbor taken -> earlier suggested; both taken -> blank", async () => {
+  const h1 = harness2({ events: MTEV, bookings: [eli, { Slot: "10:40", Phone: "1" }] });
+  const a = await processBooking({ ...base, phone: "6194176865", email: "", slot: "9:00" }, h1.deps);
+  assert.equal(a.suggestedSlot, "10:00");
+  const h2 = harness2({ events: MTEV, bookings: [eli, { Slot: "10:40", Phone: "1" }, { Slot: "10:00", Phone: "2" }] });
+  const b = await processBooking({ ...base, phone: "6194176865", email: "", slot: "9:00" }, h2.deps);
+  assert.equal(b.status, "multi-truck");
+  assert.equal(b.suggestedSlot, "");
+  assert.equal("Requested Slot" in h2.created[0].fields, false);
+});
+
+test("multi-truck guard only fires for the SAME event: same phone books a different event fine", async () => {
+  // Same contact, but the taken list for THIS event has no matching booking.
+  const h = harness2({ events: MTEV, bookings: [{ Slot: "9:00", Phone: "5550001111" }] });
+  const out = await processBooking({ ...base, phone: "6194176865", email: "", slot: "9:20" }, h.deps);
+  assert.equal(out.status, "booked");
+});
+
+const tpl = require("../netlify/functions/lib/templates.js");
+test("multi-truck email copy: customer text names the second truck; installer email carries the suggestion", async () => {
+  const d = { name: "Eli Soetenga", phone: "6194176865", email: "e@x.com", vehicle: "Tacoma", suggestedSlot: "10:40" };
+  const inst = { name: "Cody Star", phone: "(605) 214-1335", email: "cody@tunedyota.com" };
+  const cust = tpl.buildPriorityCustomerEmail(d, inst, { city: "Sioux Falls" }, "multi-truck");
+  assert.match(cust.text, /second[- ]truck/i);
+  const instEmail = tpl.buildPriorityInstallerEmail(d, inst, { city: "Sioux Falls" }, "multi-truck");
+  assert.match(instEmail.text, /Multi-truck request/);
+  assert.match(instEmail.text, /10:40/);
+});
