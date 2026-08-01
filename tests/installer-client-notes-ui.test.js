@@ -24,6 +24,15 @@ test("saving a note posts to installer-client-note and highlights the booking", 
   assert.ok(fn.slice(0, 1600).includes("jumpToBooking"), "jump-and-flash");
 });
 
+test("lead cards show notes and can add one via leadId", () => {
+  const fn = HTML.slice(HTML.indexOf("function leadCard"));
+  assert.ok(fn.includes("noteLines(l.clientNotes)"), "strip renders lead notes");
+  assert.ok(fn.includes("addLeadNote(l"), "add-note wired");
+  const add = HTML.slice(HTML.indexOf("function addLeadNote"));
+  assert.ok(add.slice(0, 900).includes("installer-client-note"), "endpoint");
+  assert.ok(add.slice(0, 900).includes("leadId:"), "lead-scoped body");
+});
+
 test("the feed lazy-loads leads so notes can render on booking cards", () => {
   const fn = HTML.slice(HTML.indexOf("function renderFeed"));
   assert.ok(fn.slice(0, 600).includes("loadLeads()"), "lazy trigger in feed render");

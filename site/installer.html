@@ -2036,6 +2036,19 @@
       }));
       body.appendChild(lbRow);
     }
+    // Client notes — the stamped log that travels with this person (owner rule
+    // 2026-07-31): starts before any booking, simply there after conversion.
+    var nls=noteLines(l.clientNotes);
+    if(nls.length){
+      var nb=document.createElement('div'); nb.className='ffnote';
+      nb.innerHTML=nls.map(function(s){ return '📝 '+esc(s); }).join('<br>');
+      body.appendChild(nb);
+    }
+    var nrow=document.createElement('div'); nrow.className='walkmini';
+    var ninp=document.createElement('input'); ninp.placeholder='Add note — travels with the client record'; ninp.maxLength=500;
+    nrow.appendChild(ninp);
+    nrow.appendChild(act('📝 Save note',function(){ addLeadNote(l,ninp); }));
+    body.appendChild(nrow);
     // "Looks booked already" — same phone/email as an existing booking. One tap links.
     if(!l.bookingId && (l.matches||[]).length){
       var sg=document.createElement('div'); sg.className='ffnote';
@@ -2423,6 +2436,22 @@
     }catch(e){ fail('Network error — try again.'); }
   }
   function wireNotes(c,b){ var s=c.querySelector('#cns_'+b.id); if(s) s.onclick=function(){ addClientNote(b); }; }
+  async function addLeadNote(l,inp){
+    var note=(inp&&inp.value||'').trim();
+    if(!note){ inp.placeholder='Type the note first'; return; }
+    try{
+      var res=await fetch('/.netlify/functions/installer-client-note',{method:'POST',
+        headers:{'Content-Type':'application/json','x-installer-token':tok()},
+        body:JSON.stringify({leadId:l.id,note:note})});
+      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      var out=await res.json().catch(function(){return{};});
+      if(res.ok && out.status==='ok'){
+        l.clientNotes=out.notes;
+        STATE.leadOpenId=l.id;   // re-open + flash this card after re-render
+        renderLeads();
+      } else { inp.value=note; inp.placeholder='Could not save — try again'; }
+    }catch(e){ inp.placeholder='Network error — try again'; }
+  }
 
   // Any name tap opens the customer's 360 view — same affordance on every card.
   function wireCust(c,b){ var a=c.querySelector('[data-cust]');
