@@ -310,3 +310,28 @@ test("dedupe backfills an entirely blank existing name", async () => {
     { list: async () => [existing], create: async () => ({}), update: async (a) => { updated = a; return { id: a.id }; } });
   assert.equal(updated.fields.Name, "Sam Blank");
 });
+
+test("ingest: modelYear lands in Model Year on create", async () => {
+  const writes = [];
+  const deps = { env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, now: new Date("2026-08-01T12:00:00Z"),
+    list: async () => [], update: async () => ({}),
+    create: async (a) => { writes.push(a); return { id: "recNew" }; } };
+  const out = await L.processLeadIngest({ name: "Sam", phone: "6125550100", city: "Madison",
+    vehicle: "2016-2023 Toyota Tacoma 3.5L", modelYear: "2019", channel: "sms" }, deps);
+  assert.equal(out.status, "lead");
+  assert.equal(writes[0].fields["Model Year"], "2019");
+});
+
+test("ingest: dedupe touch backfills a blank Model Year, never overwrites", async () => {
+  const patches = [];
+  const existing = (my) => [{ id: "recL1", fields: { Name: "Sam", Phone: "6125550100", Stage: "New",
+    ...(my ? { "Model Year": my } : {}) } }];
+  const deps = (rows) => ({ env: { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" }, now: new Date("2026-08-01T12:00:00Z"),
+    list: async () => rows, create: async () => ({ id: "x" }),
+    update: async (a) => { patches.push(a); return {}; } });
+  await L.processLeadIngest({ name: "Sam", phone: "6125550100", modelYear: "2019" }, deps(existing()));
+  assert.equal(patches[0].fields["Model Year"], "2019");
+  patches.length = 0;
+  await L.processLeadIngest({ name: "Sam", phone: "6125550100", modelYear: "2021" }, deps(existing("2019")));
+  assert.equal(patches[0].fields["Model Year"], undefined, "a stored year is never overwritten by ingest");
+});

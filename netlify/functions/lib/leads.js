@@ -142,6 +142,7 @@ async function processLeadIngest(body, deps) {
   const channel = validChannel(d.channel) ? d.channel : normalizeChannel(d.source || d.channel);
   const source = String(d.source || `lead:${channel}`);
   const city = String(d.city || "").trim();
+  const modelYear = String(d.modelYear || "").trim().slice(0, 4);
   const market = getMarket(city);
   const ownerKey = market ? keyToInstaller(market.inst).key : "";
   const c = cfg(env);
@@ -176,12 +177,13 @@ async function processLeadIngest(body, deps) {
       fields["Activity Log"] = appendActivity(fields["Activity Log"],
         logLine(now, `name: ${String(match.fields.Name || "").trim() || "(blank)"} → ${name}`));
     }
+    if (modelYear && !String(match.fields["Model Year"] || "").trim()) fields["Model Year"] = modelYear;
     if (emailThread) fields["Email Thread"] = emailThread;
     if (emailMessageId) fields["Email Message-Id"] = emailMessageId;
     if (replyTo) fields["Reply-To"] = replyTo;
     try {
       await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.priority, id: match.id, fields },
-        ["Last Contact", "Activity Log", "Email Thread", "Email Message-Id", "Reply-To"]);
+        ["Last Contact", "Activity Log", "Model Year", "Email Thread", "Email Message-Id", "Reply-To"]);
     } catch (e) { return { status: "error", error: "store-unavailable" }; }
     return { status: "lead", recordId: match.id, deduped: true };
   }
@@ -194,6 +196,7 @@ async function processLeadIngest(body, deps) {
     // Airtable's Stage select gains the option via typecast:true.
     Stage: (market && String(d.vehicle || "").trim()) ? "Qualified" : "New",
     "Last Contact": new Date(now).toISOString().slice(0, 10), "Activity Log": touch,
+    ...(modelYear ? { "Model Year": modelYear } : {}),
     ...(emailThread ? { "Email Thread": emailThread } : {}),
     ...(emailMessageId ? { "Email Message-Id": emailMessageId } : {}),
     ...(replyTo ? { "Reply-To": replyTo } : {}),
@@ -203,7 +206,7 @@ async function processLeadIngest(body, deps) {
   let rec;
   try {
     rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields },
-      ["Channel", "Stage", "Last Contact", "Activity Log", "Source", "Email Thread", "Email Message-Id", "Reply-To", "GHL Link"]);
+      ["Channel", "Stage", "Last Contact", "Activity Log", "Source", "Model Year", "Email Thread", "Email Message-Id", "Reply-To", "GHL Link"]);
   } catch (e) { return { status: "error", error: "store-unavailable" }; }
   return { status: "lead", recordId: rec && rec.id, deduped: false };
 }
