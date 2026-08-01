@@ -908,9 +908,15 @@ function populateModelYear(){
   const group=$("#fYearGroup"), sel=$("#fYear");
   if(!group||!sel) return;
   sel.innerHTML='<option value="" disabled selected>Select your exact year</option>';
+  const CUR=new Date().getFullYear();
   const r=parseYearRange(S.cfg&&S.cfg.y);
-  if(!r||r.hi<=r.lo){ group.style.display="none"; sel.required=false; sel.value=""; return; }
-  for(let y=r.hi;y>=r.lo;y--){ const o=document.createElement("option"); o.value=String(y); o.textContent=String(y); sel.appendChild(o); }
+  if(r&&r.hi===r.lo){ /* single-year platform: capture silently, zero taps */
+    const o=document.createElement("option"); o.value=String(r.lo); o.textContent=String(r.lo);
+    sel.appendChild(o); sel.value=String(r.lo);
+    group.style.display="none"; sel.required=false; return;
+  }
+  const lo=r?r.lo:1995, hi=r?r.hi:CUR+1;   /* no parseable range → generic list, still required */
+  for(let y=hi;y>=lo;y--){ const o=document.createElement("option"); o.value=String(y); o.textContent=String(y); sel.appendChild(o); }
   group.style.display=""; sel.required=true;
 }
 /* ---- live booking: slots + priority list ---- */
@@ -1054,7 +1060,7 @@ $("#fSubmit").onclick=async()=>{
   if(needSlot && !BOOK.slot){ $("#fErr").textContent="Please pick a time above."; $("#fErr").style.display="block"; const sl=document.querySelector("#tfSlots button,#tfSlots [tabindex]"); if(sl) sl.focus(); else $("#fErr").scrollIntoView({behavior:"smooth",block:"center"}); return; }
   const yearEl=$("#fYear"), yearShown=$("#fYearGroup") && $("#fYearGroup").style.display!=="none";
   if(yearShown && !yearEl.value){ $("#fErr").textContent="Please select your exact model year."; $("#fErr").style.display="block"; yearEl.focus(); return; }
-  const modelYear=yearShown?yearEl.value:"";
+  const modelYear=yearEl?yearEl.value:"";
   const goalsStr=[...S.goals].map(id=>(GOALS.find(g=>g.id===id)||{}).l).filter(Boolean).join(", ");
   const msg=$("#fMsg").value.trim();
   const mods=$("#fMods").value.trim();
@@ -1100,7 +1106,7 @@ function submitNetlifyLead(){
   const market=$("#fLoc").value||S.market||"Not selected";
   const message=$("#fMsg").value.trim();
   const vehicle=$("#fVeh").value;
-  const modelYear=($("#fYearGroup")&&$("#fYearGroup").style.display!=="none")?$("#fYear").value:"";
+  const modelYear=($("#fYear")&&$("#fYear").value)||"";
   const payload={ name, phone, email, location:market, installer:S.installer||"", vehicle, modelYear, message, source:"Tune Finder" };
   const fields={
     "form-name":LEAD_FORM_NAME, "bot-field":"",
