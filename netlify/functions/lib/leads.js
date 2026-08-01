@@ -51,6 +51,7 @@ function toLeadView(rec) {
     followupMessage: f["Follow-up Message"] || "",
     lastContact: (f["Last Contact"] || "").slice(0, 10),
     activity: f["Activity Log"] || "",
+    clientNotes: f["Client Notes"] || "",
     convertedBooking: f["Converted Booking"] || "",
     bookingId: linkedBookingId(f),
     eventDate: String(f["Event Date"] || "").slice(0, 10),
