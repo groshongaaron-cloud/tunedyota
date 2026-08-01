@@ -45,6 +45,52 @@ async function processClientNote(body, deps) {
     catch (e) { if (log.error) log.error("client-note update", e.message); return { status: "error", error: "store-unavailable" }; }
   }
 
+  if (d.bookingId) {
+    let rec;
+    try { rec = await get({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.bookingId }); }
+    catch (e) { if (log.error) log.error("client-note get booking", e.message); return { status: "error", error: "store-unavailable" }; }
+    const f = (rec && rec.fields) || {};
+    const owner = normalizeInstallerKey(f.Installer);
+    if (!admin && owner !== key) return { status: "error", error: "not-yours" };
+    // Booking Status is deliberately not checked — notes never touch the booking.
+
+    let leads = [];
+    try { leads = (await list({ token: c.token, baseId: c.baseId, table: c.priority })).map(toLeadView); }
+    catch (e) { if (log.error) log.error("client-note list leads", e.message); return { status: "error", error: "store-unavailable" }; }
+    const pKey = normalizePhone(f.Phone), eKey = normalizeEmail(f.Email);
+    const match = leads.find((l) => l.bookingId === d.bookingId)
+      || (pKey && leads.find((l) => normalizePhone(l.phone) === pKey))
+      || (eKey && leads.find((l) => normalizeEmail(l.email) === eKey)) || null;
+    if (match) {
+      try { return { status: "ok", leadId: match.id, notes: await appendTo(match.id, match.clientNotes), minted: false }; }
+      catch (e) { if (log.error) log.error("client-note update", e.message); return { status: "error", error: "store-unavailable" }; }
+    }
+
+    // No client record yet — mint one from the booking identity (market-routed,
+    // linked back), same spirit as the contact-resolver. The note becomes the
+    // record's first Client Notes line.
+    const city = String(f.City || "").trim();
+    const market = getMarket(city);
+    const instKey = market ? keyToInstaller(market.inst).key : owner;
+    const fields = {
+      Name: String(f.Name || ""), Phone: String(f.Phone || ""), Email: String(f.Email || ""),
+      City: market ? market.city : (city || "Unassigned"), Vehicle: String(f.Vehicle || ""),
+      Source: "booking-note", Stage: "Booked",
+      Booking: [d.bookingId], "Converted Booking": d.bookingId,
+      "Activity Log": logLine(now, `minted from booking ${d.bookingId}`),
+      "Client Notes": line,
+    };
+    if (instKey) fields.Installer = instKey;
+    let createdRec;
+    try {
+      // "Client Notes" is NOT in the tolerated list — if the column is missing
+      // the create must fail loudly, not silently drop the note.
+      createdRec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields },
+        ["Booking", "Converted Booking", "Stage", "Source", "Activity Log"]);
+    } catch (e) { if (log.error) log.error("client-note mint", e.message); return { status: "error", error: "store-unavailable" }; }
+    return { status: "ok", leadId: createdRec && createdRec.id, notes: line, minted: true };
+  }
+
   return { status: "error", error: "missing-target" };
 }
 

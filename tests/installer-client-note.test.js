@@ -44,6 +44,65 @@ test("lead path rejects another installer's lead; admin passes", async () => {
   assert.equal(ok.status, "ok");
 });
 
+const bookingRec = (extra = {}) => ({ id: "recB", fields: { Name: "Jane", Installer: ["cody"], Status: "Booked",
+  Phone: "(612) 555-0100", Email: "jane@x.com", City: "Madison", Vehicle: "2019 Tacoma 3.5L", ...extra } });
+const leadRow = (extra = {}) => ({ id: "recL", fields: { Name: "Jane", Installer: "cody", Phone: "612-555-0100", ...extra } });
+
+test("booking path finds the linked lead first", async () => {
+  let patched;
+  const out = await processClientNote({ bookingId: "recB", note: "has aFe CAI" },
+    { env, key: "cody", now: NOW, get: async () => bookingRec(),
+      list: async () => [leadRow({ Booking: ["recB"], Phone: "999" }), leadRow({ Phone: "612-555-0100" })],
+      update: async (a) => { patched = a; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal(out.leadId, "recL");
+  assert.equal(out.minted, false);
+  assert.equal(patched.table, "Priority List");
+  assert.equal(patched.fields["Client Notes"], "2026-07-31 14:03 — cody: has aFe CAI");
+});
+
+test("booking path falls back to a normalized phone match", async () => {
+  const out = await processClientNote({ bookingId: "recB", note: "n" },
+    { env, key: "cody", now: NOW, get: async () => bookingRec(),
+      list: async () => [leadRow({ Phone: "+1 (612) 555-0100" })],
+      update: async () => ({}) });
+  assert.equal(out.status, "ok");
+  assert.equal(out.leadId, "recL");
+});
+
+test("booking path mints a market-routed linked lead when no client exists", async () => {
+  let created;
+  const out = await processClientNote({ bookingId: "recB", note: "has aFe CAI" },
+    { env, key: "cody", now: NOW, get: async () => bookingRec(), list: async () => [],
+      create: async (a) => { created = a; return { id: "recNew" }; } });
+  assert.equal(out.status, "ok");
+  assert.equal(out.minted, true);
+  assert.equal(out.leadId, "recNew");
+  assert.equal(created.fields.Name, "Jane");
+  assert.equal(created.fields.Stage, "Booked");
+  assert.deepEqual(created.fields.Booking, ["recB"]);
+  assert.equal(created.fields["Converted Booking"], "recB");
+  assert.ok(created.fields.Installer, "installer set (market-routed or booking owner)");
+  assert.equal(created.fields["Client Notes"], "2026-07-31 14:03 — cody: has aFe CAI");
+  assert.match(created.fields["Activity Log"], /minted from booking recB/);
+});
+
+test("notes are allowed on a Completed booking", async () => {
+  const out = await processClientNote({ bookingId: "recB", note: "noticed CAI during flash" },
+    { env, key: "cody", now: NOW, get: async () => bookingRec({ Status: "Completed" }),
+      list: async () => [leadRow()], update: async () => ({}) });
+  assert.equal(out.status, "ok");
+});
+
+test("booking path rejects another installer's booking; admin passes", async () => {
+  const deny = await processClientNote({ bookingId: "recB", note: "x" },
+    { env, key: "noah", now: NOW, get: async () => bookingRec(), list: async () => [leadRow()], update: async () => ({}) });
+  assert.equal(deny.error, "not-yours");
+  const ok = await processClientNote({ bookingId: "recB", note: "x" },
+    { env, key: "aaron", admin: true, now: NOW, get: async () => bookingRec(), list: async () => [leadRow()], update: async () => ({}) });
+  assert.equal(ok.status, "ok");
+});
+
 test("empty and oversize notes are rejected", async () => {
   assert.equal((await processClientNote({ leadId: "recL", note: "  " }, { env, key: "cody" })).error, "missing-note");
   assert.equal((await processClientNote({ leadId: "recL", note: "x".repeat(501) }, { env, key: "cody" })).error, "note-too-long");
