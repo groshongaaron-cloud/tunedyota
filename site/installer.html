@@ -293,11 +293,13 @@
            style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
     <input id="tok" name="password" type="password" autocomplete="current-password" placeholder="Your installer passcode">
     <div style="height:8px"></div>
+    <div id="gatewhy" class="hidden" style="margin:0 0 8px;font-size:13px;color:var(--muted)"></div>
     <button class="btn" id="unlock" type="submit" style="width:100%">Unlock</button>
   </form>
   <div id="app" class="hidden">
     <a class="link" href="/" id="backapp" style="display:none">‹ App</a>
     <a class="link" href="/calibration">Calibration reference (cal ID · TSB)</a>
+    <span id="whoami" style="margin-left:14px;font-size:12px;color:var(--muted)"></span>
     <a class="link" href="#" id="logout" style="margin-left:14px;color:#8a2a2a">Log out</a>
     <a class="link" href="#" id="reviewlink" style="display:none;margin-left:14px">★ Ask for a review</a>
     <a class="link" href="#" id="pushlink" style="display:none;margin-left:14px">🔔 Enable notifications</a>
@@ -331,6 +333,10 @@
   // (Tacoma 2024+, 4Runner 2025+, LC250). Keep in sync with CAL_OPTIONS in
   // netlify/functions/lib/certificate.js, which is what the server accepts.
   var CAL_STAGES = ["Stage 1 - Basic","Stage 1 - Enhanced","Stage 2","Stage 3"];
+  // Declared before the boot call: showApp() runs load() synchronously mid-script
+  // (no biometric await anymore), so anything load() touches before its first await
+  // must already be assigned — setTimeout(fn, undefined) fires immediately.
+  var ROSTER_TIMEOUT_MS = 15000;
   // Platform-derived vehicle strings look like "2024+ Toyota Tacoma 2.4L-T I4 · goals";
   // walk-ins are free text ("2024 Tacoma", "LC250"). A closed year range
   // ("2020-2024 4Runner 4.0L V6") is always a pre-turbo platform even when the
@@ -448,15 +454,38 @@
   }
   applyTheme(localStorage.getItem('ty_theme')||'heritage');
 
-  document.getElementById('gate').onsubmit=function(e){ e.preventDefault(); var v=document.getElementById('tok').value.trim(); if(!v) return; localStorage.setItem('ty_installer_token', v); showApp(); };
+  document.getElementById('gate').onsubmit=function(e){ e.preventDefault(); var v=document.getElementById('tok').value.trim(); if(!v) return; try{ localStorage.removeItem('ty_gate_reason'); }catch(err){} localStorage.setItem('ty_installer_token', v); showApp(); };
   if(tok()) showApp();
+  // Gate breadcrumb — say WHY the gate appeared on a device that had a passcode,
+  // so an unexpected recurrence is diagnosable instead of guesswork.
+  (function(){ if(tok()) return; var r=''; try{ r=localStorage.getItem('ty_gate_reason')||''; }catch(e){}
+    if(!r) return; var el=document.getElementById('gatewhy'); if(!el) return;
+    el.textContent = r==='passcode-changed' ? 'Your passcode was changed — enter the new one.' : 'You logged out on this device.';
+    el.classList.remove('hidden'); })();
   document.getElementById('logout').onclick=function(e){ e.preventDefault();
     if(Q().loadQueue(store()).length && !confirm('You have unsynced close-outs/walk-ins. Log out anyway and lose them?')) return;
+    try{ localStorage.setItem('ty_gate_reason','logged-out'); }catch(err){}
     localStorage.removeItem('ty_installer_token'); location.reload(); };
-  async function showApp(){ registerServiceWorker(); renderPendingBadge(); if(!(await nativeLock())) return; document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); loadThemePref(); }
+  async function showApp(){ registerServiceWorker(); renderPendingBadge(); document.getElementById('gate').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); load(); loadThemePref(); }
   function fail(m){ var el=document.getElementById('msg'); el.className='msg err'; el.textContent=m; el.scrollIntoView({block:'nearest'}); }
   function succeed(m){ var el=document.getElementById('msg'); el.className='msg ok'; el.textContent=m; el.scrollIntoView({block:'nearest'}); }
   function clearMsg(){ var el=document.getElementById('msg'); el.className='msg'; el.textContent=''; }
+  // A lone 401 is NOT proof the passcode is bad — cold starts and transient server
+  // trouble must never log an installer out. Re-verify with one cheap authed GET;
+  // only a CONFIRMED second 401 (a genuine rotation) wipes the saved passcode.
+  var AUTH_CHECKING=false;
+  async function handle401(){
+    if(AUTH_CHECKING) return; AUTH_CHECKING=true;
+    try{
+      var res=await fetch('/.netlify/functions/installer-prefs',{headers:{'x-installer-token':tok()}});
+      if(res.status===401){
+        try{ localStorage.setItem('ty_gate_reason','passcode-changed'); }catch(e){}
+        localStorage.removeItem('ty_installer_token'); location.reload(); return;
+      }
+      fail('Server hiccup — your session is fine. Try that again.');
+    }catch(e){ fail('Server hiccup — your session is fine. Try that again.'); }
+    finally{ AUTH_CHECKING=false; }
+  }
 
   function openReviewOverlay(){
     var ov = document.getElementById('reviewov');
@@ -571,7 +600,7 @@
     clearMsg();
     try{
       var res = await fetch('/.netlify/functions/installer-signature?id='+encodeURIComponent(id), { headers:{ 'x-installer-token':tok() } });
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       var out = await res.json().catch(function(){return{};});
       if(out.status!=='ok' || !out.signature){ succeed('No signature on file for this tune.'); return; }
       var ov = document.createElement('div'); ov.className='reviewov'; ov.id='sigviewov';
@@ -607,7 +636,7 @@
     var qs=[]; if(p.phone) qs.push('phone='+encodeURIComponent(p.phone)); if(p.email) qs.push('email='+encodeURIComponent(p.email));
     try{
       var res=await fetch('/.netlify/functions/customer-view?'+qs.join('&'),{headers:{'x-installer-token':tok()},signal:ctrl.signal});
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       if(!res.ok) throw new Error('http '+res.status);
       renderCustomer(body, p, await res.json());
     }catch(e){
@@ -701,13 +730,6 @@
 
   // --- Native (Capacitor) helpers — no-ops on the plain website ---
   function isNative(){ return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
-  async function nativeLock(){
-    if(!isNative()) return true;
-    var B = window.Capacitor.Plugins && window.Capacitor.Plugins.BiometricAuth;
-    if(!B) return true;
-    try{ await B.authenticate({ reason:'Unlock Tuned Yota', allowDeviceCredential:true }); return true; }
-    catch(e){ return false; }
-  }
   async function registerPush(){
     if(!isNative()) return;
     var P = window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
@@ -725,14 +747,14 @@
   // function, network blip, Airtable latency, or the events sheet hanging) can never
   // leave the console wedged on "Loading…". On any failure we fall back to the last
   // synced roster if we have one, else show an explicit error with a Retry button.
-  var ROSTER_TIMEOUT_MS = 15000;
+  // (ROSTER_TIMEOUT_MS is declared with the config block up top — see note there.)
   async function load(){
     document.getElementById('feed').innerHTML='<div class="empty">Loading…</div>';
     var ctrl = new AbortController();
     var timer = setTimeout(function(){ ctrl.abort(); }, ROSTER_TIMEOUT_MS);
     try {
       var res = await fetch('/.netlify/functions/installer-roster', { headers:{ 'x-installer-token':tok() }, signal: ctrl.signal });
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       if(!res.ok){ rosterUnavailable('Could not reach the server — showing your last synced roster.'); return; }
       var data = await res.json();
       try { localStorage.setItem('ty_roster_cache', JSON.stringify({ savedAt: Date.now(), data: data })); } catch(e){}
@@ -765,6 +787,7 @@
     STATE.today = localToday(); STATE.bookings = data.bookings||[]; STATE.events = data.events||[];
     STATE.admin = !!data.admin;
     STATE.me = data.installer || '';
+    var who=document.getElementById('whoami'); if(who) who.textContent = STATE.me ? 'Logged in as '+STATE.me : '';
     STATE.reviewUrl = data.reviewUrl || '';
     var rl = document.getElementById('reviewlink');
     if(rl){
@@ -1837,7 +1860,7 @@
     var res, netErr=null;
     try { res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(op.body)}); }
     catch(e){ netErr=e; }
-    if(!netErr && res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    if(!netErr && res.status===401){ await handle401(); return; }
     if(netErr || (res && Q().shouldQueue(null, res.status))){
       queuePush(op);
       STATE.walkOpen[evt.key]=true; STATE.eventOpen[evt.key]=true;
@@ -1884,7 +1907,7 @@
   async function loadLeads(){
     try{
       var res=await fetch('/.netlify/functions/leads-list',{headers:{'x-installer-token':tok()}});
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       var data=await res.json(); STATE.leads=data.leads||[]; STATE.leadsLoaded=true;
     }catch(e){ /* keep whatever we have */ }
     STATE.leadsLoading=false;
@@ -2424,7 +2447,7 @@
       var res=await fetch('/.netlify/functions/installer-client-note',{method:'POST',
         headers:{'Content-Type':'application/json','x-installer-token':tok()},
         body:JSON.stringify({bookingId:b.id,note:note})});
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       var out=await res.json().catch(function(){return{};});
       if(res.ok && out.status==='ok'){
         var l=clientLeadFor(b);
@@ -2443,7 +2466,7 @@
       var res=await fetch('/.netlify/functions/installer-client-note',{method:'POST',
         headers:{'Content-Type':'application/json','x-installer-token':tok()},
         body:JSON.stringify({leadId:l.id,note:note})});
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       var out=await res.json().catch(function(){return{};});
       if(res.ok && out.status==='ok'){
         l.clientNotes=out.notes;
@@ -2649,7 +2672,7 @@
     if(!d && !t && !a && !nameChanged && !vehChanged){ fail('Change the name or vehicle, pick a date, enter a time, or add the install address.'); return; }
     try{
       var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,dateISO:d,time:t,address:a,name:nameChanged?n:'',vehicle:vehChanged?veh:''})});
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       var out=await res.json().catch(function(){return{};});
       if(res.ok && out.status==='ok'){
         var b=b0;
@@ -2678,7 +2701,7 @@
     STATE.bookings.forEach(function(x,i){ if(x.id===id){ idx=i; b=x; } });
     try{
       var res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,action:'cancel'})});
-      if(res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+      if(res.status===401){ await handle401(); return; }
       var out=await res.json().catch(function(){return{};});
       if(!(res.ok && out.status==='cancelled')){ fail('Could not delete: '+(out.error||res.status)); return; }
     }catch(e){ fail('Network error — try again.'); return; }
@@ -2694,7 +2717,7 @@
       if(u.__busy) return; u.__busy=true;
       try{
         var r=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,action:'uncancel'})});
-        if(r.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+        if(r.status===401){ await handle401(); return; }
         var o=await r.json().catch(function(){return{};});
         if(r.ok && o.status==='uncancelled'){
           if(b && !STATE.bookings.some(function(x){return x.id===id;})) STATE.bookings.splice(idx>=0?idx:STATE.bookings.length, 0, b);
@@ -2712,7 +2735,7 @@
     var res, netErr=null;
     try { res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(body)}); }
     catch(e){ netErr=e; }
-    if(!netErr && res.status===401){ localStorage.removeItem('ty_installer_token'); location.reload(); return; }
+    if(!netErr && res.status===401){ await handle401(); return; }
     if(netErr || (res && Q().shouldQueue(null, res.status))){ enqueueOp('closeout', body, id, extra); return; }
     var out=await res.json().catch(function(){return{};});
     var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
@@ -2750,7 +2773,7 @@
           else synced++;
           q.shift(); Q().saveQueue(store(), q); renderPendingBadge();
         } else if(verdict==='stop-auth'){
-          Q().saveQueue(store(), q); localStorage.removeItem('ty_installer_token'); location.reload(); return;
+          Q().saveQueue(store(), q); await handle401(); return;
         } else { break; }
       }
       // Refresh the roster ONLY when we actually synced a queued op, so the newly
