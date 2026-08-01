@@ -113,7 +113,7 @@ async function runSweep(deps = {}) {
 
         const body = {
           name: lead.name, phone: lead.phone, email: lead.email,
-          vehicle: lead.vehicle, goals: lead.goals, city: lead.city,
+          vehicle: lead.vehicle, modelYear: lead.modelYear || "", goals: lead.goals, city: lead.city,
           message: lead.message, channel: lead.channel, source: lead.source,
           ghlLink: lead.ghlLink,
           emailThread: lead.threadId || msg.threadId,

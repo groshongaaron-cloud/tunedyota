@@ -25,8 +25,11 @@ function parseOttLeadEmail(message) {
   const phone = fieldAfter(body, ["Phone", "Phone Number", "Mobile"]).split("|")[0].replace(/[^\d+]/g, "");
   const email = fieldAfter(body, ["Email"]) || firstEmail(body);
   // Vehicle is split across three labeled lines; fall back to a single "Vehicle:" line.
-  const vehicle = [fieldAfter(body, ["Vehicle Year"]), fieldAfter(body, ["Vehicle Make"]), fieldAfter(body, ["Vehicle Model"])]
+  const vehicleYear = fieldAfter(body, ["Vehicle Year"]);
+  const vehicle = [vehicleYear, fieldAfter(body, ["Vehicle Make"]), fieldAfter(body, ["Vehicle Model"])]
     .filter(Boolean).join(" ") || fieldAfter(body, ["Vehicle", "Car", "Truck"]);
+  const modelYear = /^(19|20)\d{2}$/.test(vehicleYear) ? vehicleYear
+    : ((String(vehicle).match(/\b(19|20)\d{2}\b/) || [])[0]) || "";
   // Extra context → Goals (location + engine). City also routes to a market if it's a known one.
   const city = fieldAfter(body, ["City"]);
   const state = fieldAfter(body, ["State"]);
@@ -38,7 +41,7 @@ function parseOttLeadEmail(message) {
     (mods && !/^none?$/i.test(mods)) && ("Mods " + mods)].filter(Boolean).join(" · ");
   const rt = (h.replyTo || h.from || "").match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
   return {
-    name, phone, email, vehicle, goals, city, ghlLink,
+    name, phone, email, vehicle, modelYear, goals, city, ghlLink,
     channel: "ott-national", source: "ott-national:fb-ads",
     message: "OTT national Facebook lead",
     replyTo: rt ? rt[0] : "",

@@ -55,6 +55,7 @@ async function escalate({ transfer, sess }, deps) {
       email: transfer.contactMethod === "email" ? transfer.contactValue : "",
       channel, source, city: transfer.city,
       vehicle, goals: transfer.questionSummary,
+      modelYear: /^(19|20)\d{2}$/.test(String(transfer.modelYear || "").trim()) ? String(transfer.modelYear).trim() : "",
       message: `Chat escalation (${transfer.reason}). ${contact}\n--- transcript ---\n${transcriptTail}` });
   } catch (e) { if (log.error) log.error("chat lead", e.message); }
   try {
