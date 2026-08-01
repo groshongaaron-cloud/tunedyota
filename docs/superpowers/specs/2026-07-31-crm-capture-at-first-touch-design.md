@@ -38,6 +38,14 @@ Three sub-projects, shipped separately, in order:
    of Calibration?" captures email + confirms phone + records preferred contact
    method — feeding the client record that powers the tailored-retail funnel
    (queued separately in memory).
+6. **A2P marketing consent rides the close-out signature** (Aaron, revising the
+   earlier out-of-scope call). The client signs at close-out accepting the
+   certificate; that same signing moment carries marketing consent — with the
+   compliance refinement that consent is disclosed conspicuously and accepted
+   affirmatively (its own tap above the signature pad), never implied by the
+   certificate acceptance alone, and never a condition of completion or cert
+   delivery. Evidence chain (consent date + language version + signed booking
+   reference) persists on the client record.
 
 ---
 
@@ -190,7 +198,16 @@ are the same motion.
    Instagram / Call). Prompted prominently, **never blocking** — a customer
    without email must not trap completion (cert falls back to installer delivery,
    as today).
-6. **Signature + Notes**, then **Complete**.
+6. **Marketing consent + Signature + Notes**, then **Complete**. Directly above
+   the signature pad: the A2P disclosure block — brand name, message types
+   (service updates + parts/maintenance offers for their truck), "message
+   frequency varies, msg & data rates may apply, reply STOP to opt out, HELP for
+   help, consent is not a condition of purchase," link to tunedyota.com terms —
+   with an **affirmative consent toggle (default off)**. The client's signature
+   covers certificate acceptance and, when the toggle is on, the consent
+   disclosure above it. Declining changes nothing about completion or the cert.
+   The disclosure copy is versioned in code (`CONSENT_VERSION`, e.g. `a2p-2026-07`)
+   so stored consents always reference the exact language shown.
 
 ### The gate (server-enforced, `installer-closeout.js`)
 
@@ -219,8 +236,13 @@ are the same motion.
 - On complete (and on draft save when contact fields were entered),
   `installer-closeout.js` resolves the linked client record (linked lead →
   phone match → mint; the shared B1 helper) and patches: `Email` (if blank),
-  `Preferred Contact`, `Model Year` (if blank). One server-side write path — the
-  close-out is the moment the client record becomes retail-funnel-complete.
+  `Preferred Contact`, `Model Year` (if blank), and — when the consent toggle
+  was on **and** a signature was captured — `Marketing Consent` (date) +
+  `Consent Version`, plus an Activity Log line naming the booking id that holds
+  the signature PNG (the evidence chain). Consent is recorded only with a
+  signature present; toggle-without-signature records nothing. One server-side
+  write path — the close-out is the moment the client record becomes
+  retail-funnel-complete.
 
 ### Downstream
 
@@ -236,6 +258,8 @@ are the same motion.
 | Field | Table | Type |
 |---|---|---|
 | `Preferred Contact` | Priority List | single select: SMS / Email / Messenger / Instagram / Call |
+| `Marketing Consent` | Priority List | date |
+| `Consent Version` | Priority List | single line text |
 | `Closeout Draft` | Bookings | checkbox |
 
 Everything else rides on existing columns. `Preferred Contact` is a new field, so
@@ -290,5 +314,7 @@ quirk in airtable-base-schema-quirks doesn't apply).
 - Auto-merge of any kind, including exact-phone (decision 1).
 - Client-facing surfacing of merge/notes (internal only).
 - Undo-merge (absorb+delete is final; Review-before-merge is the safety).
-- A2P/campaign consent capture at close-out (belongs to the funnel work and its
-  opt-in language — deliberately not bolted on here).
+- Sending any marketing message (the funnel work consumes `Marketing Consent`;
+  this spec only captures and evidences it). Reconciling the consent copy with
+  the approved A2P campaign's declared opt-in flow happens when the funnel
+  ships.
