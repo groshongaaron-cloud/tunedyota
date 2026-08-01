@@ -113,3 +113,41 @@ test("inbox-sweep: OTT lead post body carries modelYear when Vehicle Year is pre
   assert.equal(posted[0].vehicle, "2019 Toyota Tundra", "combined vehicle string is Year Make Model only for OTT email");
   assert.match(posted[0].goals, /Engine 5\.7/, "engine size goes into goals for OTT emails");
 });
+
+// ── inbox-sweep LLM fallback → posted body carries modelYear from vehicle string ─
+
+test("inbox-sweep: LLM-fallback lead scans year from vehicle string when modelYear not set", async () => {
+  const posted = [];
+  const deps = {
+    env: {
+      GMAIL_REFRESH_TOKEN: "r", ANTHROPIC_API_KEY: "k",
+      INTERNAL_TASK_SECRET: "s", URL: "https://tunedyota.com", SLACK_WEBHOOK_URL: "https://x",
+    },
+    gmail: {
+      listMessages: async () => [{ id: "m-llm", threadId: "t-llm" }],
+      getMessage: async () => ({
+        id: "m-llm", threadId: "t-llm",
+        headers: { from: "OTT <info@overlandtailor.com>", subject: "New Lead", messageId: "<llm@x>", replyTo: "" },
+        // No structured fields — parseOttLeadEmail will return no phone/email, triggering LLM fallback.
+        textBody: "Unstructured email body with no parseable contact info.",
+      }),
+      addLabel: async () => {},
+    },
+    classify: async () => ({ bucket: "ott-lead", stage: "situation", confidence: 0.95, summary: "" }),
+    // extract stub simulates extractLeadFields return shape (lib/email-classify.js:74-79)
+    extract: async () => ({
+      name: "Sam", phone: "6125550100", email: "",
+      city: "", state: "", vehicle: "2019 Toyota Tundra",
+      goals: "",
+      ghlLink: "", channel: "ott-national", source: "ott-national:email",
+      message: "OTT lead (LLM-extracted)", threadId: "t-llm", messageIdHeader: "<llm@x>",
+      replyTo: "",
+    }),
+    postImpl: async (url, opts) => { posted.push(JSON.parse(opts.body)); return { ok: true, json: async () => ({ status: "lead" }) }; },
+    notify: async () => {},
+    log: { error() {} },
+  };
+  await runSweep(deps);
+  assert.equal(posted.length, 1, "one lead must have been posted");
+  assert.equal(posted[0].modelYear, "2019", "year must be scanned from vehicle string in LLM-fallback path");
+});
