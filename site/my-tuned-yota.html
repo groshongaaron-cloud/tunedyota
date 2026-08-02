@@ -149,6 +149,13 @@ a{color:inherit}
 .gauge .remlab{font-family:var(--data);font-size:7.4px;letter-spacing:.16em;fill:var(--muted-dark)}
 .gauge .sys{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.07em}
 .gauge .fluid{font-family:var(--data);font-size:10px;letter-spacing:.06em;color:var(--muted-dark);margin-top:4px;text-transform:uppercase}
+.gauge .gtext{min-width:0}
+.gauge .gsvc{margin-top:8px}
+.gauge .gsvc input{
+  width:96px;font-family:var(--data);font-size:13px;color:#fff;background:#12161A;
+  border:1px solid var(--line-dark);border-radius:6px;padding:6px 8px;
+}
+.gauge .gsvc input:focus-visible{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(231,183,51,.22)}
 .g-ok .val{stroke:var(--ok)} .g-warn .val{stroke:var(--warn)} .g-due .val{stroke:var(--due)}
 
 /* cluster: empty / new member state */
@@ -675,22 +682,56 @@ footer .stale{font-family:var(--data);font-size:10.5px;letter-spacing:.1em;text-
 
   function renderGauges() {
     var box = $("gauges");
-    var list = ((MEMBER && MEMBER.gauges) || []).filter(function (x) { return x.milesLeft != null; });
+    var list = (MEMBER && MEMBER.gauges) || [];
     box.hidden = !list.length;
     if (!list.length) return;
-    box.innerHTML = list.map(function (x) {
-      var label = x.system + ": " + (x.milesLeft > 0 ? x.milesLeft.toLocaleString() + " miles remaining" : "service due");
+    box.innerHTML = list.map(function (x, i) {
+      var label = x.milesLeft == null ? x.system + ": not tracked yet — mark a service to start"
+        : x.system + ": " + (x.milesLeft > 0 ? x.milesLeft.toLocaleString() + " miles remaining" : "service due");
       return '<div class="gauge"><svg viewBox="0 0 100 100" role="img" aria-label="' + esc(label) + '">' +
         '<circle class="track" cx="50" cy="50" r="40" pathLength="100" stroke-dasharray="75 25" transform="rotate(-225 50 50)"/>' +
         '<circle class="val" cx="50" cy="50" r="40" pathLength="100" stroke-dasharray="0 100" transform="rotate(-225 50 50)"/>' +
         '<text class="rem" x="50" y="49" text-anchor="middle">' + esc(fmtMiles(x.milesLeft)) + "</text>" +
         '<text class="remlab" x="50" y="61" text-anchor="middle">MILES LEFT</text></svg>' +
-        '<div class="sys">' + esc(x.system) + "</div>" +
-        '<div class="fluid">' + esc(x.product || "") + "</div></div>";
+        '<div class="gtext"><div class="sys">' + esc(x.system) + "</div>" +
+        '<div class="fluid">' + esc(x.product || "") + "</div>" +
+        '<div class="gsvc"><button class="linkish gmark" type="button" data-gi="' + i + '">Mark serviced</button></div></div></div>';
     }).join("");
     Array.prototype.forEach.call(box.children, function (el, i) {
-      setGauge(el, list[i].milesLeft, list[i].intervalMiles);
+      if (list[i].milesLeft != null) setGauge(el, list[i].milesLeft, list[i].intervalMiles);
     });
+    Array.prototype.forEach.call(box.querySelectorAll(".gmark"), function (b) {
+      b.onclick = function () { showSvcInput(this, list[+this.getAttribute("data-gi")]); };
+    });
+  }
+
+  // "Mark serviced": one POST {service:{system, miles}} — the server logs it and
+  // that gauge baselines off the new entry (a gauge with no baseline starts here).
+  function showSvcInput(btn, gauge) {
+    var holder = btn.parentNode;
+    var current = MEMBER && MEMBER.odometer && MEMBER.odometer.miles != null ? MEMBER.odometer.miles : "";
+    holder.innerHTML = '<input type="tel" inputmode="numeric" aria-label="Miles when serviced" placeholder="Miles" value="' + current + '"> ' +
+      '<button class="linkish gsave" type="button">Save</button> ' +
+      '<button class="linkish gcancel" type="button">Cancel</button>';
+    var input = holder.querySelector("input");
+    input.focus();
+    input.select();
+    function save() {
+      var n = parseInt(String(input.value).replace(/[^\d]/g, ""), 10);
+      if (!n || n <= 0) { input.focus(); return; }
+      holder.querySelector(".gsave").disabled = true;
+      api("member-data", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ service: { system: gauge.system, miles: n } }) })
+        .then(function (r) { if (!r.ok) throw 0; return loadMember(); })
+        .then(render)
+        .catch(function () {
+          renderGauges();
+          alert("Couldn't log the service — check your connection and try again.");
+        });
+    }
+    holder.querySelector(".gsave").onclick = save;
+    holder.querySelector(".gcancel").onclick = renderGauges;
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") save(); });
   }
 
   function renderPicks(g, r) {

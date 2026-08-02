@@ -57,10 +57,13 @@ const MEMBER = {
 };
 
 // Boot the page with stubbed member endpoints. token=null boots a guest.
-async function boot({ token, memberBody, failMember, localStorageExtra } = {}) {
+// requests collects every URL the page asks for (CDN-leak assertions).
+async function boot({ token, memberBody, failMember, localStorageExtra, ctxOpts } = {}) {
   const posts = [];
-  const ctx = await browser.newContext();
+  const requests = [];
+  const ctx = await browser.newContext(ctxOpts || {});
   const page = await ctx.newPage();
+  page.on("request", (r) => requests.push(r.url()));
   await page.route("**/.netlify/functions/member-data**", async (r) => {
     if (r.request().method() === "POST") {
       posts.push(JSON.parse(r.request().postData() || "{}"));
@@ -79,7 +82,7 @@ async function boot({ token, memberBody, failMember, localStorageExtra } = {}) {
   }, { token: token || null, extra: localStorageExtra || {} });
   await page.goto(base + "/my-tuned-yota.html");
   await page.waitForLoadState("networkidle");
-  return { page, ctx, posts };
+  return { page, ctx, posts, requests };
 }
 
 test("guest: empty state, catalog-driven picker, fluid sheet with no prices", async (t) => {
@@ -134,6 +137,58 @@ test("member: update miles POSTs the odometer and refetches", async (t) => {
   await page.click("#odoSave");
   await page.waitForSelector("#logMiles");
   assert.deepEqual(posts, [{ odometer: 64500 }]);
+  await ctx.close();
+});
+
+test("member: mark serviced POSTs the service entry; unknown gauge bootstraps via the same control", async (t) => {
+  if (!browserOk) return t.skip("no browser");
+  const body = JSON.parse(JSON.stringify(MEMBER));
+  body.gauges.push({ system: "Front Differential", product: "Severe Gear 75W-90", stockNo: "SVGQT",
+    intervalMiles: 30000, baselineMiles: null, milesLeft: null, status: "unknown" });
+  const { page, ctx, posts } = await boot({ token: "tok1", memberBody: body });
+  assert.equal((await page.$$("#gauges .gauge")).length, 3, "unknown gauge renders too");
+  assert.match(await page.textContent("#gauges .gauge:nth-child(3) .rem"), /—/);
+
+  await page.click('#gauges .gauge:nth-child(3) .gmark');
+  const input = page.locator("#gauges .gauge:nth-child(3) .gsvc input");
+  assert.equal(await input.inputValue(), "64180", "prefilled with the current odometer");
+  await input.fill("64100");
+  await page.click("#gauges .gauge:nth-child(3) .gsave");
+  await page.waitForSelector("#gauges .gmark"); // re-render after refetch
+  assert.deepEqual(posts, [{ service: { system: "Front Differential", miles: 64100 } }]);
+  await ctx.close();
+});
+
+test("device: fonts are bundle-local — no font CDN request, Archivo actually loads", async (t) => {
+  if (!browserOk) return t.skip("no browser");
+  const { page, ctx, requests } = await boot({ token: "tok1" });
+  await page.evaluate(() => document.fonts.ready);
+  assert.ok(!requests.some((u) => /fonts\.googleapis\.com|fonts\.gstatic\.com/.test(u)),
+    "no Google Fonts requests — bundle must render in Airplane Mode");
+  assert.ok(requests.some((u) => /assets\/fonts\/archivo-var\.woff2/.test(u)), "local Archivo fetched");
+  assert.ok(await page.evaluate(() => document.fonts.check('800 16px "Archivo"')), "Archivo usable");
+  assert.ok(await page.evaluate(() => document.fonts.check('600 16px "IBM Plex Mono"')), "Plex Mono usable");
+  await ctx.close();
+});
+
+test("device: Reduce Motion kills the rise animation and the gauge arc transition", async (t) => {
+  if (!browserOk) return t.skip("no browser");
+  const { page, ctx } = await boot({ token: "tok1", ctxOpts: { reducedMotion: "reduce" } });
+  const anim = await page.$eval("section.sec.rise", (el) => getComputedStyle(el).animationName);
+  assert.equal(anim, "none", "rise animation disabled");
+  const op = await page.$eval("section.sec.rise", (el) => getComputedStyle(el).opacity);
+  assert.equal(op, "1", "content fully visible without the animation");
+  const trans = await page.$eval("#gauges .gauge .val", (el) => getComputedStyle(el).transitionProperty);
+  assert.equal(trans, "none", "gauge arc does not animate");
+  await ctx.close();
+});
+
+test("device: no horizontal overflow at a 375px phone viewport (sheet open)", async (t) => {
+  if (!browserOk) return t.skip("no browser");
+  const { page, ctx } = await boot({ token: "tok1", ctxOpts: { viewport: { width: 375, height: 667 } } });
+  await page.click("details.sheet summary");
+  const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  assert.ok(over <= 1, "page must not scroll sideways on a phone (overflow " + over + "px)");
   await ctx.close();
 });
 
