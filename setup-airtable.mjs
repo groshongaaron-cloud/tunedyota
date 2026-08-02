@@ -59,6 +59,13 @@ const SCHEMA = {
     txt("Customer Name"), txt("Phone"), txt("Vehicle"), txt("City"),
     sel("Installer", INSTALLERS), multiline("Transcript"), txt("Created"), txt("Last Activity"),
   ],
+  // Client accounts (lib/client-auth.js + client-garage/member-data functions).
+  // Odometer Date is TEXT on purpose (ISO yyyy-mm-dd), matching Event Date.
+  // Service Log is JSON in a long-text field: {"Engine Oil":{miles,date},...}.
+  "Clients": [
+    txt("Email"), txt("Created At"), txt("Last Login"), multiline("Vehicles"),
+    num("Odometer"), txt("Odometer Date"), multiline("Service Log"),
+  ],
   // Questions the AI couldn't answer — the owner mines these to grow its knowledge.
   "Chat Escalations": [
     txt("Question"), sel("Reason", ["asked-for-human", "guardrail", "no-answer"]),
