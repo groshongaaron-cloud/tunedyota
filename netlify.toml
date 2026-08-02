@@ -92,6 +92,11 @@
 [functions."review-ask"]
   schedule = "0 16 * * *"
 
+# Annual rebook nudge, Mondays ~10:30am CT: one personal email 11-13 months
+# after a calibration unless the customer already rebooked (rebook-nudge.js).
+[functions."rebook-nudge"]
+  schedule = "30 15 * * 1"
+
 # Legacy Wix redirects live in site/_redirects (single source of truth; it also
 # carries the generated .html→clean-URL 301! block from scripts/build-redirects.mjs).
 
