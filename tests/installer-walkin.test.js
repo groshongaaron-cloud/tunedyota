@@ -1,6 +1,40 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const { processWalkin } = require("../netlify/functions/installer-walkin.js");
+
+const HTML = fs.readFileSync(path.join(__dirname, "..", "site", "installer.html"), "utf8");
+
+// Static-wiring guard: both walk-in forms must carry a model year input wired into addWalkin.
+// Anyday form (anydayWalkForm) was wired in commit 4b8abff. This guards the event form (walkAdder).
+test("walkAdder (event-side walk-in form) has a model year number input", () => {
+  // Isolate the walkAdder function body — stops before the next function declaration.
+  const start = HTML.indexOf("function walkAdder(");
+  assert.ok(start !== -1, "walkAdder function not found in installer.html");
+  const end = HTML.indexOf("\n  function ", start + 1);
+  const fn = end !== -1 ? HTML.slice(start, end) : HTML.slice(start, start + 4000);
+  assert.ok(
+    /yr\s*=\s*mkInput\(/.test(fn),
+    "walkAdder: yr input not created via mkInput"
+  );
+  assert.ok(
+    /yr\.type\s*=\s*['"]number['"]/.test(fn),
+    "walkAdder: yr.type must be 'number'"
+  );
+  assert.ok(
+    /yr\.min\s*=\s*['"]1990['"]/.test(fn),
+    "walkAdder: yr.min must be '1990'"
+  );
+  assert.ok(
+    /yr\.max\s*=\s*['"]2099['"]/.test(fn),
+    "walkAdder: yr.max must be '2099'"
+  );
+  assert.ok(
+    /modelYear\s*:\s*yr\.value/.test(fn),
+    "walkAdder btn.onclick: modelYear:yr.value not passed to addWalkin"
+  );
+});
 
 const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" };
 const okCreate = async () => ({ id: "recNEW" });

@@ -1735,12 +1735,13 @@
     // Full install address — optional, feeds the card's maps/navigation link.
     var ad=mkInput('Install address (street, city) — optional'); ad.autocomplete='street-address';
     var tm=mkInput('Time (e.g. 10:30 AM) — optional');
+    var yr=mkInput('Year (optional)'); yr.type='number'; yr.min='1990'; yr.max='2099'; yr.placeholder='Year (optional)';
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Add walk-in';
-    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(lc); box.appendChild(ad); box.appendChild(tm); box.appendChild(em); box.appendChild(btn);
+    box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(lc); box.appendChild(ad); box.appendChild(tm); box.appendChild(em); box.appendChild(yr); box.appendChild(btn);
     det.appendChild(box);
     btn.onclick=function(){
       var c=(lc.value||'').trim()||e.city;
-      addWalkin({city:c,dateISO:e.dateISO,key:c+'|'+e.dateISO},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,time:tm.value,address:ad.value});
+      addWalkin({city:c,dateISO:e.dateISO,key:c+'|'+e.dateISO},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,time:tm.value,address:ad.value,modelYear:yr.value});
     };
     return det;
   }
