@@ -271,7 +271,7 @@ function buildUnlinkPatch(lead, now = new Date()) {
 // normalized phone, then email. Views come from toLeadView. Null when unknown.
 function findLeadForBooking(bookingId, bookingFields, leadViews) {
   const pKey = normalizePhone(bookingFields.Phone), eKey = normalizeEmail(bookingFields.Email);
-  return leadViews.find((l) => l.bookingId === bookingId)
+  return (bookingId && leadViews.find((l) => l.bookingId === bookingId))
     || (pKey && leadViews.find((l) => normalizePhone(l.phone) === pKey))
     || (eKey && leadViews.find((l) => normalizeEmail(l.email) === eKey)) || null;
 }
@@ -293,6 +293,7 @@ function mintLeadFields(bookingId, f, now = new Date(), extra = {}) {
     "Activity Log": logLine(now, `minted from booking ${bookingId}`),
     ...(extra.fields || {}),
   };
+  // Routing owns Installer — deliberately clobbers any caller-supplied value from extra.fields.
   if (instKey) fields.Installer = instKey;
   return fields;
 }

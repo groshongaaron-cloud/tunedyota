@@ -348,6 +348,10 @@ test("findLeadForBooking: linked id wins, then phone, then email", () => {
   assert.equal(findLeadForBooking("recOther", f, leads).id, "recB");
   assert.equal(findLeadForBooking("recOther", { Email: "SAM@X.COM" }, leads).id, "recC");
   assert.equal(findLeadForBooking("recOther", { Phone: "999" }, [leads[1]]), null);
+  // empty bookingId must never match an unlinked lead (bookingId:"" === "")
+  assert.equal(findLeadForBooking("", { Phone: "999" }, leads), null);
+  // non-matching phone falls through to email match
+  assert.equal(findLeadForBooking("recOther", { Phone: "999", Email: "sam@x.com" }, leads).id, "recC");
 });
 
 test("mintLeadFields: market-routed, linked back, Model Year carried", () => {
