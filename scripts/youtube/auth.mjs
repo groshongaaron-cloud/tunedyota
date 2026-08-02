@@ -44,7 +44,8 @@ async function main() {
   const authUrl = client.generateAuthUrl({ access_type: "offline", prompt: "consent", scope: SCOPES });
 
   console.log("Opening browser for one-time approval (sign in as the @tunedyota channel owner)…");
-  try { execSync(`cmd /c start "" "${authUrl.replace(/&/g, "^&")}"`); }
+  // The URL rides in cmd double quotes, where & is literal — no escaping.
+  try { execSync(`cmd /c start "" "${authUrl}"`); }
   catch { console.log(`Browser didn't open — paste this URL manually:\n${authUrl}`); }
 
   const code = await new Promise((resolve, reject) => {
