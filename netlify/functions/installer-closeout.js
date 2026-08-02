@@ -77,11 +77,7 @@ async function processCloseout(body, deps) {
     return { status: "noshow", waitlisted };
   }
 
-  // complete — idempotent: once the certificate is issued the calibration is
-  // locked, so a re-submit (e.g. a double-tap) must not send a second cert.
-  if (f["Certificate Sent"]) return { status: "completed", certSent: true, alreadySent: true };
-  const calibration = String(d.calibration || "").trim();
-  if (!CAL_OPTIONS.includes(calibration)) return { status: "error", error: "bad-calibration" };
+  // Normalize report fields here so both draft and complete paths share them.
   // VIN: normalize to the standard 17-char uppercase form (strip spaces/dashes).
   // Optional at this layer so a close-out is never blocked; the console enforces it.
   const vin = String(d.vin || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -95,6 +91,35 @@ async function processCloseout(body, deps) {
   const gearSize = String(d.gearSize || "").trim();
   const mileage = String(d.mileage == null ? "" : d.mileage).replace(/[^0-9]/g, "");
   const modelYear = /^(19|20)\d{2}$/.test(String(d.modelYear || "").trim()) ? String(d.modelYear).trim() : "";
+  const customerEmail = String(d.customerEmail || f.Email || "").trim();
+
+  // Draft (owner decision 2026-07-31): an unfinished close-out saves everything
+  // entered and lands in the console's Drafts bucket. Real fields write
+  // immediately (they ARE the data); only Status/cert wait for complete.
+  if (d.action === "draft") {
+    if (f.Status === "Completed" || f.Status === "Cancelled") return { status: "error", error: "not-open" };
+    const fields = { "Closeout Draft": true };
+    if (vin) fields.VIN = vin;
+    if (tuningPlatform) fields["Tuning Platform"] = tuningPlatform;
+    if (calibrationType) fields["Calibration Type"] = calibrationType;
+    if (ecuId) fields["ECU ID"] = ecuId;
+    if (gearSize) fields["Gear Size"] = gearSize;
+    if (mileage) fields.Mileage = Number(mileage);
+    if (modelYear && !String(f["Model Year"] || "").trim()) fields["Model Year"] = modelYear;
+    if (customerEmail) fields.Email = customerEmail;
+    if (CAL_OPTIONS.includes(String(d.calibration || "").trim())) fields["OTT Calibration"] = String(d.calibration).trim();
+    try {
+      await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields },
+        ["Closeout Draft", "VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Model Year", "Email", "OTT Calibration"]);
+    } catch (e) { if (log.error) log.error("closeout draft", e.message); return { status: "error", error: "store-unavailable" }; }
+    return { status: "draft" };
+  }
+
+  // complete — idempotent: once the certificate is issued the calibration is
+  // locked, so a re-submit (e.g. a double-tap) must not send a second cert.
+  if (f["Certificate Sent"]) return { status: "completed", certSent: true, alreadySent: true };
+  const calibration = String(d.calibration || "").trim();
+  if (!CAL_OPTIONS.includes(calibration)) return { status: "error", error: "bad-calibration" };
   // Report-field gate (owner decision 2026-07-31): an installer completes only a
   // report-ready record; the ADMIN may skip anything (never-block-the-owner).
   // "Present" = supplied now or already on the booking. The console pre-fills
@@ -112,8 +137,8 @@ async function processCloseout(body, deps) {
   // must still report under June. Falls back to today only when there's no event
   // date (e.g. a walk-in with no scheduled event).
   const calibrationDate = String(f["Event Date"] || "").slice(0, 10) || issueDate;
-  const customerEmail = String(d.customerEmail || f.Email || "").trim();
-  const completeFields = { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": calibrationDate };
+  const completeFields = { Status: "Completed", "OTT Calibration": calibration, "Calibration Date": calibrationDate,
+    "Closeout Draft": false };
   if (vin) completeFields.VIN = vin;
   if (tuningPlatform) completeFields["Tuning Platform"] = tuningPlatform;
   if (calibrationType) completeFields["Calibration Type"] = calibrationType;
@@ -141,7 +166,7 @@ async function processCloseout(body, deps) {
     // updateTolerant: if the base hasn't added a column yet, drop only the missing
     // optional field(s) and retry, so the completion (Status/Calibration) still persists.
     await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields },
-      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Model Year", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery", "Customer Signature"]);
+      ["Closeout Draft", "VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Model Year", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery", "Customer Signature"]);
   } catch (e) { if (log.error) log.error("closeout complete", e.message); return { status: "error", error: "store-unavailable" }; }
 
   let certSent = false;
