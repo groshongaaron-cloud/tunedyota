@@ -122,6 +122,57 @@ function scopeLeads(leads, { key, admin, filter } = {}) {
 function logLine(now, text) { return `${new Date(now).toISOString().slice(0, 16).replace("T", " ")} — ${text}`; }
 function appendActivity(existing, line) { return existing ? existing + "\n" + line : line; }
 
+// Placeholder identities minted by channel adapters and the contact resolver.
+// Shared by ingest name-backfill and merge fill logic.
+function isPlaceholderName(n) {
+  return !String(n || "").trim() || /^(caller|text|unknown)\b/i.test(String(n).trim());
+}
+
+const MERGE_FILL_FIELDS = ["Phone", "Email", "Vehicle", "Model Year", "City", "Goals", "Modifications",
+  "Preferred Contact", "Marketing Consent", "Consent Version"];
+const STAGE_ADVANCE = ["New", "Contacted", "Qualified", "Following up", "Booked"]; // "Not now" deliberately absent
+
+// Absorb-and-delete merge (owner decisions 2026-07-31): survivor = earlier
+// Created Time; blanks fill from the duplicate (placeholder names count as
+// blank); notes/activity append under a stamped divider; booking links union;
+// stage keeps the most advanced active value. Pure — the endpoint writes
+// `fields` to survivorId, verifies, then deletes duplicateId. `already` guards
+// idempotent retries after a failed delete (absorb once, delete again).
+function computeMerge(aRec, bRec, now = new Date()) {
+  const created = (r) => String(((r || {}).fields || {})["Created Time"] || "");
+  let s = aRec, d = bRec;
+  if (created(bRec) && (!created(aRec) || created(bRec) < created(aRec))) { s = bRec; d = aRec; }
+  const sf = s.fields || {}, df = d.fields || {};
+  const already = String(sf["Activity Log"] || "").includes(`merged in ${d.id}`);
+  const fields = {};
+  if (isPlaceholderName(sf.Name) && !isPlaceholderName(df.Name)) fields.Name = df.Name;
+  for (const k of MERGE_FILL_FIELDS) {
+    if (!String(sf[k] == null ? "" : sf[k]).trim() && String(df[k] == null ? "" : df[k]).trim()) fields[k] = df[k];
+  }
+  const si = STAGE_ADVANCE.indexOf(sf.Stage), di = STAGE_ADVANCE.indexOf(df.Stage);
+  if (di > si) fields.Stage = df.Stage;
+  const sNF = String(sf["Next Follow-up"] || "").slice(0, 10), dNF = String(df["Next Follow-up"] || "").slice(0, 10);
+  if (dNF && (!sNF || dNF < sNF)) {
+    fields["Next Follow-up"] = dNF;
+    if (df["Follow-up Message"]) fields["Follow-up Message"] = df["Follow-up Message"];
+  }
+  const sLC = String(sf["Last Contact"] || "").slice(0, 10), dLC = String(df["Last Contact"] || "").slice(0, 10);
+  if (dLC && (!sLC || dLC > sLC)) fields["Last Contact"] = dLC;
+  const sB = Array.isArray(sf.Booking) ? sf.Booking : [], dB = Array.isArray(df.Booking) ? df.Booking : [];
+  const union = [...new Set([...sB, ...dB])];
+  if (union.length !== sB.length) fields.Booking = union;
+  if (!String(sf["Converted Booking"] || "").trim() && df["Converted Booking"]) fields["Converted Booking"] = df["Converted Booking"];
+  if (!already) {
+    const divider = logLine(now, `merged in ${d.id} — ${df.Channel || "?"} "${String(df.Name || "").trim() || "(blank)"}"`);
+    if (String(df["Client Notes"] || "").trim()) {
+      fields["Client Notes"] = appendActivity(sf["Client Notes"] || "", appendActivity(divider, df["Client Notes"]));
+    }
+    fields["Activity Log"] = appendActivity(sf["Activity Log"] || "",
+      String(df["Activity Log"] || "").trim() ? appendActivity(divider, df["Activity Log"]) : divider);
+  }
+  return { survivorId: s.id, duplicateId: d.id, fields, already };
+}
+
 // The single normalized write path. Adapters + the manual UI all call this.
 async function processLeadIngest(body, deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(),
@@ -167,12 +218,11 @@ async function processLeadIngest(body, deps) {
     const fields = { "Last Contact": new Date(now).toISOString().slice(0, 10),
       "Activity Log": appendActivity(match.fields["Activity Log"], touch) };
     // Name backfill (owner ask 2026-07-29): channel adapters auto-name leads
-    // "Caller (xxx) xxx-xxxx"; when a later touch carries the real name
-    // (usually the chat agent's transfer), upgrade the placeholder. Never
-    // overwrite a real name — a conflicting real name is a human's call —
-    // and never downgrade a real name to a placeholder.
-    const isPlaceholder = (n) => !String(n || "").trim() || /^caller\b/i.test(String(n).trim());
-    if (!isPlaceholder(name) && isPlaceholder(match.fields.Name)) {
+    // "Caller (xxx) xxx-xxxx" or "Text (xxx) xxx-xxxx"; when a later touch
+    // carries the real name (usually the chat agent's transfer), upgrade the
+    // placeholder. Never overwrite a real name — a conflicting real name is a
+    // human's call — and never downgrade a real name to a placeholder.
+    if (!isPlaceholderName(name) && isPlaceholderName(match.fields.Name)) {
       fields.Name = name;
       fields["Activity Log"] = appendActivity(fields["Activity Log"],
         logLine(now, `name: ${String(match.fields.Name || "").trim() || "(blank)"} → ${name}`));
@@ -407,4 +457,5 @@ module.exports = {
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, staleLeads, STALE_AFTER_DAYS, installerKeyForPhone,
   ensureClientRecordForBooking, duplicateLeadsFor,
+  isPlaceholderName, computeMerge,
 };
