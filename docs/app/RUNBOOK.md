@@ -12,7 +12,9 @@ Do them in this order (roughly slowest-to-verify first).
 
 ---
 
-## 1. Apple Developer Program  ⏳ (days — start FIRST)
+## 1. Apple Developer Program  ✅ DONE
+> **STATUS 2026-08-02: ENROLLMENT COMPLETE** — Aaron confirmed the entity-corrected
+> enrollment is live. Historical detail below kept for the paper trail.
 > **STATUS 2026-07-21:** LEGAL ENTITY CORRECTED — the business's legal entity is
 > **1st Minnesota Lending, LLC** ("Tuned Yota" is its DBA; a separate "Tuned Yota LLC"
 > does not exist). D-U-N-S **03-502-7760** arrived 2026-07-21 for 1st Minnesota Lending.
@@ -32,9 +34,14 @@ Do them in this order (roughly slowest-to-verify first).
 4. → **Tell Claude** when it's active (I don't need credentials — just the go-ahead + the Team ID
    shown in your account).
 
-## 2. Google Play Developer  ⏳ (usually same-day)
+## 2. Google Play Developer  ⏳ (usually same-day) — THE REMAINING BIG ONE
 1. **play.google.com/console** → create a developer account, pay $25, verify identity.
+   **Register as an ORGANIZATION** (reuse D-U-N-S 03-502-7760): personal accounts
+   created since late 2023 must run a 12-tester closed test for 14 days before any
+   public release; organization accounts skip that gate.
 2. → **Tell Claude** when active.
+> Not a blocker for Cody's phone: the Codemagic `tunedyota-android` workflow already
+> produces a sideloadable debug APK with no Play account at all.
 
 ## 3. Firebase project (for push notifications)  🆓
 1. **console.firebase.google.com** → Add project → name it "Tuned Yota".
@@ -51,16 +58,22 @@ Do them in this order (roughly slowest-to-verify first).
 ## 4. Netlify + Airtable wiring  (I do most; you provide access)
 1. **Netlify env secret** `FCM_SERVICE_ACCOUNT` = the entire service-account JSON from step 3.4.
    → I'll set this via `netlify env:set` from your clipboard (never printed in chat).
-2. **Airtable "Push Devices" table:** in the same base as Bookings, create a table named
-   **`Push Devices`** with columns: **Installer** (Single line text), **Token** (Single line text),
-   **Platform** (Single line text). *(The metadata API can't create these for us — 2-minute manual
-   add.)* → **Tell Claude** when it exists.
+2. ✅ DONE 2026-08-02 — **Airtable "Push Devices" table** created via the Meta API
+   (`tblHOLLcBUl5IjnJ7`: Installer / Token / Platform, matching `push-register.js`).
+   *(The old "metadata API can't create these" note was wrong — the token in Netlify
+   has schema-write scope.)*
 
-## 5. Codemagic (cloud build — compiles iOS without a Mac)  🆓 tier
-1. **codemagic.io** → sign up with GitHub → authorize the `tunedyota` repo.
-2. Later (once the Plan 2 scaffold + `codemagic.yaml` are in the repo) you'll connect **App Store
-   Connect** and **Play** publishing + code-signing in Codemagic's UI — I'll give you the exact
-   click-path then.
+## 5. Codemagic (cloud build — compiles iOS without a Mac)  ✅ DONE 2026-08-02
+Account created, repo connected, yaml read off `master`. The pipeline is split:
+- **`tunedyota-android`** — zero config, manual start, produces a sideloadable debug
+  APK + unsigned release .aab. Native projects are committed (72b56e8), so builds
+  compile rather than scaffold.
+- **`tunedyota-ios`** — needs the Developer Portal integration named exactly
+  **`tunedyota-asc`** (hyphens); then it signs itself and publishes to TestFlight.
+- **No automatic triggering by design** — daily content pushes must not burn build
+  minutes. Start builds from the Codemagic UI, or hand Claude a Codemagic API token
+  (avatar → Settings → Integrations → Codemagic API) to trigger/monitor from the CLI.
+Play publishing + upload-key signing get wired in the Codemagic UI once step 2 exists.
 
 ## 6. Store listings + submit  (after the first build)
 When the app builds and lands in TestFlight / Play internal testing:
