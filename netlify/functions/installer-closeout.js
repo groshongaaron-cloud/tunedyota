@@ -2,7 +2,7 @@
 // Per-installer close-out: mark a booking Completed (+ OTT Calibration) or No-show.
 // On completion, emails the Certificate of Calibration immediately (daily
 // certificate-dispatch backstops any send failure). Ownership is re-checked server-side.
-const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant } = require("./lib/airtable.js");
+const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate.js");
@@ -10,16 +10,51 @@ const { sendEmail } = require("./lib/resend.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
 const { accountLink, referralUrl } = require("./lib/client-auth.js");
+const { ensureClientRecordForBooking, toLeadView, logLine, appendActivity } = require("./lib/leads.js");
+const { CONSENT_VERSION } = require("./lib/consent.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
+
+const PREFERRED = ["SMS", "Email", "Messenger", "Instagram", "Call"];
+
+// Best-effort, fail-open, AWAITED (Lambda freeze): push contact prefs, year,
+// and consent evidence to the client record. Consent requires BOTH the toggle
+// and a captured signature — the signed booking is the evidence artifact.
+async function propagateToClient({ c, list, update, create, env, fetchImpl, log, now, recordId, f, d,
+                                   customerEmail, modelYear, signatureCaptured }) {
+  const pref = PREFERRED.includes(String(d.preferredContact || "").trim()) ? String(d.preferredContact).trim() : "";
+  const consent = d.marketingConsent === true && signatureCaptured;
+  if (!customerEmail && !pref && !modelYear && !consent) return;
+  const r = await ensureClientRecordForBooking(recordId,
+    { Name: f.Name, Phone: f.Phone || "", Email: f.Email || "", City: f.City || "",
+      Vehicle: f.Vehicle || "", "Model Year": f["Model Year"] || modelYear || "", Installer: f.Installer },
+    { env, fetchImpl, now, channel: "walk-in", list, create, update });
+  if (!r || !r.leadId) return;
+  const cur = r.minted ? null : toLeadView((await list({ token: c.token, baseId: c.baseId, table: c.priority }))
+    .find((x) => x.id === r.leadId) || null);
+  const patch = {};
+  if (customerEmail && (!cur || !cur.email)) patch.Email = customerEmail;
+  if (pref) patch["Preferred Contact"] = pref;
+  if (modelYear && (!cur || !cur.modelYear)) patch["Model Year"] = modelYear;
+  if (consent && (!cur || !cur.marketingConsent)) {
+    patch["Marketing Consent"] = now.toISOString().slice(0, 10);
+    patch["Consent Version"] = CONSENT_VERSION;
+    patch["Activity Log"] = appendActivity((cur && cur.activity) || "",
+      logLine(now, `a2p marketing consent (${CONSENT_VERSION}) — signature on booking ${recordId}`));
+  }
+  if (!Object.keys(patch).length) return;
+  await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.priority, id: r.leadId, fields: patch },
+    ["Email", "Preferred Contact", "Model Year", "Marketing Consent", "Consent Version", "Activity Log"]);
+}
 
 async function processCloseout(body, deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false,
           get = (a) => getRecord({ fetchImpl, ...a }),
           update = (a) => updateRecord({ fetchImpl, ...a }),
           create = (a) => createRecord({ fetchImpl, ...a }),
+          list = (a) => listAllRecords({ fetchImpl, ...a }),
           send = sendEmail, log = console } = deps;
   const d = body || {};
   if (!d.recordId) return { status: "error", error: "missing-record" };
@@ -112,6 +147,10 @@ async function processCloseout(body, deps) {
       await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields },
         ["Closeout Draft", "VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Model Year", "Email", "OTT Calibration"]);
     } catch (e) { if (log.error) log.error("closeout draft", e.message); return { status: "error", error: "store-unavailable" }; }
+    try {
+      await propagateToClient({ c, list, update, create, env, fetchImpl, log, now,
+        recordId: d.recordId, f, d, customerEmail, modelYear, signatureCaptured: false });
+    } catch (e) { if (log.error) log.error("closeout propagate", e.message); }
     return { status: "draft" };
   }
 
@@ -168,6 +207,12 @@ async function processCloseout(body, deps) {
     await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields },
       ["Closeout Draft", "VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Model Year", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery", "Customer Signature"]);
   } catch (e) { if (log.error) log.error("closeout complete", e.message); return { status: "error", error: "store-unavailable" }; }
+
+  const signatureCaptured = !!completeFields["Customer Signature"];
+  try {
+    await propagateToClient({ c, list, update, create, env, fetchImpl, log, now,
+      recordId: d.recordId, f, d, customerEmail, modelYear, signatureCaptured });
+  } catch (e) { if (log.error) log.error("closeout propagate", e.message); }
 
   let certSent = false;
   try {

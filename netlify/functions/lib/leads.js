@@ -51,6 +51,8 @@ function toLeadView(rec) {
     followupMessage: f["Follow-up Message"] || "",
     lastContact: (f["Last Contact"] || "").slice(0, 10),
     activity: f["Activity Log"] || "",
+    preferredContact: f["Preferred Contact"] || "",
+    marketingConsent: (f["Marketing Consent"] || "").slice(0, 10),
     clientNotes: f["Client Notes"] || "",
     convertedBooking: f["Converted Booking"] || "",
     bookingId: linkedBookingId(f),
