@@ -75,6 +75,9 @@ workflows:
           xcode-project build-ipa --workspace App.xcworkspace --scheme App
     artifacts:
       - app/ios/App/build/ios/ipa/*.ipa
+      # pod install's lockfile — retrievable ONLY as an artifact (runner is
+      # destroyed post-build); commit it after build #1 to pin pod resolution.
+      - app/ios/App/Podfile.lock
     publishing:
       app_store_connect:
         auth: integration
