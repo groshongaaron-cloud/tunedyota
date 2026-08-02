@@ -570,6 +570,10 @@
         '<div class="reviewh">Confirm the tune</div>'+
         '<p class="meta">'+summary+'</p>'+
         '<p class="meta">Ask the customer to sign below confirming the work is complete.</p>'+
+        '<label class="a2pconsent" style="display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.4;margin:8px 0;color:#555">'+
+          '<input type="checkbox" id="a2pconsent" style="width:auto;flex-shrink:0;margin-top:2px">'+
+          '<span>I agree to receive service updates and occasional parts & maintenance offers for my vehicle from Tuned Yota by text message and email. Message frequency varies. Message & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase or service. Terms & privacy: tunedyota.com</span>'+
+        '</label>'+
         '<canvas id="sigpad" width="600" height="180" style="width:100%;height:180px;border:2px dashed #b9c0ad;border-radius:10px;background:#fff;touch-action:none"></canvas>'+
         '<div class="row-actions" style="margin-top:10px">'+
           '<button class="btn ns" id="sigclear">Clear</button>'+
@@ -590,7 +594,7 @@
     canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
     ov.querySelector('#sigclear').onclick = function(){ ctx.clearRect(0,0,canvas.width,canvas.height); SIGPAD.dirty = false; };
-    ov.querySelector('#sigdone').onclick = function(){ if(SIGPAD.dirty){ extra.signature = canvas.toDataURL('image/png'); } closeSignOverlay(); closeout(id, extra); };
+    ov.querySelector('#sigdone').onclick = function(){ if(SIGPAD.dirty){ extra.signature = canvas.toDataURL('image/png'); } extra.marketingConsent = !!ov.querySelector('#a2pconsent').checked; closeSignOverlay(); closeout(id, extra); };
     ov.querySelector('#sigskip').onclick = function(e){ e.preventDefault(); closeSignOverlay(); closeout(id, extra); };
     ov.querySelector('#signx').onclick = function(){ closeSignOverlay(); };
   }
@@ -1342,6 +1346,8 @@
     // under All and in the Week view, never lost.
     list.forEach(function(c){ if(c.city) html+=tab(c.city, c.city, c.overdue, c.open?String(c.open):''); });
     html+=tab('done','✓ Done','','');
+    var draftList=STATE.bookings.filter(function(bk){ return bk.closeoutDraft && bk.status!=='Completed' && bk.status!=='No-show'; });
+    if(draftList.length) html+=tab('drafts','📋 Drafts','',String(draftList.length));
     host.innerHTML=html;
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){ STATE.jobTab=b.getAttribute('data-sub'); if(STATE.jobTab!=='done') STATE.doneCity=''; renderFeed(); }; });
   }
@@ -1569,6 +1575,18 @@
 
     // Done tab: completed jobs only, grouped by event, newest first.
     if(STATE.jobTab==='done'){ renderDone(events, host); return; }
+
+    // Drafts tab: bookings with a saved close-out draft
+    if(STATE.jobTab==='drafts'){
+      var draftBookings=STATE.bookings.filter(function(bk){ return bk.closeoutDraft && bk.status!=='Completed' && bk.status!=='No-show'; });
+      if(!draftBookings.length){ var dre=document.createElement('div'); dre.className='empty'; dre.textContent='No saved drafts.'; host.appendChild(dre); return; }
+      host.appendChild(secHead('Drafts',''));
+      // Group by event key to use the same eventCard UI
+      var draftEvMap={};
+      draftBookings.forEach(function(bk){ var k=(bk.city||'')+'|'+(bk.dateISO||''); (draftEvMap[k]=draftEvMap[k]||{key:k,city:bk.city||'',dateISO:bk.dateISO||'',installer:bk.installer||'',bookings:[],done:0,open:0,no:0,total:0,hasOpen:true}).bookings.push(bk); });
+      Object.keys(draftEvMap).sort().forEach(function(k){ var e=draftEvMap[k]; e.total=e.bookings.length; host.appendChild(eventCard(e,e.bookings,true,true,false)); });
+      return;
+    }
 
     // 📅 Week view: a real calendar of who's booked, day by day. Typing a search
     // hops back to All so results are never silently hidden behind the calendar.
@@ -2468,7 +2486,11 @@
     try{
       var res = await fetch('/.netlify/functions/vin-decode',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({vin:vin,vehicle:b.vehicle,modelYear:b.modelYear})});
       var out = await res.json().catch(function(){ return {ok:true,warnings:[]}; });
-      if(out.ok || !(out.warnings && out.warnings.length)){ clear(); return; }
+      if(out.ok || !(out.warnings && out.warnings.length)){
+        // Backfill year from VIN decode when field is blank
+        if(out.decoded && out.decoded.modelYear){ var yearInput=document.getElementById('yr_'+id); if(yearInput && !yearInput.value) yearInput.value = out.decoded.modelYear; }
+        clear(); return;
+      }
       STATE.vinBlocked[id]=true;
       box.className='vinwarn';
       box.innerHTML='<div class="vinwarn-h">⚠ Check this VIN</div><ul>'+
@@ -2693,11 +2715,24 @@
       '<input id="ecu_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="ECU ID" style="text-transform:uppercase;margin:5px 0">'+
       '<input id="gear_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="Gear ratio (e.g. 4.30)" style="margin:5px 0">'+
       '<input id="mi_'+b.id+'" inputmode="numeric" autocomplete="off" placeholder="Mileage" style="margin:5px 0">'+
-      '<input id="cem_'+b.id+'" type="email" autocomplete="off" placeholder="Customer email (for their certificate)" value="'+esc(b.email||'')+'" style="margin:5px 0">'+ 
-      '<div class="row-actions"><button class="btn" id="ok_'+b.id+'">Mark complete</button></div>'+
+      '<div class="certpanel" style="margin:8px 0;padding:8px 10px;background:#f0f4eb;border:1px solid #c8d4ba;border-radius:8px">'+
+        '<div style="font-size:13px;font-weight:700;margin-bottom:6px">Where should we send your Certificate of Calibration?</div>'+
+        '<input id="cem_'+b.id+'" type="email" autocomplete="off" placeholder="Customer email" value="'+esc(b.email||'')+'" style="margin:3px 0 5px">'+
+        '<select id="cocPref_'+b.id+'" name="preferredContact" style="margin:3px 0">'+
+          '<option value="">Preferred contact…</option>'+
+          '<option>SMS</option><option>Email</option><option>Messenger</option><option>Instagram</option><option>Call</option>'+
+        '</select>'+
+      '</div>'+
+      '<div class="row-actions">'+
+        '<button class="btn" id="ok_'+b.id+'">Mark complete</button>'+
+        '<button class="btn ns" id="draft_'+b.id+'">Save draft</button>'+
+      '</div>'+
+      (STATE.admin ? '<div style="margin-top:4px"><button class="btn" style="background:#4a3a2a;font-size:13px;padding:8px" id="okforce_'+b.id+'">Complete anyway (admin)</button></div>' : '')+
       '<label class="nsconfirm"><input type="checkbox" id="nsc_'+b.id+'"> Customer didn\'t show — add to waitlist</label>'+
       '<div class="row-actions"><button class="btn ns" id="ns_'+b.id+'" disabled>No-show</button></div>';
     c.querySelector('#ok_'+b.id).onclick=function(){ complete(b.id); };
+    c.querySelector('#draft_'+b.id).onclick=function(){ saveDraft(b.id); };
+    if(STATE.admin){ var okf=c.querySelector('#okforce_'+b.id); if(okf) okf.onclick=function(){ complete(b.id, true); }; }
     wireChat();
     c.querySelector('#rs_'+b.id).onclick=function(){ reschedule(b.id); };
     var db=c.querySelector('#del_'+b.id); if(db) db.onclick=function(){ db.disabled=true; cancelBooking(b.id).finally(function(){ db.disabled=false; }); };
@@ -2707,24 +2742,59 @@
     nsb.onclick=function(){ if(cb.checked) closeout(b.id,{action:'noshow',confirmed:true}); };
     var vinEl = c.querySelector('#vin_'+b.id);
     if(vinEl) vinEl.oninput = function(){ scheduleVinCheck(b.id); };
+    // Prefill tuning platform from PCM protocol
+    var tpEl = c.querySelector('#tp_'+b.id);
+    if(tpEl && !tpEl.value && b.pcm){ tpEl.value = b.pcm && b.pcm.vft ? 'VFT' : 'PCM'; }
+    // Prefill calibration type from stored value or calibration name
+    var ctEl = c.querySelector('#ct_'+b.id);
+    if(ctEl && !ctEl.value && b.calibrationType){ ctEl.value = b.calibrationType; }
+    else if(ctEl && !ctEl.value && b.calibration){ ctEl.value = /supercharger/i.test(b.calibration) ? 'Supercharger' : 'Basic'; }
+    // Auto-fill CT when calibration changes
+    var calEl2 = c.querySelector('#cal_'+b.id);
+    if(calEl2) calEl2.addEventListener('change', function(){
+      var ctEl2 = c.querySelector('#ct_'+b.id);
+      if(ctEl2 && !ctEl2.value){ ctEl2.value = /supercharger/i.test(calEl2.value) ? 'Supercharger' : 'Basic'; }
+    });
+    // Prefill ECU / gear / mileage from stored values
+    var ecuEl = c.querySelector('#ecu_'+b.id);
+    if(ecuEl && !ecuEl.value && b.ecuId) ecuEl.value = b.ecuId;
+    var gearEl = c.querySelector('#gear_'+b.id);
+    if(gearEl && !gearEl.value && b.gearSize) gearEl.value = b.gearSize;
+    var miEl = c.querySelector('#mi_'+b.id);
+    if(miEl && !miEl.value && b.mileage) miEl.value = b.mileage;
+    if(vinEl && !vinEl.value && b.vin){ vinEl.value = b.vin; scheduleVinCheck(b.id); }
     renderWhoStrip(c,b);
     wireCust(c,b); wireNotes(c,b);
     return c;
   }
 
-  async function complete(id){
+  function highlightMissingFields(id, missing){
+    var fieldMap={vin:'vin_'+id,calibration:'cal_'+id,tuningPlatform:'tp_'+id,calibrationType:'ct_'+id,
+      ecuId:'ecu_'+id,gearSize:'gear_'+id,mileage:'mi_'+id,customerEmail:'cem_'+id,modelYear:'yr_'+id};
+    var first=null;
+    (missing||[]).forEach(function(f){
+      var el=document.getElementById(fieldMap[f]||f+'_'+id);
+      if(el){ el.style.borderColor='#c0392b'; el.style.borderWidth='2px'; if(!first) first=el; }
+    });
+    if(first){ first.scrollIntoView({block:'center',behavior:'smooth'}); first.focus(); }
+  }
+  async function complete(id, adminForce){
     clearMsg();
     var vin=val('vin_'+id).toUpperCase().replace(/[^A-Z0-9]/g,'');
-    if(vin.length!==17){ fail('Enter the full 17-character VIN.'); return; }
-    var cal=val('cal_'+id); if(!cal){ fail('Pick an OTT Calibration.'); return; }
-    var tp=val('tp_'+id); if(!tp){ fail('Pick the Tuning Platform.'); return; }
-    var ct=val('ct_'+id); if(!ct){ fail('Pick the Calibration Type.'); return; }
-    var ecu=val('ecu_'+id).toUpperCase(); if(!ecu){ fail('Enter the ECU ID.'); return; }
-    var gear=val('gear_'+id); if(!gear){ fail('Enter the gear ratio.'); return; }
-    var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!mi){ fail('Enter the mileage.'); return; }
+    if(!adminForce){
+      if(vin.length!==17){ fail('Enter the full 17-character VIN.'); return; }
+    }
+    var cal=val('cal_'+id); if(!adminForce && !cal){ fail('Pick an OTT Calibration.'); return; }
+    var tp=val('tp_'+id); if(!adminForce && !tp){ fail('Pick the Tuning Platform.'); return; }
+    var ct=val('ct_'+id); if(!adminForce && !ct){ fail('Pick the Calibration Type.'); return; }
+    var ecu=val('ecu_'+id).toUpperCase(); if(!adminForce && !ecu){ fail('Enter the ECU ID.'); return; }
+    var gear=val('gear_'+id); if(!adminForce && !gear){ fail('Enter the gear ratio.'); return; }
+    var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!adminForce && !mi){ fail('Enter the mileage.'); return; }
     var cem=val('cem_'+id);
+    var pref=val('cocPref_'+id);
     if(STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I've verified this VIN is correct'."); return; } }
-    var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem};
+    var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem,preferredContact:pref};
+    if(adminForce) extra.adminForce=true;
     openSignOverlay(id, extra);
   }
 
@@ -2798,6 +2868,42 @@
     };
   }
 
+  async function saveDraft(id){
+    clearMsg();
+    var vin=val('vin_'+id).toUpperCase().replace(/[^A-Z0-9]/g,'');
+    var cal=val('cal_'+id);
+    var tp=val('tp_'+id);
+    var ct=val('ct_'+id);
+    var ecu=val('ecu_'+id).toUpperCase();
+    var gear=val('gear_'+id);
+    var mi=val('mi_'+id).replace(/[^0-9]/g,'');
+    var cem=val('cem_'+id);
+    var pref=val('cocPref_'+id);
+    var body={recordId:id,action:'draft'};
+    if(vin.length===17) body.vin=vin;
+    if(cal) body.calibration=cal;
+    if(tp) body.tuningPlatform=tp;
+    if(ct) body.calibrationType=ct;
+    if(ecu) body.ecuId=ecu;
+    if(gear) body.gearSize=gear;
+    if(mi) body.mileage=mi;
+    if(cem) body.customerEmail=cem;
+    if(pref) body.preferredContact=pref;
+    var res, netErr=null;
+    try { res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(body)}); }
+    catch(e){ netErr=e; }
+    if(netErr || !res){ fail('Network error — draft not saved.'); return; }
+    if(res.status===401){ await handle401(); return; }
+    var out=await res.json().catch(function(){return{};});
+    if(res.ok && out.status==='draft'){
+      var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
+      if(b) b.closeoutDraft=true;
+      renderAll();
+      succeed('✓ Draft saved.');
+      if(b) jumpToBooking(b);
+    } else { fail('Could not save draft: '+(out.error||'error '+(res?res.status:'network'))); }
+  }
+
   async function closeout(id,extra){
     clearMsg();
     var body=Object.assign({recordId:id},extra);
@@ -2808,8 +2914,10 @@
     if(netErr || (res && Q().shouldQueue(null, res.status))){ enqueueOp('closeout', body, id, extra); return; }
     var out=await res.json().catch(function(){return{};});
     var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
-    if(out.status==='completed'){ if(b){ b.status='Completed'; if(extra.calibration)b.calibration=extra.calibration; if(extra.vin)b.vin=extra.vin; if(extra.tuningPlatform)b.tuningPlatform=extra.tuningPlatform; if(extra.calibrationType)b.calibrationType=extra.calibrationType; if(extra.signature) b.signed=true; } renderAll(); }
+    if(!res.ok && out.error==='report-fields-missing'){ highlightMissingFields(id, out.missing||[]); fail('Fill in the highlighted fields to complete.'); return; }
+    if(out.status==='completed'){ if(b){ b.status='Completed'; if(extra.calibration)b.calibration=extra.calibration; if(extra.vin)b.vin=extra.vin; if(extra.tuningPlatform)b.tuningPlatform=extra.tuningPlatform; if(extra.calibrationType)b.calibrationType=extra.calibrationType; if(extra.signature) b.signed=true; } renderAll(); succeed('✓ Tune completed.'); if(b) jumpToBooking(b); }
     else if(out.status==='noshow'){ if(b){ b.status='No-show'; } renderAll(); }
+    else if(out.status==='draft'){ if(b) b.closeoutDraft=true; renderAll(); succeed('✓ Draft saved.'); if(b) jumpToBooking(b); }
     else { fail('Could not save: '+(out.error||'error '+res.status)); }
   }
 

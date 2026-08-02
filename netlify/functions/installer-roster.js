@@ -71,6 +71,7 @@ async function buildRoster(deps) {
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
       certDelivery: f["Cert Delivery"] || "",
       signed: !!(f["Customer Signature"] && String(f["Customer Signature"]).trim()),
+      closeoutDraft: !!f["Closeout Draft"],
       commission,
     };
   }).sort((a, b) => a.dateISO.localeCompare(b.dateISO) || bySlot(a, b));
