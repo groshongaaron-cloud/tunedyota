@@ -87,6 +87,11 @@
 [functions."chat-harvest"]
   schedule = "30 13 * * *"
 
+# Post-install review ask, ~11am CT: one personal email per completed customer,
+# 2-14 days after the certificate. Dormant until GOOGLE_REVIEW_URL is set.
+[functions."review-ask"]
+  schedule = "0 16 * * *"
+
 # Legacy Wix redirects live in site/_redirects (single source of truth; it also
 # carries the generated .html→clean-URL 301! block from scripts/build-redirects.mjs).
 
