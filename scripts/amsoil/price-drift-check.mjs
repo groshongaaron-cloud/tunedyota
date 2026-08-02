@@ -35,11 +35,14 @@ const MAX_SENTINELS = Number((process.argv.find((a) => a.startsWith("--sentinels
 const TOLERANCE = 0.01; // dollars — anything beyond a rounding hair is drift
 
 async function notify(text) {
-  const url = process.env.NOTIFY_URL || "https://tunedyota.com/notify";
+  // Full functions path — there is NO /notify redirect; the short URL 404s
+  // silently (fetch does not throw on 404), which ate summaries until 2026-08-02.
+  const url = process.env.NOTIFY_URL || "https://tunedyota.com/.netlify/functions/notify";
   const token = process.env.NOTIFY_TOKEN || process.env.TY_NOTIFY_TOKEN;
   if (!token) { console.log("[notify skipped: no NOTIFY_TOKEN/TY_NOTIFY_TOKEN]\n" + text); return; }
   try {
-    await fetch(url, { method: "POST", headers: { "content-type": "application/json", "x-ty-notify": token }, body: JSON.stringify({ text }) });
+    const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json", "x-ty-notify": token }, body: JSON.stringify({ text }) });
+    if (!res.ok) console.error(`notify failed: HTTP ${res.status}`);
   } catch (e) { console.error("notify failed:", e.message); }
 }
 

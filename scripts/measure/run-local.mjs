@@ -97,6 +97,11 @@ async function main() {
   log(`\n----- REPORT -----\n${report}\n------------------\n`);
 
   // --- Slack (optional) ---
+  // Direct webhook first if configured; on failure (or no webhook) fall back to
+  // the site's /notify relay — the same contract price-sync and the drift
+  // sentinel use, so the monthly report lands in Slack even after a webhook
+  // is rotated (the 2026-08 run 404'd on a dead webhook).
+  let slacked = false;
   if (cfg.slackWebhookUrl) {
     try {
       const res = await fetch(cfg.slackWebhookUrl, {
@@ -105,21 +110,41 @@ async function main() {
         body: JSON.stringify({ text: report }),
       });
       log(`Slack: HTTP ${res.status}`);
+      slacked = res.ok;
     } catch (e) {
       log(`Slack ERROR: ${e.message}`);
     }
-  } else {
-    log("Slack: skipped (no slackWebhookUrl in config)");
   }
+  const notifyToken = cfg.notifyToken || process.env.NOTIFY_TOKEN || process.env.TY_NOTIFY_TOKEN;
+  if (!slacked && notifyToken) {
+    try {
+      const res = await fetch(cfg.notifyUrl || "https://tunedyota.com/.netlify/functions/notify", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-ty-notify": notifyToken },
+        body: JSON.stringify({ text: report }),
+      });
+      log(`Notify relay: HTTP ${res.status}`);
+      slacked = res.ok;
+    } catch (e) {
+      log(`Notify relay ERROR: ${e.message}`);
+    }
+  }
+  if (!slacked) log("Slack: no working delivery path (webhook failed/missing and no notify token)");
 
   // --- Persist (commit + push the snapshot) ---
+  // Pathspec commit only — parallel sessions stage files in this repo, and a
+  // bare `git commit` would sweep them in. Master-only, same as price-sync.
   try {
+    const branch = execSync("git rev-parse --abbrev-ref HEAD", { cwd: ROOT, stdio: "pipe" }).toString().trim();
+    if (branch !== "master") throw new Error(`on branch ${branch}, not master — snapshot left uncommitted`);
     execSync(`git add "${outPath}"`, { cwd: ROOT, stdio: "pipe" });
-    execSync(`git commit -m "chore(measure): ${date} snapshot"`, { cwd: ROOT, stdio: "pipe" });
+    execSync(`git commit -m "chore(measure): ${date} snapshot" -- "${outPath}"`, { cwd: ROOT, stdio: "pipe" });
     execSync("git push", { cwd: ROOT, stdio: "pipe" });
     log("Persisted: committed + pushed snapshot to origin.");
   } catch (e) {
-    log(`Persist skipped/failed: ${String(e.message).split("\n")[0]}`);
+    const detail = [e.stderr && e.stderr.toString(), e.stdout && e.stdout.toString(), String(e.message)]
+      .filter(Boolean).join(" | ").split("\n").filter(Boolean).slice(0, 3).join(" | ");
+    log(`Persist skipped/failed: ${detail.slice(0, 300)}`);
   }
 }
 
