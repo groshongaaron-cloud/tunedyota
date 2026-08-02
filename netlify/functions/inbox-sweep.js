@@ -142,17 +142,34 @@ async function runSweep(deps = {}) {
       if (["inquiry", "thread-reply", "sensitive"].includes(classification.bucket)) {
         const grounding = groundingFor({ city: "", state: "", text: msg.textBody });
 
-        // Thread context: thread-reply and sensitive are likely mid-conversation, so
-        // fetch the earlier messages for the drafter. Inquiry = first contact — the
-        // thread is just this message, skip the API call. Fail-open: a context-fetch
-        // hiccup must never block the draft (a context-free draft beats none).
-        let threadContext = "";
-        if (["thread-reply", "sensitive"].includes(classification.bucket)) {
-          try {
-            threadContext = formatThreadContext(await gmail.getThread(msg.threadId, { env }), msg.id);
-          } catch (e) {
-            log.error(`inbox-sweep: thread-context fetch failed for ${id}:`, e.message || e);
+        // One thread fetch serves two jobs. (1) Already-answered guard: the owner
+        // often replies within minutes, before this sweep's tick reaches the message —
+        // if the thread already holds OUR reply after this message, a draft would
+        // duplicate a human answer (regression: empty stale draft on "Availability
+        // for 2017 Tacoma", 2026-08-01). (2) Conversation context for the drafter.
+        // Fail-open: a fetch hiccup must never block the draft, and the guard only
+        // suppresses on positive evidence we answered.
+        let thread = null;
+        try {
+          thread = await gmail.getThread(msg.threadId, { env });
+        } catch (e) {
+          log.error(`inbox-sweep: thread fetch failed for ${id}:`, e.message || e);
+        }
+        if (Array.isArray(thread)) {
+          const at = thread.findIndex((m) => m && m.id === msg.id);
+          const later = at >= 0 ? thread.slice(at + 1) : [];
+          if (later.some((m) => SELF_SENDERS.test((m.headers && m.headers.from) || ""))) {
+            await gmail.addLabel(id, "ty-skipped", { env });
+            skipped++;
+            continue;
           }
+        }
+
+        // Inquiry = first contact, so its context would just be this message; only
+        // mid-conversation buckets feed the thread to the drafter.
+        let threadContext = "";
+        if (["thread-reply", "sensitive"].includes(classification.bucket) && Array.isArray(thread)) {
+          threadContext = formatThreadContext(thread, msg.id);
         }
 
         const prompt = buildDraftPrompt({ message: msg, classification, grounding, threadContext });

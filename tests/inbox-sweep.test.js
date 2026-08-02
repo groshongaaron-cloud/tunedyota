@@ -85,12 +85,37 @@ test("sensitive draft also fetches thread context", async () => {
   await runSweep(h.deps);
   assert.equal(h.threadFetches.length, 1, "sensitive must fetch its thread");
 });
-test("inquiry draft does NOT fetch the thread (fresh contact — saves the API call)", async () => {
+test("inquiry fetches the thread exactly once (already-answered guard) and drafts when unanswered", async () => {
   const h = harness([MSG("m22", { textBody: "how much for a tune?" })],
     [{ bucket: "inquiry", stage: "connect", confidence: 0.9, summary: "price ask" }]);
   const out = await runSweep(h.deps);
   assert.equal(out.drafted, 1);
-  assert.equal(h.threadFetches.length, 0, "inquiry must not call getThread");
+  assert.equal(h.threadFetches.length, 1, "one fetch serves the guard");
+});
+// Regression: the sweep drafted an empty stale reply on a thread the owner had
+// already answered minutes earlier (Re: Availability for 2017 Tacoma, 2026-08-01).
+test("a thread we already replied to gets NO draft — skipped with ty-skipped", async () => {
+  const h = harness([MSG("m24", { threadId: "T2", textBody: "any availability this week?" })],
+    [{ bucket: "inquiry", stage: "connect", confidence: 0.9, summary: "availability ask" }]);
+  h.deps.gmail.getThread = async (threadId) => { h.threadFetches.push(threadId); return [
+    { id: "m24", threadId: "T2", headers: { from: "jo@x.com", date: "" }, textBody: "any availability this week?" },
+    { id: "m25", threadId: "T2", headers: { from: "Tuned Yota <info@tunedyota.com>", date: "" }, textBody: "We can set up a private appointment." },
+  ]; };
+  const out = await runSweep(h.deps);
+  assert.equal(out.drafted, 0, "no draft on an answered thread");
+  assert.equal(out.skipped, 1);
+  assert.equal(h.drafts.length, 0);
+  assert.deepEqual(h.labeled[0], ["m24", "ty-skipped"]);
+});
+test("our reply EARLIER in the thread does not suppress a draft for a newer customer message", async () => {
+  const h = harness([MSG("m26", { threadId: "T3", textBody: "yes it's the crewmax" })],
+    [{ bucket: "thread-reply", stage: "commitment", confidence: 0.9, summary: "year answer" }]);
+  h.deps.gmail.getThread = async (threadId) => { h.threadFetches.push(threadId); return [
+    { id: "m25", threadId: "T3", headers: { from: "info@tunedyota.com", date: "" }, textBody: "What year is it?" },
+    { id: "m26", threadId: "T3", headers: { from: "jo@x.com", date: "" }, textBody: "yes it's the crewmax" },
+  ]; };
+  const out = await runSweep(h.deps);
+  assert.equal(out.drafted, 1, "customer's latest message still deserves a draft");
 });
 test("getThread failure fails open — draft still created without context", async () => {
   const h = harness([MSG("m23", { textBody: "any update on my tune?" })],
