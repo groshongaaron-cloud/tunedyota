@@ -1,0 +1,934 @@
+{
+  "date": "2026-08-02",
+  "gsc": {
+    "range": {
+      "start": "2026-07-03",
+      "end": "2026-07-30"
+    },
+    "tracked": [
+      {
+        "clicks": 4,
+        "impressions": 66,
+        "ctr": 0.06060606060606061,
+        "position": 4.666666666666666,
+        "query": "ott tune cost",
+        "page": "https://tunedyota.com/ott-tune-cost"
+      },
+      {
+        "clicks": 1,
+        "impressions": 6,
+        "ctr": 0.16666666666666666,
+        "position": 9.333333333333334,
+        "query": "how much is an ott tune",
+        "page": "https://tunedyota.com/ott-tune"
+      },
+      {
+        "clicks": 1,
+        "impressions": 28,
+        "ctr": 0.03571428571428571,
+        "position": 8.464285714285715,
+        "query": "ott tune cost",
+        "page": "https://tunedyota.com/ott-tune"
+      },
+      {
+        "clicks": 1,
+        "impressions": 47,
+        "ctr": 0.02127659574468085,
+        "position": 7.638297872340425,
+        "query": "toyota tacoma ott tune",
+        "page": "https://tunedyota.com/toyota-tacoma-ott-tune"
+      },
+      {
+        "clicks": 1,
+        "impressions": 48,
+        "ctr": 0.020833333333333332,
+        "position": 7.270833333333333,
+        "query": "toyota tundra ott tune",
+        "page": "https://tunedyota.com/"
+      },
+      {
+        "clicks": 0,
+        "impressions": 6,
+        "ctr": 0,
+        "position": 9.333333333333334,
+        "query": "how much is an ott tune",
+        "page": "https://tunedyota.com/"
+      },
+      {
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 3,
+        "query": "how much is an ott tune",
+        "page": "https://tunedyota.com/is-the-ott-tune-worth-it"
+      },
+      {
+        "clicks": 0,
+        "impressions": 36,
+        "ctr": 0,
+        "position": 5.916666666666667,
+        "query": "how much is an ott tune",
+        "page": "https://tunedyota.com/ott-tune-cost"
+      },
+      {
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 35,
+        "query": "how much is an ott tune",
+        "page": "https://tunedyota.com/toyota-tacoma-ott-tune"
+      },
+      {
+        "clicks": 0,
+        "impressions": 12,
+        "ctr": 0,
+        "position": 25.833333333333332,
+        "query": "magnuson supercharger tacoma",
+        "page": "https://tunedyota.com/toyota-tacoma-supercharger"
+      },
+      {
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 9.7,
+        "query": "ott tune cost",
+        "page": "https://tunedyota.com/"
+      },
+      {
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 3,
+        "query": "ott tune cost",
+        "page": "https://tunedyota.com/is-the-ott-tune-worth-it"
+      },
+      {
+        "clicks": 0,
+        "impressions": 8,
+        "ctr": 0,
+        "position": 10.625,
+        "query": "ott tune cost",
+        "page": "https://tunedyota.com/toyota-tacoma-ott-tune"
+      }
+    ],
+    "topPages": [
+      {
+        "clicks": 165,
+        "impressions": 5823,
+        "ctr": 0.02833590932509016,
+        "position": 9.493731753391723,
+        "page": "https://tunedyota.com/"
+      },
+      {
+        "clicks": 46,
+        "impressions": 4330,
+        "ctr": 0.010623556581986143,
+        "position": 7.054503464203234,
+        "page": "https://tunedyota.com/ott-tune"
+      },
+      {
+        "clicks": 46,
+        "impressions": 3399,
+        "ctr": 0.013533392174168874,
+        "position": 9.09561635775228,
+        "page": "https://tunedyota.com/toyota-tacoma-ott-tune"
+      },
+      {
+        "clicks": 43,
+        "impressions": 2376,
+        "ctr": 0.0180976430976431,
+        "position": 5.151936026936027,
+        "page": "https://tunedyota.com/ott-tune-cost"
+      },
+      {
+        "clicks": 31,
+        "impressions": 2627,
+        "ctr": 0.011800532927293491,
+        "position": 8.535211267605634,
+        "page": "https://tunedyota.com/toyota-4runner-ott-tune"
+      },
+      {
+        "clicks": 24,
+        "impressions": 667,
+        "ctr": 0.035982008995502246,
+        "position": 7.2653673163418295,
+        "page": "https://tunedyota.com/lexus-gx-ott-tune"
+      },
+      {
+        "clicks": 22,
+        "impressions": 161,
+        "ctr": 0.13664596273291926,
+        "position": 4,
+        "page": "https://tunedyota.com/toyota-lexus-tuning-wisconsin"
+      },
+      {
+        "clicks": 17,
+        "impressions": 1180,
+        "ctr": 0.01440677966101695,
+        "position": 5.211864406779661,
+        "page": "https://tunedyota.com/is-the-ott-tune-worth-it"
+      },
+      {
+        "clicks": 14,
+        "impressions": 267,
+        "ctr": 0.052434456928838954,
+        "position": 6.722846441947565,
+        "page": "https://tunedyota.com/toyota-highlander-ott-tune"
+      },
+      {
+        "clicks": 14,
+        "impressions": 193,
+        "ctr": 0.07253886010362694,
+        "position": 4.404145077720207,
+        "page": "https://tunedyota.com/toyota-lexus-tuning-minnesota"
+      },
+      {
+        "clicks": 13,
+        "impressions": 372,
+        "ctr": 0.03494623655913978,
+        "position": 4.932795698924731,
+        "page": "https://tunedyota.com/team"
+      },
+      {
+        "clicks": 12,
+        "impressions": 764,
+        "ctr": 0.015706806282722512,
+        "position": 8.040575916230367,
+        "page": "https://tunedyota.com/supercharger"
+      },
+      {
+        "clicks": 11,
+        "impressions": 183,
+        "ctr": 0.060109289617486336,
+        "position": 5.612021857923497,
+        "page": "https://tunedyota.com/lexus-lx570-ott-tune"
+      },
+      {
+        "clicks": 11,
+        "impressions": 173,
+        "ctr": 0.06358381502890173,
+        "position": 8.658959537572255,
+        "page": "https://tunedyota.com/toyota-land-cruiser-ott-tune"
+      },
+      {
+        "clicks": 7,
+        "impressions": 322,
+        "ctr": 0.021739130434782608,
+        "position": 9.462732919254659,
+        "page": "https://tunedyota.com/toyota-4runner-supercharger"
+      },
+      {
+        "clicks": 7,
+        "impressions": 92,
+        "ctr": 0.07608695652173914,
+        "position": 5.630434782608695,
+        "page": "https://tunedyota.com/toyota-lexus-tuning-iowa"
+      },
+      {
+        "clicks": 6,
+        "impressions": 77,
+        "ctr": 0.07792207792207792,
+        "position": 5.87012987012987,
+        "page": "https://tunedyota.com/amsoil-vs-oem-toyota-lexus-fluids"
+      },
+      {
+        "clicks": 6,
+        "impressions": 968,
+        "ctr": 0.006198347107438017,
+        "position": 7.828512396694215,
+        "page": "https://tunedyota.com/magnuson-supercharger-pricing"
+      },
+      {
+        "clicks": 6,
+        "impressions": 585,
+        "ctr": 0.010256410256410256,
+        "position": 9.03931623931624,
+        "page": "https://tunedyota.com/toyota-tundra-supercharger"
+      },
+      {
+        "clicks": 4,
+        "impressions": 339,
+        "ctr": 0.011799410029498525,
+        "position": 5.752212389380531,
+        "page": "https://tunedyota.com/find-your-exact-tune"
+      },
+      {
+        "clicks": 4,
+        "impressions": 200,
+        "ctr": 0.02,
+        "position": 8.21,
+        "page": "https://tunedyota.com/toyota-land-cruiser-supercharger"
+      },
+      {
+        "clicks": 3,
+        "impressions": 416,
+        "ctr": 0.007211538461538462,
+        "position": 9.370192307692308,
+        "page": "https://tunedyota.com/toyota-fj-cruiser-supercharger"
+      },
+      {
+        "clicks": 2,
+        "impressions": 6,
+        "ctr": 0.3333333333333333,
+        "position": 6.166666666666667,
+        "page": "https://tunedyota.com/amsoil-ea-oil-filter-ea15k49"
+      },
+      {
+        "clicks": 2,
+        "impressions": 76,
+        "ctr": 0.02631578947368421,
+        "position": 8,
+        "page": "https://tunedyota.com/amsoil-toyota-tundra"
+      },
+      {
+        "clicks": 2,
+        "impressions": 47,
+        "ctr": 0.0425531914893617,
+        "position": 6.1063829787234045,
+        "page": "https://tunedyota.com/lexus-rx350-ott-tune"
+      }
+    ]
+  },
+  "ai": {
+    "webSearch": [],
+    "perplexity": [
+      {
+        "query": "ott tune cost",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/ott-tune-cost",
+          "https://tunedyota.com/ott-tune"
+        ],
+        "competitors": [
+          "reddit.com",
+          "rctuningfl.com",
+          "facebook.com",
+          "adventuremotorsusa.com",
+          "trailtacoma.com",
+          "ottweek.com",
+          "ottengine.com",
+          "overlandtailor.com",
+          "tacoma4g.com",
+          "youtube.com",
+          "appinventiv.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "how much is an ott tune",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/ott-tune-cost"
+        ],
+        "competitors": [
+          "facebook.com",
+          "reddit.com",
+          "rctuningfl.com",
+          "adventuremotorsusa.com",
+          "trailtacoma.com",
+          "pedalcommander.com",
+          "youtube.com",
+          "toyogenics.com",
+          "kevinsautos.com",
+          "tundras.com",
+          "overlandtailor.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "toyota tundra ott tune",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/",
+          "https://tunedyota.com/toyota-tundra-ott-tune",
+          "https://tunedyota.com/ott-tune"
+        ],
+        "competitors": [
+          "overlandtailor.com",
+          "tundras.com",
+          "youtube.com",
+          "reddit.com",
+          "facebook.com",
+          "bighorntuning.com",
+          "tacovinyl.com",
+          "instagram.com",
+          "adv4x4.us",
+          "appalachiantoyotatuning.com"
+        ]
+      },
+      {
+        "query": "toyota tacoma ott tune",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/toyota-tacoma-ott-tune"
+        ],
+        "competitors": [
+          "overlandtailor.com",
+          "youtube.com",
+          "reddit.com",
+          "tacoma4g.com",
+          "trailtacoma.com",
+          "tacomaworld.com",
+          "instagram.com",
+          "tacoma3g.com",
+          "facebook.com",
+          "adv4x4.us"
+        ]
+      },
+      {
+        "query": "magnuson supercharger tundra cost",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/magnuson-products",
+          "https://tunedyota.com/magnuson-supercharger-pricing",
+          "https://tunedyota.com/toyota-tundra-supercharger"
+        ],
+        "competitors": [
+          "tundralifestyle.com",
+          "vmpperformance.com",
+          "superchargersonline.com",
+          "ebay.com",
+          "shopfigs.com",
+          "magnusonsuperchargers.com",
+          "trdshop.carlocktoyotaoftupelo.com",
+          "treperformance.com",
+          "runnin4tacos.com",
+          "youtube.com",
+          "tundras.com",
+          "reddit.com"
+        ]
+      },
+      {
+        "query": "magnuson supercharger tacoma",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/toyota-tacoma-supercharger"
+        ],
+        "competitors": [
+          "magnusonsuperchargers.com",
+          "tacomabeast.com",
+          "youtube.com",
+          "superchargersonline.com",
+          "facebook.com",
+          "speedwaymotors.com",
+          "reddit.com"
+        ]
+      },
+      {
+        "query": "is an ott tune worth it",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/is-the-ott-tune-worth-it"
+        ],
+        "competitors": [
+          "reddit.com",
+          "youtube.com",
+          "facebook.com",
+          "trailtacoma.com",
+          "adv4x4.us",
+          "tacoma4g.com"
+        ]
+      },
+      {
+        "query": "ott tune vs stock",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/is-the-ott-tune-worth-it",
+          "https://tunedyota.com/ott-tune"
+        ],
+        "competitors": [
+          "overlandtailor.com",
+          "centralcoasttuning.com",
+          "reddit.com",
+          "sites.google.com",
+          "youtube.com",
+          "wyoverlandtuning.com",
+          "facebook.com",
+          "tundras.com",
+          "tacoma4g.com",
+          "4runners.com",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "what is an ott tune",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/ott-tune",
+          "https://tunedyota.com/is-the-ott-tune-worth-it",
+          "https://tunedyota.com/"
+        ],
+        "competitors": [
+          "reddit.com",
+          "pedalcommander.com",
+          "tech.dvosuspension.com",
+          "youtube.com",
+          "trailtacoma.com",
+          "device.report",
+          "adv4x4.us",
+          "facebook.com",
+          "kevinsautos.com",
+          "overlandtailor.com",
+          "sites.google.com",
+          "tacoma3g.com",
+          "adventuremotorsusa.com"
+        ]
+      },
+      {
+        "query": "ott vs custom tune",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/ott-tune",
+          "https://tunedyota.com/is-the-ott-tune-worth-it"
+        ],
+        "competitors": [
+          "golfr.org",
+          "reddit.com",
+          "instagram.com",
+          "youtube.com",
+          "tacomaworld.com",
+          "tacoma3g.com",
+          "f30.bimmerpost.com",
+          "pedalcommander.com",
+          "facebook.com",
+          "overlandtailor.com",
+          "solomotorsportsmilton.com",
+          "4runner6g.com",
+          "tacoma4g.com"
+        ]
+      },
+      {
+        "query": "does a tune void warranty",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "nashvilleperformance.com",
+          "reddit.com",
+          "youtube.com",
+          "carpartsguys.com",
+          "f80.bimmerpost.com",
+          "engineerfix.com",
+          "ampauto.io",
+          "capitalone.com",
+          "alibaba.com",
+          "facebook.com",
+          "mustang6g.com",
+          "endurancewarranty.com"
+        ]
+      },
+      {
+        "query": "is tuning emissions legal",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "cleanairnortheast.epa.gov",
+          "gov.uk",
+          "mychiptuningfiles.com",
+          "arnoldporter.com",
+          "haulandtrail.com",
+          "youtube.com",
+          "apexandoctane.com",
+          "cdphe.colorado.gov",
+          "hpacademy.com",
+          "epa.gov",
+          "duramaxtuner.com",
+          "risingsun4x4club.org",
+          "thedrive.com",
+          "morepowertuning.com",
+          "afdc.energy.gov",
+          "forums.justcommodores.com.au",
+          "aptuning.net",
+          "forums.tdiclub.com"
+        ]
+      },
+      {
+        "query": "will a tune throw a check engine light",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "corvetteforum.com",
+          "facebook.com",
+          "reddit.com",
+          "stickshifting.com",
+          "carolinasbmwmoa.org",
+          "youtube.com",
+          "ls1tech.com",
+          "camaro5.com",
+          "powerstroke.org",
+          "formulax.in",
+          "vikingoffroad.com",
+          "ls1.com"
+        ]
+      },
+      {
+        "query": "toyota tuning minnesota",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/",
+          "https://tunedyota.com/toyota-lexus-tuning-minnesota",
+          "https://tunedyota.com/terms"
+        ],
+        "competitors": [
+          "facebook.com",
+          "mapquest.com",
+          "instagram.com",
+          "toyota.com",
+          "overlandtailor.com",
+          "tcpmn.com",
+          "aamcominnesota.com",
+          "carspecmn.com",
+          "dynoseek.com",
+          "reddit.com",
+          "maplewoodtoyota.com",
+          "twincitiestransmission.com",
+          "yelp.com"
+        ]
+      },
+      {
+        "query": "toyota tuning wisconsin",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/toyota-lexus-tuning-wisconsin",
+          "https://tunedyota.com/",
+          "https://tunedyota.com/team"
+        ],
+        "competitors": [
+          "toyota.com",
+          "facebook.com",
+          "toyotaofbrookfield.com",
+          "quantum-performance.com",
+          "overlandtailor.com",
+          "nelsonsautomotive.com",
+          "cars.com",
+          "kolossotoyota.com",
+          "jandsautocare.com",
+          "marktoyota.com",
+          "russdarrowtoyota.com",
+          "kbb.com",
+          "yelp.com",
+          "mapquest.com",
+          "manyo-motors.com",
+          "tunezilla.com"
+        ]
+      },
+      {
+        "query": "toyota tuning iowa",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/toyota-lexus-tuning-iowa",
+          "https://tunedyota.com/"
+        ],
+        "competitors": [
+          "mapquest.com",
+          "toyota.com",
+          "goblingarage.net",
+          "cedarrapidstoyota.com",
+          "overlandtailor.com",
+          "facebook.com",
+          "autotechiowa.com",
+          "dynoseek.com",
+          "kbb.com",
+          "choiceautomotiveia.com",
+          "toyotaiowacity.com",
+          "motorinnautogroup.com",
+          "hptuners.com",
+          "sandsautoiowacity.com",
+          "masteryotallc.com",
+          "tintworld.com"
+        ]
+      },
+      {
+        "query": "toyota tundra oil capacity",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "reddit.com",
+          "autofiles.com",
+          "oilcapacity.org",
+          "toyotaofclermont.com",
+          "erwinsalarda.com",
+          "toyota-club.net",
+          "myoiltype.com",
+          "tundras.com",
+          "amsoil.com",
+          "blauparts.com",
+          "youtube.com",
+          "oil-change.info",
+          "autocarshub.com",
+          "mail.carspecs.org",
+          "poweroilcenter.com",
+          "facebook.com"
+        ]
+      },
+      {
+        "query": "tundra 5.7 oil capacity",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "reddit.com",
+          "tundras.com",
+          "amsoil.com",
+          "youtube.com",
+          "ryansautomi.com",
+          "blauparts.com",
+          "tundratalk.net",
+          "oilcapacitycheck.com",
+          "tundrasolutions.com",
+          "erwinsalarda.com",
+          "ccgit.crown.edu",
+          "toyotaofclermont.com",
+          "oilcapacity.org",
+          "poweroilcenter.com",
+          "toyota-specs.com",
+          "costaoils.com",
+          "vps2.mondinion.com"
+        ]
+      },
+      {
+        "query": "toyota tacoma oil capacity",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "engineswork.com",
+          "autofiles.com",
+          "erwinsalarda.com",
+          "oilchangers.com",
+          "reddit.com",
+          "oilcapacity.org",
+          "spotonauto.com",
+          "autoclubcar.com",
+          "toyota-club.net",
+          "amsoil.com",
+          "takeuroil.com",
+          "youtube.com",
+          "oil-change.info",
+          "toyotaofclermont.com",
+          "facebook.com",
+          "oilshop.ca",
+          "tacomaworld.com"
+        ]
+      },
+      {
+        "query": "4runner oil capacity",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "reddit.com",
+          "4runners.com",
+          "canadiangearhead.com",
+          "6thgen4runner.com",
+          "oilcapacity.org",
+          "newporttoyota.com",
+          "autofiles.com",
+          "amsoil.com",
+          "erwinsalarda.com",
+          "youtube.com",
+          "toyota-4runner.org",
+          "ftp.newportchamber.org",
+          "carinterior.alibaba.com",
+          "toyotaofnorthcharlotte.com",
+          "oilchangediy.com",
+          "uploads-ssl.webflow.com"
+        ]
+      },
+      {
+        "query": "best oil for toyota tundra",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "tundras.com",
+          "reddit.com",
+          "youtube.com",
+          "facebook.com",
+          "blauparts.com",
+          "tundrasolutions.com",
+          "bobistheoilguy.com"
+        ]
+      },
+      {
+        "query": "best oil for tuned tundra",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/amsoil-toyota-tundra"
+        ],
+        "competitors": [
+          "youtube.com",
+          "tundras.com",
+          "blauparts.com",
+          "facebook.com",
+          "reddit.com",
+          "bobistheoilguy.com",
+          "tundrasolutions.com",
+          "autozone.com",
+          "toyotaofclermont.com"
+        ]
+      },
+      {
+        "query": "amsoil tundra",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/amsoil-toyota-tundra"
+        ],
+        "competitors": [
+          "amsoil.com",
+          "reddit.com",
+          "tundras.com",
+          "youtube.com",
+          "facebook.com",
+          "oilshop.ca",
+          "amsoil-club.su"
+        ]
+      },
+      {
+        "query": "amsoil tacoma",
+        "citedUs": true,
+        "ourCitations": [
+          "https://tunedyota.com/amsoil-toyota-tacoma",
+          "https://tunedyota.com/amsoil-signature-series-0w-20-synthetic-motor-oil"
+        ],
+        "competitors": [
+          "amsoil.com",
+          "haldimandsyntheticoil.ca",
+          "tacomaworld.com",
+          "blog.amsoil.com",
+          "youtube.com",
+          "reddit.com",
+          "bobistheoilguy.com",
+          "facebook.com",
+          "yotatech.com"
+        ]
+      },
+      {
+        "query": "amsoil dealer minnesota",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "amsoil.com",
+          "mapquest.com",
+          "selectsynthetics.com",
+          "linkedin.com",
+          "eastcentralsynthetics.com",
+          "yelp.com",
+          "millcitysynthetics.com",
+          "robert-johnston.com",
+          "mpsoil.com",
+          "mn.aoil.us",
+          "oil-near-me.com",
+          "mikeford.shop"
+        ]
+      },
+      {
+        "query": "tundra differential fluid capacity",
+        "citedUs": false,
+        "ourCitations": [],
+        "competitors": [
+          "blauparts.com",
+          "toyota-club.net",
+          "dahoodman.com",
+          "reddit.com",
+          "youtube.com",
+          "tundras.com",
+          "tundrasolutions.com",
+          "openlaborproject.com",
+          "ahgautoservice.com",
+          "horsepowerhub.com",
+          "tundratalk.net"
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "aiPresenceRate": 0,
+    "perplexityCiteRate": 0.62,
+    "ctrOpportunities": [],
+    "pageOpportunities": [
+      {
+        "page": "https://tunedyota.com/ott-tune",
+        "impressions": 4330,
+        "position": 7.1,
+        "ctr": 0.0106,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/toyota-tacoma-ott-tune",
+        "impressions": 3399,
+        "position": 9.1,
+        "ctr": 0.0135,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/toyota-4runner-ott-tune",
+        "impressions": 2627,
+        "position": 8.5,
+        "ctr": 0.0118,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/ott-tune-cost",
+        "impressions": 2376,
+        "position": 5.2,
+        "ctr": 0.0181,
+        "expectedCtr": 0.05
+      },
+      {
+        "page": "https://tunedyota.com/is-the-ott-tune-worth-it",
+        "impressions": 1180,
+        "position": 5.2,
+        "ctr": 0.0144,
+        "expectedCtr": 0.05
+      },
+      {
+        "page": "https://tunedyota.com/magnuson-supercharger-pricing",
+        "impressions": 968,
+        "position": 7.8,
+        "ctr": 0.0062,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/supercharger",
+        "impressions": 764,
+        "position": 8,
+        "ctr": 0.0157,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/toyota-tundra-supercharger",
+        "impressions": 585,
+        "position": 9,
+        "ctr": 0.0103,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/toyota-fj-cruiser-supercharger",
+        "impressions": 416,
+        "position": 9.4,
+        "ctr": 0.0072,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/team",
+        "impressions": 372,
+        "position": 4.9,
+        "ctr": 0.0349,
+        "expectedCtr": 0.05
+      },
+      {
+        "page": "https://tunedyota.com/find-your-exact-tune",
+        "impressions": 339,
+        "position": 5.8,
+        "ctr": 0.0118,
+        "expectedCtr": 0.03
+      },
+      {
+        "page": "https://tunedyota.com/toyota-land-cruiser-supercharger",
+        "impressions": 200,
+        "position": 8.2,
+        "ctr": 0.02,
+        "expectedCtr": 0.03
+      }
+    ]
+  },
+  "meta": {
+    "errors": []
+  }
+}
