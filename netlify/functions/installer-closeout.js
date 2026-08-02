@@ -4,7 +4,9 @@
 // certificate-dispatch backstops any send failure). Ownership is re-checked server-side.
 const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
+const { keyToInstaller, normalizeInstallerKey, smsNumberFor } = require("./lib/routing.js");
+const { sendSms } = require("./lib/twilio.js");
+const { sendWebPush } = require("./lib/webpush.js");
 const { buildCertificate, certSerial, CAL_OPTIONS } = require("./lib/certificate.js");
 const { sendEmail } = require("./lib/resend.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
@@ -58,7 +60,9 @@ async function processCloseout(body, deps) {
           update = (a) => updateRecord({ fetchImpl, ...a }),
           create = (a) => createRecord({ fetchImpl, ...a }),
           list = (a) => listAllRecords({ fetchImpl, ...a }),
-          send = sendEmail, log = console } = deps;
+          send = sendEmail, log = console,
+          sms = (a) => sendSms(a, { fetchImpl, env }),
+          webPush = (k, m) => sendWebPush(k, m, { env, fetchImpl }) } = deps;
   const d = body || {};
   if (!d.recordId) return { status: "error", error: "missing-record" };
   const c = cfg(env);
@@ -289,6 +293,18 @@ async function processCloseout(body, deps) {
     await update({ token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: { "Certificate Sent": true } });
     certSent = true;
   } catch (e) { if (log.error) log.error("closeout cert", e.message); }
+
+  // Fallback nudge (funnel audit 2026-08-02): a cert without a customer email
+  // lands in the installer's inbox — and the customer is often still standing
+  // there. SMS + push right now so the installer grabs the email and resends,
+  // instead of the cert quietly rotting in their mailbox. Best-effort.
+  if (certSent && !toCustomer) {
+    const nudge = `TY: no email on file for ${f.Name || "the customer"} — their certificate went to YOUR inbox. Grab their email while you can, add it in the console, and resend the cert.`;
+    try { await sms({ to: smsNumberFor(owner, env), body: nudge }); }
+    catch (e) { if (log.error) log.error("cert nudge sms", e.message); }
+    try { await webPush(owner, { title: "Certificate needs an email", body: `${f.Name || "Customer"} — add their email + resend`, url: "/installer.html" }); }
+    catch (e) { if (log.error) log.error("cert nudge push", e.message); }
+  }
 
   return { status: "completed", certSent };
 }
