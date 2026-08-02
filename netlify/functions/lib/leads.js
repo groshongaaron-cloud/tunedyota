@@ -5,7 +5,7 @@ const { getMarket } = require("./markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./routing.js");
 const { cfg, createRecord, updateRecord, createTolerant, updateTolerant, listAllRecords } = require("./airtable.js");
 
-const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "chat", "other", "ott-national"];
+const CHANNELS = ["email", "facebook", "instagram", "sms", "phone", "walk-in", "chat", "web", "other", "ott-national"];
 const STAGES = ["New", "Contacted", "Qualified", "Following up", "Booked", "Not now"];
 const ACTIVE_STAGES = ["New", "Contacted", "Qualified", "Following up"];
 
@@ -311,9 +311,11 @@ async function ensureClientRecordForBooking(bookingId, bookingFields, deps = {})
   const c = cfg(env);
   const rows = await list({ token: c.token, baseId: c.baseId, table: c.priority });
   const leads = rows.map(toLeadView);
+  // First-match-wins is deliberate: a phone-shared dupe already linked elsewhere
+  // returns early without writing; B4's duplicate detection surfaces those rows for merge.
   const match = findLeadForBooking(bookingId, bookingFields, leads);
   if (match) {
-    if (match.bookingId) return { leadId: match.id, linked: false, minted: false }; // already linked to this or another booking — leave links alone
+    if (match.bookingId) return { leadId: match.id, linked: match.bookingId === bookingId, minted: false }; // already linked — honest flag: true=this booking (idempotent retry), false=another booking
     const patch = buildLinkPatch(match, toBookingSummary({ id: bookingId, fields: bookingFields }), now);
     await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.priority, id: match.id, fields: patch },
       ["Booking", "Converted Booking", "Stage", "Activity Log"]);

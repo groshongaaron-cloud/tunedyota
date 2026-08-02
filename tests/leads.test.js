@@ -394,4 +394,19 @@ test("ensureClientRecordForBooking: links an unlinked match, mints when none, le
     deps([{ id: "recL2", fields: { Phone: "6125550100", Booking: ["recB9"] } }]));
   assert.equal(other.leadId, "recL2");
   assert.equal(patches.length, 0);
+  // Fix 2: same-booking retry → linked: true, zero writes (idempotency)
+  patches.length = 0; creates.length = 0;
+  const retry = await ensureClientRecordForBooking("recB1", bookingFields,
+    deps([{ id: "recL1", fields: { Phone: "6125550100", Booking: ["recB1"] } }]));
+  assert.deepEqual(retry, { leadId: "recL1", linked: true, minted: false },
+    "retry on same booking must return linked:true");
+  assert.equal(patches.length, 0, "retry must not write");
+  assert.equal(creates.length, 0, "retry must not create");
+});
+
+test("toLeadView: Channel 'web' is recognized as-is, not collapsed to 'other'", () => {
+  // Fix 1: 'web' must be in CHANNELS so validChannel passes and channel is preserved
+  const v = L.toLeadView({ id: "rW", fields: { Name: "X", Channel: "web" } });
+  assert.equal(v.channel, "web", "web channel must round-trip through toLeadView");
+  assert.equal(L.validChannel("web"), true, "web must be a valid channel");
 });
