@@ -2715,6 +2715,7 @@
       '<input id="ecu_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="ECU ID" style="text-transform:uppercase;margin:5px 0">'+
       '<input id="gear_'+b.id+'" autocomplete="off" spellcheck="false" placeholder="Gear ratio (e.g. 4.30)" style="margin:5px 0">'+
       '<input id="mi_'+b.id+'" inputmode="numeric" autocomplete="off" placeholder="Mileage" style="margin:5px 0">'+
+      '<input id="yr_'+b.id+'" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="Model year (e.g. 2022)" style="margin:5px 0" value="'+esc(b.modelYear||'')+'">'+
       '<div class="certpanel" style="margin:8px 0;padding:8px 10px;background:#f0f4eb;border:1px solid #c8d4ba;border-radius:8px">'+
         '<div style="font-size:13px;font-weight:700;margin-bottom:6px">Where should we send your Certificate of Calibration?</div>'+
         '<input id="cem_'+b.id+'" type="email" autocomplete="off" placeholder="Customer email" value="'+esc(b.email||'')+'" style="margin:3px 0 5px">'+
@@ -2792,8 +2793,9 @@
     var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!adminForce && !mi){ fail('Enter the mileage.'); return; }
     var cem=val('cem_'+id);
     var pref=val('cocPref_'+id);
+    var yr=val('yr_'+id).trim().slice(0,4);
     if(STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I've verified this VIN is correct'."); return; } }
-    var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem,preferredContact:pref};
+    var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem,preferredContact:pref,modelYear:yr};
     if(adminForce) extra.adminForce=true;
     openSignOverlay(id, extra);
   }
@@ -2879,6 +2881,7 @@
     var mi=val('mi_'+id).replace(/[^0-9]/g,'');
     var cem=val('cem_'+id);
     var pref=val('cocPref_'+id);
+    var yr=val('yr_'+id).trim().slice(0,4);
     var body={recordId:id,action:'draft'};
     if(vin.length===17) body.vin=vin;
     if(cal) body.calibration=cal;
@@ -2889,6 +2892,7 @@
     if(mi) body.mileage=mi;
     if(cem) body.customerEmail=cem;
     if(pref) body.preferredContact=pref;
+    if(yr) body.modelYear=yr;
     var res, netErr=null;
     try { res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(body)}); }
     catch(e){ netErr=e; }
@@ -2897,7 +2901,18 @@
     var out=await res.json().catch(function(){return{};});
     if(res.ok && out.status==='draft'){
       var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
-      if(b) b.closeoutDraft=true;
+      if(b){
+        b.closeoutDraft=true;
+        if(vin.length===17) b.vin=vin;
+        if(cal) b.calibration=cal;
+        if(tp) b.tuningPlatform=tp;
+        if(ct) b.calibrationType=ct;
+        if(ecu) b.ecuId=ecu;
+        if(gear) b.gearSize=gear;
+        if(mi) b.mileage=mi;
+        if(cem) b.email=cem;
+        if(yr) b.modelYear=yr;
+      }
       renderAll();
       succeed('✓ Draft saved.');
       if(b) jumpToBooking(b);
