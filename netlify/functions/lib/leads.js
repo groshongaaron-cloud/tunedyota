@@ -356,7 +356,7 @@ function mintLeadFields(bookingId, f, now = new Date(), extra = {}) {
 // client-record upkeep must NEVER fail a booking (fail-open), and callers must
 // AWAIT it (Lambda freeze: fire-and-forget never runs).
 async function ensureClientRecordForBooking(bookingId, bookingFields, deps = {}) {
-  const { env = process.env, fetchImpl = fetch, now = new Date(), channel = "web",
+  const { env = process.env, fetchImpl = fetch, now = new Date(), channel = "web", source = "",
           list = (a) => listAllRecords({ fetchImpl, ...a }),
           create = (a) => createRecord({ fetchImpl, ...a }),
           update = (a) => updateRecord({ fetchImpl, ...a }) } = deps;
@@ -373,10 +373,23 @@ async function ensureClientRecordForBooking(bookingId, bookingFields, deps = {})
       ["Booking", "Converted Booking", "Stage", "Activity Log"]);
     return { leadId: match.id, linked: true, minted: false };
   }
-  const fields = mintLeadFields(bookingId, bookingFields, now, { source: `booking:${channel}`, fields: { Channel: channel } });
+  const fields = mintLeadFields(bookingId, bookingFields, now, { source: source || `booking:${channel}`, fields: { Channel: channel } });
   const rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields },
     ["Booking", "Converted Booking", "Stage", "Source", "Channel", "Activity Log", "Model Year"]);
   return { leadId: rec && rec.id, linked: true, minted: true };
+}
+
+// Booking Source string → lead Channel (owner directive 2026-08-02: every lead
+// carries where it came from). normalizeChannel's "other" here means the source
+// names no contact channel — those are web motions ("find-your-exact-tune",
+// "banks-reserve"); a truly sourceless booking is installer-entered (walk-in).
+function channelForBooking(source) {
+  const s = String(source == null ? "" : source).trim().toLowerCase();
+  if (!s) return "walk-in";
+  if (s.includes("ott-national")) return "ott-national";
+  if (s.includes("web")) return "web";
+  const ch = normalizeChannel(s);
+  return ch === "other" ? "web" : ch;
 }
 
 // Two client records that look like the same person: same normalized phone or
@@ -458,6 +471,6 @@ module.exports = {
   buildLinkPatch, buildUnlinkPatch, findLeadForBooking, mintLeadFields,
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, staleLeads, STALE_AFTER_DAYS, installerKeyForPhone,
-  ensureClientRecordForBooking, duplicateLeadsFor,
+  ensureClientRecordForBooking, duplicateLeadsFor, channelForBooking,
   isPlaceholderName, computeMerge,
 };

@@ -1926,7 +1926,7 @@
   // ---- Leads pipeline ----
   var LEAD_STAGES=['New','Contacted','Qualified','Following up','Booked','Not now'];
   var ACTIVE_LEAD_STAGES=LEAD_STAGES.slice(0,LEAD_STAGES.indexOf('Booked'));
-  var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶','ott-national':'🇺🇸',web:'🌐',other:'•'};
+  var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶','ott-national':'🇺🇸',web:'🌐',chat:'🗨',other:'•'};
   async function loadLeads(){
     try{
       var res=await fetch('/.netlify/functions/leads-list',{headers:{'x-installer-token':tok()}});

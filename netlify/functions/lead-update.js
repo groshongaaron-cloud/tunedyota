@@ -77,7 +77,12 @@ async function handler(event, ctx = {}) {
     if (slot && !isValidSlot(slot, owner)) return { statusCode: 400, body: JSON.stringify({ error: "bad-slot" }) };
     const fields = { City: bookCity, "Event Date": dateISO, Name: eff.Name,
       Vehicle: eff.Vehicle, Phone: eff.Phone, Email: eff.Email, Goals: lead.goals,
-      Status: "Booked", Source: `lead:${lead.channel || "convert"}`, Installer: owner };
+      Status: "Booked",
+      // Channel plus generation: keep the lead's granular origin (e.g. chat:instagram)
+      // on the booking so attribution survives conversion (owner directive 2026-08-02).
+      Source: `lead:${lead.channel || "convert"}` +
+        (lead.source && lead.source !== `lead:${lead.channel}` ? ` (${lead.source})` : ""),
+      Installer: owner };
     if (eff["Model Year"]) fields["Model Year"] = eff["Model Year"];
     if (lead.modifications) fields.Modifications = lead.modifications;
     if (slot) fields.Slot = slot;

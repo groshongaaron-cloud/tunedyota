@@ -101,7 +101,10 @@ async function processNotifications(job, deps) {
       Name: d.name, Phone: d.phone || "", Email: d.email || "",
       City: market.city, Vehicle: d.vehicle || "", "Model Year": d.modelYear || "",
       Installer: inst.key,
-    }, { env, fetchImpl, channel: "web" });
+    }, { env, fetchImpl, channel: "web",
+      // Generation, not just channel (owner directive 2026-08-02): the booking
+      // knows its real origin + utm — the client record must not flatten it.
+      source: "booking:" + (d.source || "find-your-exact-tune") + (d.utm_source ? ":" + d.utm_source : "") });
   } catch (e) { if (log.error) log.error("client-record", e.message); }
 
   return { ok: true, emailFailed };

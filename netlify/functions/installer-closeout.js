@@ -10,7 +10,7 @@ const { sendEmail } = require("./lib/resend.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
 const { qrSvg } = require("./lib/qr.js");
 const { accountLink, referralUrl } = require("./lib/client-auth.js");
-const { ensureClientRecordForBooking, toLeadView, logLine, appendActivity } = require("./lib/leads.js");
+const { ensureClientRecordForBooking, toLeadView, logLine, appendActivity, channelForBooking } = require("./lib/leads.js");
 const { CONSENT_VERSION } = require("./lib/consent.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
@@ -30,7 +30,10 @@ async function propagateToClient({ c, list, update, create, env, fetchImpl, log,
   const r = await ensureClientRecordForBooking(recordId,
     { Name: f.Name, Phone: f.Phone || "", Email: f.Email || "", City: f.City || "",
       Vehicle: f.Vehicle || "", "Model Year": f["Model Year"] || modelYear || "", Installer: f.Installer },
-    { env, fetchImpl, now, channel: "walk-in", list, create, update });
+    // Channel from the booking's real origin — a web-funnel booking closed out at
+    // the event must not mint a "walk-in" client record (owner directive 2026-08-02).
+    { env, fetchImpl, now, channel: channelForBooking(f.Source),
+      source: f.Source ? `booking:${f.Source}` : "", list, create, update });
   if (!r || !r.leadId) return;
   const cur = r.minted ? null : toLeadView((await list({ token: c.token, baseId: c.baseId, table: c.priority }))
     .find((x) => x.id === r.leadId) || null);
@@ -105,8 +108,11 @@ async function processCloseout(body, deps) {
     try {
       const fields = { City: f.City || "", Name: f.Name || "", Phone: f.Phone || "", Email: f.Email || "",
         Vehicle: f.Vehicle || "", Modifications: f.Modifications || "", Installer: owner,
-        Reason: `No-show — ${f.City || ""} ${dateOnly(f["Event Date"])}`.trim(), Source: "installer:no-show" };
-      await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields }, ["Modifications", "Source"]);
+        Reason: `No-show — ${f.City || ""} ${dateOnly(f["Event Date"])}`.trim(), Source: "installer:no-show",
+        // Source says WHY they're waitlisted; Channel keeps WHERE they came from —
+        // without it the row displays as "other" and the origin is lost.
+        Channel: channelForBooking(f.Source) };
+      await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields }, ["Modifications", "Source", "Channel"]);
       waitlisted = true;
     } catch (e) { if (log.error) log.error("closeout waitlist", e.message); }
     return { status: "noshow", waitlisted };
