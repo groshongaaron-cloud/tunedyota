@@ -125,9 +125,10 @@ function logLine(now, text) { return `${new Date(now).toISOString().slice(0, 16)
 function appendActivity(existing, line) { return existing ? existing + "\n" + line : line; }
 
 // Placeholder identities minted by channel adapters and the contact resolver.
-// Shared by ingest name-backfill and merge fill logic.
+// Shared by ingest name-backfill and merge fill logic. "Chat" requires the \b
+// word boundary + trailing space-or-( so real names like "Chad" never match.
 function isPlaceholderName(n) {
-  return !String(n || "").trim() || /^(caller|text|unknown)\b/i.test(String(n).trim());
+  return !String(n || "").trim() || /^(caller|text|unknown|chat)\b[\s(]/i.test(String(n).trim()) || /^(caller|text|unknown)$/i.test(String(n).trim());
 }
 
 const MERGE_FILL_FIELDS = ["Phone", "Email", "Vehicle", "Model Year", "City", "Goals", "Modifications",

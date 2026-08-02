@@ -82,6 +82,11 @@
 [functions."ga-weekly-report"]
   schedule = "0 13 * * 1"
 
+# Quiet-chat harvest: mint leads from never-escalated chat/DM sessions that
+# captured contact info, tagged to their platform (netlify/functions/chat-harvest.js).
+[functions."chat-harvest"]
+  schedule = "30 13 * * *"
+
 # Legacy Wix redirects live in site/_redirects (single source of truth; it also
 # carries the generated .html→clean-URL 301! block from scripts/build-redirects.mjs).
 
