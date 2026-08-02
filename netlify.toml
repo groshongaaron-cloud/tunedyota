@@ -97,6 +97,11 @@
 [functions."rebook-nudge"]
   schedule = "30 15 * * 1"
 
+# Weekly channel-ROI funnel report, Mondays 13:15 UTC ≈ 8:15am CT — leads by
+# channel, 90d conversion, installs by origin (netlify/functions/funnel-report.js).
+[functions."funnel-report"]
+  schedule = "15 13 * * 1"
+
 # Legacy Wix redirects live in site/_redirects (single source of truth; it also
 # carries the generated .html→clean-URL 301! block from scripts/build-redirects.mjs).
 
