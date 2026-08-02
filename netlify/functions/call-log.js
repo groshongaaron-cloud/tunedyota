@@ -6,6 +6,7 @@
 // rendering as a second row. Auth: installer token (same as the other console
 // functions). Read-only — never mutates Twilio state.
 const { resolveInstaller } = require("./lib/installer-auth.js");
+const { withCors } = require("./lib/cors.js");
 
 async function handler(event, ctx = {}) {
   const env = ctx.env || process.env;
@@ -48,4 +49,4 @@ async function handler(event, ctx = {}) {
     body: JSON.stringify({ calls: rows }) };
 }
 
-module.exports = { handler };
+module.exports = { handler: withCors(handler) };

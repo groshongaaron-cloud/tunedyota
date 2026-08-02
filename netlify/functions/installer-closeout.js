@@ -14,6 +14,7 @@ const { qrSvg } = require("./lib/qr.js");
 const { accountLink, referralUrl } = require("./lib/client-auth.js");
 const { ensureClientRecordForBooking, toLeadView, logLine, appendActivity, channelForBooking } = require("./lib/leads.js");
 const { CONSENT_VERSION } = require("./lib/consent.js");
+const { withCors } = require("./lib/cors.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
 const OWNER = "info@tunedyota.com";
@@ -322,4 +323,4 @@ async function handler(event) {
     : (out.error === "store-unavailable" || out.error === "send-failed") ? 502 : 400;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processCloseout };
+module.exports = { handler: withCors(handler), processCloseout };

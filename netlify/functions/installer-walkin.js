@@ -10,6 +10,7 @@ const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 const { ensureClientRecordForBooking } = require("./lib/leads.js");
+const { withCors } = require("./lib/cors.js");
 
 async function processWalkin(body, deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false,
@@ -106,4 +107,4 @@ async function handler(event) {
   const code = out.status !== "error" ? 200 : (out.error === "store-unavailable" ? 502 : 400);
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processWalkin };
+module.exports = { handler: withCors(handler), processWalkin };

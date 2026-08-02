@@ -9,6 +9,7 @@ const { normalizePhone, normalizeEmail } = require("./lib/leads.js");
 const { triggerBackground } = require("./lib/background.js");
 const { verifyReferral } = require("./lib/client-auth.js");
 const { pcmProtocol } = require("./lib/pcm-protocol.js");
+const { withCors } = require("./lib/cors.js");
 
 // The back-to-back suggestion for a second truck: the open slot adjacent to the
 // client's existing one (later preferred). Meaningless in generic slot mode —
@@ -139,4 +140,4 @@ async function handler(event) {
   const code = out.error === "missing-engine" ? 400 : out.status === "error" ? 502 : out.status === "conflict" ? 409 : 200;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processBooking };
+module.exports = { handler: withCors(handler), processBooking };

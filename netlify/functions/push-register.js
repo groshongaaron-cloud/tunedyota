@@ -4,6 +4,7 @@
 // grants notification permission. Dedups by token (update, not duplicate).
 const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
+const { withCors } = require("./lib/cors.js");
 
 const DEVICES = (env) => env.AIRTABLE_DEVICES_TABLE || "Push Devices";
 
@@ -35,4 +36,4 @@ async function handler(event) {
   const code = out.status !== "error" ? 200 : (out.error === "missing-token" ? 400 : 502);
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processRegister };
+module.exports = { handler: withCors(handler), processRegister };

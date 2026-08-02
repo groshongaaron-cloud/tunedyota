@@ -14,6 +14,7 @@ const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { notifyOwner } = require("./lib/alert.js");
 const { detectVisitIntent } = require("./lib/urgent-visit.js");
 const chatAdmin = require("./lib/chat-admin.js");
+const { withCors } = require("./lib/cors.js");
 
 const MAX_MESSAGES = 40;
 const MAX_CHARS = 1000;
@@ -278,4 +279,4 @@ async function handler(event) {
   return { statusCode: out.status, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out.body) };
 }
 
-module.exports = { handler, processChat, escalate, urgentEscalate, installerOp, MAX_MESSAGES, MAX_CHARS };
+module.exports = { handler: withCors(handler), processChat, escalate, urgentEscalate, installerOp, MAX_MESSAGES, MAX_CHARS };

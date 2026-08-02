@@ -4,6 +4,7 @@
 // after the browser grants notification permission.
 const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
+const { withCors } = require("./lib/cors.js");
 
 const SUBS = (env) => env.AIRTABLE_WEBPUSH_TABLE || "Web Push Subs";
 
@@ -35,4 +36,4 @@ async function handler(event) {
   const code = out.status !== "error" ? 200 : (out.error === "missing-subscription" ? 400 : 502);
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processSubscribe };
+module.exports = { handler: withCors(handler), processSubscribe };

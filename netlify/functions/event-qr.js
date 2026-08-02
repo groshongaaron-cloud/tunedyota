@@ -3,6 +3,7 @@
 // Validates the slug against real markets so this can't QR arbitrary strings.
 const { qrSvg } = require("./lib/qr.js");
 const { parseEventSlug, eventUrl } = require("./lib/event-links.js");
+const { withCors } = require("./lib/cors.js");
 
 async function handler(event) {
   const slug = ((event && event.queryStringParameters) || {}).e || "";
@@ -18,4 +19,4 @@ async function handler(event) {
   }
   return { statusCode: 200, headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "public, max-age=3600" }, body: svg };
 }
-module.exports = { handler };
+module.exports = { handler: withCors(handler) };

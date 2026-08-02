@@ -11,6 +11,7 @@ const { cfg, getRecord, updateRecord, createRecord, createTolerant, listAllRecor
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { toLeadView, logLine, appendActivity, findLeadForBooking, mintLeadFields } = require("./lib/leads.js");
 const { normalizeInstallerKey } = require("./lib/routing.js");
+const { withCors } = require("./lib/cors.js");
 
 async function processClientNote(body, deps) {
   const { env = process.env, fetchImpl = fetch, key, admin = false, now = new Date(), log = console,
@@ -90,4 +91,4 @@ async function handler(event) {
     : out.error === "store-unavailable" ? 502 : 400;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processClientNote };
+module.exports = { handler: withCors(handler), processClientNote };

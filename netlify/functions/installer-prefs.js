@@ -6,6 +6,7 @@
 // store-unavailable and the console falls back to per-device (localStorage) persistence.
 const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
 const { resolveInstaller } = require("./lib/installer-auth.js");
+const { withCors } = require("./lib/cors.js");
 
 const PREFS = (env) => env.AIRTABLE_INSTALLER_PREFS_TABLE || "Installer Prefs";
 // Must match the switcher options in site/installer.html.
@@ -61,4 +62,4 @@ async function handler(event) {
   return { statusCode: 405, body: "method not allowed" };
 }
 
-module.exports = { handler, processGetPrefs, processSetPrefs, THEMES };
+module.exports = { handler: withCors(handler), processGetPrefs, processSetPrefs, THEMES };

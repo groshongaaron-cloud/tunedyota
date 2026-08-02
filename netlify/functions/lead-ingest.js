@@ -4,6 +4,7 @@
 const { processLeadIngest } = require("./lib/leads.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { secretEquals } = require("./lib/secrets.js");
+const { withCors } = require("./lib/cors.js");
 
 function taskAuthed(headers, env) {
   const s = env && env.INTERNAL_TASK_SECRET;
@@ -24,4 +25,4 @@ async function handler(event, ctx = {}) {
   const code = out.status !== "error" ? 200 : (out.error === "store-unavailable" ? 502 : 400);
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, taskAuthed };
+module.exports = { handler: withCors(handler), taskAuthed };

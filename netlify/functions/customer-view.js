@@ -11,6 +11,7 @@ const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { normalizePhone, normalizeEmail, toLeadView } = require("./lib/leads.js");
 const { normalizeInstallerKey } = require("./lib/routing.js");
 const { TABLE: chatTable, parseTranscript } = require("./lib/chat-store.js");
+const { withCors } = require("./lib/cors.js");
 
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 
@@ -97,4 +98,4 @@ async function handler(event, ctx = {}) {
   return { statusCode: 200, headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status: "ok", partial, bookings, leads, chats, calls }) };
 }
-module.exports = { handler };
+module.exports = { handler: withCors(handler) };

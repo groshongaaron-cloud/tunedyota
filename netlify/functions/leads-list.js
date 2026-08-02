@@ -4,6 +4,7 @@
 const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { toLeadView, scopeLeads, ACTIVE_STAGES, toBookingSummary, bookingMatchesForLead, clientForLead, staleLeads, duplicateLeadsFor } = require("./lib/leads.js");
+const { withCors } = require("./lib/cors.js");
 
 function summarize(leads, today) {
   const byChannel = {}, byStage = {};
@@ -59,4 +60,4 @@ async function handler(event, ctx = {}) {
   return { statusCode: 200, headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ leads, admin, summary: admin ? summarize(all, today) : summarize(leads, today) }) };
 }
-module.exports = { handler, summarize };
+module.exports = { handler: withCors(handler), summarize };

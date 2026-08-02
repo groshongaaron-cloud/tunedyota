@@ -5,6 +5,7 @@
 const { cfg, getRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { normalizeInstallerKey } = require("./lib/routing.js");
+const { withCors } = require("./lib/cors.js");
 
 async function getSignature(id, deps) {
   const { env = process.env, fetchImpl = fetch, key, admin = false, log = console,
@@ -32,4 +33,4 @@ async function handler(event) {
     : out.error === "missing-id" ? 400 : 502;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, getSignature };
+module.exports = { handler: withCors(handler), getSignature };

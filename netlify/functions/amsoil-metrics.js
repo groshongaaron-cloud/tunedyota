@@ -5,6 +5,7 @@
 // funnel, a 14-day sparkline, and the most recent clicks. Read-only.
 const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
+const { withCors } = require("./lib/cors.js");
 
 const CLICKS = (env) => env.AIRTABLE_CLICKS_TABLE || "AMSOIL Clicks";
 const dOnly = (s) => String(s == null ? "" : s).slice(0, 10);
@@ -66,4 +67,4 @@ async function handler(event) {
     return { statusCode: 502, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ error: e.message }) };
   }
 }
-module.exports = { handler, aggregate };
+module.exports = { handler: withCors(handler), aggregate };

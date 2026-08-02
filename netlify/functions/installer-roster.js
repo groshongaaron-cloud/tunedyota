@@ -13,6 +13,7 @@ const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 const EVENTS = require("./lib/events-data.js");
 const { deriveVehicle, resolveCommission } = require("./lib/ott-commission.js");
+const { withCors } = require("./lib/cors.js");
 
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 const bySlot = (a, b) => String(a.slot || "").localeCompare(String(b.slot || ""), undefined, { numeric: true });
@@ -109,4 +110,4 @@ async function handler(event) {
     return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
   } catch (e) { return { statusCode: 502, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ error: e.message }) }; }
 }
-module.exports = { handler, buildRoster };
+module.exports = { handler: withCors(handler), buildRoster };

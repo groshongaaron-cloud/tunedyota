@@ -4,6 +4,7 @@ const { getEventsForCity } = require("./lib/events.js");
 const { cfg, listRecords } = require("./lib/airtable.js");
 const { slotsFor, capacityFor, slotMode, computeOpen, windowSlots, formatSlot } = require("./lib/slots.js");
 const EVENTS = require("./lib/events-data.js");
+const { withCors } = require("./lib/cors.js");
 
 async function getAvailability(city, deps) {
   const { fetchImpl = fetch, env = process.env, log = console, now } = deps;
@@ -45,4 +46,4 @@ async function handler(event) {
   const out = await getAvailability(city, { fetchImpl: fetch, env: process.env });
   return { statusCode: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, getAvailability };
+module.exports = { handler: withCors(handler), getAvailability };

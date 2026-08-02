@@ -6,6 +6,7 @@
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { compareVin } = require("./lib/vin-guard.js");
 const { vinCheckDigitOk } = require("./lib/vin.js");
+const { withCors } = require("./lib/cors.js");
 
 const NHTSA = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/";
 // Same wording vin-guard emits on NHTSA ErrorCode 1, so the two sources dedupe.
@@ -49,4 +50,4 @@ async function handler(event) {
   const out = await processVinDecode(body, {});
   return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processVinDecode };
+module.exports = { handler: withCors(handler), processVinDecode };

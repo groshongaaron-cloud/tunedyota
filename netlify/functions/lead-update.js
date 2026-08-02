@@ -9,6 +9,7 @@ const { toLeadView, applyLeadUpdate, logLine, appendActivity, toBookingSummary, 
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 const { isValidSlot, formatSlot } = require("./lib/slots.js");
+const { withCors } = require("./lib/cors.js");
 
 async function handler(event, ctx = {}) {
   const env = ctx.env || process.env;
@@ -176,4 +177,4 @@ async function handler(event, ctx = {}) {
   } catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
   return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", fields: built.fields }) };
 }
-module.exports = { handler };
+module.exports = { handler: withCors(handler) };

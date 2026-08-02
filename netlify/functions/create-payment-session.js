@@ -5,6 +5,7 @@
 // NOT LIVE until the Converge env vars exist (returns 503 payments-not-configured).
 // See docs/operations/online-payments-go-live.md.
 const { priceForSku } = require("./lib/magnuson-prices.js");
+const { withCors } = require("./lib/cors.js");
 
 const PROD_TOKEN_URL = "https://api.convergepay.com/hosted-payments/transaction_token";
 const DEMO_TOKEN_URL = "https://api.demo.convergepay.com/hosted-payments/transaction_token";
@@ -59,4 +60,4 @@ async function handler(event) {
   return { statusCode, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 
-module.exports = { handler, createSession, PROD_TOKEN_URL, DEMO_TOKEN_URL };
+module.exports = { handler: withCors(handler), createSession, PROD_TOKEN_URL, DEMO_TOKEN_URL };

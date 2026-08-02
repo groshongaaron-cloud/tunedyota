@@ -4,6 +4,7 @@
 // so `node --test` doesn't discover a production function as a test file.)
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { sendWebPush } = require("./lib/webpush.js");
+const { withCors } = require("./lib/cors.js");
 
 async function processTest(deps) {
   const { key, push = sendWebPush } = deps;
@@ -17,4 +18,4 @@ async function handler(event) {
   const out = await processTest({ key });
   return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
-module.exports = { handler, processTest };
+module.exports = { handler: withCors(handler), processTest };

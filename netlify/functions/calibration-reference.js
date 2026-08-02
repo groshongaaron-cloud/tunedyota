@@ -3,6 +3,7 @@
 // Returns the full row set for responsive client-side filtering + the coverage report.
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { allRows, models, coverage } = require("./lib/calibration-reference.js");
+const { withCors } = require("./lib/cors.js");
 
 async function handler(event) {
   const key = resolveInstaller((event && event.headers) || {}, process.env);
@@ -18,4 +19,4 @@ async function handler(event) {
     body: JSON.stringify({ rows, models: models(), coverage: coverage() }),
   };
 }
-module.exports = { handler };
+module.exports = { handler: withCors(handler) };

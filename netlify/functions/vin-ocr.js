@@ -5,6 +5,7 @@
 // never stored). Degrades gracefully when ANTHROPIC_API_KEY is unset.
 const { resolveInstaller } = require("./lib/installer-auth.js");
 const { readVinFromImage } = require("./lib/vin-ocr-core.js");
+const { withCors } = require("./lib/cors.js");
 
 async function handler(event, _ctx, deps = {}) {
   const { readImpl = readVinFromImage, log = console } = deps;
@@ -27,4 +28,4 @@ async function handler(event, _ctx, deps = {}) {
   return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 
-module.exports = { handler };
+module.exports = { handler: withCors(handler) };

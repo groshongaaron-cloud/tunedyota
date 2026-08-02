@@ -9,6 +9,7 @@
 const { notifyOwner } = require("./lib/alert.js");
 const { processLeadIngest } = require("./lib/leads.js");
 const { priceForSku } = require("./lib/magnuson-prices.js");
+const { withCors } = require("./lib/cors.js");
 
 const s = (v, n) => String(v == null ? "" : v).trim().slice(0, n);
 
@@ -71,4 +72,4 @@ async function handler(event) {
   return { statusCode: out.status === "ok" ? 200 : 400, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 
-module.exports = { handler, recordPayment };
+module.exports = { handler: withCors(handler), recordPayment };

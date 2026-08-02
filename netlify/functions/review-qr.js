@@ -3,6 +3,7 @@
 // SVG QR for the installer console's "Ask for a review" overlay. Reuses lib/qr.js.
 // Public on purpose — a review link is public info, so the console loads it via <img>.
 const { qrSvg } = require("./lib/qr.js");
+const { withCors } = require("./lib/cors.js");
 
 function buildReviewQr(env = process.env) {
   const url = String((env && env.GOOGLE_REVIEW_URL) || "").trim();
@@ -15,4 +16,4 @@ async function handler() {
   if (!out.ok) return { statusCode: 404, headers: { "Content-Type": "text/plain" }, body: "review url not configured" };
   return { statusCode: 200, headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Cache-Control": "public, max-age=300" }, body: out.svg };
 }
-module.exports = { handler, buildReviewQr };
+module.exports = { handler: withCors(handler), buildReviewQr };

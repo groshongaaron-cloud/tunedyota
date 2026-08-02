@@ -1,6 +1,7 @@
 // First-party funnel-step beacon sink. Writes one Funnel Events row per step.
 // Always 204 (beacons ignore the response); never throws into the request.
 const { cfg, createRecord } = require("./lib/airtable.js");
+const { withCors } = require("./lib/cors.js");
 
 // Public unauthenticated beacon: cap every string before it reaches Airtable so
 // a hostile client can't stuff megabytes into a row.
@@ -28,4 +29,4 @@ async function handler(event) {
   await processTrack(body, { fetchImpl: fetch });
   return { statusCode: 204, body: "" };
 }
-module.exports = { handler, processTrack };
+module.exports = { handler: withCors(handler), processTrack };

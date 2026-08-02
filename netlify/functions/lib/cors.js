@@ -18,4 +18,17 @@ function corsHeaders(origin) {
   };
 }
 
-module.exports = { corsHeaders, ALLOWED_ORIGINS };
+// Wrap a handler so it speaks CORS for the app origins: answers preflight
+// before auth/method checks, and merges CORS headers into every response
+// (handler-set headers win on conflict).
+function withCors(handler) {
+  return async function (event, ...rest) {
+    const headers = corsHeaders((((event || {}).headers || {}).origin || "").toString());
+    if (event && event.httpMethod === "OPTIONS") return { statusCode: 204, headers };
+    const res = await handler(event, ...rest);
+    if (!res || typeof res !== "object") return res;
+    return { ...res, headers: { ...headers, ...(res.headers || {}) } };
+  };
+}
+
+module.exports = { corsHeaders, withCors, ALLOWED_ORIGINS };

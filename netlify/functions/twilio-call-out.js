@@ -8,6 +8,7 @@ const { resolveInstaller } = require("./lib/installer-auth.js");
 const { smsNumberFor } = require("./lib/routing.js");
 const { normalizePhone } = require("./lib/leads.js");
 const { webhookUrl, formatPhone, ingestLead } = require("./lib/twilio.js");
+const { withCors } = require("./lib/cors.js");
 
 async function handler(event, ctx = {}) {
   const env = ctx.env || process.env;
@@ -51,4 +52,4 @@ async function handler(event, ctx = {}) {
     body: JSON.stringify({ ok: true, callSid: call.sid }) };
 }
 
-module.exports = { handler };
+module.exports = { handler: withCors(handler) };

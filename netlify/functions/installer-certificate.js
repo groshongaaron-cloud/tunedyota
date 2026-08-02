@@ -6,6 +6,7 @@ const { cfg, getRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { certHtmlForRecord } = require("./lib/cert-render.js");
 const { normalizeInstallerKey } = require("./lib/routing.js");
+const { withCors } = require("./lib/cors.js");
 
 async function renderCertificate(recordId, deps) {
   const { env = process.env, fetchImpl = fetch, key, admin = false,
@@ -32,4 +33,4 @@ async function handler(event) {
   }
   return { statusCode: 200, headers: { "Content-Type": "text/html; charset=utf-8" }, body: out.html };
 }
-module.exports = { handler, renderCertificate };
+module.exports = { handler: withCors(handler), renderCertificate };
