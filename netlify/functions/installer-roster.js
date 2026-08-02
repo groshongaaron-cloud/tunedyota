@@ -70,6 +70,7 @@ async function buildRoster(deps) {
       tuningPlatform: f["Tuning Platform"] || "", calibrationType: f["Calibration Type"] || "",
       ecuId: f["ECU ID"] || "", gearSize: f["Gear Size"] || "", mileage: f.Mileage || "",
       certDelivery: f["Cert Delivery"] || "",
+      preferredContact: f["Preferred Contact"] || "",
       signed: !!(f["Customer Signature"] && String(f["Customer Signature"]).trim()),
       closeoutDraft: !!f["Closeout Draft"],
       commission,

@@ -2764,6 +2764,8 @@
     var miEl = c.querySelector('#mi_'+b.id);
     if(miEl && !miEl.value && b.mileage) miEl.value = b.mileage;
     if(vinEl && !vinEl.value && b.vin){ vinEl.value = b.vin; scheduleVinCheck(b.id); }
+    var prefEl = c.querySelector('#cocPref_'+b.id);
+    if(prefEl && !prefEl.value && b.preferredContact) prefEl.value = b.preferredContact;
     renderWhoStrip(c,b);
     wireCust(c,b); wireNotes(c,b);
     return c;
@@ -2794,7 +2796,7 @@
     var cem=val('cem_'+id);
     var pref=val('cocPref_'+id);
     var yr=val('yr_'+id).trim().slice(0,4);
-    if(STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I've verified this VIN is correct'."); return; } }
+    if(!adminForce && STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I\\'ve verified this VIN is correct'."); return; } }
     var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem,preferredContact:pref,modelYear:yr};
     if(adminForce) extra.adminForce=true;
     openSignOverlay(id, extra);
@@ -2912,6 +2914,7 @@
         if(mi) b.mileage=mi;
         if(cem) b.email=cem;
         if(yr) b.modelYear=yr;
+        if(pref) b.preferredContact=pref;
       }
       renderAll();
       succeed('✓ Draft saved.');
