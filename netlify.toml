@@ -102,6 +102,12 @@
 [functions."funnel-report"]
   schedule = "15 13 * * 1"
 
+# Weekly chat-quality review, Mondays 13:45 UTC ≈ 8:45am CT — grades the week's
+# real conversations (AI + installer turns) against the NEPQ standard and emails
+# the owner exemplars + coaching + systemic fixes (netlify/functions/chat-review.js).
+[functions."chat-review"]
+  schedule = "45 13 * * 1"
+
 # Legacy Wix redirects live in site/_redirects (single source of truth; it also
 # carries the generated .html→clean-URL 301! block from scripts/build-redirects.mjs).
 
