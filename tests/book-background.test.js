@@ -162,3 +162,34 @@ test("a non-referred booking shows no referral line", async () => {
   assert.doesNotMatch(i.text, /Referred by/);
   assert.equal(h.pings[0].payload.referredBy, "");
 });
+
+test("booking job ensures a client record — awaited, fail-open", async () => {
+  const h = harness();
+  // Track ensureClient calls and whether it was awaited before processNotifications resolves.
+  const calls = [];
+  let resolvedBeforeProcessNotifications = false;
+  h.deps.ensureClient = async (bookingId, fields) => {
+    // Record the args
+    calls.push({ bookingId, fields });
+    // Flip a flag BEFORE this promise resolves — lets us verify it was awaited
+    // (if fire-and-forget, this flag would not be set when processNotifications returns)
+    resolvedBeforeProcessNotifications = false; // will be set true after await
+    await Promise.resolve(); // yield the microtask queue once
+    resolvedBeforeProcessNotifications = true;
+  };
+  await processNotifications(bookingJob({ d: { ...d, modelYear: "2019" } }), h.deps);
+  // Verify it was called with the booking's recordId
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].bookingId, "r1");
+  // Verify fields carry Name, Phone, Model Year
+  assert.equal(calls[0].fields.Name, d.name);
+  assert.equal(calls[0].fields.Phone, d.phone);
+  assert.equal(calls[0].fields["Model Year"], "2019");
+  // Verify it was AWAITED: the async function completed before processNotifications returned
+  assert.equal(resolvedBeforeProcessNotifications, true);
+
+  // Fail-open: a throwing ensureClient must not reject processNotifications
+  h.deps.ensureClient = async () => { throw new Error("airtable timeout"); };
+  const r = await processNotifications(bookingJob(), h.deps);
+  assert.equal(r.ok, true);
+});

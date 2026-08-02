@@ -14,6 +14,7 @@ const { sendPush } = require("./lib/push.js");
 const { sendWebPush } = require("./lib/webpush.js");
 const { buildIcs } = require("./lib/ics.js");
 const tpl = require("./lib/templates.js");
+const { ensureClientRecordForBooking } = require("./lib/leads.js");
 
 // Sender must be on the Resend-verified domain (send.tunedyota.events).
 // The mailbox (events@) is arbitrary — Resend sends from it without an inbox.
@@ -42,7 +43,8 @@ async function reportEmailFailure({ fetchImpl, env, notify, update, c, table, id
 async function processNotifications(job, deps) {
   const { fetchImpl = fetch, env = process.env, send = sendEmail, log = console,
           notify = notifyOwner, update = updateRecord, ping = pingN8n, push = sendPush,
-          webPush = sendWebPush } = deps;
+          webPush = sendWebPush,
+          ensureClient = ensureClientRecordForBooking } = deps;
   const c = cfg(env);
   const d = (job && job.d) || {};
   const inst = job && job.inst;
@@ -93,6 +95,14 @@ async function processNotifications(job, deps) {
     referredBy: job.referredBy || "",
     emailFailed,
   } });
+
+  try {
+    await ensureClient(job.recordId, {
+      Name: d.name, Phone: d.phone || "", Email: d.email || "",
+      City: market.city, Vehicle: d.vehicle || "", "Model Year": d.modelYear || "",
+      Installer: inst.key,
+    }, { env, fetchImpl, channel: "web" });
+  } catch (e) { if (log.error) log.error("client-record", e.message); }
 
   return { ok: true, emailFailed };
 }

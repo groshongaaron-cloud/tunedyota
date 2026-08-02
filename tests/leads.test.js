@@ -368,3 +368,30 @@ test("mintLeadFields: market-routed, linked back, Model Year carried", () => {
   assert.ok(out.Installer, "market routing sets an installer");
   assert.match(out["Activity Log"], /minted from booking recB1/);
 });
+
+test("ensureClientRecordForBooking: links an unlinked match, mints when none, leaves other-booking links alone", async () => {
+  const { ensureClientRecordForBooking } = require("../netlify/functions/lib/leads.js");
+  const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" };
+  const bookingFields = { Name: "Sam", Phone: "6125550100", Email: "", City: "Madison", Vehicle: "Tacoma", Installer: ["aaron"] };
+  // unlinked phone match → linked
+  const patches = [], creates = [];
+  const deps = (rows) => ({ env, now: new Date("2026-08-01T12:00:00Z"), channel: "web",
+    list: async () => rows,
+    update: async (a) => { patches.push(a); return {}; },
+    create: async (a) => { creates.push(a); return { id: "recMint" }; } });
+  const linked = await ensureClientRecordForBooking("recB1", bookingFields,
+    deps([{ id: "recL1", fields: { Name: "Sam", Phone: "6125550100", Stage: "New" } }]));
+  assert.deepEqual(linked, { leadId: "recL1", linked: true, minted: false });
+  assert.deepEqual(patches[0].fields.Booking, ["recB1"]);
+  assert.equal(patches[0].fields.Stage, "Booked");
+  // no match → minted
+  const minted = await ensureClientRecordForBooking("recB2", bookingFields, deps([]));
+  assert.deepEqual(minted, { leadId: "recMint", linked: true, minted: true });
+  assert.equal(creates[0].fields.Channel, "web");
+  // match already linked to a DIFFERENT booking → untouched (single-link stays honest)
+  patches.length = 0;
+  const other = await ensureClientRecordForBooking("recB3", bookingFields,
+    deps([{ id: "recL2", fields: { Phone: "6125550100", Booking: ["recB9"] } }]));
+  assert.equal(other.leadId, "recL2");
+  assert.equal(patches.length, 0);
+});

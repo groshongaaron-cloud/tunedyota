@@ -298,6 +298,33 @@ function mintLeadFields(bookingId, f, now = new Date(), extra = {}) {
   return fields;
 }
 
+// Ensure a client record exists and is linked for a just-created booking.
+// The universal first-touch rule (spec 2026-07-31): every booking either links
+// to the existing client record or mints one. Callers wrap in try/catch —
+// client-record upkeep must NEVER fail a booking (fail-open), and callers must
+// AWAIT it (Lambda freeze: fire-and-forget never runs).
+async function ensureClientRecordForBooking(bookingId, bookingFields, deps = {}) {
+  const { env = process.env, fetchImpl = fetch, now = new Date(), channel = "web",
+          list = (a) => listAllRecords({ fetchImpl, ...a }),
+          create = (a) => createRecord({ fetchImpl, ...a }),
+          update = (a) => updateRecord({ fetchImpl, ...a }) } = deps;
+  const c = cfg(env);
+  const rows = await list({ token: c.token, baseId: c.baseId, table: c.priority });
+  const leads = rows.map(toLeadView);
+  const match = findLeadForBooking(bookingId, bookingFields, leads);
+  if (match) {
+    if (match.bookingId) return { leadId: match.id, linked: false, minted: false }; // already linked to this or another booking — leave links alone
+    const patch = buildLinkPatch(match, toBookingSummary({ id: bookingId, fields: bookingFields }), now);
+    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.priority, id: match.id, fields: patch },
+      ["Booking", "Converted Booking", "Stage", "Activity Log"]);
+    return { leadId: match.id, linked: true, minted: false };
+  }
+  const fields = mintLeadFields(bookingId, bookingFields, now, { source: `booking:${channel}`, fields: { Channel: channel } });
+  const rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.priority, fields },
+    ["Booking", "Converted Booking", "Stage", "Source", "Channel", "Activity Log", "Model Year"]);
+  return { leadId: rec && rec.id, linked: true, minted: true };
+}
+
 const STALE_AFTER_DAYS = 30;
 
 // The fell-through-the-cracks bucket: active stage, nothing scheduled (a future
@@ -367,4 +394,5 @@ module.exports = {
   buildLinkPatch, buildUnlinkPatch, findLeadForBooking, mintLeadFields,
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, staleLeads, STALE_AFTER_DAYS, installerKeyForPhone,
+  ensureClientRecordForBooking,
 };
