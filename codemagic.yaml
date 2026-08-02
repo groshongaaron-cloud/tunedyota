@@ -51,11 +51,8 @@ workflows:
       app_store_connect: tunedyota-asc
     environment:
       node: 20
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.tunedyota.app
-      vars:
-        APP_ID: com.tunedyota.app
+      groups:
+        - appstore_credentials  # CERTIFICATE_PRIVATE_KEY (secure) — RSA 2048 for cert creation
     scripts:
       - name: Install app deps
         script: |
@@ -66,6 +63,17 @@ workflows:
       - name: Capacitor sync (runs pod install)
         script: |
           cd app && npx cap sync ios
+      # Explicit signing (NOT the declarative ios_signing block): build #1
+      # proved the automatic flow fetches without creating against an empty
+      # account and dies with "No matching profiles found". fetch-signing-files
+      # --create makes the distribution cert (from CERTIFICATE_PRIVATE_KEY) and
+      # the App Store profile on demand; the tunedyota-asc integration injects
+      # the APP_STORE_CONNECT_* auth the CLI reads.
+      - name: Fetch or create signing files
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files com.tunedyota.app --type IOS_APP_STORE --create
+          keychain add-certificates
       - name: Apply signing profiles
         script: |
           xcode-project use-profiles
