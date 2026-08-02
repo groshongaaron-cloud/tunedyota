@@ -1735,7 +1735,7 @@
     // Full install address — optional, feeds the card's maps/navigation link.
     var ad=mkInput('Install address (street, city) — optional'); ad.autocomplete='street-address';
     var tm=mkInput('Time (e.g. 10:30 AM) — optional');
-    var yr=mkInput('Year (optional)'); yr.type='number'; yr.min='1990'; yr.max='2099'; yr.placeholder='Year (optional)';
+    var yr=mkInput('Year (optional)'); yr.type='number'; yr.min='1990'; yr.max='2099';
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Add walk-in';
     box.appendChild(n); box.appendChild(v); box.appendChild(p); box.appendChild(lc); box.appendChild(ad); box.appendChild(tm); box.appendChild(em); box.appendChild(yr); box.appendChild(btn);
     det.appendChild(box);
@@ -1818,7 +1818,7 @@
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Log walk-in';
     var em=mkInput('Customer email (for their certificate)'); em.type='email';
     var tm=mkInput('Time (e.g. 10:30 AM) — optional');
-    var yr=mkInput('Model year (optional)'); yr.type='number'; yr.min='1990'; yr.max='2099'; yr.placeholder='Year (optional)';
+    var yr=mkInput('Year (optional)'); yr.type='number'; yr.min='1990'; yr.max='2099';
     var instSel=instSelect();   // admin only: direct-assign to any installer
     [n,v,p,ld,dt,lc,city,ad,tm,em,yr].forEach(function(el){ box.appendChild(el); });
     if(instSel) box.appendChild(instSel);

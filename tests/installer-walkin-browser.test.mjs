@@ -39,15 +39,17 @@ before(async () => {
 after(async () => { if (browser) await browser.close(); if (server) server.close(); });
 
 // Boot a page with a stubbed roster + a walk-in endpoint that emulates create + clientKey
-// dedupe + unknown-city rejection. Returns { page, created }.
+// dedupe + unknown-city rejection. Returns { page, created, bodies }.
+// `bodies` captures the raw parsed POST body of every installer-walkin request.
 async function boot(roster) {
-  const created = []; const byCK = new Map();
+  const created = []; const bodies = []; const byCK = new Map();
   const page = await (await browser.newContext()).newPage();
   await page.route("**/sw.js", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "/*noop*/" }));
   await page.route("**/installer-roster**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(roster) }));
   await page.route("**/amsoil-metrics**", (r) => r.fulfill({ status: 200, body: "{}" }));
   await page.route("**/installer-walkin**", async (r) => {
     const b = JSON.parse(r.request().postData() || "{}");
+    bodies.push(b);
     const name = (b.name || "").trim(), phone = (b.phone || "").trim(), city = (b.city || "").trim(), ck = (b.clientKey || "").trim();
     if (!name || !phone) return r.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ status: "error", error: "missing-contact" }) });
     if (!city || city === "Nowhere") return r.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ status: "error", error: "unknown-city" }) });
@@ -62,10 +64,11 @@ async function boot(roster) {
   await page.waitForFunction(() => !document.getElementById("app").classList.contains("hidden"));
   await page.waitForFunction(() => !!document.querySelector("#feed details.evt"));
   await page.waitForTimeout(120);
-  return { page, created };
+  return { page, created, bodies };
 }
 
 // Fill + submit the top "Log a walk-in / call-in" (anyday) form.
+// v.year is optional — when provided the year input is filled; when omitted it is left blank.
 async function anyday(page, v) {
   return await page.evaluate((v) => {
     const det = document.querySelector("#feed details.evt");
@@ -74,6 +77,8 @@ async function anyday(page, v) {
     const byPh = (f) => Array.from(form.querySelectorAll("input")).find((i) => (i.placeholder || "").toLowerCase().includes(f));
     byPh("name").value = v.name; byPh("vehicle").value = v.vehicle; byPh("phone").value = v.phone;
     const cityInput = byPh("city"); cityInput.value = v.city;
+    const yrInput = byPh("year (optional)");
+    if (v.year != null && yrInput) yrInput.value = v.year; else if (yrInput) yrInput.value = "";
     form.querySelector("button.addwalk").click();
     return { cityIsFreeText: !form.querySelector("select") && !!cityInput };
   }, v);
@@ -125,4 +130,24 @@ test("an unrecognized city shows a loud error and creates nothing (no silent mis
   await page.close();
   assert.equal(created.length, 0);
   assert.match(m, /isn.t a recognized market/);
+});
+
+test("anyday walk-in: modelYear is forwarded in the POST body when filled", async (t) => {
+  if (!browserOk) return t.skip("no browser available");
+  const { page, bodies } = await boot({ bookings: [], events: [], admin: false });
+  await anyday(page, { name: "Cara", vehicle: "2019 Tundra", phone: "6125550101", city: "Minneapolis", year: "2019" });
+  await page.waitForTimeout(150);
+  await page.close();
+  assert.equal(bodies.length, 1, "expected exactly one POST");
+  assert.equal(bodies[0].modelYear, "2019", "modelYear must be forwarded to the walk-in endpoint");
+});
+
+test("anyday walk-in: modelYear key is ABSENT from the POST body when year is left blank", async (t) => {
+  if (!browserOk) return t.skip("no browser available");
+  const { page, bodies } = await boot({ bookings: [], events: [], admin: false });
+  await anyday(page, { name: "Dan", vehicle: "2020 Tacoma", phone: "6125550202", city: "Minneapolis" });
+  await page.waitForTimeout(150);
+  await page.close();
+  assert.equal(bodies.length, 1, "expected exactly one POST");
+  assert.ok(!("modelYear" in bodies[0]), "modelYear must be omitted from the body when the year field is blank");
 });
