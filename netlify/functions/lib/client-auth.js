@@ -46,8 +46,13 @@ function verifyLogin(token, now, env) {
 }
 // Header auth for client endpoints. Returns {email, renewedToken?} or null.
 // renewedToken implements the sliding session: any visit after 30 days re-issues.
+// Accepts x-client-token (web) or Authorization: Bearer (the native app — a
+// tunedyota.com cookie is third-party to capacitor://localhost, so the app
+// stores the session token itself and sends it as a bearer header).
 function resolveClient(headers, now, env) {
-  const got = ((headers || {})["x-client-token"] || (headers || {})["X-Client-Token"] || "").toString();
+  const h = headers || {};
+  const bearer = (/^Bearer\s+(\S+)$/i.exec((h.authorization || h.Authorization || "").toString()) || [])[1] || "";
+  const got = (h["x-client-token"] || h["X-Client-Token"] || bearer).toString();
   const v = verifySession(got, now, env);
   if (!v) return null;
   const out = { email: v.email };

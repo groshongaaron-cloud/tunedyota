@@ -70,6 +70,17 @@ test("resolveClient reads the header; renews only past the renewal window", () =
   assert.equal(resolveClient({ "x-client-token": "junk" }, NOW, ENV), null);
 });
 
+test("resolveClient accepts Authorization: Bearer (the native app's transport)", () => {
+  const t = signSession("a@b.co", NOW, ENV);
+  assert.equal(resolveClient({ authorization: "Bearer " + t }, NOW + 1000, ENV).email, "a@b.co");
+  assert.equal(resolveClient({ Authorization: "Bearer " + t }, NOW + 1000, ENV).email, "a@b.co");
+  assert.equal(resolveClient({ authorization: "Bearer junk" }, NOW, ENV), null);
+  assert.equal(resolveClient({ authorization: t }, NOW, ENV), null); // scheme required
+  // x-client-token wins when both are present (web page behavior unchanged)
+  const other = signSession("web@b.co", NOW, ENV);
+  assert.equal(resolveClient({ "x-client-token": other, authorization: "Bearer " + t }, NOW + 1000, ENV).email, "web@b.co");
+});
+
 const { signReferral, verifyReferral, referralUrl, REFERRAL_TTL_MS } = require("../netlify/functions/lib/client-auth.js");
 
 test("referral token round-trips + lowercases; rejects tamper, expiry, wrong type", () => {
