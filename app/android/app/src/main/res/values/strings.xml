@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Tuned Yota</string>
+    <string name="title_activity_main">Tuned Yota</string>
+    <string name="package_name">com.tunedyota.app</string>
+    <string name="custom_url_scheme">com.tunedyota.app</string>
+</resources>

@@ -1,34 +1,79 @@
-# Codemagic cloud build for the Tuned Yota app (Capacitor). Compiles iOS + Android
-# on a Mac runner so no Mac is needed locally. Signing + store publishing are wired
-# in the Codemagic UI (App Store Connect API key + Play service account) per
-# docs/app/RUNBOOK.md. Exact build commands are validated/adjusted on the first run.
+# Codemagic cloud builds for the Tuned Yota app (Capacitor).
+# The native projects are COMMITTED (app/android, app/ios) — builds sync and
+# compile, they do not scaffold. No automatic triggering: this repo pushes
+# content daily and every push would burn build minutes, so builds start from
+# the Codemagic UI (or API) when we actually want one.
+#
+# ANDROID needs nothing configured to go green: it produces a debug APK
+# (sideloadable onto a phone immediately) and an unsigned release .aab
+# (Play upload signing comes later, in the Codemagic UI, once the Play
+# account exists).
+#
+# IOS needs ONE thing in the Codemagic UI before its first run:
+#   Teams → Personal Account → Integrations → Developer Portal → connect
+#   App Store Connect with an API key, named exactly:  tunedyota-asc
+# That key comes from App Store Connect → Users and Access → Integrations
+# (role: App Manager). With it, Codemagic fetches/creates the signing
+# certificate + provisioning profile itself and publishes to TestFlight.
 workflows:
-  tunedyota-app:
-    name: Tuned Yota App
+  tunedyota-android:
+    name: Tuned Yota Android
     instance_type: mac_mini_m2
+    max_build_duration: 45
     environment:
+      java: 17
       node: 20
-      vars:
-        BUNDLE_ID: "com.tunedyota.app"
     scripts:
-      - name: Install root + app deps
+      - name: Install app deps
         script: |
-          npm ci
-          cd app && npm install
-      - name: Assemble web + native projects
+          cd app && npm ci
+      - name: Assemble web bundle into www/
         script: |
           node app/scripts/sync-web.mjs
-          cd app
-          npx cap add ios || true
-          npx cap add android || true
-          npx cap sync
-      - name: Build Android (.aab)
+      - name: Capacitor sync
         script: |
-          cd app/android && ./gradlew bundleRelease
-      - name: Build iOS (.ipa)
+          cd app && npx cap sync android
+      - name: Build debug APK + release AAB
+        script: |
+          cd app/android
+          ./gradlew assembleDebug bundleRelease
+    artifacts:
+      - app/android/app/build/outputs/apk/debug/*.apk
+      - app/android/app/build/outputs/bundle/release/*.aab
+
+  tunedyota-ios:
+    name: Tuned Yota iOS
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: tunedyota-asc
+    environment:
+      node: 20
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.tunedyota.app
+      vars:
+        APP_ID: com.tunedyota.app
+    scripts:
+      - name: Install app deps
+        script: |
+          cd app && npm ci
+      - name: Assemble web bundle into www/
+        script: |
+          node app/scripts/sync-web.mjs
+      - name: Capacitor sync (runs pod install)
+        script: |
+          cd app && npx cap sync ios
+      - name: Apply signing profiles
+        script: |
+          xcode-project use-profiles
+      - name: Build signed IPA
         script: |
           cd app/ios/App
           xcode-project build-ipa --workspace App.xcworkspace --scheme App
     artifacts:
-      - app/android/app/build/outputs/**/*.aab
       - app/ios/App/build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
