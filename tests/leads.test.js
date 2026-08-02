@@ -335,3 +335,32 @@ test("ingest: dedupe touch backfills a blank Model Year, never overwrites", asyn
   await L.processLeadIngest({ name: "Sam", phone: "6125550100", modelYear: "2021" }, deps(existing("2019")));
   assert.equal(patches[0].fields["Model Year"], undefined, "a stored year is never overwritten by ingest");
 });
+
+test("findLeadForBooking: linked id wins, then phone, then email", () => {
+  const { findLeadForBooking } = require("../netlify/functions/lib/leads.js");
+  const leads = [
+    { id: "recA", bookingId: "recB9", phone: "", email: "" },
+    { id: "recB", bookingId: "", phone: "(612) 555-0100", email: "" },
+    { id: "recC", bookingId: "", phone: "", email: "Sam@X.com" },
+  ];
+  const f = { Phone: "+16125550100", Email: "sam@x.com" };
+  assert.equal(findLeadForBooking("recB9", f, leads).id, "recA");
+  assert.equal(findLeadForBooking("recOther", f, leads).id, "recB");
+  assert.equal(findLeadForBooking("recOther", { Email: "SAM@X.COM" }, leads).id, "recC");
+  assert.equal(findLeadForBooking("recOther", { Phone: "999" }, [leads[1]]), null);
+});
+
+test("mintLeadFields: market-routed, linked back, Model Year carried", () => {
+  const { mintLeadFields } = require("../netlify/functions/lib/leads.js");
+  const f = { Name: "Sam", Phone: "6125550100", Email: "", City: "Madison",
+    Vehicle: "2016-2023 Tacoma 3.5L", "Model Year": "2019", Installer: ["aaron"] };
+  const out = mintLeadFields("recB1", f, new Date("2026-08-01T12:00:00Z"), { source: "booking:web", fields: { Channel: "web" } });
+  assert.equal(out.Stage, "Booked");
+  assert.deepEqual(out.Booking, ["recB1"]);
+  assert.equal(out["Converted Booking"], "recB1");
+  assert.equal(out["Model Year"], "2019");
+  assert.equal(out.Channel, "web");
+  assert.equal(out.Source, "booking:web");
+  assert.ok(out.Installer, "market routing sets an installer");
+  assert.match(out["Activity Log"], /minted from booking recB1/);
+});

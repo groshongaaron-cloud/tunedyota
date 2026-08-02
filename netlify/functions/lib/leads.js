@@ -267,6 +267,36 @@ function buildUnlinkPatch(lead, now = new Date()) {
   };
 }
 
+// Resolve the client record behind a booking: linked lead first, then the same
+// normalized phone, then email. Views come from toLeadView. Null when unknown.
+function findLeadForBooking(bookingId, bookingFields, leadViews) {
+  const pKey = normalizePhone(bookingFields.Phone), eKey = normalizeEmail(bookingFields.Email);
+  return leadViews.find((l) => l.bookingId === bookingId)
+    || (pKey && leadViews.find((l) => normalizePhone(l.phone) === pKey))
+    || (eKey && leadViews.find((l) => normalizeEmail(l.email) === eKey)) || null;
+}
+
+// The Priority List fields for a client record minted from a booking identity —
+// market-routed, Stage Booked, linked back. `extra.fields` lets callers add
+// channel/notes columns; `extra.source` names the minting motion.
+function mintLeadFields(bookingId, f, now = new Date(), extra = {}) {
+  const city = String(f.City || "").trim();
+  const market = getMarket(city);
+  const owner = normalizeInstallerKey(f.Installer);
+  const instKey = market ? keyToInstaller(market.inst).key : owner;
+  const fields = {
+    Name: String(f.Name || ""), Phone: String(f.Phone || ""), Email: String(f.Email || ""),
+    City: market ? market.city : (city || "Unassigned"), Vehicle: String(f.Vehicle || ""),
+    ...(String(f["Model Year"] || "").trim() ? { "Model Year": String(f["Model Year"]).trim() } : {}),
+    Source: extra.source || "booking", Stage: "Booked",
+    Booking: [bookingId], "Converted Booking": bookingId,
+    "Activity Log": logLine(now, `minted from booking ${bookingId}`),
+    ...(extra.fields || {}),
+  };
+  if (instKey) fields.Installer = instKey;
+  return fields;
+}
+
 const STALE_AFTER_DAYS = 30;
 
 // The fell-through-the-cracks bucket: active stage, nothing scheduled (a future
@@ -333,7 +363,7 @@ module.exports = {
   validChannel, validStage,
   normalizeChannel, normalizePhone, normalizeEmail,
   toLeadView, scopeLeads, toBookingSummary, bookingMatchesForLead, clientForLead,
-  buildLinkPatch, buildUnlinkPatch,
+  buildLinkPatch, buildUnlinkPatch, findLeadForBooking, mintLeadFields,
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, staleLeads, STALE_AFTER_DAYS, installerKeyForPhone,
 };

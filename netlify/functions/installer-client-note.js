@@ -9,9 +9,8 @@
 // report-critical-field lock protects the booking record, which this never touches.
 const { cfg, getRecord, updateRecord, createRecord, createTolerant, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { toLeadView, logLine, appendActivity, normalizePhone, normalizeEmail } = require("./lib/leads.js");
-const { normalizeInstallerKey, keyToInstaller } = require("./lib/routing.js");
-const { getMarket } = require("./lib/markets.js");
+const { toLeadView, logLine, appendActivity, findLeadForBooking, mintLeadFields } = require("./lib/leads.js");
+const { normalizeInstallerKey } = require("./lib/routing.js");
 
 async function processClientNote(body, deps) {
   const { env = process.env, fetchImpl = fetch, key, admin = false, now = new Date(), log = console,
@@ -57,10 +56,7 @@ async function processClientNote(body, deps) {
     let leads = [];
     try { leads = (await list({ token: c.token, baseId: c.baseId, table: c.priority })).map(toLeadView); }
     catch (e) { if (log.error) log.error("client-note list leads", e.message); return { status: "error", error: "store-unavailable" }; }
-    const pKey = normalizePhone(f.Phone), eKey = normalizeEmail(f.Email);
-    const match = leads.find((l) => l.bookingId === d.bookingId)
-      || (pKey && leads.find((l) => normalizePhone(l.phone) === pKey))
-      || (eKey && leads.find((l) => normalizeEmail(l.email) === eKey)) || null;
+    const match = findLeadForBooking(d.bookingId, f, leads);
     if (match) {
       try { return { status: "ok", leadId: match.id, notes: await appendTo(match.id, match.clientNotes), minted: false }; }
       catch (e) { if (log.error) log.error("client-note update", e.message); return { status: "error", error: "store-unavailable" }; }
@@ -69,18 +65,7 @@ async function processClientNote(body, deps) {
     // No client record yet — mint one from the booking identity (market-routed,
     // linked back), same spirit as the contact-resolver. The note becomes the
     // record's first Client Notes line.
-    const city = String(f.City || "").trim();
-    const market = getMarket(city);
-    const instKey = market ? keyToInstaller(market.inst).key : owner;
-    const fields = {
-      Name: String(f.Name || ""), Phone: String(f.Phone || ""), Email: String(f.Email || ""),
-      City: market ? market.city : (city || "Unassigned"), Vehicle: String(f.Vehicle || ""),
-      Source: "booking-note", Stage: "Booked",
-      Booking: [d.bookingId], "Converted Booking": d.bookingId,
-      "Activity Log": logLine(now, `minted from booking ${d.bookingId}`),
-      "Client Notes": line,
-    };
-    if (instKey) fields.Installer = instKey;
+    const fields = mintLeadFields(d.bookingId, f, now, { source: "booking-note", fields: { "Client Notes": line } });
     let createdRec;
     try {
       // "Client Notes" is NOT in the tolerated list — if the column is missing
