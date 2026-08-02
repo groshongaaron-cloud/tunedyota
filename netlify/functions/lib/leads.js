@@ -327,6 +327,16 @@ async function ensureClientRecordForBooking(bookingId, bookingFields, deps = {})
   return { leadId: rec && rec.id, linked: true, minted: true };
 }
 
+// Two client records that look like the same person: same normalized phone or
+// email. Merge is ALWAYS human-confirmed (owner decision 2026-07-31) — this
+// only powers the suggestion strip. Self excluded; contact-less leads never match.
+function duplicateLeadsFor(lead, leads) {
+  const pKey = normalizePhone(lead.phone), eKey = normalizeEmail(lead.email);
+  if (!pKey && !eKey) return [];
+  return (leads || []).filter((l) => l.id !== lead.id &&
+    ((pKey && normalizePhone(l.phone) === pKey) || (eKey && normalizeEmail(l.email) === eKey)));
+}
+
 const STALE_AFTER_DAYS = 30;
 
 // The fell-through-the-cracks bucket: active stage, nothing scheduled (a future
@@ -396,5 +406,5 @@ module.exports = {
   buildLinkPatch, buildUnlinkPatch, findLeadForBooking, mintLeadFields,
   logLine, appendActivity, processLeadIngest,
   applyLeadUpdate, dueLeads, staleLeads, STALE_AFTER_DAYS, installerKeyForPhone,
-  ensureClientRecordForBooking,
+  ensureClientRecordForBooking, duplicateLeadsFor,
 };

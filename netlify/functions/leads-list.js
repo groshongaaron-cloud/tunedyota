@@ -3,7 +3,7 @@
 // only their own leads; an admin sees all (optionally filtered by ?installer= or ?scope=unassigned).
 const { cfg, listAllRecords } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { toLeadView, scopeLeads, ACTIVE_STAGES, toBookingSummary, bookingMatchesForLead, clientForLead, staleLeads } = require("./lib/leads.js");
+const { toLeadView, scopeLeads, ACTIVE_STAGES, toBookingSummary, bookingMatchesForLead, clientForLead, staleLeads, duplicateLeadsFor } = require("./lib/leads.js");
 
 function summarize(leads, today) {
   const byChannel = {}, byStage = {};
@@ -49,7 +49,13 @@ async function handler(event, ctx = {}) {
   });
   const q = (event.queryStringParameters) || {};
   const filter = q.installer || q.scope || "";
-  const leads = scopeLeads(all, { key, admin, filter });
+  const scoped = scopeLeads(all, { key, admin, filter });
+  const leads = scoped.map((l) => ({
+    ...l,
+    duplicates: duplicateLeadsFor(l, scoped).map((x) => ({
+      id: x.id, name: x.name, channel: x.channel, stage: x.stage, createdTime: x.createdTime,
+    })),
+  }));
   return { statusCode: 200, headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ leads, admin, summary: admin ? summarize(all, today) : summarize(leads, today) }) };
 }

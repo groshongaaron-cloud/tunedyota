@@ -56,3 +56,49 @@ test("a linked lead resolves its booking summary instead of matches", async () =
   assert.equal(l.booking.city, "Madison");
   assert.deepEqual(l.matches, []);
 });
+
+test("duplicates[] shape: same-phone leads each reference the other, scoped to caller's installer", async () => {
+  // Two leads with the same phone, both belonging to aaron
+  const dupLeadRows = [
+    { id: "recD1", fields: { Name: "Sam Smith", Phone: "6125550100", Channel: "sms", Stage: "New",
+        Installer: "aaron", "Created Time": "2026-07-01T10:00:00.000Z" } },
+    { id: "recD2", fields: { Name: "Sam S", Phone: "(612) 555-0100", Channel: "phone", Stage: "Contacted",
+        Installer: "aaron", "Created Time": "2026-07-10T10:00:00.000Z" } },
+  ];
+  const res = await handler(ev, { env, listImpl: listFor({ priority: dupLeadRows, bookings: [], clients: [] }) });
+  assert.equal(res.statusCode, 200);
+  const out = JSON.parse(res.body);
+  const d1 = out.leads.find((l) => l.id === "recD1");
+  const d2 = out.leads.find((l) => l.id === "recD2");
+  // Each should see the other as a duplicate
+  assert.equal(d1.duplicates.length, 1);
+  assert.equal(d1.duplicates[0].id, "recD2");
+  assert.equal(d1.duplicates[0].name, "Sam S");
+  assert.equal(d1.duplicates[0].channel, "phone");
+  assert.equal(d1.duplicates[0].stage, "Contacted");
+  assert.ok("createdTime" in d1.duplicates[0]);
+  assert.equal(d2.duplicates.length, 1);
+  assert.equal(d2.duplicates[0].id, "recD1");
+});
+
+test("duplicates[] scoping: a non-admin installer never sees another installer's lead as a duplicate", async () => {
+  // Same phone, different installers
+  const crossInstLeads = [
+    { id: "recE1", fields: { Name: "Jordan A", Phone: "6125550200", Channel: "sms", Stage: "New",
+        Installer: "aaron", "Created Time": "2026-07-01T10:00:00.000Z" } },
+    { id: "recE2", fields: { Name: "Jordan C", Phone: "(612) 555-0200", Channel: "phone", Stage: "New",
+        Installer: "cody", "Created Time": "2026-07-02T10:00:00.000Z" } },
+  ];
+  // aaron is admin — but we need to test a non-admin installer
+  const codyEnv = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b",
+    INSTALLER_TOKENS: '{"cody":"ctok"}', INSTALLER_ADMINS: "aaron" };
+  const codyEv = { headers: { "x-installer-token": "ctok" }, queryStringParameters: {} };
+  const res = await handler(codyEv, { env: codyEnv, listImpl: listFor({ priority: crossInstLeads, bookings: [], clients: [] }) });
+  assert.equal(res.statusCode, 200);
+  const out = JSON.parse(res.body);
+  // cody only sees their own lead (recE2) — and its duplicates[] must be empty
+  // because recE1 (aaron's) is outside cody's scope
+  assert.equal(out.leads.length, 1);
+  assert.equal(out.leads[0].id, "recE2");
+  assert.deepEqual(out.leads[0].duplicates, []);
+});

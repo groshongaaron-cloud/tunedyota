@@ -410,3 +410,12 @@ test("toLeadView: Channel 'web' is recognized as-is, not collapsed to 'other'", 
   assert.equal(v.channel, "web", "web channel must round-trip through toLeadView");
   assert.equal(L.validChannel("web"), true, "web must be a valid channel");
 });
+
+test("duplicateLeadsFor: same phone or email, self excluded, no-contact leads never match", () => {
+  const { duplicateLeadsFor } = require("../netlify/functions/lib/leads.js");
+  const L2 = (id, phone, email) => ({ id, phone: phone || "", email: email || "" });
+  const all = [L2("a", "+1 (612) 555-0100"), L2("b", "6125550100"), L2("c", "", "s@x.com"), L2("d", "", "S@X.COM"), L2("e")];
+  assert.deepEqual(duplicateLeadsFor(all[0], all).map((l) => l.id), ["b"]);
+  assert.deepEqual(duplicateLeadsFor(all[2], all).map((l) => l.id), ["d"]);
+  assert.deepEqual(duplicateLeadsFor(all[4], all), []);
+});
