@@ -94,6 +94,17 @@ async function processCloseout(body, deps) {
   const ecuId = String(d.ecuId || "").trim().toUpperCase();
   const gearSize = String(d.gearSize || "").trim();
   const mileage = String(d.mileage == null ? "" : d.mileage).replace(/[^0-9]/g, "");
+  const modelYear = /^(19|20)\d{2}$/.test(String(d.modelYear || "").trim()) ? String(d.modelYear).trim() : "";
+  // Report-field gate (owner decision 2026-07-31): an installer completes only a
+  // report-ready record; the ADMIN may skip anything (never-block-the-owner).
+  // "Present" = supplied now or already on the booking. The console pre-fills
+  // most of these, so the gate normally costs zero taps.
+  if (d.action !== "draft" && !admin) {
+    const finals = { VIN: vin, "Tuning Platform": tuningPlatform, "Calibration Type": calibrationType,
+      "ECU ID": ecuId, "Gear Size": gearSize, Mileage: mileage, "Model Year": modelYear };
+    const missing = Object.keys(finals).filter((k) => !String(finals[k] || "").trim() && !String(f[k] == null ? "" : f[k]).trim());
+    if (missing.length) return { status: "error", error: "report-fields-missing", missing };
+  }
   const issueDate = now.toISOString().slice(0, 10);
   // Calibration Date = the day the calibration was actually applied (the event
   // day), NOT the day the installer closes it out. The monthly OTT report buckets
@@ -109,6 +120,7 @@ async function processCloseout(body, deps) {
   if (ecuId) completeFields["ECU ID"] = ecuId;
   if (gearSize) completeFields["Gear Size"] = gearSize;
   if (mileage) completeFields["Mileage"] = Number(mileage);
+  if (modelYear && !String(f["Model Year"] || "").trim()) completeFields["Model Year"] = modelYear;
   // Resolve recipient before updateTolerant so delivery metadata is persisted together
   // with Status/Calibration in the first write (tolerant retry drops only missing cols).
   const inst = keyToInstaller(owner);
@@ -129,7 +141,7 @@ async function processCloseout(body, deps) {
     // updateTolerant: if the base hasn't added a column yet, drop only the missing
     // optional field(s) and retry, so the completion (Status/Calibration) still persists.
     await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: completeFields },
-      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery", "Customer Signature"]);
+      ["VIN", "Tuning Platform", "Calibration Type", "ECU ID", "Gear Size", "Mileage", "Model Year", "Email", "Certificate Issued", "Certificate Recipient", "Cert Delivery", "Customer Signature"]);
   } catch (e) { if (log.error) log.error("closeout complete", e.message); return { status: "error", error: "store-unavailable" }; }
 
   let certSent = false;

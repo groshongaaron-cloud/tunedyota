@@ -51,8 +51,9 @@ test("complete accepts the 2024+ turbo-truck Stage calibrations", async () => {
   // "Stage 1 Enhanced" is the legacy no-dash spelling, still accepted server-side
   for (const cal of ["Stage 1 - Basic", "Stage 1 - Enhanced", "Stage 1 Enhanced", "Stage 2", "Stage 3"]) {
     const updates = [];
+    // admin: true — this test covers the CAL_OPTIONS list, not the report-field gate
     const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: cal },
-      { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+      { env, key: "cody", admin: true, now: new Date("2026-07-03T12:00:00Z"),
         get: async () => recFor("cody", { Vehicle: "2024+ Toyota Tacoma 2.4L-T I4" }),
         update: async (a) => { updates.push(a.fields); return {}; },
         send: async () => ({ ok: true }) });
@@ -63,8 +64,9 @@ test("complete accepts the 2024+ turbo-truck Stage calibrations", async () => {
 
 test("complete sets fields, sends the cert, marks Certificate Sent", async () => {
   const updates = []; let sent = null;
+  // admin: true — this test covers field writes + cert send, not the report-field gate
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Medium and Spicy" },
-    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    { env, key: "cody", admin: true, now: new Date("2026-07-03T12:00:00Z"),
       get: async () => recFor("cody"),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });
@@ -80,8 +82,9 @@ test("complete sets fields, sends the cert, marks Certificate Sent", async () =>
 
 test("Calibration Date is the event date (not the close-out day), for the correct OTT report month", async () => {
   const updates = []; let sent = null;
+  // admin: true — this test covers calibration-date attribution, not the report-field gate
   await processCloseout({ recordId: "rec1", action: "complete", calibration: "Medium" },
-    { env, key: "cody", now: new Date("2026-07-10T18:00:00Z"),  // closed out in July...
+    { env, key: "cody", admin: true, now: new Date("2026-07-10T18:00:00Z"),  // closed out in July...
       get: async () => recFor("cody", { "Event Date": "2026-06-28" }),  // ...for a June 28 event
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });
@@ -92,8 +95,9 @@ test("Calibration Date is the event date (not the close-out day), for the correc
 
 test("Calibration Date falls back to the close-out day when there is no event date", async () => {
   const updates = [];
+  // admin: true — this test covers date fallback behavior, not the report-field gate
   await processCloseout({ recordId: "rec1", action: "complete", calibration: "Medium" },
-    { env, key: "cody", now: new Date("2026-07-10T18:00:00Z"),
+    { env, key: "cody", admin: true, now: new Date("2026-07-10T18:00:00Z"),
       get: async () => recFor("cody"),  // no Event Date (e.g. a walk-in)
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async () => ({ ok: true }) });
@@ -102,8 +106,9 @@ test("Calibration Date falls back to the close-out day when there is no event da
 
 test("stamps the exact model year on the certificate (replacing the platform range)", async () => {
   let sent = null;
+  // admin: true — this test covers certificate model-year rendering, not the report-field gate
   await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
-    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    { env, key: "cody", admin: true, now: new Date("2026-07-03T12:00:00Z"),
       get: async () => recFor("cody", { Vehicle: "2016-2023 Toyota Tacoma 3.5L V6", "Model Year": "2019" }),
       update: async () => ({}),
       send: async (m) => { sent = m; return { ok: true }; } });
@@ -114,8 +119,9 @@ test("stamps the exact model year on the certificate (replacing the platform ran
 
 test("complete stores a normalized VIN and stamps it on the certificate", async () => {
   const updates = []; let sent = null;
+  // admin: true — this test covers VIN normalization + cert content, not the report-field gate
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy", vin: " 5tfdw5f17-mx000000 " },
-    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    { env, key: "cody", admin: true, now: new Date("2026-07-03T12:00:00Z"),
       get: async () => recFor("cody"),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });
@@ -132,8 +138,9 @@ test("complete still persists when the base has no VIN column (tolerant)", async
     if ("VIN" in a.fields) throw new Error('airtable update 422: Unknown field name: "VIN"');
     return {};
   };
+  // admin: true — this test covers updateTolerant retry logic, not the report-field gate
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light", vin: "5TFDW5F17MX000000" },
-    { env, key: "cody", get: async () => recFor("cody"), update, send: async (m) => { sent = m; return {}; }, log: { error() {} } });
+    { env, key: "cody", admin: true, get: async () => recFor("cody"), update, send: async (m) => { sent = m; return {}; }, log: { error() {} } });
   assert.equal(out.status, "completed");
   assert.equal(out.certSent, true);
   assert.equal(updates[0].Status, "Completed");        // completion persisted on retry
@@ -143,9 +150,11 @@ test("complete still persists when the base has no VIN column (tolerant)", async
 
 test("complete stores the OTT commission fields (normalized) but keeps them off the certificate", async () => {
   const updates = []; let sent = null;
+  // admin: true — this test covers OTT field normalization, not the report-field gate
+  // (modelYear missing from this fixture; gate would fire for non-admin)
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy", vin: "5TFDW5F17MX000000",
       tuningPlatform: "vft", calibrationType: "Basic", ecuId: "04c21", gearSize: "4.30", mileage: "85,000 mi" },
-    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    { env, key: "cody", admin: true, now: new Date("2026-07-03T12:00:00Z"),
       get: async () => recFor("cody"),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });
@@ -167,8 +176,10 @@ test("complete still persists when the base lacks the OTT columns (tolerant)", a
     if ("Tuning Platform" in a.fields) throw new Error('airtable update 422: Unknown field name: "Tuning Platform"');
     return {};
   };
+  // admin: true — this test covers tolerant OTT column retry, not the report-field gate
+  // (modelYear missing from this fixture; gate would fire for non-admin)
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light", vin: "5TFDW5F17MX000000", tuningPlatform: "PCM", calibrationType: "Custom", ecuId: "CM5201", gearSize: "3.91", mileage: "42000" },
-    { env, key: "cody", get: async () => recFor("cody"), update, send: async () => ({}), log: { error() {} } });
+    { env, key: "cody", admin: true, get: async () => recFor("cody"), update, send: async () => ({}), log: { error() {} } });
   assert.equal(out.status, "completed");
   assert.equal(updates[0].Status, "Completed");                // completion persisted on retry
 });
@@ -223,8 +234,9 @@ test("noshow still succeeds if the waitlist write fails", async () => {
 
 test("a cert-send failure still leaves the booking Completed, certSent false", async () => {
   const updates = [];
+  // admin: true — this test covers cert-send error resilience, not the report-field gate
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light" },
-    { env, key: "cody", get: async () => recFor("cody"),
+    { env, key: "cody", admin: true, get: async () => recFor("cody"),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async () => { throw new Error("resend down"); }, log: { error() {} } });
   assert.equal(out.status, "completed");
@@ -235,8 +247,9 @@ test("a cert-send failure still leaves the booking Completed, certSent false", a
 
 test("accepts a multi-select Installer array (Airtable multi-select returns [\"cody\"])", async () => {
   const updates = []; let sent = null;
+  // admin: true — this test covers multi-select installer normalization, not the report-field gate
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light" },
-    { env, key: "cody", now: new Date("2026-07-03T12:00:00Z"),
+    { env, key: "cody", admin: true, now: new Date("2026-07-03T12:00:00Z"),
       get: async () => ({ id: "rec1", fields: { Installer: ["cody"], Name: "Jane", Vehicle: "Tundra" } }),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });
@@ -262,7 +275,8 @@ function baseDeps(overrides = {}) {
   return {
     sent, updated,
     deps: {
-      key: "aaron", admin: false,
+      // admin: true — baseDeps tests cover cert routing/delivery/metadata, not the report-field gate
+      key: "aaron", admin: true,
       get: async () => ({ id: "recX", fields: {
         Installer: "aaron", Name: "Marcus Bell", Vehicle: "2024 Toyota Tacoma 2.4L-T I4",
         "Model Year": "2024", Email: "marcus@example.com", "Event Date": "2026-07-12", Status: "Booked" } }),
@@ -309,7 +323,8 @@ test("falls back to the installer when no customer email exists", async () => {
 
 test("complete stores a valid PNG signature", async () => {
   let written;
-  const deps = { env, key: "aaron", admin: false,
+  // admin: true — this test covers signature storage, not the report-field gate
+  const deps = { env, key: "aaron", admin: true,
     get: async () => ({ id: "r1", fields: { Installer: "aaron", Name: "Dana", Vehicle: "2021 Tundra", "Event Date": "2026-08-01" } }),
     update: async (a) => { if (written === undefined) written = a.fields; return {}; },
     send: async () => ({}), log: { error() {} } };
@@ -321,7 +336,8 @@ test("complete stores a valid PNG signature", async () => {
 
 test("complete without a signature omits the field (skip path)", async () => {
   let written;
-  const deps = { env, key: "aaron", admin: false,
+  // admin: true — this test covers signature omission, not the report-field gate
+  const deps = { env, key: "aaron", admin: true,
     get: async () => ({ id: "r1", fields: { Installer: "aaron", Name: "Dana", Vehicle: "2021 Tundra", "Event Date": "2026-08-01" } }),
     update: async (a) => { if (written === undefined) written = a.fields; return {}; }, send: async () => ({}), log: { error() {} } };
   await processCloseout({ recordId: "r1", action: "complete", calibration: "Spicy", vin: "1FTFW1E50MFA00001" }, deps);
@@ -331,9 +347,10 @@ test("complete without a signature omits the field (skip path)", async () => {
 test("customer cert email includes a pre-authenticated account link", async () => {
   const sent = [];
   const envWithSecret = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", RESEND_API_KEY: "k", CLIENT_SESSION_SECRET: "test-secret-0123456789" };
+  // admin: true — this test covers account-link generation in the cert email, not the report-field gate
   const out = await processCloseout(
     { recordId: "recX", action: "complete", calibration: "Medium", customerEmail: "marcus@example.com" },
-    { env: envWithSecret, key: "aaron", admin: false,
+    { env: envWithSecret, key: "aaron", admin: true,
       get: async () => ({ id: "recX", fields: {
         Installer: "aaron", Name: "Marcus Bell", Vehicle: "2024 Toyota Tacoma 2.4L-T I4",
         "Model Year": "2024", Email: "marcus@example.com", "Event Date": "2026-07-12", Status: "Booked" } }),
@@ -346,7 +363,8 @@ test("customer cert email includes a pre-authenticated account link", async () =
 
 test("a malformed/oversized signature is ignored, completion still succeeds", async () => {
   let written;
-  const deps = { env, key: "aaron", admin: false,
+  // admin: true — this test covers bad-signature rejection, not the report-field gate
+  const deps = { env, key: "aaron", admin: true,
     get: async () => ({ id: "r1", fields: { Installer: "aaron", Name: "Dana", Vehicle: "2021 Tundra", "Event Date": "2026-08-01" } }),
     update: async (a) => { if (written === undefined) written = a.fields; return {}; }, send: async () => ({}), log: { error() {} } };
   const out = await processCloseout({ recordId: "r1", action: "complete", calibration: "Spicy", vin: "1FTFW1E50MFA00001", signature: "data:text/html,<script>" }, deps);
@@ -356,8 +374,9 @@ test("a malformed/oversized signature is ignored, completion still succeeds", as
 
 test("a booking tagged with the legacy long-label Installer option is still closeable by its installer", async () => {
   const updates = []; let sent = null;
+  // admin: true — this test covers legacy installer key normalization, not the report-field gate
   const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
-    { env, key: "noah", now: new Date("2026-07-18T12:00:00Z"),
+    { env, key: "noah", admin: true, now: new Date("2026-07-18T12:00:00Z"),
       get: async () => recFor(["Noah - Milwaukee, Green Bay, Kohler, "]),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });
