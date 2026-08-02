@@ -49,5 +49,7 @@
 	<string>Tuned Yota uses the camera to scan a vehicle&#8217;s VIN barcode so installers don&#8217;t have to type the 17 characters by hand.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Tuned Yota can use Face ID to unlock the installer console without re-entering your passcode.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

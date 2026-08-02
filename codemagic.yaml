@@ -10,8 +10,10 @@
 # account exists).
 #
 # IOS needs ONE thing in the Codemagic UI before its first run:
-#   Teams → Personal Account → Integrations → Developer Portal → connect
-#   App Store Connect with an API key, named exactly:  tunedyota-asc
+#   Teams → Tuned Yota → Settings → Team integrations → Developer Portal →
+#   Manage keys → connect App Store Connect with an API key, named exactly:
+#   tunedyota-asc   (the app lives in the "Tuned Yota" TEAM, not the personal
+#   account — a personal-account integration is invisible to team apps)
 # That key comes from App Store Connect → Users and Access → Integrations
 # (role: App Manager). With it, Codemagic fetches/creates the signing
 # certificate + provisioning profile itself and publishes to TestFlight.
