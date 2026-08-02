@@ -11,6 +11,19 @@ test("injectNativeFetch adds the bootstrap tag once, right after <head>", async 
   assert.equal(injectNativeFetch(out), out, "idempotent");
 });
 
+test("book.html fonts are self-hosted — bundle carries them, page hits no font CDN", async () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const { FONTS } = await import("../app/scripts/sync-lib.mjs");
+  const html = fs.readFileSync(path.join(__dirname, "..", "site", "book.html"), "utf8");
+  assert.ok(!/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(html),
+    "book.html must not load fonts from Google — the bundled page has to render offline");
+  for (const f of ["lato-400.woff2", "lato-700.woff2", "lato-900.woff2",
+    "spectral-400.woff2", "spectral-500.woff2", "spectral-600.woff2", "spectral-700.woff2"]) {
+    assert.ok(FONTS.includes(f), f + " missing from FONTS");
+  }
+});
+
 test("PAGES maps app.html to the app index and keeps installer + book + privacy/terms/calibration", async () => {
   const { PAGES, ASSETS } = await import("../app/scripts/sync-lib.mjs");
   assert.deepEqual(PAGES.find((p) => p[1] === "index.html"), ["app.html", "index.html"]);

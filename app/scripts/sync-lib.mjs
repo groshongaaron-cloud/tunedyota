@@ -18,6 +18,18 @@ export const PAGES = [
   ["privacy.html", "privacy.html"],
   ["terms.html", "terms.html"],
   ["calibration.html", "calibration.html"],
+  ["my-tuned-yota.html", "my-tuned-yota.html"],
+];
+
+// Self-hosted fonts for my-tuned-yota.html (Archivo/IBM Plex) and book.html
+// (Lato/Spectral) — referenced relatively (assets/fonts/...) so they resolve
+// in both the bundle and on the web.
+export const FONTS = [
+  "archivo-var.woff2",
+  "ibm-plex-sans-400.woff2", "ibm-plex-sans-500.woff2", "ibm-plex-sans-600.woff2",
+  "ibm-plex-mono-400.woff2", "ibm-plex-mono-500.woff2", "ibm-plex-mono-600.woff2",
+  "lato-400.woff2", "lato-700.woff2", "lato-900.woff2",
+  "spectral-400.woff2", "spectral-500.woff2", "spectral-600.woff2", "spectral-700.woff2",
 ];
 
 export const ASSETS = [
@@ -47,6 +59,10 @@ export function assemble() {
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(WWW, f));
   }
   fs.copyFileSync(path.join(SITE, "vendor", "zxing.min.js"), path.join(WWW, "vendor", "zxing.min.js"));
+  fs.mkdirSync(path.join(WWW, "assets", "fonts"), { recursive: true });
+  for (const f of FONTS) {
+    fs.copyFileSync(path.join(SITE, "assets", "fonts", f), path.join(WWW, "assets", "fonts", f));
+  }
   // Extensionless /privacy and /terms: create index.html inside each dir so
   // Capacitor's local server resolves /privacy and /terms without redirects.
   for (const name of ["privacy", "terms"]) {
@@ -54,5 +70,5 @@ export function assemble() {
     fs.mkdirSync(dir, { recursive: true });
     fs.copyFileSync(path.join(WWW, name + ".html"), path.join(dir, "index.html"));
   }
-  console.log("app/www assembled: client shell (index) + installer console + booking + privacy/terms/calibration");
+  console.log("app/www assembled: client shell (index) + installer console + booking + privacy/terms/calibration + my-tuned-yota (with fonts)");
 }

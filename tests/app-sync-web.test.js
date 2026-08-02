@@ -18,6 +18,25 @@ test("sync-web assembles the client shell as index.html in app/www", () => {
   assert.ok(idx.includes('<script src="/native-fetch.js"></script>'), "native-fetch injection");
 });
 
+test("sync-web bundles the my-tuned-yota member page with its fonts", () => {
+  execFileSync("node", ["app/scripts/sync-web.mjs"], { cwd: path.join(__dirname, "..") });
+  const www = path.join(__dirname, "..", "app", "www");
+  const page = fs.readFileSync(path.join(www, "my-tuned-yota.html"), "utf8");
+  assert.ok(page.includes('<script src="/native-fetch.js"></script>'), "native-fetch injection");
+  // no placeholder prices or sample vehicles may ship in the bundle
+  assert.ok(!/\$\d/.test(page), "no hardcoded dollar amounts");
+  assert.ok(!page.includes("previewbar"), "preview switch removed");
+  // every @font-face source must exist in the bundle
+  for (const m of page.matchAll(/url\('assets\/fonts\/([^']+)'\)/g)) {
+    assert.ok(fs.existsSync(path.join(www, "assets", "fonts", m[1])), `missing font: ${m[1]}`);
+  }
+  assert.ok(page.match(/@font-face/g).length >= 7, "all seven font faces declared");
+  // outbound links must be absolute and routed through the in-app browser
+  for (const m of page.matchAll(/<a[^>]*data-external[^>]*href="([^"]+)"/g)) {
+    assert.match(m[1], /^https:\/\//, `data-external link not absolute: ${m[1]}`);
+  }
+});
+
 test("every root-relative static asset the console references exists in app/www", () => {
   execFileSync("node", ["app/scripts/sync-web.mjs"], { cwd: path.join(__dirname, "..") });
   const www = path.join(__dirname, "..", "app", "www");

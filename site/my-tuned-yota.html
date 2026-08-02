@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="format-detection" content="telephone=no">
+<meta name="robots" content="noindex">
+<title>My Tuned Yota</title>
+<style>
+/* ==========================================================
+   SELF-HOSTED FONTS — required for Capacitor.
+   Files live in assets/fonts/ (copied into the app bundle by
+   app/scripts/sync-web.mjs). No network call, so the page
+   renders correctly offline and on first launch.
+   ========================================================== */
+@font-face{font-family:'Archivo';src:url('assets/fonts/archivo-var.woff2') format('woff2-variations');
+  font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'IBM Plex Sans';src:url('assets/fonts/ibm-plex-sans-400.woff2') format('woff2');
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'IBM Plex Sans';src:url('assets/fonts/ibm-plex-sans-500.woff2') format('woff2');
+  font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'IBM Plex Sans';src:url('assets/fonts/ibm-plex-sans-600.woff2') format('woff2');
+  font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'IBM Plex Mono';src:url('assets/fonts/ibm-plex-mono-400.woff2') format('woff2');
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'IBM Plex Mono';src:url('assets/fonts/ibm-plex-mono-500.woff2') format('woff2');
+  font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'IBM Plex Mono';src:url('assets/fonts/ibm-plex-mono-600.woff2') format('woff2');
+  font-weight:600;font-style:normal;font-display:swap}
+</style>
+<style>
+/* ==========================================================
+   MY TUNED YOTA — member logbook
+   v2: the page is a service record for the truck, not an account page.
+   All member data (vehicle, fluids, certificates, referral link) is
+   fetched at runtime — nothing priced or member-specific is baked in.
+   ========================================================== */
+:root{
+  --ink:#16181A;
+  --slate:#1D2226;
+  --slate-2:#2B3238;
+  --slate-3:#3A424A;
+  --paper:#EFEDE8;
+  --card:#FFFFFF;
+  --line:#D9D5CD;
+  --line-dark:#39424A;
+  --muted:#6B6862;
+  --muted-dark:#98A0A7;
+
+  --s1:#C4342B; --s2:#E07A2B; --s3:#E7B733;   /* heritage stripe */
+
+  --ok:#6BA96F;
+  --warn:#E7B733;
+  --due:#D9534A;
+
+  --amber:#E7B733;
+  --amber-deep:#8A6410;
+  --amber-wash:#FCF4DC;
+
+  --r:10px;
+  --shadow:0 1px 2px rgba(22,24,26,.06), 0 6px 18px rgba(22,24,26,.06);
+
+  --display:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --data:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}   /* hidden must beat .gauges{display:grid} etc. */
+html{
+  -webkit-text-size-adjust:100%;
+  color-scheme:light;                    /* stops iOS/Android forced-dark inverting the page */
+  overscroll-behavior-y:none;            /* no rubber-band flash of white behind the cluster */
+}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+}
+button,select,a{-webkit-tap-highlight-color:rgba(231,183,51,.18)}
+/* safe areas — notch and home indicator when running full-screen in an app shell */
+.wrap{padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
+footer{padding-bottom:max(56px, calc(40px + env(safe-area-inset-bottom)))}
+a{color:inherit}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px}
+.mono{font-family:var(--data);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.stripe{height:4px;display:flex}
+.stripe i{flex:1}
+.stripe i:nth-child(1){background:var(--s1)}
+.stripe i:nth-child(2){background:var(--s2)}
+.stripe i:nth-child(3){background:var(--s3)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--slate);color:#fff;padding-top:env(safe-area-inset-top)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px}
+.brandmark{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:14px;letter-spacing:.1em}
+.signout{font-family:var(--data);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-dark);text-decoration:none;background:none;cursor:pointer;border:1px solid var(--line-dark);padding:6px 11px;border-radius:6px;transition:.15s}
+.signout:hover{color:#fff;border-color:#6C767D}
+
+/* ==========================================================
+   THE CLUSTER — signature element
+   ========================================================== */
+.cluster{background:linear-gradient(175deg,var(--slate-2) 0%,var(--slate) 68%);color:#fff;padding:30px 0 34px;position:relative;overflow:hidden}
+.cluster::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 70% at 50% -10%,rgba(231,183,51,.10),transparent 60%);pointer-events:none}
+.cluster .wrap{position:relative;z-index:1}
+
+.rig-line{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.rig-name{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(26px,6.4vw,38px);line-height:.98;letter-spacing:-.015em;margin:0}
+.rig-sub{font-family:var(--data);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted-dark);margin-top:9px}
+.rig-sub .cal{color:var(--amber)}
+.rig-picks{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.rig-picks select{
+  font-family:var(--data);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#fff;
+  background:#12161A;border:1px solid var(--line-dark);border-radius:6px;padding:8px 30px 8px 10px;appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%2398A0A7' stroke-width='1.6' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;
+}
+.rig-picks select:focus-visible{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(231,183,51,.22)}
+.linkish{background:none;border:0;padding:0;cursor:pointer;font-family:var(--data);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid rgba(231,183,51,.4)}
+.linkish:hover{border-bottom-color:var(--amber)}
+
+.odo{text-align:right}
+.odo .lab{font-family:var(--data);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted-dark);margin-bottom:6px}
+.odo .digits{display:inline-flex;gap:3px}
+.odo .digits span{
+  font-family:var(--data);font-weight:600;font-size:22px;color:#fff;
+  background:#12161A;border:1px solid var(--line-dark);border-radius:4px;
+  padding:5px 7px;min-width:26px;text-align:center;
+}
+.odo .digits span.unit{background:transparent;border:0;color:var(--muted-dark);font-size:11px;letter-spacing:.12em;align-self:center;padding-left:5px}
+.odo .update{margin-top:9px}
+.odo .update input{
+  width:110px;font-family:var(--data);font-size:14px;color:#fff;background:#12161A;
+  border:1px solid var(--line-dark);border-radius:6px;padding:8px 10px;
+}
+.odo .update input:focus-visible{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(231,183,51,.22)}
+
+/* gauges — rendered only when a member service-history payload provides
+   values (endpoint not live yet); the arc math lives in setGauge() below */
+.gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.gauge{
+  background:rgba(255,255,255,.035);border:1px solid var(--line-dark);border-radius:12px;
+  padding:16px 14px 15px;text-align:center;
+}
+.gauge svg{width:104px;height:104px;display:block;margin:0 auto 8px}
+.gauge .track{fill:none;stroke:#39424A;stroke-width:7;stroke-linecap:round}
+.gauge .val{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dasharray .9s cubic-bezier(.22,.7,.3,1)}
+.gauge .rem{font-family:var(--data);font-weight:600;font-size:17px;fill:#fff}
+.gauge .remlab{font-family:var(--data);font-size:7.4px;letter-spacing:.16em;fill:var(--muted-dark)}
+.gauge .sys{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.07em}
+.gauge .fluid{font-family:var(--data);font-size:10px;letter-spacing:.06em;color:var(--muted-dark);margin-top:4px;text-transform:uppercase}
+.g-ok .val{stroke:var(--ok)} .g-warn .val{stroke:var(--warn)} .g-due .val{stroke:var(--due)}
+
+/* cluster: empty / new member state */
+.cluster-empty{text-align:center;padding:6px 0 2px}
+.cluster-empty h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(26px,6.2vw,38px);line-height:1.02;letter-spacing:-.015em;margin:0 0 12px}
+.cluster-empty p{color:#C6CBD0;max-width:52ch;margin:0 auto 22px;font-size:15.5px}
+.addbox{background:rgba(255,255,255,.045);border:1px solid var(--line-dark);border-radius:12px;padding:18px;max-width:620px;margin:0 auto;text-align:left}
+.fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field label{display:block;color:var(--muted-dark);margin-bottom:6px}
+.field select{
+  width:100%;font-family:var(--body);font-size:15px;color:#fff;background:#12161A;
+  border:1px solid var(--line-dark);border-radius:8px;padding:11px 12px;appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%2398A0A7' stroke-width='1.6' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;transition:.15s;
+}
+.field select:hover:enabled{border-color:#6C767D}
+.field select:focus-visible{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(231,183,51,.22)}
+.field select:disabled{color:#5D666D;cursor:not-allowed}
+.addbox .row{margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.addbox .note{font-family:var(--data);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-dark)}
+
+/* ---------- buttons ---------- */
+.btn{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:13px;border:0;border-radius:8px;padding:13px 19px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;text-decoration:none;transition:.15s;white-space:nowrap}
+.btn-amber{background:var(--amber);color:#2B2100}
+.btn-amber:hover{background:#F2C645;transform:translateY(-1px)}
+.btn-amber:focus-visible{outline:3px solid rgba(231,183,51,.45);outline-offset:2px}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-ink:hover{background:#000;transform:translateY(-1px)}
+.btn-ink:focus-visible{outline:3px solid rgba(22,24,26,.25);outline-offset:2px}
+.btn-quiet{background:transparent;color:var(--ink);border:1px solid #C9C4BA}
+.btn-quiet:hover{border-color:var(--ink)}
+.btn-ghost{background:transparent;color:#fff;border:1px solid var(--line-dark)}
+.btn-ghost:hover{border-color:#6C767D}
+.btn-sm{padding:9px 14px;font-size:11.5px}
+
+/* ---------- sections ---------- */
+.sec{padding:34px 0 0}
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.sec-head h2{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:14.5px;letter-spacing:.09em;margin:0;white-space:nowrap}
+.sec-head .rule{flex:1;height:1px;background:var(--line)}
+.sec-head .tag{font-family:var(--data);font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.card .body{padding:20px}
+.card h3{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:17px;letter-spacing:.02em;margin:0 0 6px}
+.card p{margin:0;color:#4A4741;font-size:14.5px}
+
+/* sign-in card */
+.signin .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.signin input[type=email]{
+  flex:1;min-width:200px;font-family:var(--body);font-size:15px;color:var(--ink);
+  background:#fff;border:1px solid #C9C4BA;border-radius:8px;padding:12px 13px;
+}
+.signin input[type=email]:focus-visible{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(231,183,51,.22)}
+.signin .msg{font-family:var(--data);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+
+/* build record */
+.record-head{background:linear-gradient(180deg,var(--slate-2),var(--slate));color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.record-head .t{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:15px;letter-spacing:.04em}
+.record-head .n{font-family:var(--data);font-size:10.5px;letter-spacing:.12em;color:var(--muted-dark);margin-top:4px;text-transform:uppercase}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #EDEAE4}
+.meta div{padding:14px 20px;border-right:1px solid #EDEAE4}
+.meta div:last-child{border-right:0}
+.meta .k{font-family:var(--data);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.meta .v{font-size:14.5px;font-weight:500}
+.record-foot{display:flex;gap:12px;flex-wrap:wrap;padding:16px 20px 20px}
+
+/* fluid sheet */
+.specs{width:100%;border-collapse:collapse;font-size:14px}
+.specs th{font-family:var(--data);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:500;padding:12px 20px 9px;border-bottom:1px solid var(--line)}
+.specs td{padding:12px 20px;border-bottom:1px solid #EDEAE4;vertical-align:top}
+.specs tr:last-child td{border-bottom:0}
+.specs .sys{font-family:var(--data);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.specs .fluid{font-weight:500}
+.specs .num{font-family:var(--data);font-size:12.5px;white-space:nowrap;text-align:right}
+details.sheet > summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+details.sheet > summary::-webkit-details-marker{display:none}
+details.sheet > summary .st{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:14px;letter-spacing:.05em}
+details.sheet > summary .sc{font-family:var(--data);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+details.sheet[open] > summary{border-bottom:1px solid var(--line)}
+.sheet-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 20px;background:#FBFAF8;border-top:1px solid var(--line);flex-wrap:wrap}
+.sheet-foot .n{font-family:var(--data);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* preferred customer */
+.pc{border-color:#E2CE93;background:linear-gradient(180deg,var(--amber-wash),#fff 60%)}
+.pc .kicker{font-family:var(--data);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-deep);margin-bottom:8px}
+.pc h3{font-size:20px;font-weight:800;line-height:1.16;margin-bottom:8px}
+
+/* referral */
+.refer{margin-top:14px;border:1px solid var(--line);border-radius:var(--r);background:rgba(255,255,255,.55);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.refer h3{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:13.5px;letter-spacing:.05em;margin:0 0 4px}
+.refer p{margin:0;color:var(--muted);font-size:14px;max-width:44ch}
+
+/* certificate overlay */
+.certoverlay{position:fixed;inset:0;background:rgba(22,24,26,.72);z-index:50;display:flex;flex-direction:column;padding:max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom))}
+.certoverlay .bar{display:flex;justify-content:flex-end;padding-bottom:10px}
+.certoverlay iframe{flex:1;width:100%;border:0;border-radius:10px;background:#fff}
+
+footer{padding:40px 0 56px;color:var(--muted);text-align:center}
+footer .stale{font-family:var(--data);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-top:8px}
+
+/* motion */
+.rise{opacity:0;transform:translateY(10px);animation:rise .5s cubic-bezier(.22,.7,.3,1) forwards}
+.rise:nth-of-type(2){animation-delay:.05s}
+.rise:nth-of-type(3){animation-delay:.1s}
+.rise:nth-of-type(4){animation-delay:.15s}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .rise{animation:none;opacity:1;transform:none}
+  .btn:hover{transform:none}
+  .gauge .val{transition:none}
+}
+
+/* touch devices: every control clears the 44px minimum tap target */
+@media (pointer:coarse){
+  .btn{min-height:46px}
+  .btn-sm{min-height:44px}
+  .signout,.linkish{min-height:44px;display:inline-flex;align-items:center}
+  .field select,.rig-picks select{min-height:46px}
+  details.sheet > summary{min-height:52px}
+}
+
+@media (max-width:640px){
+  .fields{grid-template-columns:1fr}
+  .gauges{grid-template-columns:1fr}
+  .gauge{display:flex;align-items:center;gap:16px;text-align:left;padding:14px}
+  .gauge svg{width:74px;height:74px;margin:0;flex:0 0 74px}
+  .meta{grid-template-columns:1fr}
+  .meta div{border-right:0;border-bottom:1px solid #EDEAE4}
+  .meta div:last-child{border-bottom:0}
+  .specs .num{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<div class="stripe" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="brandmark">My Tuned Yota</span>
+    <button class="signout" id="authBtn" type="button">Sign in</button>
+  </div>
+</div>
+
+<!-- ==========================================================
+     THE CLUSTER
+     ========================================================== -->
+<section class="cluster">
+  <div class="wrap">
+
+    <!-- ---- new member ---- -->
+    <div class="cluster-empty" id="clusterEmpty" hidden>
+      <h1>Let's set up your truck</h1>
+      <p>Tell us what you drive and this page becomes its service record — the exact fluids it takes, the intervals they're due on, and your tune paperwork in one place.</p>
+      <div class="addbox">
+        <div class="fields">
+          <div class="field">
+            <label class="mono" for="make">Make</label>
+            <select id="make"><option value="">Select…</option></select>
+          </div>
+          <div class="field">
+            <label class="mono" for="model">Model</label>
+            <select id="model" disabled><option value="">Pick a make first</option></select>
+          </div>
+          <div class="field">
+            <label class="mono" for="year">Year</label>
+            <select id="year" disabled><option value="">Pick a model first</option></select>
+          </div>
+        </div>
+        <div class="row">
+          <button class="btn btn-amber" id="addVehicle" type="button" disabled>Set up my truck</button>
+          <span class="note">Takes about 10 seconds</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- active member ---- -->
+    <div id="clusterFilled" hidden>
+      <div class="rig-line">
+        <div>
+          <h1 class="rig-name" id="rigName"></h1>
+          <div class="rig-sub" id="rigSub"></div>
+        </div>
+        <div class="odo" id="odo" hidden>
+          <div class="lab">Odometer</div>
+          <div class="digits" id="odoDigits"></div>
+          <div class="update" id="odoUpdate"></div>
+        </div>
+      </div>
+      <div class="rig-picks" id="rigPicks" hidden></div>
+      <!-- per-system service gauges, computed by /.netlify/functions/member-data -->
+      <div class="gauges" id="gauges" hidden></div>
+    </div>
+
+  </div>
+</section>
+
+<main class="wrap" id="main">
+
+  <!-- SIGN IN -->
+  <section class="sec rise" id="signinSec" hidden>
+    <div class="sec-head"><h2>Your paperwork</h2><span class="rule"></span></div>
+    <div class="card signin">
+      <div class="body">
+        <h3>Been tuned? Sign in.</h3>
+        <p>Your tune certificate and saved trucks live on your account. We'll email you a sign-in link — no password.</p>
+        <div class="row">
+          <input type="email" id="signinEmail" inputmode="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+          <button class="btn btn-ink" id="signinBtn" type="button">Email my sign-in link</button>
+        </div>
+        <div class="msg" id="signinMsg" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILD RECORD -->
+  <section class="sec rise" id="recordSec" hidden>
+    <div class="sec-head"><h2>Build record</h2><span class="rule"></span><span class="tag" id="recordTag"></span></div>
+    <div class="card">
+      <div class="record-head">
+        <div>
+          <div class="t" id="recordCal"></div>
+          <div class="n" id="recordDate"></div>
+        </div>
+      </div>
+      <div class="meta" id="recordMeta"></div>
+      <div class="record-foot">
+        <button class="btn btn-quiet btn-sm" type="button" id="certView">View certificate</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUID SHEET -->
+  <section class="sec rise" id="sheetSec" hidden>
+    <div class="sec-head"><h2>Fluid sheet</h2><span class="rule"></span></div>
+    <details class="card sheet">
+      <summary>
+        <span class="st" id="sheetTitle">Every fluid your truck takes</span>
+        <span class="sc" id="sheetCount"></span>
+      </summary>
+      <table class="specs">
+        <thead><tr><th>System</th><th>Fluid</th><th style="text-align:right">Capacity / interval</th></tr></thead>
+        <tbody id="sheetRows"></tbody>
+      </table>
+      <div class="sheet-foot">
+        <span class="n">Capacities are for your exact engine and drivetrain</span>
+        <a class="btn btn-quiet btn-sm" data-external id="sheetOrder" href="https://www.tunedyota.com/amsoil-garage#store">Order any of these</a>
+      </div>
+    </details>
+  </section>
+
+  <!-- PREFERRED CUSTOMER -->
+  <section class="sec rise" id="pcSec">
+    <div class="sec-head"><h2>Member pricing</h2><span class="rule"></span></div>
+    <div class="card pc">
+      <div class="body">
+        <div class="kicker">One-time enrollment · no renewal fee</div>
+        <h3>Save up to 25% on every fluid your truck takes.</h3>
+        <p>Enroll once as a Preferred Customer under Tuned Yota and the discount applies to every item on your fluid sheet — this year and every year you own the truck. Orders are sold, shipped and fulfilled by AMSOIL Inc.</p>
+        <div style="margin-top:16px"><a class="btn btn-amber" data-external href="https://www.amsoil.com/offers/pc/?zo=30713116">Become a Preferred Customer</a></div>
+      </div>
+    </div>
+
+    <div class="refer" id="referBox" hidden>
+      <div>
+        <h3>Send a buddy your link</h3>
+        <p>Your personal referral link — share it with a friend who wants their Toyota tuned.</p>
+      </div>
+      <button class="btn btn-quiet" type="button" id="referCopy">Copy my link</button>
+    </div>
+  </section>
+
+  <footer>
+    <div class="mono">Tuned Yota · Authorized OTT Installer · MN · IA · WI · ND · SD · NE</div>
+    <div class="stale" id="staleNote" hidden></div>
+  </footer>
+</main>
+
+<!-- certificate viewer -->
+<div class="certoverlay" id="certOverlay" hidden>
+  <div class="bar"><button class="btn btn-amber btn-sm" type="button" id="certClose">Close</button></div>
+  <iframe id="certFrame" title="Your tune certificate"></iframe>
+</div>
+
+<script src="/amsoil-garage-render.js"></script>
+<script>
+/* ==========================================================
+   CAPACITOR: outbound links
+   Inside the app the origin is capacitor://localhost. A plain
+   <a href="https://..."> navigates the app's own WebView away
+   from the bundled assets — white screen, no way back.
+   Route anything marked data-external through the in-app
+   browser instead. Falls through to normal behavior on the web.
+   Requires: @capacitor/browser (installed in app/package.json)
+   ========================================================== */
+(function(){
+  var inApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  if (!inApp) return;
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('a[data-external]');
+    if (!a) return;
+    var url = a.getAttribute('href');
+    if (!url || url === '#') return;
+    e.preventDefault();
+    var B = window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+    if (B) { B.open({ url: url, presentationStyle: 'popover' }); }
+    else { window.open(url, '_system'); }
+  });
+})();
+</script>
+<script>
+(function () {
+  var AG = window.AmsoilGarage;
+  var NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  var SITE = "https://tunedyota.com";
+  var TOKEN_KEY = "ty_client_token";       // shared with app.html + account.html
+  var GARAGE_KEY = "ty_amsoil_garage";     // shared guest-garage store
+  var CACHE_KEY = "ty_myty_cache";         // last good runtime payload (offline render)
+  var SEL_KEY = "ty_myty_sel";             // {veh: index, eng: engine-string}
+  var CUR_YEAR = new Date().getFullYear() + 1;
+
+  var CAT = null;        // amsoil-garage.json (products + vehicles), runtime-fetched
+  var MEMBER = null;     // member-data payload: vehicle, calibration, odometer, gauges, fluidSheet
+  var REFERRAL = "";
+  var STALE_AT = "";     // set when rendering from cached payload
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { var d = document.createElement("div"); d.textContent = String(s == null ? "" : s); return d.innerHTML; }
+  function tok() { return localStorage.getItem(TOKEN_KEY) || ""; }
+  function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function read(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } }
+
+  // account.html / app.html pattern incl. sliding token renewal
+  function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ "x-client-token": tok() }, opts.headers || {});
+    return fetch("/.netlify/functions/" + path, opts).then(function (res) {
+      var renewed = res.headers.get("x-renewed-token");
+      if (renewed) localStorage.setItem(TOKEN_KEY, renewed);
+      if (res.status === 401) { localStorage.removeItem(TOKEN_KEY); MEMBER = null; REFERRAL = ""; }
+      return res;
+    });
+  }
+
+  function garage() {
+    var v = read(GARAGE_KEY);
+    return Array.isArray(v) ? v : [];
+  }
+  function setGarage(list) {
+    store(GARAGE_KEY, list);
+    if (tok()) api("client-garage", { method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vehicles: list }) }).catch(function () {});
+  }
+
+  function saveCache() {
+    store(CACHE_KEY, { at: new Date().toISOString(), catalog: CAT, member: MEMBER, referral: REFERRAL });
+  }
+
+  /* ---- gauge helper: kept for the service-history payload (endpoint
+     pending). usage: setGauge(el, milesLeft, intervalMiles). The track is
+     a 270° arc, so a full interval = 75 dash units. */
+  function setGauge(gaugeEl, milesLeft, interval) {
+    var used = Math.max(0, Math.min(1, (interval - milesLeft) / interval));
+    gaugeEl.querySelector(".val").setAttribute("stroke-dasharray", (used * 75).toFixed(1) + " " + (100 - used * 75).toFixed(1));
+    gaugeEl.classList.remove("g-ok", "g-warn", "g-due");
+    gaugeEl.classList.add(milesLeft <= 0 ? "g-due" : milesLeft < interval * 0.15 ? "g-warn" : "g-ok");
+  }
+  window.TYMyTunedYota = { setGauge: setGauge }; // exposed for tests + future wiring
+
+  /* ================= data loads ================= */
+
+  // Catalog: live site first (fresh prices/specs — CapacitorHttp does this
+  // natively in the app, no CORS), then last-good cache, then the copy
+  // bundled with the app.
+  function loadCatalog() {
+    var liveUrl = NATIVE ? SITE + "/amsoil-garage.json" : "/amsoil-garage.json";
+    return fetch(liveUrl).then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { CAT = j; saveCache(); })
+      .catch(function () {
+        var c = read(CACHE_KEY);
+        if (c && c.catalog) { CAT = c.catalog; STALE_AT = c.at || ""; return; }
+        if (NATIVE) return fetch("/amsoil-garage.json").then(function (r) { return r.json(); })
+          .then(function (j) { CAT = j; }).catch(function () {});
+      });
+  }
+
+  // The one member call: /.netlify/functions/member-data computes the whole
+  // logbook server-side (vehicle, calibration, odometer, gauges, fluid sheet).
+  // client-certs rides along only for the personal referral link.
+  function loadMember() {
+    if (!tok()) return Promise.resolve();
+    var memberP = api("member-data").then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { if (j.status === "ok") { MEMBER = j; saveCache(); } })
+      .catch(function () {
+        var c = read(CACHE_KEY);
+        if (c && c.member) { MEMBER = c.member; STALE_AT = STALE_AT || c.at || ""; }
+      });
+    var referP = api("client-certs").then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { REFERRAL = j.referralLink || ""; saveCache(); })
+      .catch(function () {
+        var c = read(CACHE_KEY);
+        if (c && c.referral) REFERRAL = c.referral;
+      });
+    var garageP = api("client-garage").then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (j) { if (j.status === "ok") store(GARAGE_KEY, j.vehicles || []); })
+      .catch(function () {});
+    return Promise.all([memberP, referP, garageP]);
+  }
+
+  /* ================= vehicle resolution ================= */
+
+  function selection() { return read(SEL_KEY) || {}; }
+  function currentVehicle() {
+    var g = garage();
+    if (!g.length) return null;
+    var i = selection().veh || 0;
+    return g[Math.min(i, g.length - 1)];
+  }
+  function resolveCurrent() {
+    var v = currentVehicle();
+    if (!v || !CAT) return null;
+    return AG.resolveVehicle({ make: v.make, model: v.model,
+      year: v.year ? parseInt(v.year, 10) : null, engine: selection().eng || null },
+      CAT, CUR_YEAR, true);
+  }
+
+  function yearsFor(gens) {
+    var out = [];
+    for (var y = CUR_YEAR; y >= 1990; y--) {
+      if (gens.some(function (g) { return AG.inRange(g.y, y, CUR_YEAR); })) out.push(y);
+    }
+    return out;
+  }
+
+  /* ================= render ================= */
+
+  function memberVehicle() { return MEMBER && MEMBER.vehicle ? MEMBER.vehicle : null; }
+  function shortRig(name) { return String(name || "").replace(/^(Toyota|Lexus)\s+/i, "").trim(); }
+
+  function render() {
+    var mv = memberVehicle();
+    var g = garage(), v = currentVehicle(), r = mv ? null : resolveCurrent();
+
+    $("authBtn").textContent = tok() ? "Sign out" : "Sign in";
+    var hasRig = !!(mv || v);
+    $("clusterEmpty").hidden = hasRig;
+    $("clusterFilled").hidden = !hasRig;
+    $("signinSec").hidden = !!tok();
+
+    if (mv) {
+      // signed in: the server payload is the truth (booking vehicle first,
+      // else the first garage truck) — no client-side re-derivation
+      $("rigName").textContent = ((mv.modelYear ? mv.modelYear + " " : "") + shortRig(mv.vehicle)).trim();
+      var sub = esc(mv.engine || mv.vehicle);
+      if (MEMBER.calibration && MEMBER.calibration.name) sub += ' · <span class="cal">' + esc(MEMBER.calibration.name) + "</span>";
+      $("rigSub").innerHTML = sub;
+      $("rigPicks").hidden = true;
+    } else if (v) {
+      $("rigName").textContent = (v.year ? v.year + " " : "") + v.model;
+      $("rigSub").innerHTML = r ? esc(r.gen.e) : esc(v.make);
+      renderPicks(g, r);
+    }
+
+    renderOdo();
+    renderGauges();
+    renderRecord();
+    renderSheet(r, v);
+
+    $("referBox").hidden = !REFERRAL;
+    var stale = $("staleNote");
+    stale.hidden = !STALE_AT;
+    if (STALE_AT) stale.textContent = "Offline — showing your saved copy from " + STALE_AT.slice(0, 10);
+  }
+
+  /* ---- odometer ---- */
+  function renderOdo() {
+    var box = $("odo"), o = MEMBER && MEMBER.odometer;
+    box.hidden = !memberVehicle();
+    if (box.hidden) return;
+    var digits = $("odoDigits");
+    if (o && o.miles != null) {
+      digits.hidden = false;
+      digits.setAttribute("aria-label", o.miles.toLocaleString() + " miles");
+      digits.innerHTML = String(o.miles).split("").map(function (d) { return "<span>" + d + "</span>"; }).join("") +
+        '<span class="unit">mi</span>';
+    } else {
+      digits.hidden = true;
+    }
+    $("odoUpdate").innerHTML = '<button class="linkish" type="button" id="logMiles">' +
+      (o ? "Update miles" : "Log your miles") + "</button>";
+    $("logMiles").onclick = showOdoInput;
+  }
+
+  function showOdoInput() {
+    var up = $("odoUpdate");
+    up.innerHTML = '<input type="tel" inputmode="numeric" id="odoInput" aria-label="Current miles" placeholder="Miles"> ' +
+      '<button class="linkish" type="button" id="odoSave">Save</button>';
+    var input = $("odoInput");
+    input.focus();
+    function save() {
+      var n = parseInt(String(input.value).replace(/[^\d]/g, ""), 10);
+      if (!n || n <= 0) { input.focus(); return; }
+      $("odoSave").disabled = true;
+      api("member-data", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ odometer: n }) })
+        .then(function (r) { if (!r.ok) throw 0; return loadMember(); })
+        .then(render)
+        .catch(function () {
+          renderOdo();
+          alert("Couldn't save your miles — check your connection and try again.");
+        });
+    }
+    $("odoSave").onclick = save;
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") save(); });
+  }
+
+  /* ---- gauges (values computed server-side by member-data) ---- */
+  function fmtMiles(n) {
+    if (n == null) return "—";
+    if (n <= 0) return "DUE";
+    return n >= 10000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + "k" : String(n);
+  }
+
+  function renderGauges() {
+    var box = $("gauges");
+    var list = ((MEMBER && MEMBER.gauges) || []).filter(function (x) { return x.milesLeft != null; });
+    box.hidden = !list.length;
+    if (!list.length) return;
+    box.innerHTML = list.map(function (x) {
+      var label = x.system + ": " + (x.milesLeft > 0 ? x.milesLeft.toLocaleString() + " miles remaining" : "service due");
+      return '<div class="gauge"><svg viewBox="0 0 100 100" role="img" aria-label="' + esc(label) + '">' +
+        '<circle class="track" cx="50" cy="50" r="40" pathLength="100" stroke-dasharray="75 25" transform="rotate(-225 50 50)"/>' +
+        '<circle class="val" cx="50" cy="50" r="40" pathLength="100" stroke-dasharray="0 100" transform="rotate(-225 50 50)"/>' +
+        '<text class="rem" x="50" y="49" text-anchor="middle">' + esc(fmtMiles(x.milesLeft)) + "</text>" +
+        '<text class="remlab" x="50" y="61" text-anchor="middle">MILES LEFT</text></svg>' +
+        '<div class="sys">' + esc(x.system) + "</div>" +
+        '<div class="fluid">' + esc(x.product || "") + "</div></div>";
+    }).join("");
+    Array.prototype.forEach.call(box.children, function (el, i) {
+      setGauge(el, list[i].milesLeft, list[i].intervalMiles);
+    });
+  }
+
+  function renderPicks(g, r) {
+    var box = $("rigPicks"), html = "";
+    if (g.length > 1) {
+      html += '<select id="vehSel" aria-label="Choose truck">' + g.map(function (x, i) {
+        return '<option value="' + i + '"' + (i === (selection().veh || 0) ? " selected" : "") + ">" +
+          esc((x.year ? x.year + " " : "") + x.make + " " + x.model) + "</option>";
+      }).join("") + "</select>";
+    }
+    if (r && r.matches.length > 1) {
+      var cur = r.gen.e;
+      html += '<select id="engSel" aria-label="Choose engine">' + r.matches.map(function (m) {
+        return '<option' + (m.e === cur ? " selected" : "") + ">" + esc(m.e) + "</option>";
+      }).join("") + "</select>";
+    }
+    box.innerHTML = html;
+    box.hidden = !html;
+    var vs = $("vehSel");
+    if (vs) vs.onchange = function () { store(SEL_KEY, { veh: +this.value }); render(); };
+    var es = $("engSel");
+    if (es) es.onchange = function () {
+      var s = selection(); s.eng = this.value; store(SEL_KEY, s); render();
+    };
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return "";
+    var d = new Date(iso + "T12:00:00");
+    return isNaN(d) ? iso : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function renderRecord() {
+    var cal = MEMBER && MEMBER.calibration;
+    $("recordSec").hidden = !cal;
+    if (!cal) return;
+    var mv = memberVehicle();
+    $("recordTag").textContent = "Certificate";
+    $("recordCal").textContent = cal.name || "OTT Calibration";
+    $("recordDate").textContent = "Flashed " + fmtDate(cal.date);
+    $("recordMeta").innerHTML =
+      '<div><div class="k">Vehicle</div><div class="v">' + esc(((mv && mv.modelYear ? mv.modelYear + " " : "") + (mv ? mv.vehicle : "")).trim()) + "</div></div>" +
+      '<div><div class="k">Calibration</div><div class="v">' + esc(cal.name || "OTT") + "</div></div>" +
+      '<div><div class="k">Date</div><div class="v">' + esc(fmtDate(cal.date)) + "</div></div>";
+    $("certView").onclick = function () {
+      var btn = this; btn.disabled = true;
+      api("client-certs?recordId=" + encodeURIComponent(cal.recordId))
+        .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+        .then(function (html) {
+          $("certFrame").srcdoc = html;
+          $("certOverlay").hidden = false;
+        })
+        .catch(function () { alert("Couldn't load your certificate — check your connection and try again."); })
+        .then(function () { btn.disabled = false; });
+    };
+  }
+
+  function sheetRow(system, product, capacity, unit, interval) {
+    var cap = capacity + " " + (unit === "ea" ? "×" : unit);
+    return "<tr><td class=\"sys\">" + esc(system) + "</td><td class=\"fluid\">" + esc(product) +
+      "</td><td class=\"num\">" + esc(cap + (interval ? " · " + interval : "")) + "</td></tr>";
+  }
+
+  function renderSheet(r, v) {
+    var rows = [], title = "", order = "";
+    if (MEMBER && MEMBER.fluidSheet && MEMBER.fluidSheet.length) {
+      var mv = memberVehicle();
+      title = "Every fluid your " + shortRig(mv.vehicle) + " takes";
+      rows = MEMBER.fluidSheet.map(function (s) {
+        return sheetRow(s.system, s.product, s.capacity, s.unit, s.tunedInterval || s.factoryInterval);
+      });
+      order = MEMBER.garageUrl || "https://www.tunedyota.com/amsoil-garage";
+    } else if (r) {
+      title = "Every fluid your " + r.model + " takes";
+      rows = r.gen.systems.map(function (s) {
+        var p = (CAT.products || {})[s.sku] || {};
+        return sheetRow(s.system, p.name || s.sku, s.capacity, s.unit, s.tunedInterval || s.factoryInterval);
+      });
+      order = "https://www.tunedyota.com/amsoil-garage?v=" + encodeURIComponent(r.make + ":" + r.model) +
+        (v && v.year ? "&y=" + encodeURIComponent(v.year) : "") +
+        "&e=" + encodeURIComponent(r.gen.e) + "#store";
+    }
+    $("sheetSec").hidden = !rows.length;
+    if (!rows.length) return;
+    $("sheetTitle").textContent = title;
+    $("sheetRows").innerHTML = rows.join("");
+    $("sheetCount").textContent = rows.length + " systems · tap to open";
+    $("sheetOrder").setAttribute("href", order);
+  }
+
+  /* ================= vehicle setup (empty state) ================= */
+
+  function initPicker() {
+    if (!CAT) return;
+    var makeEl = $("make"), modelEl = $("model"), yearEl = $("year"), addBtn = $("addVehicle");
+    makeEl.innerHTML = '<option value="">Select…</option>' + Object.keys(CAT.vehicles).map(function (m) {
+      return "<option>" + esc(m) + "</option>";
+    }).join("");
+    makeEl.onchange = function () {
+      modelEl.disabled = !this.value;
+      addBtn.disabled = true;
+      yearEl.disabled = true; yearEl.innerHTML = '<option value="">Pick a model first</option>';
+      modelEl.innerHTML = this.value
+        ? '<option value="">Select…</option>' + Object.keys(CAT.vehicles[this.value]).map(function (m) {
+            return "<option>" + esc(m) + "</option>";
+          }).join("")
+        : '<option value="">Pick a make first</option>';
+    };
+    modelEl.onchange = function () {
+      yearEl.disabled = !this.value;
+      addBtn.disabled = true;
+      yearEl.innerHTML = this.value
+        ? '<option value="">Select…</option>' + yearsFor(CAT.vehicles[makeEl.value][this.value]).map(function (y) {
+            return "<option>" + y + "</option>";
+          }).join("")
+        : '<option value="">Pick a model first</option>';
+    };
+    yearEl.onchange = function () { addBtn.disabled = !this.value; };
+    addBtn.onclick = function () {
+      if (!makeEl.value || !modelEl.value || !yearEl.value) return;
+      var list = garage().concat([{ make: makeEl.value, model: modelEl.value, year: String(yearEl.value) }]);
+      store(SEL_KEY, { veh: list.length - 1 });
+      setGarage(list);
+      render();
+    };
+  }
+
+  /* ================= auth ================= */
+
+  $("authBtn").onclick = function () {
+    if (tok()) {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(CACHE_KEY);
+      MEMBER = null; REFERRAL = ""; STALE_AT = "";
+      render();
+    } else {
+      $("signinSec").hidden = false;
+      $("signinEmail").focus();
+    }
+  };
+
+  $("signinBtn").onclick = function () {
+    var email = $("signinEmail").value.trim(), msg = $("signinMsg"), btn = this;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      msg.hidden = false; msg.textContent = "Enter the email you booked with."; return;
+    }
+    btn.disabled = true;
+    fetch("/.netlify/functions/client-auth", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "request", email: email }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        msg.hidden = false;
+        msg.textContent = j.status === "sent"
+          ? "Check your email — your sign-in link works for 30 minutes."
+          : "Couldn't send the link. Try again in a minute.";
+      })
+      .catch(function () { msg.hidden = false; msg.textContent = "Couldn't send the link. Try again in a minute."; })
+      .then(function () { btn.disabled = false; });
+  };
+
+  $("certClose").onclick = function () { $("certOverlay").hidden = true; $("certFrame").srcdoc = ""; };
+
+  $("referCopy").onclick = function () {
+    if (!REFERRAL) return;
+    var btn = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(REFERRAL) : Promise.reject())
+      .then(function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy my link"; }, 1800); })
+      .catch(function () { prompt("Your referral link:", REFERRAL); });
+  };
+
+  /* ================= boot ================= */
+
+  // Magic-link landing (?lt=...): exchange for a session token, then union
+  // this device's garage into the account — mirrors app.html.
+  var qs = new URLSearchParams(location.search);
+  var boot = Promise.resolve();
+  if (qs.get("lt")) {
+    boot = fetch("/.netlify/functions/client-auth", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "exchange", token: qs.get("lt") }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.status === "ok") {
+          localStorage.setItem(TOKEN_KEY, j.token);
+          return api("client-garage", { method: "PUT", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ vehicles: garage(), merge: true }) })
+            .then(function (r2) { return r2.json(); })
+            .then(function (g) { if (g.status === "ok") store(GARAGE_KEY, g.vehicles || []); });
+        }
+      }).catch(function () {})
+      .then(function () { history.replaceState(null, "", location.pathname + location.hash); });
+  }
+
+  render(); // shell + whatever local state gives us, immediately
+  boot
+    .then(function () { return Promise.all([loadCatalog(), loadMember()]); })
+    .then(function () { initPicker(); render(); });
+})();
+</script>
+</body>
+</html>
