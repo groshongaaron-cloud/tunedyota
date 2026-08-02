@@ -2099,7 +2099,7 @@
         // Merge: confirm, then absorb dup into this lead (this lead is survivor).
         var mergeBtn=document.createElement('button'); mergeBtn.className='btn'; mergeBtn.textContent='Merge';
         mergeBtn.onclick=function(){
-          if(!confirm('Merge "'+esc(dup.name||'(no name)')+'" into "'+esc(l.name||'(no name)'+'"? This cannot be undone.\n\nThe surviving record keeps all contacts and history.'))) return;
+          if(!confirm('Merge "'+esc(dup.name||'(no name)')+'" into "'+esc(l.name||'(no name)')+'"\? This cannot be undone.\n\nThe surviving record keeps all contacts and history.')) return;
           mergeBtn.disabled=true; mergeBtn.textContent='Merging…';
           (async function(){
             try{
