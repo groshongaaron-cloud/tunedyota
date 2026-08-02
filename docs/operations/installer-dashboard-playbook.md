@@ -164,7 +164,7 @@ Do this on the booking card **after the calibration is written and road-verified
 2. **OTT Calibration** — pick what you **actually flashed**: Light · Mild · Medium · Spicy · SS, or an
    adjacent combo (Light and Mild · Mild and Medium · Medium and Spicy · Spicy and SS). On the 2024+
    turbo trucks (Tacoma 2024+, 4Runner 2025+, LC250) the dropdown also offers Stage 1 - Basic ·
-   Stage 1 - Enhanced · Stage 2 · Stage 3.
+   Stage 1 - Enhanced · Stage 2 · Stage 3 · Mild-Spicy.
 3. **OTT commission fields** (for the monthly report — never printed on the customer certificate):
    **Tuning Platform** (VFT / HPT / PCM / BB), **Calibration Type** (Basic, MAF, Supercharger, 9.2
    New/Update, TCM Update, Custom, K-Line, …), **ECU ID**, **Gear ratio** (e.g. 4.30), **Mileage**.

@@ -328,11 +328,12 @@
 <div class="toast" id="toast"></div>
 <script>
   var CAL = ["Light","Mild","Medium","Spicy","SS","Light and Mild","Mild and Medium","Medium and Spicy","Spicy and SS"];
-  // Stage tiers OTT uses on the 2024+ turbo trucks — offered IN ADDITION to the
-  // classic tiers, and only when the booking's vehicle is one of those platforms
-  // (Tacoma 2024+, 4Runner 2025+, LC250). Keep in sync with CAL_OPTIONS in
-  // netlify/functions/lib/certificate.js, which is what the server accepts.
-  var CAL_STAGES = ["Stage 1 - Basic","Stage 1 - Enhanced","Stage 2","Stage 3"];
+  // Platform-specific tiers OTT uses on the 2024+ turbo trucks — offered IN
+  // ADDITION to the classic tiers, and only when the booking's vehicle is one of
+  // those platforms (Tacoma 2024+, 4Runner 2025+, LC250). Keep in sync with
+  // CAL_OPTIONS in netlify/functions/lib/certificate.js, which is what the
+  // server accepts.
+  var CAL_STAGES = ["Stage 1 - Basic","Stage 1 - Enhanced","Stage 2","Stage 3","Mild-Spicy"];
   // Declared before the boot call: showApp() runs load() synchronously mid-script
   // (no biometric await anymore), so anything load() touches before its first await
   // must already be assigned — setTimeout(fn, undefined) fires immediately.
