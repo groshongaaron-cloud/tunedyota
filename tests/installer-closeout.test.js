@@ -247,9 +247,10 @@ test("a cert-send failure still leaves the booking Completed, certSent false", a
 
 test("accepts a multi-select Installer array (Airtable multi-select returns [\"cody\"])", async () => {
   const updates = []; let sent = null;
-  // admin: true — this test covers multi-select installer normalization, not the report-field gate
-  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light" },
-    { env, key: "cody", admin: true, now: new Date("2026-07-03T12:00:00Z"),
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Light",
+      vin: "5TFDW5F17MX000000", tuningPlatform: "VFT", calibrationType: "Basic",
+      ecuId: "04C21", gearSize: "4.30", mileage: "85000", modelYear: "2022" },
+    { env, key: "cody", admin: false, now: new Date("2026-07-03T12:00:00Z"),
       get: async () => ({ id: "rec1", fields: { Installer: ["cody"], Name: "Jane", Vehicle: "Tundra" } }),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });
@@ -374,9 +375,10 @@ test("a malformed/oversized signature is ignored, completion still succeeds", as
 
 test("a booking tagged with the legacy long-label Installer option is still closeable by its installer", async () => {
   const updates = []; let sent = null;
-  // admin: true — this test covers legacy installer key normalization, not the report-field gate
-  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy" },
-    { env, key: "noah", admin: true, now: new Date("2026-07-18T12:00:00Z"),
+  const out = await processCloseout({ recordId: "rec1", action: "complete", calibration: "Spicy",
+      vin: "5TFDW5F17MX000000", tuningPlatform: "VFT", calibrationType: "Basic",
+      ecuId: "04C21", gearSize: "4.30", mileage: "85000", modelYear: "2021" },
+    { env, key: "noah", admin: false, now: new Date("2026-07-18T12:00:00Z"),
       get: async () => recFor(["Noah - Milwaukee, Green Bay, Kohler, "]),
       update: async (a) => { updates.push(a.fields); return {}; },
       send: async (m) => { sent = m; return { ok: true }; } });

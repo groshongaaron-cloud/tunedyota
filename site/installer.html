@@ -1579,12 +1579,12 @@
     // Drafts tab: bookings with a saved close-out draft
     if(STATE.jobTab==='drafts'){
       var draftBookings=STATE.bookings.filter(function(bk){ return bk.closeoutDraft && bk.status!=='Completed' && bk.status!=='No-show'; });
-      if(!draftBookings.length){ var dre=document.createElement('div'); dre.className='empty'; dre.textContent='No saved drafts.'; host.appendChild(dre); return; }
+      if(!draftBookings.length){ STATE.jobTab='all'; renderFeed(); return; }
       host.appendChild(secHead('Drafts',''));
       // Group by event key to use the same eventCard UI
       var draftEvMap={};
       draftBookings.forEach(function(bk){ var k=(bk.city||'')+'|'+(bk.dateISO||''); (draftEvMap[k]=draftEvMap[k]||{key:k,city:bk.city||'',dateISO:bk.dateISO||'',installer:bk.installer||'',bookings:[],done:0,open:0,no:0,total:0,hasOpen:true}).bookings.push(bk); });
-      Object.keys(draftEvMap).sort().forEach(function(k){ var e=draftEvMap[k]; e.total=e.bookings.length; host.appendChild(eventCard(e,e.bookings,true,true,false)); });
+      Object.keys(draftEvMap).sort().forEach(function(k){ var e=draftEvMap[k]; e.total=e.bookings.length; host.appendChild(eventCard(e,e.bookings,true,true)); });
       return;
     }
 
@@ -2046,7 +2046,7 @@
   }
   function leadCard(l){
     var overdue=(ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
-    var det=document.createElement('details'); det.className='evt';
+    var det=document.createElement('details'); det.className='evt'; det.dataset.leadId=l.id;
     // Arriving from a calendar follow-up chip: open this card, flash it, scroll to it.
     if(STATE.leadOpenId===l.id){
       det.open=true; det.classList.add('flash'); STATE.leadOpenId='';
@@ -2117,7 +2117,7 @@
         // Merge: confirm, then absorb dup into this lead (this lead is survivor).
         var mergeBtn=document.createElement('button'); mergeBtn.className='btn'; mergeBtn.textContent='Merge';
         mergeBtn.onclick=function(){
-          if(!confirm('Merge "'+esc(dup.name||'(no name)')+'" into "'+esc(l.name||'(no name)')+'"\? This cannot be undone.\n\nThe surviving record keeps all contacts and history.')) return;
+          if(!confirm('Merge "'+(dup.name||'(no name)')+'" into "'+(l.name||'(no name)')+'"\? This cannot be undone.\n\nThe surviving record keeps all contacts and history.')) return;
           mergeBtn.disabled=true; mergeBtn.textContent='Merging…';
           (async function(){
             try{
@@ -2126,19 +2126,14 @@
                 body:JSON.stringify({id:l.id,action:'merge',duplicateId:dup.id})});
               var out=await res.json().catch(function(){return{};});
               if(res.ok && out.status==='ok' && out.merged){
-                var survivorId=out.survivorId;
-                // Patch STATE: remove both cards, patch survivor back in.
-                STATE.leads=(STATE.leads||[]).filter(function(x){ return x.id!==l.id && x.id!==dup.id; });
-                if(out.survivor){ STATE.leads.unshift(out.survivor); }
+                // Reload from server — survivor data is authoritative; also recomputes duplicates.
+                STATE.leadOpenId=out.survivorId;
                 if(!out.deleted){
                   succeed('Merged — cleanup retry needed (the duplicate may still appear). Refresh to retry.');
-                  // Leave the strip visible on re-render by not removing dup from survivor.
                 } else {
                   succeed('✓ Merged into one record. Card highlighted below.');
                 }
-                // Jump-and-flash the survivor.
-                STATE.leadOpenId=survivorId;
-                renderLeads();
+                loadLeads();
               } else {
                 mergeBtn.disabled=false; mergeBtn.textContent='Merge';
                 fail('Could not merge: '+(out.error||res.status));
@@ -2151,12 +2146,10 @@
         var reviewBtn=document.createElement('button'); reviewBtn.className='btn ghost dup-review'; reviewBtn.textContent='Review';
         reviewBtn.onclick=function(){
           det.open=true;
-          // Find the duplicate's card in the feed and open + scroll it.
-          var cards=document.querySelectorAll('#feed details.evt');
-          Array.prototype.forEach.call(cards,function(c){
-            var s=c.querySelector('.etitle');
-            if(s && s.textContent.indexOf(dup.name||'')>=0){ c.open=true; c.scrollIntoView({block:'start',behavior:'smooth'}); }
-          });
+          // Find the duplicate's card in the feed by stable lead id, not fragile name substring.
+          var dupCard=document.querySelector('#feed details[data-lead-id="'+dup.id+'"]');
+          if(dupCard){ dupCard.open=true; dupCard.scrollIntoView({block:'start',behavior:'smooth'}); }
+          else { STATE.leadOpenId=dup.id; renderLeads(); }
         };
         drow.appendChild(reviewBtn);
         // Notes: open this lead's note input and focus it.
@@ -2772,8 +2765,9 @@
   }
 
   function highlightMissingFields(id, missing){
-    var fieldMap={vin:'vin_'+id,calibration:'cal_'+id,tuningPlatform:'tp_'+id,calibrationType:'ct_'+id,
-      ecuId:'ecu_'+id,gearSize:'gear_'+id,mileage:'mi_'+id,customerEmail:'cem_'+id,modelYear:'yr_'+id};
+    // Keys must match the Airtable display names the server returns in the missing[] array.
+    var fieldMap={'VIN':'vin_'+id,'Tuning Platform':'tp_'+id,'Calibration Type':'ct_'+id,
+      'ECU ID':'ecu_'+id,'Gear Size':'gear_'+id,'Mileage':'mi_'+id,'Model Year':'yr_'+id};
     var first=null;
     (missing||[]).forEach(function(f){
       var el=document.getElementById(fieldMap[f]||f+'_'+id);
@@ -2795,7 +2789,7 @@
     var mi=val('mi_'+id).replace(/[^0-9]/g,''); if(!adminForce && !mi){ fail('Enter the mileage.'); return; }
     var cem=val('cem_'+id);
     var pref=val('cocPref_'+id);
-    var yr=val('yr_'+id).trim().slice(0,4);
+    var yr=val('yr_'+id).trim().slice(0,4); if(!adminForce && !yr){ fail('Enter the model year.'); return; }
     if(!adminForce && STATE.vinBlocked[id]){ var ack=document.getElementById('ackvin_'+id); if(!(ack && ack.checked)){ fail("Double-check the VIN, or tick 'I\\'ve verified this VIN is correct'."); return; } }
     var extra={action:'complete',calibration:cal,vin:vin,tuningPlatform:tp,calibrationType:ct,ecuId:ecu,gearSize:gear,mileage:mi,customerEmail:cem,preferredContact:pref,modelYear:yr};
     if(adminForce) extra.adminForce=true;
