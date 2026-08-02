@@ -9,9 +9,12 @@ const { cfg, createRecord, createTolerant, escapeFormula, listRecords } = requir
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
+const { ensureClientRecordForBooking } = require("./lib/leads.js");
 
 async function processWalkin(body, deps) {
   const { env = process.env, fetchImpl = fetch, now = new Date(), key, admin = false,
+          log = console,
+          ensureClient = ensureClientRecordForBooking,
           create = (a) => createRecord({ fetchImpl, ...a }),
           list = (a) => listRecords({ fetchImpl, ...a }) } = deps;
   const d = body || {};
@@ -80,6 +83,13 @@ async function processWalkin(body, deps) {
   catch (e) { return { status: "error", error: "store-unavailable" }; }
 
   const id = rec && rec.id;
+  try {
+    await ensureClient(id, {
+      Name: name, Phone: phone, Email: email, City: bookCity,
+      Vehicle: vehicle, ...(modelYear ? { "Model Year": modelYear } : {}), Installer: ownerKey },
+      { env, fetchImpl, channel: "walk-in" });
+  } catch (e) { if (log.error) log.error("walkin client-record", e.message); }
+
   return { status: "booked", recordId: id, booking: {
     id, city: bookCity, dateISO, installer: ownerKey, slot: "", slotLabel: "", scheduledTime: time, address,
     name, vehicle, phone, email,

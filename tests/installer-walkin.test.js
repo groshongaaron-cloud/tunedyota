@@ -213,3 +213,56 @@ test("modelYear present → written to Model Year field on Bookings; absent → 
   assert.equal(out2.status, "booked");
   assert.equal("Model Year" in fields2, false);
 });
+
+// B3: walk-in bookings get the same first-touch CRM treatment as online bookings.
+// The ensureClient dep is injected so real Airtable calls are never made in tests.
+test("walk-in booking ensures a client record — awaited, fail-open", async () => {
+  const calls = [];
+  let resolvedBeforeProcessWalkin = false;
+
+  const ensureClient = async (bookingId, fields, opts) => {
+    calls.push({ bookingId, fields, opts });
+    // Two chained yields are required: a single Promise.resolve() resolves in the same
+    // microtask batch as the caller's own resolution, making the check vacuous for
+    // fire-and-forget callers. A second yield ensures the stub's continuation always
+    // runs AFTER an un-awaited caller has already returned.
+    resolvedBeforeProcessWalkin = false;
+    await Promise.resolve();
+    await Promise.resolve(); // second yield — makes fire-and-forget detectable
+    resolvedBeforeProcessWalkin = true;
+  };
+
+  const out = await processWalkin(
+    { city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555-1234",
+      email: "jo@x.com", vehicle: "Tundra", modelYear: "2019" },
+    { env, key: "cody", create: async () => ({ id: "recB3" }),
+      log: { warn() {}, error() {} }, ensureClient });
+
+  assert.equal(out.status, "booked");
+
+  // ensureClient must have been called exactly once, with the new booking id
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].bookingId, "recB3");
+
+  // Fields must carry Name, Phone, Email, Vehicle, Installer, and Model Year
+  assert.equal(calls[0].fields.Name, "Jo");
+  assert.equal(calls[0].fields.Phone, "555-1234");
+  assert.equal(calls[0].fields.Email, "jo@x.com");
+  assert.equal(calls[0].fields.Vehicle, "Tundra");
+  assert.equal(calls[0].fields.Installer, "cody");
+  assert.equal(calls[0].fields["Model Year"], "2019");
+
+  // channel must be "walk-in"
+  assert.equal(calls[0].opts.channel, "walk-in");
+
+  // AWAITED: the async stub completed before processWalkin returned
+  assert.equal(resolvedBeforeProcessWalkin, true);
+
+  // Fail-open: a throwing ensureClient must NOT reject processWalkin — walk-in still books
+  const out2 = await processWalkin(
+    { city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
+    { env, key: "cody", create: async () => ({ id: "recB3b" }),
+      log: { warn() {}, error() {} },
+      ensureClient: async () => { throw new Error("airtable timeout"); } });
+  assert.equal(out2.status, "booked");
+});
