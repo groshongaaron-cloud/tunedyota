@@ -14,6 +14,7 @@ const read = (p) => { try { return fs.readFileSync(path.join(__dirname, p), "utf
 const PLAYBOOK = read("../../../docs/sales/nepq-playbook.md");
 const VOICE = read("../../../docs/email-voice.md");
 const VEHICLES = (() => { try { return require("./vehicles.json"); } catch { return {}; } })();
+const EVENTS = (() => { try { return require("./events-data.js"); } catch { return {}; } })();
 
 function labelForPage(ctx) {
   if (ctx === "amsoil") return "an AMSOIL Fluid Specialist assistant — lead with fluid/maintenance expertise";
@@ -27,6 +28,25 @@ function pricingSummary() {
     lines.push(`${make} ${model}: ` + VEHICLES[make][model].map((c) => `${c.y} ${c.e} from $${c.base}`).join(" · "));
   }
   return lines.join("\n");
+}
+
+// Upcoming events from the deploy-baked schedule (events-data.js regenerates
+// from Airtable at build) — "when are you in my city" was the most common
+// question the agent could not answer in the 2026-08 transcript mining.
+// Deploy-static data, so the frozen-prompt rule holds; only the daily
+// future-date cutoff moves.
+function eventsSummary(now = new Date()) {
+  const today = now.toISOString().slice(0, 10);
+  const out = [];
+  for (const [city, list] of Object.entries(EVENTS)) {
+    for (const e of Array.isArray(list) ? list : []) {
+      if (!e || e.active === false || !e.dateISO || e.dateISO < today) continue;
+      const cityName = city.replace(/\b\w/g, (ch) => ch.toUpperCase());
+      out.push({ d: e.dateISO, line: `${cityName} — ${e.dateISO}${e.address && !/to be released/i.test(e.address) ? ` (${e.address})` : ""}` });
+    }
+  }
+  out.sort((a, b) => a.d.localeCompare(b.d));
+  return out.slice(0, 30).map((x) => x.line).join("\n") || "No events currently published — point them at the booking page for the latest.";
 }
 
 const TRANSFER_TOOL = {
@@ -54,6 +74,10 @@ function buildSystemPrompt(pageContext) {
     "OTT stands for Overland Tailor Tuning — the ECU calibration provider whose tunes Tuned Yota's certified installers flash at events. Never expand OTT as anything else.",
     "The chat window has already greeted the customer with: \"Thank you for using Tuned Yota's chat agent.\" — do NOT repeat that greeting; answer their first message directly.",
     "Style: chat, not email. 1-3 short sentences per reply. Follow the NEPQ method below — mirror the customer's words, ask one question at a time, advance toward either the booking page (https://tunedyota.com/find-your-exact-tune) or a live-installer transfer. Never hard-sell.",
+    "Early in every conversation, naturally get their first name (\"Happy to help — who am I talking with?\") and use it. Every person who reaches out is a client record; a name makes the record real.",
+    "LINK HYGIENE (customers reported broken links): when you send any URL, put it on its own line with NOTHING before or after it on that line — no period, comma, parentheses, or closing punctuation. SMS and Messenger clients swallow trailing punctuation into the link and it 404s.",
+    "FRUSTRATION RULE: if the customer asks for a human/real person a second time, or shows frustration with the AI (\"what even is this\", swearing at the bot), stop the playbook and switch to TRANSFER MODE immediately with whatever fields you have — do not ask another discovery question first.",
+    "Measured performance example you may share when asked about gains (never as a promise): on Tuned Yota's own 5.7L Tundra shop truck, the tune alone measured +40 whp on an otherwise-stock calibration. Results vary by vehicle, fuel, and mods — offer a live installer transfer for expectations on THEIR truck.",
     "",
     "== HARD GUARDRAILS (no exceptions — offer a live installer transfer instead) ==",
     "1. NEVER quote custom, negotiated, or bundle pricing. Published per-vehicle base prices below are OK to state.",
@@ -67,6 +91,8 @@ function buildSystemPrompt(pageContext) {
     "== VOICE ==", VOICE.slice(0, 3000),
     "== MARKETS (city → installer) ==",
     MARKETS.map((m) => `${m.city}, ${m.state} → ${(INSTALLERS[m.inst] || INSTALLERS.aaron).name}`).join("\n"),
+    "== UPCOMING EVENTS (published schedule — dates are bookable via the booking page) ==",
+    eventsSummary().slice(0, 2500),
     "== PUBLISHED PRICING ==", pricingSummary().slice(0, 4000),
   ].join("\n");
 }

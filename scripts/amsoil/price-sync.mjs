@@ -1,18 +1,19 @@
 // scripts/amsoil/price-sync.mjs
-// Weekly price-sync agent. Launches ONE headless Chromium session, fetches each
-// garage SKU's amsoil.com product page (bypassing Cloudflare), parses retail/sale,
+// Weekly price-sync agent. Fetches each garage SKU's amsoil.com product page
+// via the Firecrawl API (Cloudflare hard-blocks headless Chromium from this
+// host since ~2026-08 — see lib/firecrawl-fetch.mjs), parses retail/sale,
 // applies within the ±40% guardrail, writes site/amsoil-garage.json, posts a
 // summary to the /notify Slack relay. Pass --commit to git commit+push.
 // Schedule locally with Windows Task Scheduler (same host as scripts/measure/).
+// Needs FIRECRAWL_API_KEY (user-level env var, same key as the firecrawl MCP).
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import { parsePrice } from "./lib/price-parse.mjs";
 import { decide, applyToProduct } from "./lib/sync.mjs";
-import { fetchProductHtml } from "./lib/browser-fetch.mjs";
+import { fetchProductHtmlViaFirecrawl } from "./lib/firecrawl-fetch.mjs";
 import { buildAmsoilPages, AMSOIL_PAGE_FILES, AMSOIL_GUIDE_FILES, AMSOIL_GEO_FILES, AMSOIL_PRODUCT_FILES } from "../build-amsoil-pages.mjs";
-import { chromium } from "playwright";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const DATA = path.join(ROOT, "site", "amsoil-garage.json");
@@ -29,58 +30,33 @@ async function notify(text) {
   } catch (e) { console.error("notify failed:", e.message); }
 }
 
-const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
-
-// Stability flags keep headless Chromium from crashing its network service on a
-// constrained/unattended host; the log flags keep it from spamming the task log.
-function launchBrowser() {
-  return chromium.launch({
-    headless: true,
-    args: ["--disable-dev-shm-usage", "--disable-gpu", "--disable-logging", "--log-level=3"],
-  });
-}
-
 async function main() {
   const cat = JSON.parse(fs.readFileSync(DATA, "utf8"));
   const applied = [], held = [];
 
-  // Fresh browser context per product to reset the Cloudflare cookie (a reused session
-  // gets fingerprinted + blocked). Each product is isolated in its own try/catch so one
-  // Chromium hiccup can't abort the whole run; the browser is relaunched if it dies.
-  let browser = await launchBrowser();
-  try {
-    for (const sku of Object.keys(cat.products)) {
-      const p = cat.products[sku];
-      if (!p.productPath) continue;
+  // Each product is isolated in its own try/catch so one fetch hiccup can't
+  // abort the whole run.
+  for (const sku of Object.keys(cat.products)) {
+    const p = cat.products[sku];
+    if (!p.productPath) continue;
 
-      try {
-        if (!browser.isConnected()) browser = await launchBrowser();
-        const ctx = await browser.newContext({ userAgent: UA, locale: "en-US" });
-        let html, blocked;
-        try {
-          const page = await ctx.newPage();
-          ({ html, blocked } = await fetchProductHtml(page, BASE + p.productPath, 5000));
-        } finally {
-          await ctx.close().catch(() => {});
-        }
+    try {
+      const { html, blocked, error } = await fetchProductHtmlViaFirecrawl(BASE + p.productPath);
 
-        if (blocked) {
-          held.push(`${sku}: HELD — blocked/challenge (len<20k or 403)`);
-        } else {
-          const parsed = parsePrice(html);
-          const d = decide(p, parsed);
-          if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
-          else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
-        }
-      } catch (e) {
-        held.push(`${sku}: HELD — error ${String(e.message || e).split("\n")[0].slice(0, 120)}`);
+      if (blocked) {
+        held.push(`${sku}: HELD — ${error || "blocked/challenge (len<20k or 403)"}`);
+      } else {
+        const parsed = parsePrice(html);
+        const d = decide(p, parsed);
+        if (d.action === "apply") { applyToProduct(p, parsed, TODAY); applied.push(`${sku}: ${d.from ?? "—"} → ${d.to} (${d.reason})`); }
+        else if (d.action === "hold") { held.push(`${sku}: HELD ${d.from ?? "—"} → ${d.to ?? "?"} (${d.reason})`); }
       }
-
-      // Polite delay between products to avoid rate-limiting
-      await new Promise(r => setTimeout(r, 8000));
+    } catch (e) {
+      held.push(`${sku}: HELD — error ${String(e.message || e).split("\n")[0].slice(0, 120)}`);
     }
-  } finally {
-    await browser.close().catch(() => {});
+
+    // Firecrawl handles site politeness; this only paces our API usage.
+    await new Promise(r => setTimeout(r, 2000));
   }
 
   if (applied.length) {
