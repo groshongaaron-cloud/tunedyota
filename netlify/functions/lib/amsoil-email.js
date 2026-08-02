@@ -59,7 +59,7 @@ function buildAmsoilEmail({ name, vehicle, modelYear, fluids, bookingId, account
         <a href="${url}" style="display:inline-block;background:#191c1e;color:#fff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 26px;border-radius:8px;">Shop your fluids &amp; save up to 25% &#9658;</a>
       </div>
       <p style="font-size:13px;color:#8a8f94;text-align:center;margin:8px 0 0;"><a href="${pcUrl}" style="color:#8a8f94;text-decoration:underline;">Become a Preferred Customer under Tuned Yota</a> and save up to 25% for life on every future order.</p>
-      <p style="font-size:13px;color:#8a8f94;text-align:center;margin:8px 0 0;"><a href="${accountUrl || "https://tunedyota.com/account"}" style="color:#8a8f94;text-decoration:underline;">View your certificates &amp; AMSOIL garage</a></p>
+      <p style="font-size:13px;color:#8a8f94;text-align:center;margin:8px 0 0;"><a href="${accountUrl || "https://tunedyota.com/account"}" style="color:#8a8f94;text-decoration:underline;">View your certificates &amp; AMSOIL garage</a> &middot; <a href="https://tunedyota.com/my-tuned-yota" style="color:#8a8f94;text-decoration:underline;">your truck&rsquo;s logbook</a></p>
 ${reviewUrl ? `      <div style="margin:22px 0 4px;padding:16px 18px;background:#faf9f7;border:1px solid #e7e3da;border-radius:10px;text-align:center;">
         <p style="font-size:14px;color:#191c1e;font-weight:700;margin:0 0 6px;">Happy with how it&rsquo;s running?</p>
         <p style="font-size:13px;color:#5b6066;margin:0 0 12px;">A quick Google review is the single biggest thing that helps other Toyota &amp; Lexus owners find us &mdash; a line about your vehicle and your city is perfect.</p>
@@ -75,6 +75,7 @@ ${reviewUrl ? `      <div style="margin:22px 0 4px;padding:16px 18px;background:
     `Your ${fluids && fluids.model ? fluids.make + " " + fluids.model : "tuned vehicle"} is dialed in. ` +
     `Here are the exact AMSOIL synthetic fluids for your vehicle - shop and save up to 25% as a Preferred Customer: ${url}\n\n` +
     `View your certificates & AMSOIL garage anytime: ${accountUrl || "https://tunedyota.com/account"}\n\n` +
+    `Track your miles and services in your truck's logbook: https://tunedyota.com/my-tuned-yota\n\n` +
     (reviewUrl ? `Happy with how it's running? A quick Google review helps other Toyota & Lexus owners find us: ${reviewUrl}\n\n` : "") +
     `Reply UNSUBSCRIBE to stop AMSOIL emails.\nTuned Yota - Authorized AMSOIL Dealer`;
   return { subject, html, text };

@@ -10,23 +10,24 @@
 <style>
 /* ==========================================================
    SELF-HOSTED FONTS — required for Capacitor.
-   Files live in assets/fonts/ (copied into the app bundle by
-   app/scripts/sync-web.mjs). No network call, so the page
-   renders correctly offline and on first launch.
+   Files live in /assets/fonts/ (copied into the app bundle by
+   app/scripts/sync-web.mjs). Root-absolute so they resolve from
+   both /my-tuned-yota.html and the extensionless /my-tuned-yota
+   route. No network call — renders offline and on first launch.
    ========================================================== */
-@font-face{font-family:'Archivo';src:url('assets/fonts/archivo-var.woff2') format('woff2-variations');
+@font-face{font-family:'Archivo';src:url('/assets/fonts/archivo-var.woff2') format('woff2-variations');
   font-weight:100 900;font-style:normal;font-display:swap}
-@font-face{font-family:'IBM Plex Sans';src:url('assets/fonts/ibm-plex-sans-400.woff2') format('woff2');
+@font-face{font-family:'IBM Plex Sans';src:url('/assets/fonts/ibm-plex-sans-400.woff2') format('woff2');
   font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'IBM Plex Sans';src:url('assets/fonts/ibm-plex-sans-500.woff2') format('woff2');
+@font-face{font-family:'IBM Plex Sans';src:url('/assets/fonts/ibm-plex-sans-500.woff2') format('woff2');
   font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:'IBM Plex Sans';src:url('assets/fonts/ibm-plex-sans-600.woff2') format('woff2');
+@font-face{font-family:'IBM Plex Sans';src:url('/assets/fonts/ibm-plex-sans-600.woff2') format('woff2');
   font-weight:600;font-style:normal;font-display:swap}
-@font-face{font-family:'IBM Plex Mono';src:url('assets/fonts/ibm-plex-mono-400.woff2') format('woff2');
+@font-face{font-family:'IBM Plex Mono';src:url('/assets/fonts/ibm-plex-mono-400.woff2') format('woff2');
   font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'IBM Plex Mono';src:url('assets/fonts/ibm-plex-mono-500.woff2') format('woff2');
+@font-face{font-family:'IBM Plex Mono';src:url('/assets/fonts/ibm-plex-mono-500.woff2') format('woff2');
   font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:'IBM Plex Mono';src:url('assets/fonts/ibm-plex-mono-600.woff2') format('woff2');
+@font-face{font-family:'IBM Plex Mono';src:url('/assets/fonts/ibm-plex-mono-600.woff2') format('woff2');
   font-weight:600;font-style:normal;font-display:swap}
 </style>
 <style>
@@ -296,7 +297,11 @@ footer .stale{font-family:var(--data);font-size:10.5px;letter-spacing:.1em;text-
 
 <div class="topbar">
   <div class="wrap">
-    <span class="brandmark">My Tuned Yota</span>
+    <span style="display:flex;align-items:center;gap:12px">
+      <!-- back to the app shell; shown only inside the native app -->
+      <a class="signout" id="backBtn" href="/" hidden>&lsaquo; App</a>
+      <span class="brandmark">My Tuned Yota</span>
+    </span>
     <button class="signout" id="authBtn" type="button">Sign in</button>
   </div>
 </div>
@@ -923,6 +928,8 @@ footer .stale{font-family:var(--data);font-size:10.5px;letter-spacing:.1em;text-
       }).catch(function () {})
       .then(function () { history.replaceState(null, "", location.pathname + location.hash); });
   }
+
+  if (NATIVE) $("backBtn").hidden = false; // way back to the app shell tabs
 
   render(); // shell + whatever local state gives us, immediately
   boot

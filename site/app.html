@@ -166,6 +166,7 @@
       if (gen !== renderGen) return; // stale: a newer render() has run
       var g = garage();
       VIEW.innerHTML =
+        '<div class="card" id="logbook" style="cursor:pointer"><h3>My Tuned Yota</h3><p>Your truck&rsquo;s logbook — service gauges, odometer, fluid sheet &amp; your tune certificate →</p></div>' +
         g.map(function (v, i) {
           return '<div class="card" data-veh="' + i + '" style="cursor:pointer"><h3>' + esc(String(v.year || "").split("|")[0] + " " + v.make + " " + v.model) + "</h3><p>" +
             (certsFor(v).length ? "Certificate ✓ · " : "") + "Tap for fluids, upgrades & more →</p></div>";
@@ -173,6 +174,7 @@
         '<button class="cta ghost" id="addveh">+ Add another vehicle</button>' +
         (tok() ? "" : '<div class="card"><h3>Tuned with us before?</h3><p>Sign in to see your Certificates of Calibration.</p><button class="cta" id="signin" style="margin-bottom:0">Sign in — no password</button></div>');
       VIEW.onclick = function (e) {
+        if (e.target.closest("#logbook")) { location.href = "/my-tuned-yota"; return; }
         var c = e.target.closest("[data-veh]");
         if (c) return go("#vehicle/" + c.getAttribute("data-veh"));
         if (e.target.id === "addveh") { renderFirstRun(); }

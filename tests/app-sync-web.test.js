@@ -26,11 +26,15 @@ test("sync-web bundles the my-tuned-yota member page with its fonts", () => {
   // no placeholder prices or sample vehicles may ship in the bundle
   assert.ok(!/\$\d/.test(page), "no hardcoded dollar amounts");
   assert.ok(!page.includes("previewbar"), "preview switch removed");
-  // every @font-face source must exist in the bundle
-  for (const m of page.matchAll(/url\('assets\/fonts\/([^']+)'\)/g)) {
+  // every @font-face source must exist in the bundle (root-absolute paths so
+  // they resolve from the extensionless /my-tuned-yota route too)
+  const fontRefs = [...page.matchAll(/url\('\/assets\/fonts\/([^']+)'\)/g)];
+  assert.ok(fontRefs.length >= 7, "all seven font faces declared with root-absolute sources");
+  for (const m of fontRefs) {
     assert.ok(fs.existsSync(path.join(www, "assets", "fonts", m[1])), `missing font: ${m[1]}`);
   }
-  assert.ok(page.match(/@font-face/g).length >= 7, "all seven font faces declared");
+  // the clean URL must resolve inside the bundle like privacy/terms do
+  assert.ok(fs.existsSync(path.join(www, "my-tuned-yota", "index.html")), "extensionless /my-tuned-yota route");
   // outbound links must be absolute and routed through the in-app browser
   for (const m of page.matchAll(/<a[^>]*data-external[^>]*href="([^"]+)"/g)) {
     assert.match(m[1], /^https:\/\//, `data-external link not absolute: ${m[1]}`);

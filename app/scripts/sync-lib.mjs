@@ -63,9 +63,10 @@ export function assemble() {
   for (const f of FONTS) {
     fs.copyFileSync(path.join(SITE, "assets", "fonts", f), path.join(WWW, "assets", "fonts", f));
   }
-  // Extensionless /privacy and /terms: create index.html inside each dir so
-  // Capacitor's local server resolves /privacy and /terms without redirects.
-  for (const name of ["privacy", "terms"]) {
+  // Extensionless routes: create index.html inside each dir so Capacitor's
+  // local server resolves the clean URL (the same path the web uses) without
+  // redirects. Pages served this way must use root-absolute asset URLs.
+  for (const name of ["privacy", "terms", "my-tuned-yota"]) {
     const dir = path.join(WWW, name);
     fs.mkdirSync(dir, { recursive: true });
     fs.copyFileSync(path.join(WWW, name + ".html"), path.join(dir, "index.html"));
