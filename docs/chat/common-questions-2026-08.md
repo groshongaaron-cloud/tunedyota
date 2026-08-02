@@ -37,9 +37,18 @@ customer PII in this doc. Re-run the mining with
    otherwise-stock 5.7L calibration (owner-approved figure), always with
    results-vary framing and a transfer offer.
 
-## Open Aaron decisions (would unlock more autonomous answers)
+## Aaron decisions — RESOLVED 2026-08-02 (all wired into lib/chat-agent.js)
 
-- A one-line approved **warranty stance** the agent may state before offering a transfer.
-- A stated **military discount policy** (asked directly, guardrail currently forces a transfer).
-- Whether the agent may quote the **supercharger dyno numbers** (245.85 → 361.73 rwhp,
-  owner-approved for social) when customers ask about supercharger gains.
+- **Warranty stance (approved copy):** warranties are subjective; Tuned Yota has
+  never had a warranty issue and can't promise one may or may not occur — nuanced
+  cases go to a phone conversation. Encouraging facts the agent may state: the OTT
+  calibration reads as a stock calibration ID; OTT has SEMA-certified engine
+  calibrations (EPA Tampering Policy compliance under the Clean Air Act) and
+  CARB-certified engine platforms (often tougher than federal standards).
+  Guardrail 4 now scopes to this stance instead of forcing every warranty
+  question into a transfer.
+- **Military discount:** only when the client brings it up — "Yes, thank you for
+  your service, we really appreciate it. As a token of our gratitude we discount 10%."
+- **Supercharger dyno figures:** quote only numbers published at
+  overlandtailor.com; factory/base output figures from magnusonsuperchargers.com.
+  Never invent or estimate.

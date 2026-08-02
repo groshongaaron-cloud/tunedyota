@@ -30,3 +30,28 @@ test("measured-gains example is framed as measured, with results-vary caveat", (
   assert.match(prompt, /\+40/, "approved tune-alone whp figure");
   assert.match(prompt, /vary/i, "no blanket promise");
 });
+
+// Aaron's approved stances, 2026-08-02 — these unlock autonomous answers the
+// guardrails previously forced into a transfer round-trip.
+
+test("approved warranty & emissions stance: SEMA, CARB, stock calibration ID, never-had-an-issue, phone nuance", () => {
+  assert.match(prompt, /SEMA/, "SEMA-certified calibrations");
+  assert.match(prompt, /CARB/, "CARB-certified platforms");
+  assert.match(prompt, /Clean Air Act/);
+  assert.match(prompt, /stock calibration ID/i, "OTT cal reads as stock ID");
+  assert.match(prompt, /never had a warranty issue/i);
+  assert.match(prompt, /phone/i, "nuanced cases still go to a live conversation");
+  // the hard guardrail still exists, now scoped to the approved stance
+  assert.match(prompt, /never make warranty/i);
+});
+
+test("military discount: 10%, thank-them wording, only when the client brings it up", () => {
+  assert.match(prompt, /thank you for your service/i);
+  assert.match(prompt, /10%/);
+  assert.match(prompt, /brings it up|client raises|asks about/i, "never volunteered unprompted");
+});
+
+test("supercharger dyno figures come from the approved sources, never invented", () => {
+  assert.match(prompt, /overlandtailor\.com/);
+  assert.match(prompt, /magnusonsuperchargers\.com/);
+});
