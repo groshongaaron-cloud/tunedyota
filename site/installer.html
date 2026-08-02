@@ -1798,7 +1798,7 @@
     sum.innerHTML='<span class="etitle">＋ Log a walk-in / call-in</span><span class="pill">any day</span>';
     det.appendChild(sum);
     var box=document.createElement('div'); box.className='ebody walkmini';
-    var n=mkInput('Customer name'), v=mkInput('Vehicle — incl. year (e.g. 2021 Tundra)'), p=mkInput('Phone'); p.inputMode='tel';
+    var n=mkInput('Customer name'), v=mkInput('Vehicle (e.g. Tundra 5.7L)'), p=mkInput('Phone'); p.inputMode='tel';
     var ld=document.createElement('label'); ld.className='fld'; ld.textContent='Date of tune';
     var dt=document.createElement('input'); dt.type='date'; dt.value=STATE.walkPrefillDate||STATE.today;
     if(STATE.walkPrefillDate){ det.open=true; STATE.walkOpen[K]=true; STATE.walkPrefillDate=''; }
@@ -1907,7 +1907,7 @@
   // ---- Leads pipeline ----
   var LEAD_STAGES=['New','Contacted','Qualified','Following up','Booked','Not now'];
   var ACTIVE_LEAD_STAGES=LEAD_STAGES.slice(0,LEAD_STAGES.indexOf('Booked'));
-  var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶','ott-national':'🇺🇸',other:'•'};
+  var CHAN_ICON={email:'📧',sms:'💬',phone:'📞',facebook:'f',instagram:'ig','walk-in':'🚶','ott-national':'🇺🇸',web:'🌐',other:'•'};
   async function loadLeads(){
     try{
       var res=await fetch('/.netlify/functions/leads-list',{headers:{'x-installer-token':tok()}});
@@ -2086,6 +2086,71 @@
         }));
       });
       body.appendChild(sg);
+    }
+    // "Possible duplicate" — same phone/email as another open lead. Merge / Review / Notes.
+    // Multiple duplicates: one strip per duplicate entry (each confirmed by the server).
+    if((l.duplicates||[]).length){
+      l.duplicates.forEach(function(dup){
+        var ds=document.createElement('div'); ds.className='ffnote';
+        var dt=document.createElement('div');
+        dt.innerHTML='⚠ Possible duplicate: <b>'+esc(dup.name||'(no name)')+'</b> — '+esc(dup.channel||'—')+' · '+esc(dup.stage||'—');
+        ds.appendChild(dt);
+        var drow=document.createElement('div'); drow.className='walkmini'; drow.style.marginTop='4px';
+        // Merge: confirm, then absorb dup into this lead (this lead is survivor).
+        var mergeBtn=document.createElement('button'); mergeBtn.className='btn'; mergeBtn.textContent='Merge';
+        mergeBtn.onclick=function(){
+          if(!confirm('Merge "'+esc(dup.name||'(no name)')+'" into "'+esc(l.name||'(no name)'+'"? This cannot be undone.\n\nThe surviving record keeps all contacts and history.'))) return;
+          mergeBtn.disabled=true; mergeBtn.textContent='Merging…';
+          (async function(){
+            try{
+              var res=await fetch('/.netlify/functions/lead-update',{method:'POST',
+                headers:{'Content-Type':'application/json','x-installer-token':tok()},
+                body:JSON.stringify({id:l.id,action:'merge',duplicateId:dup.id})});
+              var out=await res.json().catch(function(){return{};});
+              if(res.ok && out.status==='ok' && out.merged){
+                var survivorId=out.survivorId;
+                // Patch STATE: remove both cards, patch survivor back in.
+                STATE.leads=(STATE.leads||[]).filter(function(x){ return x.id!==l.id && x.id!==dup.id; });
+                if(out.survivor){ STATE.leads.unshift(out.survivor); }
+                if(!out.deleted){
+                  succeed('Merged — cleanup retry needed (the duplicate may still appear). Refresh to retry.');
+                  // Leave the strip visible on re-render by not removing dup from survivor.
+                } else {
+                  succeed('✓ Merged into one record. Card highlighted below.');
+                }
+                // Jump-and-flash the survivor.
+                STATE.leadOpenId=survivorId;
+                renderLeads();
+              } else {
+                mergeBtn.disabled=false; mergeBtn.textContent='Merge';
+                fail('Could not merge: '+(out.error||res.status));
+              }
+            }catch(e){ mergeBtn.disabled=false; mergeBtn.textContent='Merge'; fail('Network error — try again.'); }
+          })();
+        };
+        drow.appendChild(mergeBtn);
+        // Review: open both cards' detail panels and scroll the duplicate into view.
+        var reviewBtn=document.createElement('button'); reviewBtn.className='btn ghost dup-review'; reviewBtn.textContent='Review';
+        reviewBtn.onclick=function(){
+          det.open=true;
+          // Find the duplicate's card in the feed and open + scroll it.
+          var cards=document.querySelectorAll('#feed details.evt');
+          Array.prototype.forEach.call(cards,function(c){
+            var s=c.querySelector('.etitle');
+            if(s && s.textContent.indexOf(dup.name||'')>=0){ c.open=true; c.scrollIntoView({block:'start',behavior:'smooth'}); }
+          });
+        };
+        drow.appendChild(reviewBtn);
+        // Notes: open this lead's note input and focus it.
+        var notesBtn=document.createElement('button'); notesBtn.className='btn ghost dup-notes'; notesBtn.textContent='📝 Notes';
+        notesBtn.onclick=function(){
+          det.open=true;
+          if(ninp){ ninp.scrollIntoView({block:'nearest',behavior:'smooth'}); ninp.focus(); }
+        };
+        drow.appendChild(notesBtn);
+        ds.appendChild(drow);
+        body.appendChild(ds);
+      });
     }
     // Client-portal account behind this lead (matched by email).
     if(l.client){
