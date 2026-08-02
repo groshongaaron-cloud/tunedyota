@@ -38,6 +38,9 @@ test("walkAdder (event-side walk-in form) has a model year number input", () => 
 
 const env = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b" };
 const okCreate = async () => ({ id: "recNEW" });
+// Stub deps shared by legacy tests that don't exercise ensureClient directly.
+// Prevents real Airtable network calls (ensureClient default) and console noise (log default).
+const silentDeps = { ensureClient: async () => ({}), log: { error() {}, warn() {} } };
 
 test("requires name + phone", async () => {
   const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "", phone: "" }, { env, key: "cody", create: okCreate });
@@ -48,7 +51,7 @@ test("requires name + phone", async () => {
 test("an unknown city BOOKS anyway — owned by the adding installer, city kept as typed", async () => {
   let created;
   const out = await processWalkin({ city: "Bemidji", dateISO: "2026-07-03", name: "Jo", phone: "555" },
-    { env, key: "cody", create: async (a) => { created = a; return { id: "recFREE" }; } });
+    { ...silentDeps, env, key: "cody", create: async (a) => { created = a; return { id: "recFREE" }; } });
   assert.equal(out.status, "booked");
   assert.equal(created.fields.City, "Bemidji");
   assert.equal(created.fields.Installer, "cody");
@@ -59,7 +62,7 @@ test("an unknown city BOOKS anyway — owned by the adding installer, city kept 
 test("an admin may direct-assign any booking to a chosen installer (overrides market routing)", async () => {
   let created;
   const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555", installer: "noah" },
-    { env, key: "aaron", admin: true, create: async (a) => { created = a; return { id: "recOVR" }; } });
+    { ...silentDeps, env, key: "aaron", admin: true, create: async (a) => { created = a; return { id: "recOVR" }; } });
   assert.equal(out.status, "booked");
   assert.equal(created.fields.Installer, "noah");
   assert.equal(out.booking.installer, "noah");
@@ -68,7 +71,7 @@ test("an admin may direct-assign any booking to a chosen installer (overrides ma
 test("a non-admin cannot use the installer override", async () => {
   let created;
   const out = await processWalkin({ city: "Bemidji", dateISO: "2026-07-03", name: "Jo", phone: "555", installer: "noah" },
-    { env, key: "cody", admin: false, create: async (a) => { created = a; return { id: "r" }; } });
+    { ...silentDeps, env, key: "cody", admin: false, create: async (a) => { created = a; return { id: "r" }; } });
   assert.equal(out.status, "booked");
   assert.equal(created.fields.Installer, "cody");   // override ignored — still the adder
 });
@@ -76,7 +79,7 @@ test("a non-admin cannot use the installer override", async () => {
 test("an appointment time is saved to Scheduled Time and echoed back", async () => {
   let created;
   const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555", time: "10:30 AM" },
-    { env, key: "cody", create: async (a) => { created = a; return { id: "recT" }; } });
+    { ...silentDeps, env, key: "cody", create: async (a) => { created = a; return { id: "recT" }; } });
   assert.equal(out.status, "booked");
   assert.equal(created.fields["Scheduled Time"], "10:30 AM");
   assert.equal(out.booking.scheduledTime, "10:30 AM");
@@ -86,14 +89,14 @@ test("a full install address is saved to Address and echoed back (never required
   let created;
   const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555",
     address: "  7337 L St, Omaha, NE 68127  " },
-    { env, key: "cody", create: async (a) => { created = a; return { id: "recA" }; } });
+    { ...silentDeps, env, key: "cody", create: async (a) => { created = a; return { id: "recA" }; } });
   assert.equal(out.status, "booked");
   assert.equal(created.fields.Address, "7337 L St, Omaha, NE 68127");
   assert.equal(out.booking.address, "7337 L St, Omaha, NE 68127");
   // and omitting it stays clean — no Address key, empty echo
   let created2;
   const out2 = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
-    { env, key: "cody", create: async (a) => { created2 = a; return { id: "recB" }; } });
+    { ...silentDeps, env, key: "cody", create: async (a) => { created2 = a; return { id: "recB" }; } });
   assert.equal("Address" in created2.fields, false);
   assert.equal(out2.booking.address, "");
 });
@@ -111,7 +114,7 @@ test("rejects a malformed date", async () => {
 test("creates a scoped walk-in booking with the right fields + Source", async () => {
   let created;
   const create = async (a) => { created = a; return { id: "recNEW" }; };
-  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", vehicle: "Tundra", phone: "555" }, { env, key: "cody", create, events: { omaha: [{ dateISO: "2026-07-03" }] } });
+  const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", vehicle: "Tundra", phone: "555" }, { ...silentDeps, env, key: "cody", create, events: { omaha: [{ dateISO: "2026-07-03" }] } });
   assert.equal(out.status, "booked");
   assert.equal(out.recordId, "recNEW");
   assert.equal(created.fields.Installer, "cody");
@@ -129,7 +132,7 @@ test("an admin may add a walk-in to another installer's market → assigned to t
   const create = async (a) => { created = a; return { id: "recADMIN" }; };
   // Aaron (admin) adds a walk-in in Omaha, which routes to cody.
   const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
-    { env, key: "aaron", admin: true, create, events: { omaha: [{ dateISO: "2026-07-03" }] } });
+    { ...silentDeps, env, key: "aaron", admin: true, create, events: { omaha: [{ dateISO: "2026-07-03" }] } });
   assert.equal(out.status, "booked");
   assert.equal(created.fields.Installer, "cody");     // owned by the market's installer, NOT the admin
   assert.equal(out.booking.installer, "cody");
@@ -144,7 +147,7 @@ test("a non-admin still cannot add to a market that isn't theirs", async () => {
 test("accepts a walk-in on ANY date — everyday business, not only scheduled event days", async () => {
   let created;
   const out = await processWalkin({ city: "Omaha", dateISO: "2026-07-22", name: "Jo", phone: "555" },
-    { env, key: "cody", create: async (a) => { created = a; return { id: "recX" }; } });
+    { ...silentDeps, env, key: "cody", create: async (a) => { created = a; return { id: "recX" }; } });
   assert.equal(out.status, "booked");
   assert.equal(created.fields["Event Date"], "2026-07-22");   // a non-event day is fine now
   assert.equal(created.fields.Source, "installer:walk-in");
@@ -153,7 +156,7 @@ test("accepts a walk-in on ANY date — everyday business, not only scheduled ev
 test("defaults the walk-in date to today when none is supplied", async () => {
   let created;
   await processWalkin({ city: "Omaha", name: "Jo", phone: "555" },
-    { env, key: "cody", now: new Date("2026-07-12T15:00:00Z"), create: async (a) => { created = a; return { id: "r" }; } });
+    { ...silentDeps, env, key: "cody", now: new Date("2026-07-12T15:00:00Z"), create: async (a) => { created = a; return { id: "r" }; } });
   assert.equal(created.fields["Event Date"], "2026-07-12");
 });
 
@@ -161,7 +164,7 @@ test("persists a customer email when provided", async () => {
   const created = [];
   const out = await processWalkin(
     { city: "Sioux Falls", name: "Pat R", phone: "6055551212", email: "pat@example.com", vehicle: "2021 Tundra" },
-    { key: "cody", create: async (a) => { created.push(a.fields); return { id: "rec1" }; } });
+    { ...silentDeps, key: "cody", create: async (a) => { created.push(a.fields); return { id: "rec1" }; } });
   assert.equal(out.status, "booked");
   assert.equal(created[0].Email, "pat@example.com");
 });
@@ -170,7 +173,7 @@ test("a clientKey matching an existing booking returns it without creating", asy
   let created = false;
   const existing = { id: "recX", fields: { City: "Fargo", "Event Date": "2026-08-01", Name: "Dana", Vehicle: "Tundra", Phone: "1", Email: "", Installer: "aaron", "Client Key": "ck-1" } };
   const out = await processWalkin({ city: "fargo", name: "Dana", phone: "1", clientKey: "ck-1" },
-    { key: "aaron", admin: false, list: async () => [existing], create: async () => { created = true; return {}; } });
+    { ...silentDeps, key: "aaron", admin: false, list: async () => [existing], create: async () => { created = true; return {}; } });
   assert.equal(out.status, "booked");
   assert.equal(out.recordId, "recX");
   assert.equal(created, false);
@@ -179,7 +182,7 @@ test("a clientKey matching an existing booking returns it without creating", asy
 test("a new clientKey creates and writes Client Key", async () => {
   let fields;
   const out = await processWalkin({ city: "fargo", name: "Dana", phone: "1", clientKey: "ck-2" },
-    { key: "aaron", admin: false, list: async () => [], create: async (a) => { fields = a.fields; return { id: "recNew" }; } });
+    { ...silentDeps, key: "aaron", admin: false, list: async () => [], create: async (a) => { fields = a.fields; return { id: "recNew" }; } });
   assert.equal(out.status, "booked");
   assert.equal(out.recordId, "recNew");
   assert.equal(fields["Client Key"], "ck-2");
@@ -188,13 +191,13 @@ test("a new clientKey creates and writes Client Key", async () => {
 test("a quote in the clientKey cannot break out of the dedupe formula", async () => {
   let formula;
   await processWalkin({ city: "fargo", name: "Dana", phone: "1", clientKey: 'ck", {Name}!="' },
-    { key: "aaron", admin: false, list: async (a) => { formula = a.filterByFormula; return []; }, create: async () => ({ id: "recNew" }) });
+    { ...silentDeps, key: "aaron", admin: false, list: async (a) => { formula = a.filterByFormula; return []; }, create: async () => ({ id: "recNew" }) });
   assert.equal(formula, '{Client Key}="ck\\", {Name}!=\\""');
 });
 
 test("no clientKey still creates as before (no lookup required)", async () => {
   const out = await processWalkin({ city: "fargo", name: "Dana", phone: "1" },
-    { key: "aaron", admin: false, list: async () => [], create: async () => ({ id: "rec3" }) });
+    { ...silentDeps, key: "aaron", admin: false, list: async () => [], create: async () => ({ id: "rec3" }) });
   assert.equal(out.status, "booked");
 });
 
@@ -202,14 +205,14 @@ test("modelYear present → written to Model Year field on Bookings; absent → 
   let fields1;
   const out1 = await processWalkin(
     { city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555", modelYear: "2019" },
-    { env, key: "cody", create: async (a) => { fields1 = a.fields; return { id: "recMY" }; } });
+    { ...silentDeps, env, key: "cody", create: async (a) => { fields1 = a.fields; return { id: "recMY" }; } });
   assert.equal(out1.status, "booked");
   assert.equal(fields1["Model Year"], "2019");
 
   let fields2;
   const out2 = await processWalkin(
     { city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
-    { env, key: "cody", create: async (a) => { fields2 = a.fields; return { id: "recNOMY" }; } });
+    { ...silentDeps, env, key: "cody", create: async (a) => { fields2 = a.fields; return { id: "recNOMY" }; } });
   assert.equal(out2.status, "booked");
   assert.equal("Model Year" in fields2, false);
 });
