@@ -9,6 +9,7 @@
 // if abuse appears in Resend logs.
 const { cfg, escapeFormula, listRecords, createRecord, updateRecord } = require("./lib/airtable.js");
 const { signSession, signLogin, verifyLogin } = require("./lib/client-auth.js");
+const { corsHeaders } = require("./lib/cors.js");
 const { sendEmail } = require("./lib/resend.js");
 
 const FROM = "Tuned Yota <events@send.tunedyota.events>";
@@ -73,13 +74,15 @@ async function processClientAuth(body, deps = {}) {
 }
 
 async function handler(event) {
-  if (event.httpMethod !== "POST") return { statusCode: 405, body: "method-not-allowed" };
+  const headers = corsHeaders(((event.headers || {}).origin || "").toString());
+  if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers };
+  if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: "method-not-allowed" };
   let body;
-  try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, body: "bad-json" }; }
+  try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: "bad-json" }; }
   const out = await processClientAuth(body);
   const code = out.status === "ok" || out.status === "sent" ? 200
     : out.error === "bad-link" ? 401 : out.error === "bad-email" || out.error === "bad-action" ? 400 : 502;
-  return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
+  return { statusCode: code, headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(out) };
 }
 
 module.exports = { handler, processClientAuth };

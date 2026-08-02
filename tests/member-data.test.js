@@ -166,6 +166,8 @@ test("putMemberLog rejects junk before touching the store", async () => {
 test("corsHeaders echoes an allowed origin, falls back to the site origin otherwise", () => {
   assert.equal(corsHeaders("capacitor://localhost")["Access-Control-Allow-Origin"], "capacitor://localhost");
   assert.equal(corsHeaders("http://localhost")["Access-Control-Allow-Origin"], "http://localhost");
+  assert.equal(corsHeaders("https://localhost")["Access-Control-Allow-Origin"], "https://localhost",
+    "Capacitor 6 Android default scheme is https — its WebView origin must be allowed");
   assert.equal(corsHeaders("https://evil.example")["Access-Control-Allow-Origin"], "https://tunedyota.com");
   assert.equal(corsHeaders(undefined)["Access-Control-Allow-Origin"], "https://tunedyota.com");
   const h = corsHeaders("capacitor://localhost");

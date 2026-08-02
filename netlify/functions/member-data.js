@@ -19,22 +19,10 @@
 const { cfg, escapeFormula, listRecords, createRecord, createTolerant, updateRecord, updateTolerant } = require("./lib/airtable.js");
 const { resolveClient } = require("./lib/client-auth.js");
 const { resolveFluids } = require("./lib/amsoil-fluids.js");
+const { corsHeaders } = require("./lib/cors.js");
 
-const ALLOWED_ORIGINS = ["capacitor://localhost", "http://localhost",
-  "https://tunedyota.com", "https://www.tunedyota.com"];
 const OPTIONAL_COLUMNS = ["Odometer", "Odometer Date", "Service Log", "Vehicles"];
 const MAX_MILES = 1500000;
-
-function corsHeaders(origin) {
-  return {
-    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin) ? origin : "https://tunedyota.com",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, x-client-token",
-    "Access-Control-Expose-Headers": "x-renewed-token",
-    "Access-Control-Max-Age": "86400",
-    "Vary": "Origin",
-  };
-}
 
 function parseIntervalMiles(s) {
   const m = /([\d,]+)\s*mi\b/i.exec(String(s || ""));

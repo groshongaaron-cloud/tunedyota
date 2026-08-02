@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { processClientAuth } = require("../netlify/functions/client-auth.js");
+const { handler, processClientAuth } = require("../netlify/functions/client-auth.js");
 const { verifyLogin, verifySession, signLogin } = require("../netlify/functions/lib/client-auth.js");
 
 const ENV = {
@@ -64,6 +64,25 @@ test("exchange returns the existing profile and stamps Last Login", async () => 
   assert.equal(out.vehicles[0].model, "Tundra");
   assert.equal(updated[0].id, "rc1");
   assert.ok(updated[0].fields["Last Login"]);
+});
+
+test("handler: OPTIONS preflight answers 204 with CORS for the app origins", async () => {
+  const ios = await handler({ httpMethod: "OPTIONS", headers: { origin: "capacitor://localhost" } });
+  assert.equal(ios.statusCode, 204);
+  assert.equal(ios.headers["Access-Control-Allow-Origin"], "capacitor://localhost");
+  const android = await handler({ httpMethod: "OPTIONS", headers: { origin: "https://localhost" } });
+  assert.equal(android.statusCode, 204);
+  assert.equal(android.headers["Access-Control-Allow-Origin"], "https://localhost");
+});
+
+test("handler: every response carries CORS, unknown origins fall back to the site", async () => {
+  const bad = await handler({ httpMethod: "POST", headers: { origin: "https://evil.example" },
+    body: JSON.stringify({ action: "nope" }) });
+  assert.equal(bad.statusCode, 400);
+  assert.equal(bad.headers["Access-Control-Allow-Origin"], "https://tunedyota.com");
+  const wrongMethod = await handler({ httpMethod: "GET", headers: {} });
+  assert.equal(wrongMethod.statusCode, 405);
+  assert.equal(wrongMethod.headers["Access-Control-Allow-Origin"], "https://tunedyota.com");
 });
 
 test("exchange rejects a bad or expired link", async () => {

@@ -5,7 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Book your tune | Tuned Yota</title>
 <meta name="robots" content="noindex">
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Spectral:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Self-hosted fonts — relative paths resolve both on the web (/book) and in the
+   app bundle, and the page renders offline (no font CDN). */
+@font-face{font-family:'Lato';src:url('assets/fonts/lato-400.woff2') format('woff2');
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Lato';src:url('assets/fonts/lato-700.woff2') format('woff2');
+  font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'Lato';src:url('assets/fonts/lato-900.woff2') format('woff2');
+  font-weight:900;font-style:normal;font-display:swap}
+@font-face{font-family:'Spectral';src:url('assets/fonts/spectral-400.woff2') format('woff2');
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Spectral';src:url('assets/fonts/spectral-500.woff2') format('woff2');
+  font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Spectral';src:url('assets/fonts/spectral-600.woff2') format('woff2');
+  font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'Spectral';src:url('assets/fonts/spectral-700.woff2') format('woff2');
+  font-weight:700;font-style:normal;font-display:swap}
+</style>
 <link rel="stylesheet" href="/site.css">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <!-- SEO:GA:START -->
