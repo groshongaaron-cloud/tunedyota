@@ -112,6 +112,54 @@ async function processCloseout(body, deps) {
     return { status: "noshow", waitlisted };
   }
 
+  // resend-cert (owner ask 2026-08-02): regenerate + re-send the certificate from
+  // the CURRENT record after a data correction (e.g. wrong engine picked at
+  // booking, fixed via installer-reschedule). Every certificate VIEW re-renders
+  // live from the record, so only the emailed snapshot is stale — this replaces
+  // it. certSerial is deterministic, so the corrected copy supersedes the
+  // original under the same certificate number. Explicit + confirmed: an edit
+  // never auto-emails the customer.
+  if (d.action === "resend-cert") {
+    if (d.confirmed !== true) return { status: "error", error: "unconfirmed" };
+    if (f.Status !== "Completed") return { status: "error", error: "not-completed" };
+    const calibration = String(f["OTT Calibration"] || "").trim();
+    if (!calibration) return { status: "error", error: "no-calibration" };
+    // Optional email override — also the recovery for installer-fallback certs
+    // (no customer email at close-out): add the email here and resend.
+    const customerEmail = String(d.customerEmail || f.Email || "").trim();
+    const inst = keyToInstaller(owner);
+    const toCustomer = !!customerEmail;
+    const to = toCustomer ? customerEmail : inst.email;
+    const issueDate = now.toISOString().slice(0, 10);
+    const calibrationDate = String(f["Calibration Date"] || f["Event Date"] || "").slice(0, 10) || issueDate;
+    const reissue = !!f["Certificate Sent"];
+    try {
+      const certNo = certSerial(d.recordId, calibrationDate, issueDate);
+      const fluids = resolveFluids(f.Vehicle, f["Model Year"]);
+      const track = (t) => `https://tunedyota.com/.netlify/functions/amsoil-go?c=${encodeURIComponent(d.recordId)}&to=${t}`;
+      const amsoil = { fluids, qrSvg: qrSvg(track("shop")), pcUrl: track("pc") };
+      const referralLink = customerEmail ? referralUrl(customerEmail, now.getTime(), env) : "";
+      const { subject, html } = buildCertificate({
+        name: f.Name, vehicle: f.Vehicle, modelYear: f["Model Year"], vin: f.VIN, calibration,
+        installer: inst.name, installerRegion: inst.region, calibrationDate, certNo, issueDate, amsoil, referralLink });
+      await send({ fetchImpl, apiKey: env.RESEND_API_KEY, from: FROM, to, replyTo: OWNER,
+        subject: reissue ? `${subject} (corrected)` : subject,
+        text: (reissue ? "This corrected certificate supersedes the earlier copy — same certificate number.\n\n" : "") + (toCustomer
+          ? `Attached is your Tuned Yota Certificate of Calibration and AMSOIL maintenance reference for your ${f.Vehicle || "vehicle"}.\n\nView your certificates & AMSOIL garage anytime: ${accountLink(customerEmail, Date.now(), env)}`
+          : `Attached is the Certificate of Calibration for ${f.Name || "your customer"} — no customer email on file; please forward it to them.`),
+        attachments: [{ filename: "certificate.html", content: Buffer.from(html).toString("base64") }] });
+    } catch (e) { if (log.error) log.error("closeout resend", e.message); return { status: "error", error: "send-failed" }; }
+    const meta = { "Certificate Sent": true, "Certificate Issued": issueDate, "Certificate Recipient": to,
+      "Cert Delivery": toCustomer ? "customer" : "installer-fallback" };
+    if (reissue) meta["Certificate Reissued"] = now.toISOString();
+    if (customerEmail && customerEmail !== String(f.Email || "").trim()) meta.Email = customerEmail;
+    try {
+      await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields: meta },
+        ["Certificate Issued", "Certificate Recipient", "Cert Delivery", "Certificate Reissued", "Email"]);
+    } catch (e) { if (log.error) log.error("closeout resend meta", e.message); }
+    return { status: "resent", to, toCustomer, reissue };
+  }
+
   // Normalize report fields here so both draft and complete paths share them.
   // VIN: normalize to the standard 17-char uppercase form (strip spaces/dashes).
   // Optional at this layer so a close-out is never blocked; the console enforces it.
@@ -249,7 +297,7 @@ async function handler(event) {
   // (matches installer-reschedule.js — "not-open"/"not-cancelled" are 400s).
   const code = out.status !== "error" ? 200
     : out.error === "not-yours" ? 403
-    : out.error === "store-unavailable" ? 502 : 400;
+    : (out.error === "store-unavailable" || out.error === "send-failed") ? 502 : 400;
   return { statusCode: code, headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) };
 }
 module.exports = { handler, processCloseout };

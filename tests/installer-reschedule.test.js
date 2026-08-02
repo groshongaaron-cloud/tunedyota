@@ -51,6 +51,45 @@ test("completed bookings cannot be rescheduled", async () => {
   assert.equal(out.error, "not-open");
 });
 
+test("completed bookings accept identity corrections — name, vehicle, model year (Aaron ask 2026-08-02: wrong engine picked at booking)", async () => {
+  let patched;
+  const out = await processReschedule({ recordId: "rec1", vehicle: "2016-2023 Toyota Tacoma 3.5L V6", name: "Alexander Ellis", modelYear: "2023" },
+    { env, key: "noah", get: async () => recFor("noah", { Status: "Completed", Vehicle: "2016-2023 Toyota Tacoma 2.7L I4" }), update: async (a) => { patched = a.fields; return {}; } });
+  assert.equal(out.status, "ok");
+  assert.equal(patched.Vehicle, "2016-2023 Toyota Tacoma 3.5L V6");
+  assert.equal(patched.Name, "Alexander Ellis");
+  assert.equal(patched["Model Year"], "2023");
+});
+
+test("completed bookings still refuse date/time/address changes (OTT report buckets by these dates)", async () => {
+  const deps = { env, key: "noah", get: async () => recFor("noah", { Status: "Completed" }), update: async () => ({}) };
+  assert.equal((await processReschedule({ recordId: "rec1", dateISO: "2026-09-20" }, deps)).error, "not-open");
+  assert.equal((await processReschedule({ recordId: "rec1", time: "9:00 AM" }, deps)).error, "not-open");
+  assert.equal((await processReschedule({ recordId: "rec1", address: "1 Elm St" }, deps)).error, "not-open");
+  // A mixed request (correction + date) is also refused — no partial writes.
+  assert.equal((await processReschedule({ recordId: "rec1", vehicle: "2021 Tundra", dateISO: "2026-09-20" }, deps)).error, "not-open");
+});
+
+test("cancelled bookings stay fully locked", async () => {
+  const out = await processReschedule({ recordId: "rec1", vehicle: "2021 Tundra" },
+    { env, key: "noah", get: async () => recFor("noah", { Status: "Cancelled" }), update: async () => ({}) });
+  assert.equal(out.error, "not-open");
+});
+
+test("model year: written on open bookings, validated, unchanged year not written", async () => {
+  let patched;
+  const deps = (extra) => ({ env, key: "noah", get: async () => recFor("noah", extra), update: async (a) => { patched = a.fields; return {}; } });
+  const out = await processReschedule({ recordId: "rec1", modelYear: "2023" }, deps({}));
+  assert.equal(out.status, "ok");
+  assert.equal(patched["Model Year"], "2023");
+  assert.equal(out.modelYear, "2023");
+  assert.equal((await processReschedule({ recordId: "rec1", modelYear: "23" }, deps({}))).error, "bad-year");
+  patched = undefined;
+  const out2 = await processReschedule({ recordId: "rec1", modelYear: "2023", time: "9:00 AM" }, deps({ "Model Year": "2023" }));
+  assert.equal(out2.status, "ok");
+  assert.equal("Model Year" in (patched || {}), false);
+});
+
 test("validates inputs: bad date, nothing to change, oversize time/address", async () => {
   const deps = { env, key: "noah", get: async () => recFor("noah"), update: async () => ({}) };
   assert.equal((await processReschedule({ recordId: "rec1", dateISO: "9/20/2026" }, deps)).error, "bad-date");

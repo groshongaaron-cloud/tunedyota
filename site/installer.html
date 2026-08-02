@@ -2045,6 +2045,21 @@
       STATE.tab='chats'; STATE.chatOpen=r.session; renderAll();
     }catch(e){ fail('Could not open the chat — try again.'); }
   }
+  // Shared per-city availability cache (advisory: open-slot counts + slot pickers).
+  // One in-flight fetch per city per page life; convert success clears it so the
+  // next look shows the slot as taken.
+  function loadAvail(city){
+    var k=(city||'').toLowerCase(); if(!k) return Promise.resolve(null);
+    STATE.avail=STATE.avail||{};
+    if(!STATE.avail[k]){
+      var slot=STATE.avail[k]={};
+      slot.promise=fetch('/.netlify/functions/availability?city='+encodeURIComponent(city))
+        .then(function(r){ return r.json(); })
+        .then(function(d){ slot.data=d; return d; })
+        .catch(function(){ return null; });
+    }
+    return STATE.avail[k].promise;
+  }
   function leadCard(l){
     var overdue=(ACTIVE_LEAD_STAGES.indexOf(l.stage)>=0 && l.nextFollowup && l.nextFollowup<=STATE.today);
     var det=document.createElement('details'); det.className='evt'; det.dataset.leadId=l.id;
@@ -2213,29 +2228,97 @@
     });
     delBtn.style.color='#8a2a2a';
     var mini=document.createElement('div'); mini.className='walkmini'; mini.appendChild(note); mini.appendChild(logb); mini.appendChild(delBtn); body.appendChild(mini);
-    // Convert with a real schedule: date + optional exact time, with a quick-pick of
-    // this market's upcoming events (choosing one sets the date → the booking lands
-    // on that event's roster). Available to every installer on their own leads.
+    // Convert = the capture payoff: everything captured at first touch rides into
+    // the booking with zero re-typing, and the schedule is REAL — the event picker
+    // is always offered (roster events are already installer-scoped; leads usually
+    // have no matched city, so never gate on it), picking an event sets the date and
+    // offers that day's actual open slots, and a full event warns but never blocks
+    // (owner freedom). Wrong fields get fixed inline; the server writes corrections
+    // back to the lead so the records never diverge.
+    var fixRow=document.createElement('div'); fixRow.className='walkmini';
+    var cvName=mkInput('Name'); cvName.value=l.name||''; cvName.dataset.conv='name';
+    var cvVehicle=mkInput('Vehicle'); cvVehicle.value=l.vehicle||''; cvVehicle.dataset.conv='vehicle';
+    var cvYear=mkInput('Model year'); cvYear.value=l.modelYear||''; cvYear.dataset.conv='year'; cvYear.inputMode='numeric'; cvYear.maxLength=4;
+    var cvPhone=mkInput('Phone'); cvPhone.value=l.phone||''; cvPhone.dataset.conv='phone';
+    var cvEmail=mkInput('Email'); cvEmail.value=l.email||''; cvEmail.dataset.conv='email';
+    [cvName,cvVehicle,cvYear,cvPhone,cvEmail].forEach(function(i){ fixRow.appendChild(i); });
+    body.appendChild(fixRow);
     var conv=document.createElement('div'); conv.className='walkmini';
-    var cd=document.createElement('input'); cd.type='date'; cd.value=STATE.today;
-    var evs=(STATE.events||[]).filter(function(e){ return (e.city||'').toLowerCase()===(l.city||'').toLowerCase(); });
+    var cd=document.createElement('input'); cd.type='date'; cd.value=STATE.today; cd.dataset.conv='date';
+    var ccity=mkInput('City / location'); ccity.value=l.city||'';
+    var slotSel=document.createElement('select'); slotSel.dataset.conv='slot'; slotSel.style.display='none';
+    slotSel.innerHTML='<option value="">Time slot…</option>';
+    var evWarn=document.createElement('div'); evWarn.className='ffnote'; evWarn.style.display='none';
+    evWarn.textContent='⚠ This event looks full — converting will overbook the day.';
+    var evState={};
+    var evs=(STATE.events||[]).slice().sort(function(a,b){ return String(a.dateISO).localeCompare(String(b.dateISO)); });
+    var evSel=null;
+    function refreshEvLabels(){
+      if(!evSel) return;
+      for(var i=1;i<evSel.options.length;i++){
+        var o=evSel.options[i]; var e=JSON.parse(o.value);
+        var lbl=e.city+' — '+e.dateISO;
+        var av=(STATE.avail||{})[e.city.toLowerCase()];
+        if(av&&av.data&&av.data.events){
+          var ei=av.data.events.filter(function(x){ return x.dateISO===e.dateISO; })[0];
+          if(ei) lbl+=ei.full?' · FULL':' · '+(ei.openSlots||[]).length+' open';
+        }
+        o.textContent=lbl;
+      }
+    }
     if(evs.length){
-      var evSel=document.createElement('select');
-      evSel.innerHTML='<option value="">Assign to event…</option>'+evs.map(function(e){ return '<option value="'+esc(e.dateISO)+'">'+esc(e.city+' — '+e.dateISO)+'</option>'; }).join('');
-      evSel.onchange=function(){ if(evSel.value) cd.value=evSel.value; };
+      evSel=document.createElement('select'); evSel.dataset.conv='event';
+      var evPh=document.createElement('option'); evPh.value=''; evPh.textContent='Assign to event…'; evSel.appendChild(evPh);
+      evs.forEach(function(e){
+        var o=document.createElement('option');
+        o.value=JSON.stringify({city:e.city,dateISO:e.dateISO});
+        o.textContent=e.city+' — '+e.dateISO;
+        evSel.appendChild(o);
+      });
+      // Live open-slot counts: warm lazily on first focus (never a fetch storm at render).
+      evSel.onfocus=function(){
+        if(evSel._warmed) return; evSel._warmed=true;
+        var seen={};
+        evs.forEach(function(e){ var k=e.city.toLowerCase(); if(seen[k]) return; seen[k]=1; loadAvail(e.city).then(refreshEvLabels); });
+      };
+      evSel.onchange=function(){
+        slotSel.innerHTML='<option value="">Time slot…</option>'; slotSel.style.display='none';
+        evWarn.style.display='none'; evState={};
+        if(!evSel.value) return;
+        var e=JSON.parse(evSel.value); cd.value=e.dateISO; ccity.value=e.city; evState=e;
+        loadAvail(e.city).then(function(d){
+          if(!d||!d.events) return;
+          var ei=(d.events||[]).filter(function(x){ return x.dateISO===e.dateISO; })[0];
+          if(!ei) return;
+          evState.full=!!ei.full;
+          if(ei.full){ evWarn.style.display=''; }
+          else if((ei.openSlots||[]).length){
+            slotSel.innerHTML='<option value="">Time slot…</option>'+ei.openSlots.map(function(s){
+              return '<option value="'+esc(s)+'">'+esc((ei.slotLabels||d.slotLabels||{})[s]||s)+'</option>'; }).join('');
+            slotSel.style.display='';
+          }
+          refreshEvLabels();
+        });
+      };
       conv.appendChild(evSel);
     }
+    conv.appendChild(slotSel);
     var ctime=mkInput('Time (e.g. 10:30 AM)');
     // Owner freedom: book to ANY city/location — prefilled from the lead, editable,
     // no known-market requirement. Admin may also direct-assign the installer.
-    var ccity=mkInput('City / location'); ccity.value=l.city||'';
     var cinst=instSelect();
     conv.appendChild(ccity); conv.appendChild(cd); conv.appendChild(ctime);
     if(cinst) conv.appendChild(cinst);
-    conv.appendChild(act('Convert to booking',function(){
+    var goBtn=act('Convert to booking',function(){
+      if(evState.full && !confirm('This event looks full — convert anyway? It will overbook the day.')) return;
       leadUpdate(l.id,{action:'convert',dateISO:cd.value,time:(ctime.value||'').trim(),
-        city:(ccity.value||'').trim(),installer:cinst?cinst.value:''});
-    }));
+        city:(ccity.value||'').trim(),installer:cinst?cinst.value:'',
+        slot:slotSel.value||'',name:cvName.value.trim(),vehicle:cvVehicle.value.trim(),
+        modelYear:cvYear.value.trim(),phone:cvPhone.value.trim(),email:cvEmail.value.trim()});
+    });
+    goBtn.dataset.conv='go';
+    conv.appendChild(goBtn);
+    body.appendChild(evWarn);
     body.appendChild(conv);
     // Link to an EXISTING booking (dedupe: this person already booked directly).
     if(!l.bookingId && (STATE.bookings||[]).length){
@@ -2282,11 +2365,12 @@
           // Never let a fresh booking vanish: pull the pipeline refresh in the
           // background and take the user straight to the highlighted booking card.
           loadLeads();
+          STATE.avail={};   // the taken slot must show taken on the next look
           var bk=out.booking;
           STATE.bookings.push(bk);
           jumpToBooking(bk);
           succeed('✓ Booked '+(bk.name||'client')+' — '+(bk.city||'no city')+' · '+relDate(bk.dateISO)+
-            (bk.scheduledTime?' · '+bk.scheduledTime:'')+
+            (bk.slotLabel?' · '+bk.slotLabel:(bk.scheduledTime?' · '+bk.scheduledTime:''))+
             (STATE.admin&&bk.installer?' · assigned to '+cap(bk.installer):'')+'. Card highlighted below.');
         } else if(payload.action==='link' && out.booking){
           // Linking lands the user on the (already existing) booking card,
@@ -2658,9 +2742,30 @@
       if(cbtn) cbtn.onclick=function(){ openTyThread(b.phone,b.name,b.vehicle,cbtn,'💬 Text via TY'); }; }
     if(b.status==='Completed'){
       c.innerHTML=head+contact+notesBlock(b)+'<div class="done">✓ Completed'+(b.calibration?' · '+esc(b.calibration):'')+(b.vin?' · VIN '+esc(b.vin):'')+(b.tuningPlatform?' · '+esc(b.tuningPlatform)+(b.calibrationType?'/'+esc(b.calibrationType):''):'')+'</div>'+
-        (b.certDelivery==='installer-fallback' ? '<div class="ffnote">No customer email on file — this certificate went to you. Re-open and add the email to send it to the customer.</div>' : '')+
+        (b.certDelivery==='installer-fallback' ? '<div class="ffnote">No customer email on file — this certificate went to you. Add their email under ✉ Resend certificate below to send it to the customer.</div>' : '')+
         '<a href="#" class="link" id="cert_'+b.id+'">View / download certificate</a>'+
-        (b.signed ? '<a href="#" class="link" id="sig_'+b.id+'" style="margin-left:14px">✍ Signed — view</a>' : '');
+        (b.signed ? '<a href="#" class="link" id="sig_'+b.id+'" style="margin-left:14px">✍ Signed — view</a>' : '')+
+        // Post-completion corrections (owner ask 2026-08-02: wrong engine picked at
+        // booking). Identity fields only — dates stay locked (OTT report buckets).
+        // Certificates re-render from the record, so a save corrects the stored
+        // cert everywhere; Resend below emails the corrected copy.
+        '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✏️ Correct details — name / vehicle / year</summary>'+
+        '<div class="row-actions" style="margin-top:6px">'+
+        '<input id="rn_'+b.id+'" autocomplete="off" placeholder="Customer name" value="'+esc(b.name||'')+'">'+
+        '<input id="rv_'+b.id+'" autocomplete="off" placeholder="Vehicle (e.g. 2016-2023 Toyota Tacoma 3.5L V6)" value="'+esc(b.vehicle||'')+'">'+
+        '<input id="ry_'+b.id+'" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="Model year (e.g. 2023)" value="'+esc(b.modelYear||'')+'">'+
+        '<button class="btn" id="cc_'+b.id+'">Save corrections</button>'+
+        '</div></details>'+
+        '<details style="margin:6px 0"><summary class="btn" style="display:inline-block;cursor:pointer;list-style:none">✉ Resend certificate</summary>'+
+        '<div class="row-actions" style="margin-top:6px">'+
+        '<input id="rem_'+b.id+'" type="email" autocomplete="off" placeholder="Customer email" value="'+esc(b.email||'')+'">'+
+        '<div class="meta">Re-sends the certificate exactly as it renders now — same certificate number; it supersedes any copy already emailed.</div>'+
+        '<button class="btn" id="resend_'+b.id+'">Send now</button>'+
+        '</div></details>';
+      var ccb=c.querySelector('#cc_'+b.id);
+      if(ccb) ccb.onclick=function(){ correctCompleted(b.id); };
+      var rsb=c.querySelector('#resend_'+b.id);
+      if(rsb) rsb.onclick=function(){ resendCert(b.id, rsb); };
       var certEl=c.querySelector('#cert_'+b.id);
       if(certEl) certEl.onclick=async function(e){
         e.preventDefault();
@@ -2828,6 +2933,54 @@
         if(b) jumpToBooking(b); else renderAll();
       } else { fail('Could not update: '+(out.error||res.status)); }
     }catch(e){ fail('Network error — try again.'); }
+  }
+
+  // Post-completion identity corrections (name / vehicle / model year) on a
+  // COMPLETED booking — same endpoint as reschedule; the server refuses date/
+  // time changes after completion. Certificates re-render from the record, so a
+  // save corrects the repository + client-portal views immediately; emailing the
+  // corrected copy stays a separate, explicit Resend action.
+  async function correctCompleted(id){
+    clearMsg();
+    var n=val('rn_'+id), veh=val('rv_'+id), yr=val('ry_'+id).trim().slice(0,4);
+    var b0=STATE.bookings.filter(function(x){return x.id===id;})[0];
+    var nameChanged = n && (!b0 || n!==(b0.name||''));
+    var vehChanged = veh && (!b0 || veh!==(b0.vehicle||''));
+    var yrChanged = yr && (!b0 || yr!==(String(b0.modelYear||'')));
+    if(!nameChanged && !vehChanged && !yrChanged){ fail('Change the name, vehicle, or model year first.'); return; }
+    try{
+      var res=await fetch('/.netlify/functions/installer-reschedule',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,name:nameChanged?n:'',vehicle:vehChanged?veh:'',modelYear:yrChanged?yr:''})});
+      if(res.status===401){ await handle401(); return; }
+      var out=await res.json().catch(function(){return{};});
+      if(res.ok && out.status==='ok'){
+        if(b0){ if(nameChanged) b0.name=n; if(vehChanged) b0.vehicle=veh; if(yrChanged) b0.modelYear=yr; }
+        var what=[]; if(nameChanged) what.push('name → '+n); if(vehChanged) what.push('vehicle → '+veh); if(yrChanged) what.push('year → '+yr);
+        succeed('✓ '+((b0&&b0.name)||'Booking')+' corrected — '+what.join(' · ')+'. The stored certificate already shows the fix — use ✉ Resend certificate to email the corrected copy.');
+        if(vehChanged||yrChanged) load(); else renderAll();
+      } else { fail('Could not save: '+(out.error||res.status)); }
+    }catch(e){ fail('Network error — try again.'); }
+  }
+
+  // Regenerate + re-send the Certificate of Calibration from the record as it
+  // stands now (post-correction). Also the recovery for installer-fallback
+  // certs: add the customer email and send. Never automatic.
+  async function resendCert(id, btn){
+    clearMsg();
+    var em=val('rem_'+id).trim();
+    if(em && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ fail('Enter a valid customer email (or clear it to send to yourself).'); return; }
+    if(btn) btn.disabled=true;
+    try{
+      var res=await fetch('/.netlify/functions/installer-closeout',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify({recordId:id,action:'resend-cert',confirmed:true,customerEmail:em})});
+      if(res.status===401){ await handle401(); return; }
+      var out=await res.json().catch(function(){return{};});
+      if(res.ok && out.status==='resent'){
+        var b=STATE.bookings.filter(function(x){return x.id===id;})[0];
+        if(b){ if(em) b.email=em; if(out.toCustomer) b.certDelivery='customer'; }
+        succeed('✓ Certificate sent to '+out.to+(out.reissue?' — it supersedes the earlier copy (same certificate number).':'.'));
+        renderAll();
+      } else { fail('Could not resend: '+(out.error||res.status)); }
+    }catch(e){ fail('Network error — try again.'); }
+    finally{ if(btn) btn.disabled=false; }
   }
 
   // Soft-delete with Undo (owner decision 2026-07-27): no blocking confirm —

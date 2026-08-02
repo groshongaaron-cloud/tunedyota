@@ -3,8 +3,11 @@
 // assign the exact time ("Scheduled Time"). Built for slot-mode markets (Noah's
 // customers reserve a generic slot; he names the time and may move the date), but
 // available to every installer on their own bookings. Ownership re-checked
-// server-side; admins may adjust any. Completed/Cancelled bookings are locked —
-// their dates feed the certificate and the monthly OTT report.
+// server-side; admins may adjust any. Completed bookings accept IDENTITY
+// corrections only (name / vehicle / model year — owner ask 2026-08-02: a customer
+// picked the wrong engine at booking); their dates stay locked because Event/
+// Calibration dates feed the certificate and the monthly OTT report buckets.
+// Cancelled bookings are fully locked.
 const { cfg, getRecord, updateRecord, updateTolerant } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { normalizeInstallerKey } = require("./lib/routing.js");
@@ -24,12 +27,16 @@ async function processReschedule(body, deps) {
   // bookings named "Text (xxx) xxx-xxxx" — the installer fixes them here.
   const name = String(d.name || "").trim();
   const vehicle = String(d.vehicle || "").trim();
+  // Exact model year — it prints on the certificate, so it must be correctable
+  // wherever the vehicle is.
+  const modelYear = String(d.modelYear || "").trim();
   if (dateISO && !/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) return { status: "error", error: "bad-date" };
   if (time.length > 40) return { status: "error", error: "bad-time" };
   if (address.length > 200) return { status: "error", error: "bad-address" };
   if (name.length > 80) return { status: "error", error: "bad-name" };
   if (vehicle.length > 120) return { status: "error", error: "bad-vehicle" };
-  if (!dateISO && !time && !address && !name && !vehicle) return { status: "error", error: "nothing-to-change" };
+  if (modelYear && !/^(19|20)\d{2}$/.test(modelYear)) return { status: "error", error: "bad-year" };
+  if (!dateISO && !time && !address && !name && !vehicle && !modelYear) return { status: "error", error: "nothing-to-change" };
 
   const c = cfg(env);
   let rec;
@@ -38,7 +45,10 @@ async function processReschedule(body, deps) {
   const f = (rec && rec.fields) || {};
   const owner = normalizeInstallerKey(f.Installer);
   if (!admin && owner !== key) return { status: "error", error: "not-yours" };
-  if (f.Status === "Completed" || f.Status === "Cancelled") return { status: "error", error: "not-open" };
+  if (f.Status === "Cancelled") return { status: "error", error: "not-open" };
+  // Completed: identity corrections only. A request that also touches the
+  // schedule is refused whole — no partial writes.
+  if (f.Status === "Completed" && (dateISO || time || address)) return { status: "error", error: "not-open" };
 
   const fields = {};
   if (dateISO) fields["Event Date"] = dateISO;
@@ -46,11 +56,13 @@ async function processReschedule(body, deps) {
   if (address) fields.Address = address;
   if (name && name !== String(f.Name || "").trim()) fields.Name = name;
   if (vehicle && vehicle !== String(f.Vehicle || "").trim()) fields.Vehicle = vehicle;
+  if (modelYear && modelYear !== String(f["Model Year"] || "").trim()) fields["Model Year"] = modelYear;
   try {
-    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields }, ["Scheduled Time", "Address"]);
+    await updateTolerant(update, { token: c.token, baseId: c.baseId, table: c.bookings, id: d.recordId, fields }, ["Scheduled Time", "Address", "Model Year"]);
   } catch (e) { if (log.error) log.error("reschedule update", e.message); return { status: "error", error: "store-unavailable" }; }
   return { status: "ok", dateISO: dateISO || String(f["Event Date"] || "").slice(0, 10), time: time || String(f["Scheduled Time"] || ""),
-    address: address || String(f.Address || ""), name: name || String(f.Name || ""), vehicle: vehicle || String(f.Vehicle || "") };
+    address: address || String(f.Address || ""), name: name || String(f.Name || ""), vehicle: vehicle || String(f.Vehicle || ""),
+    modelYear: modelYear || String(f["Model Year"] || "") };
 }
 
 async function handler(event) {
