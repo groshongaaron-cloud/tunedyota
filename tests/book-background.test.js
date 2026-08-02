@@ -173,8 +173,13 @@ test("booking job ensures a client record — awaited, fail-open", async () => {
     calls.push({ bookingId, fields });
     // Flip a flag BEFORE this promise resolves — lets us verify it was awaited
     // (if fire-and-forget, this flag would not be set when processNotifications returns)
+    // Two chained yields are required: a single Promise.resolve() resolves in the same
+    // microtask batch as the caller's own resolution, making the check vacuous for
+    // fire-and-forget callers. A second yield ensures the stub's continuation always
+    // runs AFTER an un-awaited caller has already returned.
     resolvedBeforeProcessNotifications = false; // will be set true after await
-    await Promise.resolve(); // yield the microtask queue once
+    await Promise.resolve();
+    await Promise.resolve(); // second yield — makes fire-and-forget detectable
     resolvedBeforeProcessNotifications = true;
   };
   await processNotifications(bookingJob({ d: { ...d, modelYear: "2019" } }), h.deps);
