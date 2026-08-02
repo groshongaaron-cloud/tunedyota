@@ -8,6 +8,7 @@ const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
 const { toLeadView, applyLeadUpdate, logLine, appendActivity, toBookingSummary, buildLinkPatch, buildUnlinkPatch, computeMerge } = require("./lib/leads.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
+const { isValidSlot, formatSlot } = require("./lib/slots.js");
 
 async function handler(event, ctx = {}) {
   const env = ctx.env || process.env;
@@ -56,22 +57,46 @@ async function handler(event, ctx = {}) {
     const override = admin ? normalizeInstallerKey(body.installer) : "";
     const owner = override || (market ? keyToInstaller(market.inst).key : (lead.installer || key));
     const bookCity = market ? market.city : city;
-    const fields = { City: bookCity, "Event Date": dateISO, Name: lead.name,
-      Vehicle: lead.vehicle, Phone: lead.phone, Email: lead.email, Goals: lead.goals,
+    // Inline corrections (capture payoff, 2026-08-02): the installer may fix
+    // name/vehicle/year/phone/email right in the convert strip. Corrections ride
+    // into the booking AND write back to the lead so the records never diverge.
+    const ov = {
+      Name: String(body.name || "").trim(),
+      Vehicle: String(body.vehicle || "").trim(),
+      Phone: String(body.phone || "").trim(),
+      Email: String(body.email || "").trim(),
+      "Model Year": /^(19|20)\d{2}$/.test(String(body.modelYear || "").trim()) ? String(body.modelYear).trim() : "",
+    };
+    const eff = { Name: ov.Name || lead.name, Vehicle: ov.Vehicle || lead.vehicle,
+      Phone: ov.Phone || lead.phone, Email: ov.Email || lead.email,
+      "Model Year": ov["Model Year"] || lead.modelYear };
+    // A slot choice occupies real event capacity (the same Slot column
+    // availability.js counts) — without it a converted booking is invisible
+    // to the slot grid and the day silently overbooks.
+    const slot = String(body.slot || "").trim();
+    if (slot && !isValidSlot(slot, owner)) return { statusCode: 400, body: JSON.stringify({ error: "bad-slot" }) };
+    const fields = { City: bookCity, "Event Date": dateISO, Name: eff.Name,
+      Vehicle: eff.Vehicle, Phone: eff.Phone, Email: eff.Email, Goals: lead.goals,
       Status: "Booked", Source: `lead:${lead.channel || "convert"}`, Installer: owner };
+    if (eff["Model Year"]) fields["Model Year"] = eff["Model Year"];
+    if (lead.modifications) fields.Modifications = lead.modifications;
+    if (slot) fields.Slot = slot;
     if (time) fields["Scheduled Time"] = time;
     let bk;
-    try { bk = await createTolerant(createBookingImpl, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Goals", "Scheduled Time"]); }
+    try { bk = await createTolerant(createBookingImpl, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Goals", "Scheduled Time", "Model Year", "Modifications", "Slot"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
     const patch = { "Converted Booking": bk && bk.id, Booking: bk && bk.id ? [bk.id] : [], Stage: "Booked",
-      "Activity Log": appendActivity(lead.activity, logLine(now, `converted → booking ${bk && bk.id} (${bookCity} ${dateISO}${time ? " " + time : ""})`)) };
-    try { await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: patch }, ["Converted Booking", "Booking", "Stage", "Activity Log"]); }
+      "Activity Log": appendActivity(lead.activity, logLine(now, `converted → booking ${bk && bk.id} (${bookCity} ${dateISO}${slot ? " " + formatSlot(slot) : ""}${time ? " " + time : ""})`)) };
+    for (const k of Object.keys(ov)) if (ov[k] && ov[k] !== (k === "Model Year" ? lead.modelYear : lead[k.toLowerCase()])) patch[k] = ov[k];
+    try { await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id, fields: patch }, ["Converted Booking", "Booking", "Stage", "Activity Log", "Name", "Vehicle", "Phone", "Email", "Model Year"]); }
     catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
     // The booking payload tells the console exactly WHERE this landed so it can take
     // the user there — a converted lead must never just vanish from view.
-    const booking = { id: bk && bk.id, city: bookCity, dateISO, installer: owner, slot: "", slotLabel: "",
-      scheduledTime: time, name: lead.name, vehicle: lead.vehicle, phone: lead.phone, email: lead.email,
-      mods: "", status: "Booked", isWalkin: false, calibration: "", vin: "", tuningPlatform: "",
+    const booking = { id: bk && bk.id, city: bookCity, dateISO, installer: owner,
+      slot, slotLabel: slot ? formatSlot(slot) : "",
+      scheduledTime: time, name: eff.Name, vehicle: eff.Vehicle, phone: eff.Phone, email: eff.Email,
+      modelYear: eff["Model Year"] || "",
+      mods: lead.modifications || "", status: "Booked", isWalkin: false, calibration: "", vin: "", tuningPlatform: "",
       calibrationType: "", ecuId: "", gearSize: "", mileage: "" };
     return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", bookingId: bk && bk.id, stage: "Booked", booking }) };
   }
