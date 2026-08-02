@@ -163,3 +163,19 @@ test("no clientKey still creates as before (no lookup required)", async () => {
     { key: "aaron", admin: false, list: async () => [], create: async () => ({ id: "rec3" }) });
   assert.equal(out.status, "booked");
 });
+
+test("modelYear present → written to Model Year field on Bookings; absent → field omitted", async () => {
+  let fields1;
+  const out1 = await processWalkin(
+    { city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555", modelYear: "2019" },
+    { env, key: "cody", create: async (a) => { fields1 = a.fields; return { id: "recMY" }; } });
+  assert.equal(out1.status, "booked");
+  assert.equal(fields1["Model Year"], "2019");
+
+  let fields2;
+  const out2 = await processWalkin(
+    { city: "Omaha", dateISO: "2026-07-03", name: "Jo", phone: "555" },
+    { env, key: "cody", create: async (a) => { fields2 = a.fields; return { id: "recNOMY" }; } });
+  assert.equal(out2.status, "booked");
+  assert.equal("Model Year" in fields2, false);
+});

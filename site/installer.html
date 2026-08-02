@@ -1817,8 +1817,9 @@
     var btn=document.createElement('button'); btn.className='btn addwalk'; btn.textContent='Log walk-in';
     var em=mkInput('Customer email (for their certificate)'); em.type='email';
     var tm=mkInput('Time (e.g. 10:30 AM) — optional');
+    var yr=mkInput('Model year (optional)'); yr.type='number'; yr.min='1990'; yr.max='2099'; yr.placeholder='Year (optional)';
     var instSel=instSelect();   // admin only: direct-assign to any installer
-    [n,v,p,ld,dt,lc,city,ad,tm,em].forEach(function(el){ box.appendChild(el); });
+    [n,v,p,ld,dt,lc,city,ad,tm,em,yr].forEach(function(el){ box.appendChild(el); });
     if(instSel) box.appendChild(instSel);
     box.appendChild(btn);
     if(dl) box.appendChild(dl);
@@ -1829,7 +1830,7 @@
       if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ fail('Pick the date of the tune.'); return; }
       STATE.walkOpen[K]=true;                       // keep this form open for the next entry
       addWalkin({city:c,dateISO:d,key:c+'|'+d},{name:n.value,vehicle:v.value,phone:p.value,email:em.value,
-        time:tm.value,address:ad.value,installer:instSel?instSel.value:''});
+        time:tm.value,address:ad.value,modelYear:yr.value,installer:instSel?instSel.value:''});
     };
     return det;
   }
@@ -1855,8 +1856,10 @@
     if(!name){ fail('Enter the customer name.'); return; }
     if(!phone){ fail('Enter a phone number.'); return; }
     var time=(vals.time||'').trim(), inst=(vals.installer||'').trim(), address=(vals.address||'').trim();
+    var modelYear=String(vals.modelYear||'').trim().slice(0,4);
     var op = Q().makeOp('walkin', { city:evt.city, dateISO:evt.dateISO, name:name, vehicle:vehicle, phone:phone, email:email, time:time, address:address, installer:inst, clientKey:null });
     op.body.clientKey = op.clientKey;
+    if(modelYear) op.body.modelYear = modelYear;
     var res, netErr=null;
     try { res=await fetch('/.netlify/functions/installer-walkin',{method:'POST',headers:{'Content-Type':'application/json','x-installer-token':tok()},body:JSON.stringify(op.body)}); }
     catch(e){ netErr=e; }

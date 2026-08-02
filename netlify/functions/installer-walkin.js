@@ -45,6 +45,7 @@ async function processWalkin(body, deps) {
   const vehicle = String(d.vehicle || "").trim();
   const email = String(d.email || "").trim();
   const time = String(d.time || "").trim().slice(0, 40);
+  const modelYear = String(d.modelYear || "").trim().slice(0, 4);
   // Full install address (mobile installs happen at the client's location). Free
   // text, never required, never validated — owner rule: no booking is ever blocked
   // on location detail. Feeds the console's maps/navigation link.
@@ -73,8 +74,9 @@ async function processWalkin(body, deps) {
   if (clientKey) fields["Client Key"] = clientKey;
   if (time) fields["Scheduled Time"] = time;
   if (address) fields.Address = address;
+  if (modelYear) fields["Model Year"] = modelYear;
   let rec;
-  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Email", "Client Key", "Scheduled Time", "Address"]); }
+  try { rec = await createTolerant(create, { token: c.token, baseId: c.baseId, table: c.bookings, fields }, ["Source", "Email", "Client Key", "Scheduled Time", "Address", "Model Year"]); }
   catch (e) { return { status: "error", error: "store-unavailable" }; }
 
   const id = rec && rec.id;
