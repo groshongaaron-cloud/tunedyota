@@ -5,7 +5,7 @@
 // (walk-in-style, any date) and links it back to the lead.
 const { cfg, getRecord, updateRecord, updateTolerant, createRecord, createTolerant, deleteRecord } = require("./lib/airtable.js");
 const { resolveInstaller, isAdmin } = require("./lib/installer-auth.js");
-const { toLeadView, applyLeadUpdate, logLine, appendActivity, toBookingSummary, buildLinkPatch, buildUnlinkPatch } = require("./lib/leads.js");
+const { toLeadView, applyLeadUpdate, logLine, appendActivity, toBookingSummary, buildLinkPatch, buildUnlinkPatch, computeMerge } = require("./lib/leads.js");
 const { getMarket } = require("./lib/markets.js");
 const { keyToInstaller, normalizeInstallerKey } = require("./lib/routing.js");
 
@@ -103,6 +103,39 @@ async function handler(event, ctx = {}) {
         ["Booking", "Converted Booking", "Activity Log"]);
     } catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
     return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "ok", unlinked: true }) };
+  }
+
+  // Merge two client records (owner decisions 2026-07-31): absorb-and-delete,
+  // survivor = earlier Created Time. Human-confirmed only — the console's
+  // duplicate strip is the sole caller. Absorb is written and verified BEFORE
+  // the delete; a failed delete returns deleted:false and the retry (computeMerge
+  // is idempotent via the audit stamp) re-attempts only the delete.
+  if (action === "merge") {
+    const deleteImpl = ctx.deleteImpl || ((a) => deleteRecord({ ...a }));
+    const duplicateId = String(body.duplicateId || "").trim();
+    if (!duplicateId || duplicateId === id) return { statusCode: 400, body: JSON.stringify({ error: "missing-duplicate-id" }) };
+    let dupRec;
+    try { dupRec = await getImpl({ token: c.token, baseId: c.baseId, table: c.priority, id: duplicateId }); }
+    catch (e) {
+      const notFound = /40[34]/.test(String(e && e.message));
+      return { statusCode: notFound ? 400 : 502, body: JSON.stringify({ error: notFound ? "duplicate-not-found" : "store-unavailable" }) };
+    }
+    const dupLead = toLeadView(dupRec);
+    if (!admin && (dupLead.installer || "") !== key) return { statusCode: 400, body: JSON.stringify({ error: "not-your-market" }) };
+    const m = computeMerge(rec, dupRec, now);
+    if (Object.keys(m.fields).length) {
+      try {
+        await updateTolerant(updateImpl, { token: c.token, baseId: c.baseId, table: c.priority, id: m.survivorId, fields: m.fields },
+          ["Preferred Contact", "Marketing Consent", "Consent Version", "Model Year", "Client Notes", "Goals",
+           "Modifications", "Next Follow-up", "Follow-up Message", "Last Contact", "Stage", "Booking",
+           "Converted Booking", "Activity Log"]);
+      } catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
+    }
+    let deleted = true;
+    try { await deleteImpl({ token: c.token, baseId: c.baseId, table: c.priority, id: m.duplicateId }); }
+    catch (e) { deleted = false; }
+    return { statusCode: 200, headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "ok", merged: true, survivorId: m.survivorId, deleted }) };
   }
 
   const built = applyLeadUpdate(lead, action, body, now);
