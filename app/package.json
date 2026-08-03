@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "sync-web": "node scripts/sync-web.mjs"
+    "sync-web": "node scripts/sync-web.mjs",
+    "postinstall": "node scripts/patch-mlkit-privacy.mjs"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^7.0.0",
