@@ -77,6 +77,13 @@ workflows:
       - name: Apply signing profiles
         script: |
           xcode-project use-profiles
+      # Unique bundle version per upload — ASC refuses a second binary carrying
+      # the same build number (killed build 2). BUILD_NUMBER is Codemagic's
+      # per-app build index, so it only ever goes up.
+      - name: Stamp build number
+        script: |
+          cd app/ios/App
+          agvtool new-version -all $BUILD_NUMBER
       - name: Build signed IPA
         script: |
           cd app/ios/App
