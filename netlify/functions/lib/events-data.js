@@ -48,7 +48,7 @@ module.exports = {
     { dateISO: "2027-05-22", label: "May 22, 2027", active: true, event: "Fargo, North Dakota Spring 2027 OTT Event", details: "", address: "To Be Released" },
   ],
   "madison": [
-    { dateISO: "2026-08-01", label: "August 1, 2026", active: true, event: "Madison, Wisconsin Summer 2026 OTT Event", details: "", address: "430 Commerce Drive, Madison, WI 53719" },
+    { dateISO: "2026-08-01", label: "August 1, 2026", active: false, event: "Madison, Wisconsin Summer 2026 OTT Event", details: "", address: "430 Commerce Drive, Madison, WI 53719" },
     { dateISO: "2026-10-17", label: "October 17, 2026", active: true, event: "Madison, Wisconsin Fall 2026 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-04-03", label: "April 3, 2027", active: true, event: "Madison, Wisconsin Spring 2027 OTT Event", details: "", address: "To Be Released" },
     { dateISO: "2027-07-10", label: "July 10, 2027", active: true, event: "Madison, Wisconsin Summer 2027 OTT Event", details: "", address: "To Be Released" },
