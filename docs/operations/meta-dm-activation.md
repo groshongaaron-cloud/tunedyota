@@ -51,6 +51,73 @@ Meta's process 2026-07-21; expect a few business days to ~2 weeks of review.
 Submit **Messenger only** — Instagram gets its own submission after its dev-mode
 smoke (an undemonstrable permission risks the whole review).
 
+> **STATUS 2026-08-03: REJECTED — screencast only.** Verdict: "your app's use
+> case is allowed" but the screencast "does not show a message being sent from
+> your app UI and the same message appearing in the native client." This is the
+> exact beat that was cut from the 07-22 phone recording (accepted risk at
+> submission). Nothing about testability or credentials was raised — the
+> no-tester-account gamble held. **Fix = re-record only**; use case text,
+> permission scope, and Business Verification all stand. See
+> **Resubmission #2** below.
+
+### Resubmission #2 — re-record + resubmit (2026-08-03 plan)
+
+Reviewer's three required shots, verbatim: **(1) asset selection (Page
+visible), (2) a live send action from your app, (3) the delivered message in
+the native client.** Plus general rules: English UI, captions/tool-tips
+explaining buttons, and — because ours is a **server-to-server app** (webhook +
+Page token, no user-facing Facebook Login) — the submission must SAY so, which
+excuses the "complete Meta login flow" requirement.
+
+**Recording setup (no phone-filming this time):**
+- Use the **Windows 11 Snipping Tool screen recorder** (Win+Shift+R → record a
+  region) — NOT Game Bar (Win+Alt+R records a single app window; beats 3–4
+  need two windows in frame). Record at least 1080p region, landscape.
+- Arrange for beats 3–4: installer console (tunedyota.com console, Chats tab)
+  and **messenger.com in a second browser window side-by-side** so the send
+  and the native-client delivery appear in the SAME frame with no cut.
+- Record clean (no narration needed). Drop the raw file in `Downloads\` —
+  Claude burns in timed English captions with ffmpeg and encodes to
+  Meta-friendly MP4 (≤3 min target).
+- DM from a role account (dev mode only delivers those) — Aaron's personal
+  account with a Tester/Admin role is fine.
+
+**Shot list (one continuous recording, ~2–3 min):**
+1. **Asset selection (~15s):** App Dashboard → Messenger → Messenger API
+   Settings, showing the **Tuned Yota Page** connected as the token'd Page.
+   ⚠️ Do NOT click "Show" on the token. Caption: "Server-to-server app — our
+   webhook receives Page messages; the Page admin generated this Page access
+   token here. No user-facing Facebook Login exists in the product."
+2. **Inbound + AI reply:** messenger.com → DM the Tuned Yota Page
+   "Do you tune 4Runners?" → AI answer arrives. Caption: "Customer messages
+   our Page; our app receives it via webhook and replies (pages_messaging
+   send)."
+3. **Escalation:** "Can I talk to a real person?" → answer the bot's
+   name/phone/city/vehicle questions → handoff confirmation. Caption: "The
+   assistant collects contact details and notifies our staff."
+4. **THE MONEY SHOT — live send from app UI:** side-by-side windows. In the
+   installer console Chats tab, open the conversation, type a reply, click
+   **Send** — caption pointing at the button: "Staff replies from our app UI —
+   this Send uses the pages_messaging Send API." The reply then pops into the
+   messenger.com thread in the adjacent window. Caption: "Same message
+   delivered in the native Messenger client."
+5. **Close (~5s):** linger on the Messenger thread showing the full
+   conversation.
+
+**Submission changes:**
+- Attach the new screencast.
+- Use-case description: same as below PLUS the server-to-server paragraph
+  (added 2026-08-03) — Meta's rejection text explicitly asks server-to-server
+  apps to say so.
+- "0 of 1 API calls" check: the recording itself fires fresh Send API calls;
+  verify the permission page shows ≥1 call (up to 24h lag) before submitting.
+- Tester account: not required by this verdict, but adding one (any willing
+  real account as Tester in App Roles) removes the last known rejection vector
+  — Aaron's call, he declined last round.
+
+**After approval:** unchanged — re-smoke from a NON-role account; Page FAQ
+automation already OFF (2026-07-22). Then Phase B (IG) reusing this playbook.
+
 1. **Business Verification (start FIRST — it gates Advanced Access):**
    business.facebook.com → Settings → **Security Centre → Start Verification**.
    Verify the business (legal entity: **1st Minnesota Lending, LLC** — "Tuned
@@ -100,6 +167,17 @@ smoke (an undemonstrable permission risks the whole review).
 > the standard messaging window. Data handling: conversation transcripts are
 > stored in our CRM; users can request deletion via our registered data
 > deletion callback. Privacy policy: https://tunedyota.com/privacy
+>
+> Note for the reviewer: this is a SERVER-TO-SERVER app. There is no
+> user-facing Facebook Login flow anywhere in the product — the app receives
+> Page messages via webhook and sends replies using a Page access token that
+> the Page admin generated in the App Dashboard (Messenger API Settings). The
+> screencast therefore shows the Page asset selection in the App Dashboard in
+> place of a login flow, per the App Review guidance for server-to-server
+> apps. The screencast then shows the end-to-end flow: a customer message to
+> our Page, the app's automated reply, a staff member sending a reply from our
+> app UI (staff console), and that same message delivered in the native
+> Messenger client, side-by-side with no cuts.
 
 **Reviewer test instructions (paste):**
 > 1. Go to our Facebook Page ("Tuned Yota") and send it a message, e.g.
