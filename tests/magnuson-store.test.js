@@ -107,6 +107,32 @@ test("bespoke store pages tell the shopper about the 3–5 week build-to-order l
   assert.ok(/3–5 weeks/.test(html), "bespoke page missing the 3–5 week caution");
 });
 
+// ── Magnuson consumer returns policy (Aaron: pass through dealer terms) ─────
+// Source: Magnuson Dealer Policy July 1st 2026 §8 (cancellations), §15
+// (defective), §16 (RMA returns), §6.11 (refused shipments). The policy has NO
+// fixed return window — returns are RMA-approval-conditional — so the page
+// must never promise one, and product schema carries no MerchantReturnPolicy
+// (no schema category truthfully models approval-conditional returns).
+
+test("returns.html documents the Magnuson pass-through terms accurately", () => {
+  const html = fs.readFileSync(path.join(SITE, "returns.html"), "utf8");
+  const sect = (html.split(/<h2 id="magnuson"/)[1] || "").split(/<h2 /)[0];
+  assert.ok(sect, "returns.html missing the Magnuson section");
+  for (const required of [/24 hours/, /12%/, /RMA/, /[Dd]iscontinued/, /15%/, /original packaging/i, /freight prepaid/i]) {
+    assert.match(sect, required, `Magnuson section missing sourced clause ${required}`);
+  }
+  assert.match(sect, /[Cc]ancellations? after shipment .{0,40}not permitted|not permitted after shipment|once .{0,30}shipped.{0,60}cannot be cancelled/i,
+    "must state the after-shipment no-cancellation rule");
+  assert.ok(!/30[- ]day/.test(sect), "Magnuson section must not promise a 30-day window the dealer policy does not grant");
+});
+
+test("store pages carry no MerchantReturnPolicy (approval-conditional returns have no truthful schema category)", () => {
+  for (const slug of new Set(Object.values(SLUGS))) {
+    const html = fs.readFileSync(path.join(SITE, `${slug}.html`), "utf8");
+    assert.ok(!html.includes("hasMerchantReturnPolicy"), `${slug}: fabricated return-policy schema`);
+  }
+});
+
 test("merchant feed g:links point at per-SKU store pages", () => {
   const feed = fs.readFileSync(path.join(SITE, "merchant-feed.xml"), "utf8");
   const links = [...feed.matchAll(/<g:link>https:\/\/tunedyota\.com\/([^<]+)<\/g:link>/g)].map((m) => m[1]);
