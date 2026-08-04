@@ -46,11 +46,37 @@ function imageForApp(app) {
   return f ? base + f : `${SITE}/og-image.png`;
 }
 
+// Listing-quality enrichment (product_type / product_detail / product_highlight)
+// derives every value from the catalog — no performance numbers, no emissions
+// claims, no delivery promises (see tests/merchant-feed-enrichment.test.mjs).
+// Order matters: bundles led by a tune ("Tune + Cold Air Kit") are tune
+// packages, not intakes, so the Tune check precedes the part-family checks.
+function magFamily(name) {
+  if (/Upgrade System/i.test(name)) return "Supercharger Upgrade Kits";
+  if (/Supercharger System/i.test(name)) return "Supercharger Systems";
+  if (/HP Tuners/i.test(name)) return "Tuning Devices";
+  if (/^(Magnuson Performance )?Tune\b/i.test(name) || /Performance Tune/i.test(name)) return "Performance Tune Packages";
+  if (/Cat-Back|Exhaust/i.test(name)) return "Exhaust";
+  if (/Air Intake|Cold Air/i.test(name)) return "Air Intakes";
+  if (/Radiator|Charge Air Cooler/i.test(name)) return "Cooling";
+  return "Performance Parts";
+}
+
+const detail = (section, attr, value) =>
+  `    <g:product_detail><g:section_name>${ESC(section)}</g:section_name><g:attribute_name>${ESC(attr)}</g:attribute_name><g:attribute_value>${ESC(value)}</g:attribute_value></g:product_detail>`;
+
+// The price-sheet note, surfaced as a shopper-facing bullet: sentence case,
+// mid-dots to em dashes. Notes are Magnuson's own words — never embellished.
+function noteHighlight(note) {
+  const s = String(note).replace(/\s*·\s*/g, " — ").trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 // Per-SKU store pages (scripts/magnuson/build-store-pages.mjs) are the
 // preferred landing pages — one product, one price, one schema block — which
 // satisfies Merchant Center's specific-landing-page requirement. Fall back to
 // the vehicle page only if a SKU has no store page.
-function emitMagnusonItems() {
+export function emitMagnusonItems() {
   const catalogSrc = fs.readFileSync(path.join(SITE_DIR, "magnuson-catalog.js"), "utf8");
   const windowStub = {};
   new Function("window", catalogSrc)(windowStub);
@@ -73,6 +99,7 @@ function emitMagnusonItems() {
   const items = [...bySku.values()].map(({ kit, apps }) => {
     const app = apps[0];
     const fit = apps.length === 1 ? `${app.vehicle} ${app.years} (${app.engine})` : `${app.vehicle} (${app.engine})`;
+    const scFamily = (kit.name.match(/TVS\d{4}|MP90/) || [])[0];
     const title = `${kit.name} — ${fit}`;
     const description =
       `${kit.name} for the ${fit}. Genuine Magnuson hardware sold by Tuned Yota, an authorized Magnuson dealer, installer, servicer and calibrator specializing in Toyota and Lexus. Ships to the lower 48; installation and OTT calibration available in the Upper Midwest.`;
@@ -92,6 +119,17 @@ function emitMagnusonItems() {
       "    <g:brand>Magnuson Superchargers</g:brand>",
       `    <g:mpn>${ESC(kit.sku)}</g:mpn>`,
       "    <g:google_product_category>Vehicles &amp; Parts &gt; Vehicle Parts &amp; Accessories &gt; Motor Vehicle Parts &gt; Motor Vehicle Engine Parts</g:google_product_category>",
+      `    <g:product_type>${ESC(`Performance Parts > ${magFamily(kit.name)} > ${app.vehicle}`)}</g:product_type>`,
+      detail("Fitment", "Vehicle", app.vehicle),
+      detail("Fitment", "Engine", app.engine),
+      apps.length === 1
+        ? detail("Fitment", "Model years", app.years)
+        : apps.map((a) => detail("Fitment", "Fits", `${a.vehicle} ${a.years} (${a.engine})`)).join("\n"),
+      ...(scFamily ? [detail("Specs", "Supercharger", scFamily)] : []),
+      "    <g:product_highlight>Genuine Magnuson hardware from an authorized Magnuson dealer</g:product_highlight>",
+      "    <g:product_highlight>Professional installation and OTT calibration available in the Upper Midwest</g:product_highlight>",
+      "    <g:product_highlight>Flat-rate freight to the contiguous US</g:product_highlight>",
+      ...(kit.note ? [`    <g:product_highlight>${ESC(noteHighlight(kit.note))}</g:product_highlight>`] : []),
       "  </item>",
     ].join("\n");
   });
