@@ -70,15 +70,56 @@ test("titles are byte-identical to the pre-enrichment feed (CTR experiment guard
     /<g:title>Magnuson Performance Low-Temp Radiator — Toyota Tundra 2022\+ \(3\.4L i-FORCE twin-turbo V6\)<\/g:title>/);
 });
 
-test("no fabricated claims: no HP/torque numbers, no emissions/CARB claims, no delivery promises", () => {
+test("no fabricated claims: no HP/torque numbers, no emissions/CARB claims", () => {
   for (const item of magItems) {
     const enriched = [
       ...[...item.matchAll(/<g:product_highlight>([^<]+)<\/g:product_highlight>/g)].map((m) => m[1]),
       ...[...item.matchAll(/<g:attribute_value>([^<]+)<\/g:attribute_value>/g)].map((m) => m[1]),
       ...[...item.matchAll(/<g:product_type>([^<]+)<\/g:product_type>/g)].map((m) => m[1]),
     ].join(" ");
-    for (const banned of [/\bhp\b/i, /horsepower/i, /lb-?ft/i, /CARB/, /50-state/i, /emissions-legal/i, /\bEO\b/, /delivery/i, /arrives/i, /get it by/i]) {
+    for (const banned of [/\bhp\b/i, /horsepower/i, /lb-?ft/i, /CARB/, /50-state/i, /emissions-legal/i, /\bEO\b/, /get it by/i]) {
       assert.ok(!banned.test(enriched), `fabricated-claim risk "${banned}" in: ${enriched}`);
     }
+  }
+});
+
+// ── Lead times (owner-sourced, Aaron 2026-08-03) ──────────────────────────────
+// Supercharger kits (systems + upgrade systems) are bespoke build-to-order —
+// Aaron cautions 3–5 weeks total, encoded as 12–20 business days handling +
+// 3–5 transit = 15–25 business days. Everything else is Magnuson drop-ship:
+// "ships in 1–3 days, arrives in 3–7", verbatim. No third profile may exist.
+
+const shippingOf = (item) => (item.match(/<g:shipping>.*?<\/g:shipping>/s) || [])[0];
+
+test("bespoke supercharger kits carry the 3–5 week build-to-order lead time", () => {
+  for (const sku of ["01-26-57-107-BL", "05-26-57-107-BL", "01-13-34-003-BL"]) {
+    const s = shippingOf(itemBySku(sku));
+    assert.match(s, /<g:min_handling_time>12<\/g:min_handling_time>/, `${sku}: ${s}`);
+    assert.match(s, /<g:max_handling_time>20<\/g:max_handling_time>/, `${sku}: ${s}`);
+    assert.match(s, /<g:min_transit_time>3<\/g:min_transit_time>/, `${sku}: ${s}`);
+    assert.match(s, /<g:max_transit_time>5<\/g:max_transit_time>/, `${sku}: ${s}`);
+    assert.match(itemBySku(sku), /<g:product_highlight>Built to order by Magnuson — allow 3–5 weeks<\/g:product_highlight>/, sku);
+  }
+});
+
+test("drop-ship parts carry Aaron's 1–3 day handling / 3–7 day transit verbatim", () => {
+  for (const sku of ["31-99-34-005-BL", "01-99-34-101", "31-19-57-215", "31-99-34-027-BL"]) {
+    const s = shippingOf(itemBySku(sku));
+    assert.match(s, /<g:min_handling_time>1<\/g:min_handling_time>/, `${sku}: ${s}`);
+    assert.match(s, /<g:max_handling_time>3<\/g:max_handling_time>/, `${sku}: ${s}`);
+    assert.match(s, /<g:min_transit_time>3<\/g:min_transit_time>/, `${sku}: ${s}`);
+    assert.match(s, /<g:max_transit_time>7<\/g:max_transit_time>/, `${sku}: ${s}`);
+    assert.ok(!/Built to order/.test(itemBySku(sku)), `${sku} wrongly marked bespoke`);
+  }
+});
+
+test("every Magnuson item has exactly one of the two owner-approved lead-time profiles", () => {
+  for (const item of magItems) {
+    const s = shippingOf(item);
+    assert.ok(s, "item missing g:shipping");
+    assert.match(s, /<g:price>310\.00 USD<\/g:price>/, "flat $310 freight must survive");
+    const bespoke = /<g:min_handling_time>12</.test(s) && /<g:max_transit_time>5</.test(s);
+    const dropShip = /<g:min_handling_time>1</.test(s) && /<g:max_transit_time>7</.test(s);
+    assert.ok(bespoke !== dropShip, `unknown lead-time profile: ${s}`);
   }
 });

@@ -65,6 +65,23 @@ function magFamily(name) {
 const detail = (section, attr, value) =>
   `    <g:product_detail><g:section_name>${ESC(section)}</g:section_name><g:attribute_name>${ESC(attr)}</g:attribute_name><g:attribute_value>${ESC(value)}</g:attribute_value></g:product_detail>`;
 
+// Lead times per Aaron (2026-08-03). Supercharger kits (systems + upgrade
+// systems — the blowers themselves) are bespoke build-to-order direct from
+// Magnuson assembly; Aaron cautions 3–5 weeks total, encoded as 12–20 business
+// days handling + 3–5 transit = 15–25 business days. Every other Magnuson
+// product is a drop-ship order: "ships in 1–3 days, arrives in 3–7", verbatim.
+// The $310 flat rate ($275 freight + $35 drop-ship fee, dealer policy
+// §6.13/§6.9.1) applies to both profiles.
+const MAG_BESPOKE_FAMILIES = new Set(["Supercharger Systems", "Supercharger Upgrade Kits"]);
+function magShippingXml(family) {
+  const t = MAG_BESPOKE_FAMILIES.has(family)
+    ? { minH: 12, maxH: 20, minT: 3, maxT: 5 }
+    : { minH: 1, maxH: 3, minT: 3, maxT: 7 };
+  return "    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>310.00 USD</g:price>" +
+    `<g:min_handling_time>${t.minH}</g:min_handling_time><g:max_handling_time>${t.maxH}</g:max_handling_time>` +
+    `<g:min_transit_time>${t.minT}</g:min_transit_time><g:max_transit_time>${t.maxT}</g:max_transit_time></g:shipping>`;
+}
+
 // The price-sheet note, surfaced as a shopper-facing bullet: sentence case,
 // mid-dots to em dashes. Notes are Magnuson's own words — never embellished.
 function noteHighlight(note) {
@@ -100,6 +117,7 @@ export function emitMagnusonItems() {
     const app = apps[0];
     const fit = apps.length === 1 ? `${app.vehicle} ${app.years} (${app.engine})` : `${app.vehicle} (${app.engine})`;
     const scFamily = (kit.name.match(/TVS\d{4}|MP90/) || [])[0];
+    const family = magFamily(kit.name);
     const title = `${kit.name} — ${fit}`;
     const description =
       `${kit.name} for the ${fit}. Genuine Magnuson hardware sold by Tuned Yota, an authorized Magnuson dealer, installer, servicer and calibrator specializing in Toyota and Lexus. Ships to the lower 48; installation and OTT calibration available in the Upper Midwest.`;
@@ -113,13 +131,11 @@ export function emitMagnusonItems() {
       `    <g:price>${kit.retail.toFixed(2)} USD</g:price>`,
       "    <g:availability>in_stock</g:availability>",
       "    <g:condition>new</g:condition>",
-      // $310 = Magnuson dealer policy pass-through: $275 flat freight (contiguous
-      // US, policy §6.13) + $35 non-negotiable drop-ship fee (§6.9.1).
-      "    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>310.00 USD</g:price></g:shipping>",
+      magShippingXml(family),
       "    <g:brand>Magnuson Superchargers</g:brand>",
       `    <g:mpn>${ESC(kit.sku)}</g:mpn>`,
       "    <g:google_product_category>Vehicles &amp; Parts &gt; Vehicle Parts &amp; Accessories &gt; Motor Vehicle Parts &gt; Motor Vehicle Engine Parts</g:google_product_category>",
-      `    <g:product_type>${ESC(`Performance Parts > ${magFamily(kit.name)} > ${app.vehicle}`)}</g:product_type>`,
+      `    <g:product_type>${ESC(`Performance Parts > ${family} > ${app.vehicle}`)}</g:product_type>`,
       detail("Fitment", "Vehicle", app.vehicle),
       detail("Fitment", "Engine", app.engine),
       apps.length === 1
@@ -129,6 +145,9 @@ export function emitMagnusonItems() {
       "    <g:product_highlight>Genuine Magnuson hardware from an authorized Magnuson dealer</g:product_highlight>",
       "    <g:product_highlight>Professional installation and OTT calibration available in the Upper Midwest</g:product_highlight>",
       "    <g:product_highlight>Flat-rate freight to the contiguous US</g:product_highlight>",
+      ...(MAG_BESPOKE_FAMILIES.has(family)
+        ? ["    <g:product_highlight>Built to order by Magnuson — allow 3–5 weeks</g:product_highlight>"]
+        : []),
       ...(kit.note ? [`    <g:product_highlight>${ESC(noteHighlight(kit.note))}</g:product_highlight>`] : []),
       "  </item>",
     ].join("\n");
