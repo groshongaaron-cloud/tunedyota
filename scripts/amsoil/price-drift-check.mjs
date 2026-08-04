@@ -152,7 +152,9 @@ async function main() {
     const examples = drifted.slice(0, 10).join("\n");
     await notify(
       `🚨 AMSOIL PRICE DRIFT${since !== TODAY ? ` (stale since ${since})` : ""} — amsoil.com no longer matches the site.\n` +
-      `${summaryHead}\n${examples}${drifted.length > 10 ? `\n…and ${drifted.length - 10} more` : ""}\n` +
+      `${summaryHead}\n` +
+      `Evidence: VERIFIED — live amsoil.com JSON-LD offers compared against origin/master catalog this run.\n` +
+      `${examples}${drifted.length > 10 ? `\n…and ${drifted.length - 10} more` : ""}\n` +
       `ACTION (P.C. prices are stale too — they only exist in the official sheet):\n` +
       `1. Download a fresh U.S. Pricing CSV from dz.amsoil.com → replace scripts/amsoil/data/us-pricing.csv\n` +
       `2. npm run build:seo, ship per the ship skill\n` +
@@ -160,17 +162,17 @@ async function main() {
     );
   } else {
     if (state.driftSince) {
-      await notify(`✅ AMSOIL drift resolved — site matches amsoil.com again (was stale since ${state.driftSince}). ${summaryHead}`);
+      await notify(`✅ AMSOIL drift resolved — site matches amsoil.com again (was stale since ${state.driftSince}). ${summaryHead}\nEvidence: VERIFIED — live re-compare this run.`);
     }
     fs.writeFileSync(STATE_FILE, JSON.stringify({ driftSince: null, lastRun: TODAY, drifted: 0 }, null, 2));
     // Healthy = silent (watcher convention); majority-blocked runs still deserve a ping.
     if (checkedPages < sentinels.length / 2) {
-      await notify(`⚠️ AMSOIL drift-check degraded: only ${checkedPages}/${sentinels.length} sentinel pages readable (${errors.length} errors). No drift among readable pages.`);
+      await notify(`⚠️ AMSOIL drift-check degraded: only ${checkedPages}/${sentinels.length} sentinel pages readable (${errors.length} errors). No drift among readable pages.\nEvidence: mostly UNMEASURED — treat "no drift" as unconfirmed this week.`);
     }
   }
 }
 main().catch(async (e) => {
   console.error(e);
-  await notify(`⚠️ AMSOIL drift-check crashed: ${String(e.message || e).slice(0, 200)}`);
+  await notify(`⚠️ AMSOIL drift-check crashed: ${String(e.message || e).slice(0, 200)}\nEvidence: UNMEASURED — run incomplete, nothing confirmed.`);
   process.exit(1);
 });

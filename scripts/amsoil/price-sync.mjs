@@ -71,7 +71,17 @@ async function main() {
   }
   const summary = `AMSOIL price-sync ${TODAY}\nApplied: ${applied.length}\n${applied.join("\n") || "  (none)"}\nHeld: ${held.length}\n${held.join("\n") || "  (none)"}`;
   console.log(summary);
-  await notify(summary);
+  // The Slack summary goes out AFTER the commit/push attempt and carries an
+  // evidence state (docs/operations/evidence-states.md) — a summary sent before
+  // the push claims work the outside world may never have received.
+  let evidence;
+  if (!applied.length) {
+    evidence = held.length
+      ? "Evidence: no changes applied; HELD items above are UNMEASURED or guard-held — not confirmed matching."
+      : "Evidence: VERIFIED — live amsoil.com prices compared this run; catalog matches.";
+  } else if (!COMMIT) {
+    evidence = "Evidence: PREPARED — catalog + pages rewritten locally, NOT committed (run without --commit).";
+  }
   if (COMMIT && applied.length) {
     // Stage the catalog plus exactly the regenerated landing pages (never a broad
     // glob — this repo folder is shared with a separate AMSOIL session). ALL
@@ -83,9 +93,17 @@ async function main() {
     // disapproves the Merchant Center item.)
     const pageArgs = [...AMSOIL_PAGE_FILES, ...AMSOIL_GUIDE_FILES, ...AMSOIL_GEO_FILES, ...AMSOIL_PRODUCT_FILES, "amsoil-garage.html"]
       .map((f) => JSON.stringify(path.join("site", f))).join(" ");
-    execSync(`git add ${JSON.stringify(DATA)} ${pageArgs}`, { cwd: ROOT });
-    execSync(`git commit -m "chore(amsoil): weekly retail price sync (${applied.length} updated)"`, { cwd: ROOT });
-    execSync("git push", { cwd: ROOT });
+    try {
+      execSync(`git add ${JSON.stringify(DATA)} ${pageArgs}`, { cwd: ROOT });
+      // Pathspec commit — a bare commit would sweep in whatever a parallel
+      // session staged in this shared repo mid-run.
+      execSync(`git commit -m "chore(amsoil): weekly retail price sync (${applied.length} updated)" -- ${JSON.stringify(DATA)} ${pageArgs}`, { cwd: ROOT });
+      execSync("git push", { cwd: ROOT });
+      evidence = "Evidence: OBSERVED — committed + pushed to master (Netlify deploy not independently verified).";
+    } catch (e) {
+      evidence = `Evidence: 🚨 PREPARED ONLY — changes written locally but commit/push FAILED: ${String(e.message || e).split("\n")[0].slice(0, 160)}`;
+    }
   }
+  await notify(`${summary}\n${evidence}`);
 }
 main().catch((e) => { console.error(e); process.exit(1); });

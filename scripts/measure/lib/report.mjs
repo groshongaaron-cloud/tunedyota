@@ -46,5 +46,15 @@ export function renderReport(snapshot, diff) {
   const errors = snapshot.meta?.errors || [];
   if (errors.length) lines.push(`⚠ *Probe errors:* ${errors.join("; ")}`);
 
+  // Evidence footer (docs/operations/evidence-states.md): name what this run
+  // actually measured vs what it skipped, so absent stats read as UNMEASURED
+  // rather than zero.
+  const ev = [
+    snapshot.gsc ? "GSC VERIFIED (API)" : "GSC UNMEASURED",
+    hasPplx ? "Perplexity VERIFIED (live probes)" : "Perplexity UNMEASURED (skipped/failed)",
+  ];
+  if (!hasWeb) ev.push("WebSearch UNMEASURED (cloud-only probe)");
+  lines.push(`Evidence: ${ev.join(" · ")}`);
+
   return lines.join("\n");
 }
