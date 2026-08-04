@@ -20,6 +20,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { CHROME } from "../build-amsoil-pages.mjs";
+import { magFamily } from "../build-merchant-feed.mjs";
 
 const { FONTS, SITECSS, FAVICON, NAV, FOOTER, ESC, STYLE } = CHROME;
 const SITE = "site";
@@ -159,8 +160,24 @@ const CONTACT_CTA = `
     <a class="btn outline" href="mailto:info@tunedyota.com">Email info@tunedyota.com</a>
   </div>`;
 
+// Lead-time profiles (owner-sourced, Aaron 2026-08-03): supercharger kits are
+// bespoke build-to-order direct from Magnuson assembly — Aaron cautions 3–5
+// weeks total, encoded as 12–20 business days handling + 3–5 transit. Tune
+// bundles and all standalone parts are Magnuson drop-ship orders: 1–3 days
+// handling, 3–7 transit, his numbers verbatim. Classified with the same
+// magFamily rule the merchant feed uses so feed, schema and page copy always
+// agree (tests/magnuson-store.test.js cross-checks them by SKU).
+function leadProfile(it) {
+  const family = magFamily(it.kind === "kit" ? it.detail : it.name || "");
+  const bespoke = it.kind === "kit" && family !== "Performance Tune Packages";
+  return bespoke
+    ? { bespoke, minH: 12, maxH: 20, minT: 3, maxT: 5 }
+    : { bespoke, minH: 1, maxH: 3, minT: 3, maxT: 7 };
+}
+
 function productLd(it, url, name, desc) {
   const img = it.kind === "kit" ? imageForKit(it) : null;
+  const t = leadProfile(it);
   return JSON.stringify({
     "@context": "https://schema.org", "@type": "Product", "@id": `${url}#product`,
     name, sku: it.sku, mpn: it.sku,
@@ -172,6 +189,16 @@ function productLd(it, url, name, desc) {
       priceValidUntil: "2026-12-31", availability: "https://schema.org/InStock",
       itemCondition: "https://schema.org/NewCondition",
       seller: { "@type": "AutomotiveBusiness", "@id": `${BASE}/#business`, name: "Tuned Yota", telephone: "+1-612-406-7117", url: `${BASE}/` },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: { "@type": "MonetaryAmount", value: 310, currency: "USD" },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: t.minH, maxValue: t.maxH, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: t.minT, maxValue: t.maxT, unitCode: "DAY" },
+        },
+      },
     },
   });
 }
@@ -246,7 +273,7 @@ ${NAV}
     ${img ? `<img src="${img.replace(BASE, "")}" alt="${ESC(name)}" loading="lazy" width="160" height="160" style="border-radius:12px">` : ""}
     <div style="flex:1;min-width:220px">
       <div style="font-size:27px;font-weight:900;color:var(--ink)">$${it.retail.toLocaleString("en-US")}</div>
-      <div style="font-size:13.5px;color:var(--sage-d);margin-top:2px">Magnuson part&nbsp;#&nbsp;${ESC(it.sku)} · Retail (MSP) pricing · Drop-ships from Magnuson to the lower 48</div>
+      <div style="font-size:13.5px;color:var(--sage-d);margin-top:2px">Magnuson part&nbsp;#&nbsp;${ESC(it.sku)} · Retail (MSP) pricing · ${leadProfile(it).bespoke ? "Built to order by Magnuson — allow 3–5 weeks" : "Drop-ships from Magnuson in 1–3 business days"}</div>
       ${it.redSku ? `<div style="font-size:13.5px;margin-top:4px">Also available in Magnuson Red (part #${ESC(it.redSku)}) — same price.</div>` : ""}
       ${it.colorOptions ? `<div style="font-size:13.5px;margin-top:4px">Colored lid options (+$300): ${ESC(it.colorOptions)}</div>` : ""}
     </div>

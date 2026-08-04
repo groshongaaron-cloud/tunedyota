@@ -51,9 +51,12 @@ function imageForApp(app) {
 // claims, no delivery promises (see tests/merchant-feed-enrichment.test.mjs).
 // Order matters: bundles led by a tune ("Tune + Cold Air Kit") are tune
 // packages, not intakes, so the Tune check precedes the part-family checks.
-function magFamily(name) {
+export function magFamily(name) {
   if (/Upgrade System/i.test(name)) return "Supercharger Upgrade Kits";
   if (/Supercharger System/i.test(name)) return "Supercharger Systems";
+  // "Supercharger Tuner Kit" (e.g. the 4Runner MP90) is a blower kit, not a
+  // tuning device — it must classify bespoke like every other supercharger.
+  if (/Supercharger Tuner Kit/i.test(name)) return "Supercharger Tuner Kits";
   if (/HP Tuners/i.test(name)) return "Tuning Devices";
   if (/^(Magnuson Performance )?Tune\b/i.test(name) || /Performance Tune/i.test(name)) return "Performance Tune Packages";
   if (/Cat-Back|Exhaust/i.test(name)) return "Exhaust";
@@ -72,7 +75,7 @@ const detail = (section, attr, value) =>
 // product is a drop-ship order: "ships in 1–3 days, arrives in 3–7", verbatim.
 // The $310 flat rate ($275 freight + $35 drop-ship fee, dealer policy
 // §6.13/§6.9.1) applies to both profiles.
-const MAG_BESPOKE_FAMILIES = new Set(["Supercharger Systems", "Supercharger Upgrade Kits"]);
+export const MAG_BESPOKE_FAMILIES = new Set(["Supercharger Systems", "Supercharger Upgrade Kits", "Supercharger Tuner Kits"]);
 function magShippingXml(family) {
   const t = MAG_BESPOKE_FAMILIES.has(family)
     ? { minH: 12, maxH: 20, minT: 3, maxT: 5 }

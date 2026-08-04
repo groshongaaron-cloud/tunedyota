@@ -92,7 +92,9 @@ test("no fabricated claims: no HP/torque numbers, no emissions/CARB claims", () 
 const shippingOf = (item) => (item.match(/<g:shipping>.*?<\/g:shipping>/s) || [])[0];
 
 test("bespoke supercharger kits carry the 3–5 week build-to-order lead time", () => {
-  for (const sku of ["01-26-57-107-BL", "05-26-57-107-BL", "01-13-34-003-BL"]) {
+  // 05-90-40-011-BL is the MP90 Supercharger TUNER KIT — still a blower kit,
+  // still built to order; "Tuner Kit" must not fall through to drop-ship.
+  for (const sku of ["01-26-57-107-BL", "05-26-57-107-BL", "01-13-34-003-BL", "05-90-40-011-BL"]) {
     const s = shippingOf(itemBySku(sku));
     assert.match(s, /<g:min_handling_time>12<\/g:min_handling_time>/, `${sku}: ${s}`);
     assert.match(s, /<g:max_handling_time>20<\/g:max_handling_time>/, `${sku}: ${s}`);

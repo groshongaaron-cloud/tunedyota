@@ -473,11 +473,11 @@
     <g:price>6495.00 USD</g:price>
     <g:availability>in_stock</g:availability>
     <g:condition>new</g:condition>
-    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>310.00 USD</g:price><g:min_handling_time>1</g:min_handling_time><g:max_handling_time>3</g:max_handling_time><g:min_transit_time>3</g:min_transit_time><g:max_transit_time>7</g:max_transit_time></g:shipping>
+    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>310.00 USD</g:price><g:min_handling_time>12</g:min_handling_time><g:max_handling_time>20</g:max_handling_time><g:min_transit_time>3</g:min_transit_time><g:max_transit_time>5</g:max_transit_time></g:shipping>
     <g:brand>Magnuson Superchargers</g:brand>
     <g:mpn>05-90-40-011-BL</g:mpn>
     <g:google_product_category>Vehicles &amp; Parts &gt; Vehicle Parts &amp; Accessories &gt; Motor Vehicle Parts &gt; Motor Vehicle Engine Parts</g:google_product_category>
-    <g:product_type>Performance Parts &gt; Performance Parts &gt; Toyota 4Runner</g:product_type>
+    <g:product_type>Performance Parts &gt; Supercharger Tuner Kits &gt; Toyota 4Runner</g:product_type>
     <g:product_detail><g:section_name>Fitment</g:section_name><g:attribute_name>Vehicle</g:attribute_name><g:attribute_value>Toyota 4Runner</g:attribute_value></g:product_detail>
     <g:product_detail><g:section_name>Fitment</g:section_name><g:attribute_name>Engine</g:attribute_name><g:attribute_value>4.0L 1GR-FE V6</g:attribute_value></g:product_detail>
     <g:product_detail><g:section_name>Fitment</g:section_name><g:attribute_name>Model years</g:attribute_name><g:attribute_value>2003–2009</g:attribute_value></g:product_detail>
@@ -485,6 +485,7 @@
     <g:product_highlight>Genuine Magnuson hardware from an authorized Magnuson dealer</g:product_highlight>
     <g:product_highlight>Professional installation and OTT calibration available in the Upper Midwest</g:product_highlight>
     <g:product_highlight>Flat-rate freight to the contiguous US</g:product_highlight>
+    <g:product_highlight>Built to order by Magnuson — allow 3–5 weeks</g:product_highlight>
     <g:product_highlight>No factory tune included — Tuned Yota supplies the calibration</g:product_highlight>
   </item>
   <item>
