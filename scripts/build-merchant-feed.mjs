@@ -76,10 +76,28 @@ const detail = (section, attr, value) =>
 // The $310 flat rate ($275 freight + $35 drop-ship fee, dealer policy
 // §6.13/§6.9.1) applies to both profiles.
 export const MAG_BESPOKE_FAMILIES = new Set(["Supercharger Systems", "Supercharger Upgrade Kits", "Supercharger Tuner Kits"]);
+export const MAG_LEAD_TIMES = {
+  bespoke: { minH: 12, maxH: 20, minT: 3, maxT: 5 },
+  dropShip: { minH: 1, maxH: 3, minT: 3, maxT: 7 },
+};
+// JSON-LD twin of magShippingXml — same numbers, schema.org shape. Used by
+// build-product-schema.mjs (vehicle pages) and mirrored client-side in
+// site/magnuson-schema.js so every surface carries identical shipping facts.
+export function magShippingDetailsJson(kitName) {
+  const t = MAG_BESPOKE_FAMILIES.has(magFamily(kitName)) ? MAG_LEAD_TIMES.bespoke : MAG_LEAD_TIMES.dropShip;
+  return {
+    "@type": "OfferShippingDetails",
+    "shippingRate": { "@type": "MonetaryAmount", "value": 310, "currency": "USD" },
+    "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "US" },
+    "deliveryTime": {
+      "@type": "ShippingDeliveryTime",
+      "handlingTime": { "@type": "QuantitativeValue", "minValue": t.minH, "maxValue": t.maxH, "unitCode": "DAY" },
+      "transitTime": { "@type": "QuantitativeValue", "minValue": t.minT, "maxValue": t.maxT, "unitCode": "DAY" },
+    },
+  };
+}
 function magShippingXml(family) {
-  const t = MAG_BESPOKE_FAMILIES.has(family)
-    ? { minH: 12, maxH: 20, minT: 3, maxT: 5 }
-    : { minH: 1, maxH: 3, minT: 3, maxT: 7 };
+  const t = MAG_BESPOKE_FAMILIES.has(family) ? MAG_LEAD_TIMES.bespoke : MAG_LEAD_TIMES.dropShip;
   return "    <g:shipping><g:country>US</g:country><g:service>Flat rate</g:service><g:price>310.00 USD</g:price>" +
     `<g:min_handling_time>${t.minH}</g:min_handling_time><g:max_handling_time>${t.maxH}</g:max_handling_time>` +
     `<g:min_transit_time>${t.minT}</g:min_transit_time><g:max_transit_time>${t.maxT}</g:max_transit_time></g:shipping>`;

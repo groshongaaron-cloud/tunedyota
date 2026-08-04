@@ -20,7 +20,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { CHROME } from "../build-amsoil-pages.mjs";
-import { magFamily } from "../build-merchant-feed.mjs";
+import { magFamily, MAG_LEAD_TIMES } from "../build-merchant-feed.mjs";
 
 const { FONTS, SITECSS, FAVICON, NAV, FOOTER, ESC, STYLE } = CHROME;
 const SITE = "site";
@@ -170,9 +170,7 @@ const CONTACT_CTA = `
 function leadProfile(it) {
   const family = magFamily(it.kind === "kit" ? it.detail : it.name || "");
   const bespoke = it.kind === "kit" && family !== "Performance Tune Packages";
-  return bespoke
-    ? { bespoke, minH: 12, maxH: 20, minT: 3, maxT: 5 }
-    : { bespoke, minH: 1, maxH: 3, minT: 3, maxT: 7 };
+  return { bespoke, ...(bespoke ? MAG_LEAD_TIMES.bespoke : MAG_LEAD_TIMES.dropShip) };
 }
 
 function productLd(it, url, name, desc) {

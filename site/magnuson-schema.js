@@ -64,7 +64,26 @@
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
         "itemCondition": "https://schema.org/NewCondition",
-        "seller": BUSINESS
+        "seller": BUSINESS,
+        "shippingDetails": shippingDetailsFor(kit)
+      }
+    };
+  }
+
+  // Keep in lockstep with magShippingDetailsJson() in scripts/build-merchant-feed.mjs.
+  // Lead times are owner-sourced (Aaron 2026-08-03): supercharger kits are
+  // bespoke build-to-order (3–5 weeks total); tune bundles and parts drop-ship.
+  function shippingDetailsFor(kit) {
+    var bespoke = /Supercharger System|Upgrade System|Supercharger Tuner Kit/i.test(kit.name);
+    var t = bespoke ? { minH: 12, maxH: 20, minT: 3, maxT: 5 } : { minH: 1, maxH: 3, minT: 3, maxT: 7 };
+    return {
+      "@type": "OfferShippingDetails",
+      "shippingRate": { "@type": "MonetaryAmount", "value": 310, "currency": "USD" },
+      "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "US" },
+      "deliveryTime": {
+        "@type": "ShippingDeliveryTime",
+        "handlingTime": { "@type": "QuantitativeValue", "minValue": t.minH, "maxValue": t.maxH, "unitCode": "DAY" },
+        "transitTime": { "@type": "QuantitativeValue", "minValue": t.minT, "maxValue": t.maxT, "unitCode": "DAY" }
       }
     };
   }
