@@ -50,7 +50,17 @@ async function listSessions(installerKey, { env = process.env, fetchImpl = fetch
   const key = escapeFormula(String(installerKey || ""));
   const recs = await listRecords({
     fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
-    filterByFormula: `AND({Status}="escalated", OR({Installer}="${key}", {Installer}=""))`,
+    // The console inbox = escalated threads (mine or unassigned) PLUS every LIVE
+    // Facebook/Instagram DM thread (mine or unassigned). Meta DMs must be visible
+    // and answerable the moment they arrive — not only once the AI emits a
+    // structured hand-off, which it frequently never does (it free-texts a fake
+    // "someone will be with you shortly" and the thread stays in "ai" status).
+    // That gap is why FB PMs never reached this inbox.
+    filterByFormula:
+      `OR(` +
+        `AND({Status}="escalated", OR({Installer}="${key}", {Installer}="")),` +
+        `AND({Status}!="closed", OR(LEFT({Session ID},3)="fb:", LEFT({Session ID},3)="ig:"), OR({Installer}="${key}", {Installer}=""))` +
+      `)`,
     fields: ["Session ID", "Status", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Transcript", "Last Activity"],
   });
   return recs.map((r) => {
@@ -58,7 +68,8 @@ async function listSessions(installerKey, { env = process.env, fetchImpl = fetch
     const turns = parseTranscript(f.Transcript);
     const last = turns[turns.length - 1] || null;
     return {
-      id: f["Session ID"] || "", customerName: f["Customer Name"] || "", phone: f.Phone || "",
+      id: f["Session ID"] || "", status: f.Status || "ai",
+      customerName: f["Customer Name"] || "", phone: f.Phone || "",
       vehicle: f.Vehicle || "", city: f.City || "", installer: f.Installer || "",
       lastActivity: f["Last Activity"] || "", turnCount: turns.length,
       lastRole: last ? last.role : "", lastText: last ? String(last.text || "").slice(0, 120) : "",
@@ -81,7 +92,16 @@ async function installerReply(sessionId, installerKey, text, deps = {}) {
   if (!clean) return { status: "error", error: "empty" };
   const sess = await loadFn(sessionId, deps);
   if (!sess) return { status: "error", error: "not-found" };
-  if (sess.status !== "escalated") return { status: "error", error: "not-escalated" };
+  const isMeta = /^(fb|ig):/.test(String(sess.id || ""));
+  if (sess.status !== "escalated") {
+    // A live Facebook/Instagram DM is answerable before the AI escalates it: an
+    // installer replying IS the human takeover, so promote + claim the thread
+    // (future client turns then relay to them, and aiPaused silences the AI for
+    // 72 h off this installer turn). Website "ai" threads and any closed thread
+    // are still refused — only live Meta DMs get this fast path.
+    if (!isMeta || sess.status === "closed") return { status: "error", error: "not-escalated" };
+    sess.status = "escalated";
+  }
   if (!sess.installer) sess.installer = installerKey; // claim unassigned
   sess.turns.push({ role: "installer", text: clean, at: now() });
   await saveFn(sess, deps);

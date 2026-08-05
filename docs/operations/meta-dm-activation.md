@@ -96,11 +96,14 @@ excuses the "complete Meta login flow" requirement.
    name/phone/city/vehicle questions → handoff confirmation. Caption: "The
    assistant collects contact details and notifies our staff."
 4. **THE MONEY SHOT — live send from app UI:** side-by-side windows. In the
-   installer console Chats tab, open the conversation, type a reply, click
-   **Send** — caption pointing at the button: "Staff replies from our app UI —
-   this Send uses the pages_messaging Send API." The reply then pops into the
-   messenger.com thread in the adjacent window. Caption: "Same message
-   delivered in the native Messenger client."
+   installer console Chats tab, open the conversation, type a **visibly unique
+   reply** so the reviewer can match it in both frames — e.g.
+   `TY staff reply · demo 4RUNNER-7788` (any unique, legible string works; avoid
+   generic "Sure, we can help"). Click **Send** — caption pointing at the button:
+   "Staff replies from our app UI — this Send uses the pages_messaging Send API."
+   The reply then pops into the messenger.com thread in the adjacent window.
+   Caption: "Same message delivered in the native Messenger client." Keep BOTH
+   the console send and the Messenger arrival on screen together, no cut.
 5. **Close (~5s):** linger on the Messenger thread showing the full
    conversation.
 
@@ -179,14 +182,20 @@ automation already OFF (2026-07-22). Then Phase B (IG) reusing this playbook.
 > app UI (staff console), and that same message delivered in the native
 > Messenger client, side-by-side with no cuts.
 
-**Reviewer test instructions (paste):**
-> 1. Go to our Facebook Page ("Tuned Yota") and send it a message, e.g.
->    "Do you tune 4Runners?" — the assistant replies in Messenger within
->    seconds with a vehicle-specific answer.
-> 2. Reply "Can I talk to a real person?" — the assistant asks for name,
->    phone, city, and vehicle, then confirms it has notified the nearest
->    installer. This demonstrates receive + send on pages_messaging.
-> 3. No login or test account is needed; the flow is live on our public Page.
+**Reviewer test instructions (paste) — honest / screencast-only (2026-08-04):**
+> This is a server-to-server app (webhook + Page access token; no user-facing
+> Facebook Login). Because the app is currently in Development Mode, the Page's
+> automated replies are delivered only to accounts that have a role on this app —
+> a reviewer messaging the Page from a non-role account will not receive an
+> automated reply. The complete end-to-end flow is therefore demonstrated in the
+> attached screencast rather than via live hands-on testing:
+> 1. A customer message to our Page ("Do you tune 4Runners?") and the app's
+>    automated reply — receive + send on pages_messaging.
+> 2. The assistant escalating to a human and collecting name, phone, city, and
+>    vehicle.
+> 3. A staff member typing and sending a reply from our app UI (staff console),
+>    and that exact message appearing in the native Messenger client,
+>    side-by-side with no cuts.
 
 ## Phase B — Instagram DMs (Meta-gated, days-to-weeks)
 

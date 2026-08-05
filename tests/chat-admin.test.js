@@ -27,6 +27,46 @@ test("listSessions filters escalated for installer OR unassigned, sorts newest f
   assert.equal(out[1].lastRole, "user");
 });
 
+test("listSessions surfaces active Facebook/Instagram threads even before they escalate", async () => {
+  let gotFormula = "";
+  const fetchImpl = async (url) => {
+    gotFormula = decodeURIComponent(url).replace(/\+/g, " "); // URLSearchParams encodes spaces as "+"
+    return { ok: true, json: async () => ({ records: [
+      { id: "r1", fields: { "Session ID": "fb:PSID1", Status: "ai", Installer: "", Transcript: '[{"role":"assistant","text":"Hi there!","at":5}]', "Last Activity": "2026-08-04T10:00:00Z" } },
+    ] }) };
+  };
+  const out = await admin.listSessions("aaron", { env: ENV, fetchImpl });
+  // The filter must now reach non-escalated fb:/ig: sessions (the FB-connection fix).
+  assert.ok(gotFormula.includes('LEFT({Session ID},3)="fb:"'));
+  assert.ok(gotFormula.includes('LEFT({Session ID},3)="ig:"'));
+  assert.equal(out[0].id, "fb:PSID1");
+  assert.equal(out[0].status, "ai");        // surfaced while still AI-handled
+  assert.equal(out[0].lastRole, "assistant");
+});
+
+test("installerReply promotes a live (not-yet-escalated) Facebook thread and claims it", async () => {
+  const saved = [];
+  let deliveredTurn = null;
+  const out = await admin.installerReply("fb:PSID1", "aaron", "Happy to help with your 4Runner!", {
+    env: ENV,
+    loadFn: async () => ({ id: "fb:PSID1", status: "ai", installer: "", turns: [{ role: "user", text: "do you tune 4runners?", at: 1 }] }),
+    saveFn: async (s) => { saved.push(s); return s; },
+    onInstallerTurn: async (s, t) => { deliveredTurn = t; },
+    now: () => 999,
+  });
+  assert.equal(out.status, "ok");
+  assert.equal(saved[0].status, "escalated");   // human takeover promotes the thread
+  assert.equal(saved[0].installer, "aaron");    // and claims it
+  assert.deepEqual(saved[0].turns[saved[0].turns.length - 1], { role: "installer", text: "Happy to help with your 4Runner!", at: 999 });
+  assert.ok(deliveredTurn, "reply is delivered out to Messenger");
+});
+
+test("installerReply refuses a CLOSED Facebook thread (only live ones are answerable)", async () => {
+  const r = await admin.installerReply("fb:PSID1", "aaron", "x", {
+    env: ENV, loadFn: async () => ({ id: "fb:PSID1", status: "closed", installer: "", turns: [] }), saveFn: async (s) => s });
+  assert.equal(r.error, "not-escalated");
+});
+
 test("installerReply appends the SAME turn shape as the SMS relay and claims unassigned", async () => {
   const saved = [];
   const out = await admin.installerReply("s1", "noah", "  On my way  ", {
