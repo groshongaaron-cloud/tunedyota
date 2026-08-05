@@ -237,7 +237,7 @@ async function installerOp(body, installerKey, deps = {}) {
           reply = chatAdmin.installerReply, close = chatAdmin.closeSession,
           openSms = chatAdmin.openSmsThread, assign = chatAdmin.assignSession,
           admin = false } = deps;
-  if (body.op === "list") return { status: 200, body: { sessions: await list(installerKey, deps) } };
+  if (body.op === "list") return { status: 200, body: { sessions: await list(installerKey, { ...deps, view: body.view }) } };
   if (body.op === "openSms") {
     const r = await openSms(body, installerKey, deps);
     return { status: r.status === "ok" ? 200 : 400, body: r };

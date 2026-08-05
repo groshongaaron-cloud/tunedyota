@@ -169,6 +169,13 @@ test("installerOp routes ops and rejects bad ops", async () => {
   assert.equal((await installerOp({ op: "transcript", session: "zz" }, "aaron", missing)).status, 404);
 });
 
+test("installerOp op:list forwards the requested view to the lister", async () => {
+  let gotView;
+  const deps = { list: async (_key, o) => { gotView = (o || {}).view; return []; } };
+  await installerOp({ op: "list", view: "completed" }, "aaron", deps);
+  assert.equal(gotView, "completed");
+});
+
 test("handler 401s installer ops without a valid token", async () => {
   const { handler } = require("../netlify/functions/chat.js");
   const prev = process.env.INSTALLER_TOKENS;
