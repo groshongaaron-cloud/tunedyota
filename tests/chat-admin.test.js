@@ -44,6 +44,21 @@ test("listSessions surfaces active Facebook/Instagram threads even before they e
   assert.equal(out[0].lastRole, "assistant");
 });
 
+test("listSessions tags each session with a derived channel", async () => {
+  const fetchImpl = async () => ({ ok: true, json: async () => ({ records: [
+    { id: "r1", fields: { "Session ID": "fb:1", Status: "ai", Installer: "", Transcript: "[]", "Last Activity": "2026-08-05T04:00:00Z" } },
+    { id: "r2", fields: { "Session ID": "ig:2", Status: "ai", Installer: "", Transcript: "[]", "Last Activity": "2026-08-05T03:00:00Z" } },
+    { id: "r3", fields: { "Session ID": "sms:+15551234567", Status: "escalated", Installer: "", Transcript: "[]", "Last Activity": "2026-08-05T02:00:00Z" } },
+    { id: "r4", fields: { "Session ID": "abd7-uuid", Status: "escalated", Installer: "", Transcript: "[]", "Last Activity": "2026-08-05T01:00:00Z" } },
+  ] }) });
+  const out = await admin.listSessions("aaron", { env: ENV, fetchImpl });
+  const byId = Object.fromEntries(out.map((s) => [s.id, s.channel]));
+  assert.equal(byId["fb:1"], "facebook");
+  assert.equal(byId["ig:2"], "instagram");
+  assert.equal(byId["sms:+15551234567"], "text");
+  assert.equal(byId["abd7-uuid"], "web");
+});
+
 test("installerReply promotes a live (not-yet-escalated) Facebook thread and claims it", async () => {
   const saved = [];
   let deliveredTurn = null;

@@ -45,6 +45,15 @@ async function openSmsThread(body, installerKey, deps = {}) {
   return { status: "ok", session: id, isNew: true };
 }
 
+// Source-of-record channel from the Session ID prefix (ids: fb:/ig:/sms:, else web).
+function channelOf(id) {
+  const s = String(id || "");
+  if (s.startsWith("fb:")) return "facebook";
+  if (s.startsWith("ig:")) return "instagram";
+  if (s.startsWith("sms:")) return "text";
+  return "web";
+}
+
 async function listSessions(installerKey, { env = process.env, fetchImpl = fetch } = {}) {
   const c = cfg(env);
   const key = escapeFormula(String(installerKey || ""));
@@ -69,6 +78,7 @@ async function listSessions(installerKey, { env = process.env, fetchImpl = fetch
     const last = turns[turns.length - 1] || null;
     return {
       id: f["Session ID"] || "", status: f.Status || "ai",
+      channel: channelOf(f["Session ID"]),
       customerName: f["Customer Name"] || "", phone: f.Phone || "",
       vehicle: f.Vehicle || "", city: f.City || "", installer: f.Installer || "",
       lastActivity: f["Last Activity"] || "", turnCount: turns.length,
