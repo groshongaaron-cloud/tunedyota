@@ -34,3 +34,6 @@ scripts/headroom_guard/state.json
 # Git worktrees (local dev isolation)
 .worktrees/
 fleet-audit-*.html
+
+# Rocky reference packs (yt-dlp + ffmpeg output; internal tracing reference only — never shipped)
+assets/rocky/reference-packs/
