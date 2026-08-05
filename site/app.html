@@ -249,12 +249,12 @@
     };
   }
 
-  // Converge checkout — dormant until CONVERGE_* env vars exist (spec §6).
+  // EPG checkout — dormant until EPG_* env vars exist (spec §6).
   function startBuy(sku, btn) {
     var orig = btn.textContent; btn.disabled = true; btn.textContent = "Opening secure checkout…";
     window.TYPayment.startCheckout(sku, {
       onUnavailable: function () { btn.disabled = false; btn.textContent = orig; note(btn, "Online checkout opens soon — chat with us (💬) or call to reserve yours today."); },
-      onApproval: function () { btn.textContent = "Paid ✓ — we'll be in touch to schedule"; },
+      onApproval: function (r) { window.TYPayment.reportApproval(sku, r); btn.textContent = "Paid ✓ — we'll be in touch to schedule"; },
       onDeclined: function () { btn.disabled = false; btn.textContent = orig; note(btn, "Card declined — no charge was made."); },
       onCancelled: function () { btn.disabled = false; btn.textContent = orig; },
       onError: function () { btn.disabled = false; btn.textContent = orig; note(btn, "Checkout hit a snag — try again or chat with us."); },

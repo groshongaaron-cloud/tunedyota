@@ -1,21 +1,25 @@
-// site/payment-checkout.js — Elavon Converge Lightbox checkout (pure logic +
-// thin DOM glue, testable in Node like amsoil-garage-render.js). DORMANT until
-// the server reports payments configured: the pricing page keeps its
-// reservation flow, and this module only activates when create-payment-session
-// stops returning payments-not-configured. Card entry happens entirely inside
-// Converge's modal — no card data ever touches tunedyota.com.
+// site/payment-checkout.js — Elavon Payment Gateway (EPG) Lightbox checkout
+// (pure logic + thin DOM glue, testable in Node like amsoil-garage-render.js).
+// DORMANT until the server reports payments configured: the pricing page keeps
+// its reservation flow, and this module only activates when
+// create-payment-session stops returning payments-not-configured. Card entry
+// happens entirely inside Elavon's modal — no card data ever touches
+// tunedyota.com.
 (function (root) {
   var SESSION_FN = "/.netlify/functions/create-payment-session";
   var RECORD_FN = "/.netlify/functions/record-payment";
+  // client/library.js defines window.ElavonLightbox; client/index.js is the
+  // HPP's own bundle and does NOT (docs show both — library.js is correct,
+  // verified against the sandbox 2026-08-04).
   var SCRIPTS = {
-    prod: "https://www.convergepay.com/hosted-payments/PayWithConverge.js",
-    demo: "https://demo.convergepay.com/hosted-payments/PayWithConverge.js"
+    prod: "https://hpp.na.elavonpayments.com/client/library.js",
+    sandbox: "https://hpp.sandbox.elavonpayments.com/client/library.js"
   };
 
-  function scriptUrlFor(session) { return session && session.demo ? SCRIPTS.demo : SCRIPTS.prod; }
+  function scriptUrlFor(session) { return session && session.sandbox ? SCRIPTS.sandbox : SCRIPTS.prod; }
 
-  // POST the SKU (never a price) for a session token. Resolves the parsed JSON
-  // whatever the outcome; callers branch on .status / .error.
+  // POST the SKU (never a price) for a payment session. Resolves the parsed
+  // JSON whatever the outcome; callers branch on .status / .error.
   function requestSession(sku, fetchImpl) {
     return (fetchImpl || fetch)(SESSION_FN, {
       method: "POST",
@@ -24,22 +28,59 @@
     }).then(function (r) { return r.json(); });
   }
 
-  // Open the Converge Lightbox for a minted session. deps.loadScript / deps.pay
+  // Open the EPG Lightbox for a created session. deps.loadScript / deps.lightbox
   // are injectable for tests; in the browser they default to a script tag +
-  // window.PayWithConverge.
+  // window.ElavonLightbox. Message mapping: transactionCreated+isAuthorized ->
+  // onApproval, transactionCreated without -> onDeclined, closeOverlay with no
+  // transaction yet -> onCancelled, error -> onError. defaultAction is always
+  // called so the lightbox keeps its built-in behavior.
   function openLightbox(session, callbacks, deps) {
-    deps = deps || {};
+    deps = deps || {}; callbacks = callbacks || {};
     var load = deps.loadScript || function (url) {
       return new Promise(function (resolve, reject) {
-        if (root.PayWithConverge) return resolve();
+        if (root.ElavonLightbox) return resolve();
         var s = document.createElement("script");
-        s.src = url; s.onload = resolve; s.onerror = function () { reject(new Error("PayWithConverge load failed")); };
+        s.src = url; s.onload = resolve; s.onerror = function () { reject(new Error("ElavonLightbox load failed")); };
         document.head.appendChild(s);
       });
     };
+    var noop = function () {};
+    var onApproval = callbacks.onApproval || noop;
+    var onDeclined = callbacks.onDeclined || noop;
+    var onCancelled = callbacks.onCancelled || noop;
+    var onError = callbacks.onError || noop;
     return load(scriptUrlFor(session)).then(function () {
-      var pay = deps.pay || root.PayWithConverge;
-      pay.open({ ssl_txn_auth_token: session.token }, callbacks);
+      var Lightbox = deps.lightbox || root.ElavonLightbox;
+      var MT = Lightbox.MessageTypes || {};
+      var transacted = false;
+      var box = new Lightbox({
+        sessionId: session.sessionId,
+        onReady: function (error) {
+          if (error) return onError("lightbox-load-failed");
+          box.show();
+        },
+        messageHandler: function (message, defaultAction) {
+          switch (message.type) {
+            case MT.transactionCreated:
+              transacted = true;
+              // the live library carries isAuthorized inside transaction; the
+              // docs' quickstart shows it top-level — accept either.
+              var ok = message.isAuthorized === true ||
+                !!(message.transaction && message.transaction.isAuthorized === true);
+              var result = { sessionId: message.sessionId, transaction: message.transaction, authorized: ok };
+              if (ok) onApproval(result); else onDeclined(result);
+              break;
+            case MT.closeOverlay:
+              if (!transacted) onCancelled();
+              break;
+            case MT.error:
+              onError(message.error);
+              break;
+          }
+          if (typeof defaultAction === "function") defaultAction();
+        }
+      });
+      return box;
     });
   }
 
@@ -55,7 +96,7 @@
       .catch(function () { return { status: "error" }; });
   }
 
-  // Full flow: token -> modal. onUnavailable fires for payments-not-configured
+  // Full flow: session -> modal. onUnavailable fires for payments-not-configured
   // (the page should quietly keep its reservation flow).
   function startCheckout(sku, handlers, deps) {
     deps = deps || {}; handlers = handlers || {};
@@ -78,6 +119,10 @@
         onCancelled: handlers.onCancelled || function () {},
         onError: handlers.onError || function () {}
       }, deps).then(function () { return session; });
+    }).catch(function (e) {
+      // network / library-load failures reject the chain — surface them instead
+      // of leaving the button stuck on "Opening secure checkout…".
+      if (handlers.onError) handlers.onError((e && e.message) || "checkout-error");
     });
   }
 
