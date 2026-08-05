@@ -653,8 +653,9 @@
     }finally{ clearTimeout(timer); }
   }
   function custClose(){ var ov=document.getElementById('custov'); if(ov) ov.style.display='none'; }
-  function nudgeAddDays(iso, n){ var d=new Date((iso||STATE.today)+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
-  function nudgeAddMonths(iso, n){ var d=new Date((iso||STATE.today)+'T00:00:00'); d.setMonth(d.getMonth()+n); return d.toISOString().slice(0,10); }
+  function nudgeFmt(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+  function nudgeAddDays(iso, n){ var d=new Date((iso||STATE.today)+'T00:00:00'); d.setDate(d.getDate()+n); return nudgeFmt(d); }
+  function nudgeAddMonths(iso, n){ var d=new Date((iso||STATE.today)+'T00:00:00'); d.setMonth(d.getMonth()+n); return nudgeFmt(d); }
   function openNudgeDialog(person){
     STATE.nudgePerson = person || {}; STATE.nudgeDate = nudgeAddDays(STATE.today,7); STATE.nudgeMsg = '';
     var ov=document.getElementById('nudgeov');
@@ -669,7 +670,7 @@
   function renderNudge(){
     var b=document.getElementById('nudgebody'); if(!b) return;
     var p=STATE.nudgePerson||{};
-    function chip(label,iso){ return '<button type="button" class="btn'+(STATE.nudgeDate===iso?' on':'')+'" data-nudgedate="'+iso+'" style="font-size:12px">'+label+'</button>'; }
+    function chip(label,iso){ var on=STATE.nudgeDate===iso; return '<button type="button" class="btn" data-nudgedate="'+iso+'" style="font-size:12px'+(on?';outline:2px solid var(--accent,#c0392b);font-weight:800':'')+'">'+label+'</button>'; }
     b.innerHTML='<div class="reviewh" style="text-align:left">⏰ Set reminder</div>'+
       '<div class="meta">'+esc(p.name||p.phone||p.email||'Customer')+(p.vehicle?' · '+esc(p.vehicle):'')+'</div>'+
       '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">'+
