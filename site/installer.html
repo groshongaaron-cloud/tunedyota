@@ -363,7 +363,7 @@
     , doneCity: ''       // optional city filter applied inside the Done view
     , theme: '', me: ''
     , leadTab:'active', followupPending:null
-    , chats:[], chatOpen:null, chatsLoaded:false
+    , chats:[], chatOpen:null, chatsLoaded:false, chatSource:'open'
     , calls:[], callsLoaded:false, callsError:false };
   var CHAT_POLL = null;
   var DEL_TOAST_TIMER = null;
@@ -1139,7 +1139,7 @@
     var rf=document.getElementById('callsRefresh'); if(rf) rf.onclick=function(){ STATE.callsLoaded=false; renderCalls(); loadCalls(); };
   }
   async function loadChats(){
-    try{ var j = await chatApi({op:'list'}); STATE.chats = j.sessions||[]; STATE.chatsLoaded = true; }
+    try{ var j = await chatApi({op:'list', view:STATE.chatSource}); STATE.chats = j.sessions||[]; STATE.chatsLoaded = true; }
     catch(e){ STATE.chats = []; STATE.chatsLoaded = true; }
     renderAll();
   }
