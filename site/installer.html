@@ -783,7 +783,7 @@
     if(ph){ ph.innerHTML = pur.length ? '<div class="card" style="padding:0;overflow:hidden">'+pur.map(function(x){
         var ico = x.category==='OTT Tune'?'🔧':x.category==='AMSOIL'?'🛢️':x.category==='Banks'?'⚡':x.category==='Magnuson'?'🏎️':'🧾';
         var amt = (x.amount!==''&&x.amount!=null)?' · $'+esc(String(x.amount)):'';
-        return '<div class="crow"><div class="cava">'+ico+'</div>'+
+        return '<div class="crow" style="cursor:default"><div class="cava">'+ico+'</div>'+
           '<div class="cmeta"><div class="cname">'+esc(x.item||x.category)+'<span class="cbadge" style="opacity:.7"> '+esc(x.category)+'</span></div>'+
           '<div class="csnip">'+esc([x.vehicle, x.installer?('by '+x.installer):''].filter(Boolean).join(' · '))+amt+(x.source==='manual'?'':' · auto')+'</div></div>'+
           '<div class="cwhen">'+esc((x.date||'').slice(0,10))+'</div></div>';
