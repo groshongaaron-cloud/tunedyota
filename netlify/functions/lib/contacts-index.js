@@ -26,4 +26,41 @@ function splitName(name) {
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
-module.exports = { normalizeName, personKey, splitName };
+// Merge per-source contributions into one row per person. For scalar fields the
+// most-recently-active non-empty value wins; dates take the max; source record
+// ids are collected. Territory = assigned installer, else the market covering
+// the city (getMarket), else "".
+function buildContactIndex(contributions, { getMarket } = {}) {
+  const groups = new Map();
+  for (const c of contributions || []) {
+    const key = personKey(c);
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(c);
+  }
+  const rows = [];
+  for (const [key, list] of groups) {
+    const byRecency = [...list].sort((a, b) => String(b.activityDate || "").localeCompare(String(a.activityDate || "")));
+    const pick = (field) => { for (const c of byRecency) { if (c[field]) return c[field]; } return ""; };
+    const name = pick("name");
+    const installer = pick("installer");
+    const city = pick("city");
+    const market = installer ? null : (getMarket ? getMarket(city) : null);
+    const territory = installer || (market && market.inst) || "";
+    const sources = { bookingIds: [], leadIds: [], clientId: "" };
+    for (const c of list) {
+      if (c.source === "booking" && c.recordId) sources.bookingIds.push(c.recordId);
+      else if (c.source === "lead" && c.recordId) sources.leadIds.push(c.recordId);
+      else if (c.source === "client" && c.recordId) sources.clientId = c.recordId;
+    }
+    const lastActivity = byRecency.reduce((m, c) => (String(c.activityDate || "") > m ? String(c.activityDate || "") : m), "");
+    rows.push(Object.assign({
+      personKey: key, displayName: name || pick("phone") || pick("email") || "Unknown",
+      phone: pick("phone"), email: pick("email"), vehicle: pick("vehicle"), modelYear: pick("modelYear"),
+      city, territory, sources, lastActivity,
+    }, splitName(name)));
+  }
+  return rows.sort((a, b) => (normalizeName(a.lastName + " " + a.firstName) < normalizeName(b.lastName + " " + b.firstName) ? -1 : 1));
+}
+
+module.exports = { normalizeName, personKey, splitName, buildContactIndex };
