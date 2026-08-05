@@ -4,7 +4,16 @@
 // second price table to drift. Payment amounts MUST come from here, never from
 // the browser.
 const path = require("path");
-const CATALOG_PATH = path.join(__dirname, "..", "..", "..", "site", "magnuson-catalog.js");
+const fs = require("fs");
+// Local dev/tests run from the repo tree (netlify/functions/lib -> ../../../site).
+// The deployed Lambda flattens everything under /var/task and gets the catalog via
+// netlify.toml `included_files` (-> /var/task/site/magnuson-catalog.js), where the
+// ../../../ traversal would resolve to /site and fail. Pick whichever exists.
+const CATALOG_CANDIDATES = [
+  path.join(__dirname, "..", "..", "..", "site", "magnuson-catalog.js"),
+  path.join(process.cwd(), "site", "magnuson-catalog.js"),
+];
+const CATALOG_PATH = CATALOG_CANDIDATES.find((p) => fs.existsSync(p)) || CATALOG_CANDIDATES[0];
 
 function loadCatalog() {
   const prev = Object.prototype.hasOwnProperty.call(global, "window") ? global.window : undefined;

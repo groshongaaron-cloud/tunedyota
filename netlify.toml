@@ -2,6 +2,12 @@
   publish = "site"
   functions = "netlify/functions"
 
+# create-payment-session reads the price catalog at runtime, but it lives in the
+# publish dir, which isn't bundled into functions by default — include it so the
+# deployed Lambda can load it (else: Cannot find module .../magnuson-catalog.js).
+[functions]
+  included_files = ["site/magnuson-catalog.js"]
+
 # Daily email-path canary (netlify/functions/email-health.js).
 [functions."email-health"]
   schedule = "@daily"
