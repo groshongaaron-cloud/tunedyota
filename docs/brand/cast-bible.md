@@ -46,7 +46,8 @@ Body colors are **matched off a real swatch / paint code — never an eyeballed 
 - **Master:** `assets/octane/octane-master-v1.png`
 - **Kit:** `assets/octane/wardrobe/octane-nocap.png`,
   `assets/octane/turnaround/octane-{front,side,back}.png`,
-  `assets/octane/expression-sheet.png`.
+  `assets/octane/expression-sheet.png`, plus the action/reaction set in
+  `assets/octane/poses/` (overtorque, oops-drop, celebrate, question).
 - Full brief: `docs/brand/octane/character-brief.md`.
 
 ## The dynamic
