@@ -4,6 +4,12 @@
 **Status:** Ready to paste — use these to generate initial Rocky concepts for owner review
 **Related brief:** `docs/brand/rocky/character-brief.md`
 
+**CANONICAL — LOCKED 2026-08-05:** Variation #1, saved as
+`assets/rocky/canonical-concept-v1.png` (generated via Gemini Nano Banana Pro
+`gemini-3-pro-image-preview` from Prompt 0). Owner-picked. **All** turnaround
+views, expression sheets, the 3D sculpt, and episode assets derive from this
+single image — do not re-prompt Rocky from scratch (see Consistency Approach).
+
 ---
 
 ## How to Use This Pack
