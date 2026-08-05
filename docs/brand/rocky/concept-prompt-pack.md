@@ -18,6 +18,12 @@
 - The earlier apron concept `assets/rocky/canonical-concept-v1.png` is **archived/
   superseded**.
 
+**Reference sheets (generated from the v2 master 2026-08-05):**
+`assets/rocky/turnaround/rocky-front.png`, `rocky-side-3q.png` (3/4 — a true 90°
+profile can be pulled later), `rocky-back.png` (shows the hoodie back-print), and
+`assets/rocky/expression-sheet.png` (6 faces: Neutral, Explaining, Reassuring,
+Focused, Grin, Thinking). These are the 3D-artist reference set.
+
 **All** turnaround views, expression sheets, the 3D sculpt, and episode assets derive
 from the **v2 master** — do not re-prompt Rocky from scratch (see Consistency Approach).
 
