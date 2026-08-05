@@ -4,11 +4,22 @@
 **Status:** Ready to paste — use these to generate initial Rocky concepts for owner review
 **Related brief:** `docs/brand/rocky/character-brief.md`
 
-**CANONICAL — LOCKED 2026-08-05:** Variation #1, saved as
-`assets/rocky/canonical-concept-v1.png` (generated via Gemini Nano Banana Pro
-`gemini-3-pro-image-preview` from Prompt 0). Owner-picked. **All** turnaround
-views, expression sheets, the 3D sculpt, and episode assets derive from this
-single image — do not re-prompt Rocky from scratch (see Consistency Approach).
+**CANONICAL — LOCKED 2026-08-05 (v2 — supersedes v1):** Rocky's master look is the
+**Tuned Yota hoodie**, owner-picked, built from the rocky-04 hero base.
+- Master: `assets/rocky/canonical-concept-v2.png` — dark TY pullover hoodie carrying
+  the real angular light-blue fox-head logo (from `site/fox.svg`) + the cursive
+  "Tuned Yota" script wordmark, cap on, both-paws-on-hips pose, "ROCKY" nameplate,
+  Lunar Rock body.
+- Approved wardrobe states (same character): `assets/rocky/wardrobe/rocky-hoodie-nocap.png`
+  (no cap, ears free) and `assets/rocky/wardrobe/rocky-hoodie-hoodup.png` (hood up,
+  ears through the hood).
+- Generated via Gemini Nano Banana Pro (`gemini-3-pro-image-preview`) by image-editing
+  the base render + the real fox mark.
+- The earlier apron concept `assets/rocky/canonical-concept-v1.png` is **archived/
+  superseded**.
+
+**All** turnaround views, expression sheets, the 3D sculpt, and episode assets derive
+from the **v2 master** — do not re-prompt Rocky from scratch (see Consistency Approach).
 
 ---
 
