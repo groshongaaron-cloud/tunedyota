@@ -704,6 +704,50 @@
       }catch(e){ save.disabled=false; save.textContent='Set reminder'; fail('Network error — reminder not set.'); }
     };
   }
+  function openPurchaseDialog(person){
+    var ov=document.getElementById('purchov');
+    if(!ov){ ov=document.createElement('div'); ov.id='purchov'; ov.className='reviewov';
+      ov.innerHTML='<div class="reviewbox" style="max-width:440px;width:92%;text-align:left"><div id="purchbody"></div></div>';
+      document.body.appendChild(ov);
+      ov.addEventListener('click',function(e){ if(e.target===ov) ov.style.display='none'; }); }
+    ov.style.display='flex';
+    var p=person||{};
+    var b=document.getElementById('purchbody');
+    var cats=['OTT Tune','AMSOIL','Banks','Magnuson','Other'];
+    b.innerHTML='<div class="reviewh" style="text-align:left">🧾 Log a purchase</div>'+
+      '<div class="meta">'+esc(p.name||p.phone||p.email||'Customer')+'</div>'+
+      '<div class="sec"><span class="lbl">Category</span></div>'+
+      '<select id="purchcat" style="font:inherit;padding:6px;width:100%;box-sizing:border-box">'+cats.map(function(c){ return '<option>'+c+'</option>'; }).join('')+'</select>'+
+      '<div class="sec" style="margin-top:8px"><span class="lbl">Item</span></div>'+
+      '<input id="purchitem" placeholder="e.g. PedalMonster, Preferred Customer membership" style="font:inherit;padding:6px;width:100%;box-sizing:border-box">'+
+      '<div style="display:flex;gap:8px;margin-top:8px"><div style="flex:1"><div class="sec"><span class="lbl">Date</span></div><input id="purchdate" type="date" value="'+esc(STATE.today)+'" style="font:inherit;padding:6px;width:100%;box-sizing:border-box"></div>'+
+        '<div style="flex:1"><div class="sec"><span class="lbl">Amount (opt)</span></div><input id="purchamt" type="number" inputmode="decimal" placeholder="0.00" style="font:inherit;padding:6px;width:100%;box-sizing:border-box"></div></div>'+
+      '<div class="sec" style="margin-top:8px"><span class="lbl">Vehicle (opt)</span></div>'+
+      '<input id="purchveh" value="'+esc(p.vehicle||'')+'" style="font:inherit;padding:6px;width:100%;box-sizing:border-box">'+
+      '<div class="sec" style="margin-top:8px"><span class="lbl">Note (opt)</span></div>'+
+      '<textarea id="purchnote" rows="2" style="font:inherit;padding:6px;width:100%;box-sizing:border-box"></textarea>'+
+      '<div style="height:10px"></div><button class="btn" id="purchsave" style="width:100%">Log purchase</button>'+
+      '<div style="height:6px"></div><button class="btn" id="purchcancel" style="width:100%">Cancel</button>';
+    document.getElementById('purchcancel').onclick=function(){ ov.style.display='none'; };
+    document.getElementById('purchsave').onclick=async function(){
+      var item=(document.getElementById('purchitem')||{}).value||'';
+      if(!item.trim()){ fail('Add an item name.'); return; }
+      var save=document.getElementById('purchsave'); save.disabled=true; save.textContent='Saving…';
+      try{
+        var res=await fetch('/.netlify/functions/add-purchase',{method:'POST',
+          headers:{'Content-Type':'application/json','x-installer-token':tok()},
+          body:JSON.stringify({ name:p.name||'', phone:p.phone||'', email:p.email||'',
+            category:(document.getElementById('purchcat')||{}).value||'Other', item:item,
+            date:(document.getElementById('purchdate')||{}).value||STATE.today,
+            amount:(document.getElementById('purchamt')||{}).value||'',
+            vehicle:(document.getElementById('purchveh')||{}).value||'',
+            notes:(document.getElementById('purchnote')||{}).value||'' })});
+        var out=await res.json().catch(function(){return{};});
+        if(res.ok && out.status==='ok'){ ov.style.display='none'; succeed('🧾 Purchase logged.'); openCustomerView(p); }
+        else { save.disabled=false; save.textContent='Log purchase'; fail('Could not log it: '+((out&&out.error)||res.status)); }
+      }catch(e){ save.disabled=false; save.textContent='Log purchase'; fail('Network error — not logged.'); }
+    };
+  }
   function renderCustomer(body, p, d){
     var name=p.name||'', vehicle='', phone=p.phone||'', email=p.email||'';
     (d.bookings||[]).concat(d.leads||[]).forEach(function(x){
