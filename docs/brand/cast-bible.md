@@ -80,6 +80,11 @@ orange accent `#E85D2A` · off-white `#F3EFEA` · earth/sage `#3A2E26` `#5B4B42`
   1280×720 (swap MODEL / TITLE-1 / TITLE-2 / SUB / TAG text + the host & reaction
   images, then screenshot). Rendered example: `thumbnail-example-tundra-brakes.png`.
   Render helper: `C:/Users/grosh/thumbnail-render.cjs` (Playwright).
+- **Emote / sticker pack:** `assets/cast/emotes/sticker/*.png` (10 die-cut stickers,
+  white border, transparent bg) + `assets/cast/emotes/cutout/*.png` (no border).
+  Preview: `assets/cast/emotes/sticker-sheet.png`. Rocky: approve, explain, grin,
+  think, thumbsup. Octane: grin, wow, confused, oops, celebrate. Pipeline:
+  green-screen render → chroma-key → white border (`C:/Users/grosh/emote-process.cjs`).
 
 ## Open / future
 - Official **wordmark font** to replace the banner placeholder.
