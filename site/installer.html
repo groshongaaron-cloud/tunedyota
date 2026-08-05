@@ -759,10 +759,10 @@
       '<div class="tally"><span><b>'+(d.bookings||[]).length+'</b> bookings</span><span class="g"><b>'+done+'</b> completed</span>'+
       '<span><b>'+(d.chats||[]).length+'</b> chats</span><span><b>'+(d.calls||[]).length+'</b> calls</span></div>'+
       '<div class="walkmini" id="custact" style="display:flex;gap:8px;flex-wrap:wrap"></div>'+
-      (d.partial?’<div class="ffnote">Some history sources didn’t load — this view may be incomplete.</div>’:’’)+
-      ‘<div class="sec"><span class="lbl">Purchases &amp; ownership</span> <a href="#" id="custaddpurch" style="font-size:12px">+ add</a></div>’+
-      ‘<div id="custpurch"></div>’+
-      ‘<div class="sec"><span class="lbl">Timeline</span></div><div id="custtl"></div>’;
+      (d.partial?'<div class="ffnote">Some history sources didn’t load — this view may be incomplete.</div>':'')+
+      '<div class="sec"><span class="lbl">Purchases &amp; ownership</span> <a href="#" id="custaddpurch" style="font-size:12px">+ add</a></div>'+
+      '<div id="custpurch"></div>'+
+      '<div class="sec"><span class="lbl">Timeline</span></div><div id="custtl"></div>';
     var ar=document.getElementById('custact');
     if(phone){ ar.appendChild(linkBtn('Call','tel:'+phone)); ar.appendChild(linkBtn('Text','sms:'+phone)); }
     if(email){ ar.appendChild(linkBtn('Email','mailto:'+email)); }
