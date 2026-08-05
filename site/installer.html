@@ -364,6 +364,7 @@
     , theme: '', me: ''
     , leadTab:'active', followupPending:null
     , chats:[], chatOpen:null, chatsLoaded:false, chatSource:'open'
+    , contacts:[], contactsLoaded:false, contactQ:'', contactSort:'last', contactTerritory:''
     , calls:[], callsLoaded:false, callsError:false };
   var CHAT_POLL = null;
   var DEL_TOAST_TIMER = null;
@@ -1141,6 +1142,14 @@
   async function loadChats(){
     try{ var j = await chatApi({op:'list', view:STATE.chatSource}); STATE.chats = j.sessions||[]; STATE.chatsLoaded = true; }
     catch(e){ STATE.chats = []; STATE.chatsLoaded = true; }
+    renderAll();
+  }
+  async function loadContacts(){
+    try{
+      var res = await fetch('/.netlify/functions/contacts', { headers:{ 'x-installer-token':tok() } });
+      if(!res.ok) throw new Error('contacts '+res.status);
+      var j = await res.json(); STATE.contacts = j.contacts||[]; STATE.contactsLoaded = true;
+    }catch(e){ STATE.contacts = []; STATE.contactsLoaded = true; }
     renderAll();
   }
   function chanBadge(id){
