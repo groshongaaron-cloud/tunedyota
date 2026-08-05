@@ -12,6 +12,7 @@ const { normalizePhone, normalizeEmail, toLeadView } = require("./lib/leads.js")
 const { normalizeInstallerKey } = require("./lib/routing.js");
 const { TABLE: chatTable, parseTranscript } = require("./lib/chat-store.js");
 const { withCors } = require("./lib/cors.js");
+const { deriveTunes, toPurchaseView, mergePurchases } = require("./lib/purchases-view.js");
 
 const dateOnly = (s) => String(s == null ? "" : s).slice(0, 10);
 
@@ -74,6 +75,15 @@ async function fetchCalls({ env, fetchImpl, pKey }) {
   return out.sort((a, b) => (Date.parse(b.startTime) || 0) - (Date.parse(a.startTime) || 0));
 }
 
+async function fetchManualPurchases({ c, list, pKey, eKey }) {
+  const recs = await list({ token: c.token, baseId: c.baseId, table: c.purchases,
+    fields: ["Date", "Category", "Item", "Amount", "Vehicle", "Phone", "Email", "Installer", "Notes"] });
+  return recs.filter((r) => {
+    const f = r.fields || {};
+    return (pKey && normalizePhone(f.Phone) === pKey) || (eKey && normalizeEmail(f.Email) === eKey);
+  }).map(toPurchaseView).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+}
+
 async function handler(event, ctx = {}) {
   const env = ctx.env || process.env;
   const fetchImpl = ctx.fetchImpl || fetch;
@@ -89,13 +99,15 @@ async function handler(event, ctx = {}) {
   const c = cfg(env);
   let partial = false;
   const safe = (p) => p.catch(() => { partial = true; return []; });
-  const [bookings, leads, chats, calls] = await Promise.all([
+  const [bookings, leads, chats, calls, manualPurchases] = await Promise.all([
     safe(pKey ? fetchBookings({ c, list, pKey, key, admin }) : Promise.resolve([])),
     safe(fetchLeads({ c, list, pKey, eKey, key, admin })),
     safe(pKey ? fetchChats({ env, c, list, pKey, key, admin }) : Promise.resolve([])),
     safe(fetchCalls({ env, fetchImpl, pKey })),
+    safe(fetchManualPurchases({ c, list, pKey, eKey })),
   ]);
+  const purchases = mergePurchases(deriveTunes(bookings), manualPurchases);
   return { statusCode: 200, headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status: "ok", partial, bookings, leads, chats, calls }) };
+    body: JSON.stringify({ status: "ok", partial, bookings, leads, chats, calls, purchases }) };
 }
 module.exports = { handler: withCors(handler) };

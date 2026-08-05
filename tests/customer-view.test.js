@@ -93,3 +93,21 @@ test("a failing source degrades to empty + partial:true", async () => {
   assert.equal(out.chats.length, 0);
   assert.equal(out.bookings.length, 2);
 });
+
+test("customer-view returns a purchases timeline (completed-booking tunes + manual rows)", async () => {
+  const cfg = require("../netlify/functions/lib/airtable.js").cfg;
+  const ENV2 = { AIRTABLE_TOKEN: "t", AIRTABLE_BASE_ID: "b", INSTALLER_TOKENS: JSON.stringify({ aaron: "S" }), INSTALLER_ADMINS: "aaron" };
+  const c = cfg(ENV2);
+  const listImpl = async ({ table }) => {
+    if (table === c.bookings) return [{ id: "bk1", fields: { Name: "Pat", Phone: "612-406-7117", Vehicle: "2022 Tacoma", "Event Date": "2022-05-01", Status: "Completed", "OTT Calibration": "Stage 1", Installer: "aaron" } }];
+    if (table === c.purchases) return [{ id: "p1", fields: { Date: "2026-08-01", Category: "Banks", Item: "PedalMonster", Phone: "612-406-7117", Installer: "aaron" } }];
+    return [];
+  };
+  const res = await handler({ httpMethod: "GET", headers: { "x-installer-token": "S" }, queryStringParameters: { phone: "612-406-7117" } },
+    { env: ENV2, listImpl, fetchImpl: async () => ({ ok: false, json: async () => ({}) }) });
+  const body = JSON.parse(res.body);
+  assert.equal(res.statusCode, 200);
+  assert.equal(body.purchases.length, 2);
+  assert.equal(body.purchases[0].category, "Banks");    // 2026 newest first
+  assert.equal(body.purchases[1].category, "OTT Tune"); // derived from the completed booking
+});
