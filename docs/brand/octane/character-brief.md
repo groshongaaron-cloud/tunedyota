@@ -33,6 +33,11 @@ the **wrong-size socket** until Rocky hands him the right one. (Folds in the own
 - Wardrobe states: **cap** or **no cap**.
 - **NO hood-up for Octane** (owner rule 2026-08-05) — the hood-up look is Rocky's.
 
+## Scale (owner rule)
+Octane is Rocky's **little** buddy. In any shared shot he is **noticeably smaller** —
+about chest-to-shoulder height of Rocky, like a short young kid beside a tall adult.
+Never draw him as a similar-height peer.
+
 ## Cast / naming system
 Characters are named and colored from the Toyota paint deck — expandable:
 - **Rocky** ← Lunar Rock **6X3** (master tech).
