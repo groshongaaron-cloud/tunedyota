@@ -54,22 +54,34 @@ function channelOf(id) {
   return "web";
 }
 
-async function listSessions(installerKey, { env = process.env, fetchImpl = fetch } = {}) {
+// Airtable predicate selecting a single channel by Session ID prefix.
+const CHANNEL_PRED = {
+  facebook: `LEFT({Session ID},3)="fb:"`,
+  instagram: `LEFT({Session ID},3)="ig:"`,
+  text: `LEFT({Session ID},4)="sms:"`,
+  web: `AND(LEFT({Session ID},3)!="fb:", LEFT({Session ID},3)!="ig:", LEFT({Session ID},4)!="sms:")`,
+};
+
+// The inbox query per view. `scope` = mine-or-unassigned. "open" = escalated
+// (any channel) plus live (non-closed) Facebook/Instagram threads. A channel
+// view is that open set intersected with the channel. "completed" = closed
+// threads (bounded to the last 90 days so the list stays finite).
+function listFilter(view, scope) {
+  const open = `OR(AND({Status}="escalated", ${scope}),AND({Status}!="closed", OR(LEFT({Session ID},3)="fb:", LEFT({Session ID},3)="ig:"), ${scope}))`;
+  if (view === "completed") {
+    return `AND({Status}="closed", ${scope}, IS_AFTER({Last Activity}, DATEADD(TODAY(), -90, 'days')))`;
+  }
+  if (CHANNEL_PRED[view]) return `AND(${open}, ${CHANNEL_PRED[view]})`;
+  return open;
+}
+
+async function listSessions(installerKey, { env = process.env, fetchImpl = fetch, view = "open" } = {}) {
   const c = cfg(env);
   const key = escapeFormula(String(installerKey || ""));
+  const scope = `OR({Installer}="${key}", {Installer}="")`;
   const recs = await listRecords({
     fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
-    // The console inbox = escalated threads (mine or unassigned) PLUS every LIVE
-    // Facebook/Instagram DM thread (mine or unassigned). Meta DMs must be visible
-    // and answerable the moment they arrive — not only once the AI emits a
-    // structured hand-off, which it frequently never does (it free-texts a fake
-    // "someone will be with you shortly" and the thread stays in "ai" status).
-    // That gap is why FB PMs never reached this inbox.
-    filterByFormula:
-      `OR(` +
-        `AND({Status}="escalated", OR({Installer}="${key}", {Installer}="")),` +
-        `AND({Status}!="closed", OR(LEFT({Session ID},3)="fb:", LEFT({Session ID},3)="ig:"), OR({Installer}="${key}", {Installer}=""))` +
-      `)`,
+    filterByFormula: listFilter(view, scope),
     fields: ["Session ID", "Status", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Transcript", "Last Activity"],
   });
   return recs.map((r) => {

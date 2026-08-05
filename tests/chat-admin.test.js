@@ -59,6 +59,33 @@ test("listSessions tags each session with a derived channel", async () => {
   assert.equal(byId["abd7-uuid"], "web");
 });
 
+test("listSessions view=completed returns only closed threads (mine/unassigned)", async () => {
+  let formula = "";
+  const fetchImpl = async (url) => { formula = decodeURIComponent(url).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
+  await admin.listSessions("aaron", { env: ENV, fetchImpl, view: "completed" });
+  assert.ok(formula.includes('{Status}="closed"'));
+  assert.ok(!formula.includes('{Status}="escalated"'));
+  assert.ok(formula.includes('{Installer}="aaron"'));
+});
+
+test("listSessions view=facebook scopes the open set to fb: threads", async () => {
+  let formula = "";
+  const fetchImpl = async (url) => { formula = decodeURIComponent(url).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
+  await admin.listSessions("aaron", { env: ENV, fetchImpl, view: "facebook" });
+  assert.ok(formula.includes('LEFT({Session ID},3)="fb:"'));
+  assert.ok(formula.includes('{Status}="escalated"')); // still the open set, intersected with the channel
+});
+
+test("listSessions default view=open is unchanged (escalated + live fb/ig)", async () => {
+  let formula = "";
+  const fetchImpl = async (url) => { formula = decodeURIComponent(url).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
+  await admin.listSessions("aaron", { env: ENV, fetchImpl });
+  assert.ok(formula.includes('{Status}="escalated"'));
+  assert.ok(formula.includes('LEFT({Session ID},3)="fb:"'));
+  assert.ok(formula.includes('LEFT({Session ID},3)="ig:"'));
+  assert.ok(!formula.includes('{Status}="closed"'));
+});
+
 test("installerReply promotes a live (not-yet-escalated) Facebook thread and claims it", async () => {
   const saved = [];
   let deliveredTurn = null;
