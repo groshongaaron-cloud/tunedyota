@@ -1156,22 +1156,35 @@
     if(diff < 7*24*60) return d.toLocaleDateString([],{weekday:'short'});
     return d.toLocaleDateString([],{month:'numeric',day:'numeric'});
   }
+  var CHAT_SOURCES = [['open','All'],['facebook','Facebook'],['instagram','Instagram'],['text','Text'],['web','Web'],['completed','Completed']];
+  function chatSourceLabel(v){ for(var i=0;i<CHAT_SOURCES.length;i++){ if(CHAT_SOURCES[i][0]===v) return CHAT_SOURCES[i][1]; } return v; }
   function renderChats(){
     var host = document.getElementById('feed');
     if(STATE.chatOpen) return renderChatThread(host);
     if(!CHAT_POLL) CHAT_POLL = setInterval(loadChats, 15000);
-    host.innerHTML = STATE.chats.length ? '<div class="card" style="padding:0;overflow:hidden">'+STATE.chats.map(function(s){
-      var initial = (s.customerName||'?').trim().charAt(0).toUpperCase() || '?';
-      return '<div class="crow" data-chat="'+esc(s.id)+'">'+
-        '<div class="cava">'+esc(initial)+'</div>'+
-        '<div class="cmeta"><div class="cname">'+esc(s.customerName||'Customer')+
-          ' <span class="cbadge">'+chanBadge(s.id)+'</span>'+
-          (STATE.admin?(s.installer?' <span class="installer-tag">'+esc(s.installer)+'</span>':' <span class="cbadge" style="opacity:.7">unassigned</span>'):'')+'</div>'+
-        '<div class="csnip">'+(s.lastRole==='installer'?'You: ':'')+esc(s.lastText||(s.vehicle||''))+'</div></div>'+
-        '<div class="cwhen">'+esc(relTime(s.lastActivity))+'</div>'+
-        (s.lastRole==='user'?'<div class="cdot" title="needs reply"></div>':'')+
-        '</div>';
-    }).join('')+'</div>' : '<p class="muted" style="padding:14px">No active chats. Escalations land here, and you can start one from any lead’s <b>Message</b> button.</p>';
+    var picker = '<div class="mnav"><select id="chatsource" style="font:inherit;font-size:13px">'+
+      CHAT_SOURCES.map(function(s){ return '<option value="'+s[0]+'"'+(STATE.chatSource===s[0]?' selected':'')+'>'+s[1]+'</option>'; }).join('')+
+      '</select></div>';
+    var rows = STATE.chatSource==='open' ? STATE.chats.slice(0,10) : STATE.chats;
+    var emptyMsg = STATE.chatSource==='open'
+      ? 'No active chats. Escalations and Facebook/Instagram/text messages land here.'
+      : (STATE.chatSource==='completed' ? 'No completed chats in the last 90 days.' : 'No '+chatSourceLabel(STATE.chatSource)+' chats.');
+    var listHtml = rows.length ? '<div class="card" style="padding:0;overflow:hidden">'+rows.map(function(s){
+        var initial = (s.customerName||'?').trim().charAt(0).toUpperCase() || '?';
+        return '<div class="crow" data-chat="'+esc(s.id)+'">'+
+          '<div class="cava">'+esc(initial)+'</div>'+
+          '<div class="cmeta"><div class="cname">'+esc(s.customerName||'Customer')+
+            ' <span class="cbadge">'+chanBadge(s.id)+'</span>'+
+            (s.status==='closed'?' <span class="cbadge" style="opacity:.6">done</span>':'')+
+            (STATE.admin?(s.installer?' <span class="installer-tag">'+esc(s.installer)+'</span>':' <span class="cbadge" style="opacity:.7">unassigned</span>'):'')+'</div>'+
+          '<div class="csnip">'+(s.lastRole==='installer'?'You: ':'')+esc(s.lastText||(s.vehicle||''))+'</div></div>'+
+          '<div class="cwhen">'+esc(relTime(s.lastActivity))+'</div>'+
+          (s.lastRole==='user' && s.status!=='closed'?'<div class="cdot" title="needs reply"></div>':'')+
+          '</div>';
+      }).join('')+'</div>' : '<p class="muted" style="padding:14px">'+emptyMsg+'</p>';
+    host.innerHTML = picker + listHtml;
+    var sel = document.getElementById('chatsource');
+    if(sel) sel.onchange = function(){ STATE.chatSource = sel.value; STATE.chats=[]; STATE.chatsLoaded=false; loadChats(); };
     host.onclick = function(e){ var c=e.target.closest('[data-chat]'); if(c){ STATE.chatOpen=c.getAttribute('data-chat'); renderAll(); } };
   }
   async function renderChatThread(host){
