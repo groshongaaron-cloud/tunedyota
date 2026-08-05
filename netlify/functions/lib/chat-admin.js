@@ -2,7 +2,7 @@
 // Installer-side chat operations for the console Chats inbox. Deps-injected
 // like every lib here. Replies write the IDENTICAL turn shape the SMS relay
 // writes (twilio-sms.js relayInstallerReply) — one conversation, two channels.
-const { cfg, escapeFormula, listRecords } = require("./airtable.js");
+const { cfg, escapeFormula, listRecords, listAllRecords } = require("./airtable.js");
 const { loadSession, saveSession, parseTranscript, loadActiveByPrefix, aiPaused, AI_MODES, TABLE } = require("./chat-store.js");
 const { deliverInstallerTurn } = require("./meta-deliver.js");
 const { normalizeInstallerKey, smsNumberFor } = require("./routing.js");
@@ -62,10 +62,11 @@ const CHANNEL_PRED = {
   web: `AND(LEFT({Session ID},3)!="fb:", LEFT({Session ID},3)!="ig:", LEFT({Session ID},4)!="sms:")`,
 };
 
-// The inbox query per view. `scope` = mine-or-unassigned. "open" = escalated
-// (any channel) plus live (non-closed) Facebook/Instagram threads. A channel
-// view is that open set intersected with the channel. "completed" = closed
-// threads (bounded to the last 90 days so the list stays finite).
+// The inbox query per view. `scope` = mine-or-unassigned. "open" = every
+// escalated thread (any channel), plus — for Facebook/Instagram only — any
+// still-open (non-closed) thread. A channel view is that open set intersected
+// with the channel. "completed" = closed threads (bounded to the last 90 days
+// so the list stays finite).
 function listFilter(view, scope) {
   const open = `OR(AND({Status}="escalated", ${scope}),AND({Status}!="closed", OR(LEFT({Session ID},3)="fb:", LEFT({Session ID},3)="ig:"), ${scope}))`;
   if (view === "completed") {
@@ -79,12 +80,15 @@ async function listSessions(installerKey, { env = process.env, fetchImpl = fetch
   const c = cfg(env);
   const key = escapeFormula(String(installerKey || ""));
   const scope = `OR({Installer}="${key}", {Installer}="")`;
-  const recs = await listRecords({
+  const query = {
     fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
     filterByFormula: listFilter(view, scope),
     fields: ["Session ID", "Status", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Transcript", "Last Activity"],
-  });
-  return recs.map((r) => {
+  };
+  // Completed spans 90 days of closed threads — paginate so the newest aren't
+  // lost behind Airtable's 100-record page cap, then keep the most recent 50.
+  const recs = view === "completed" ? await listAllRecords(query) : await listRecords(query);
+  const rows = recs.map((r) => {
     const f = r.fields || {};
     const turns = parseTranscript(f.Transcript);
     const last = turns[turns.length - 1] || null;
@@ -97,6 +101,7 @@ async function listSessions(installerKey, { env = process.env, fetchImpl = fetch
       lastRole: last ? last.role : "", lastText: last ? String(last.text || "").slice(0, 120) : "",
     };
   }).sort((a, b) => (a.lastActivity < b.lastActivity ? 1 : -1));
+  return view === "completed" ? rows.slice(0, 50) : rows;
 }
 
 async function getTranscript(sessionId, deps = {}) {

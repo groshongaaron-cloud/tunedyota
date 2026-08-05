@@ -76,6 +76,15 @@ test("listSessions view=facebook scopes the open set to fb: threads", async () =
   assert.ok(formula.includes('{Status}="escalated"')); // still the open set, intersected with the channel
 });
 
+test("listSessions view=web excludes fb/ig/sms prefixes", async () => {
+  let formula = "";
+  const fetchImpl = async (url) => { formula = decodeURIComponent(url).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
+  await admin.listSessions("aaron", { env: ENV, fetchImpl, view: "web" });
+  assert.ok(formula.includes('LEFT({Session ID},3)!="fb:"'));
+  assert.ok(formula.includes('LEFT({Session ID},3)!="ig:"'));
+  assert.ok(formula.includes('LEFT({Session ID},4)!="sms:"'));
+});
+
 test("listSessions default view=open is unchanged (escalated + live fb/ig)", async () => {
   let formula = "";
   const fetchImpl = async (url) => { formula = decodeURIComponent(url).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
