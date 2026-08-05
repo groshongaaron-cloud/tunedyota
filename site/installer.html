@@ -1035,9 +1035,10 @@
   function renderAll(){
     if(STATE.tab!=='chats' && CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; }
     renderTally(); renderSummary(); renderTabs();
-    var st=document.getElementById('subtabs'); if(st) st.style.display = (STATE.tab==='leads'||STATE.tab==='chats'||STATE.tab==='calls') ? 'none' : 'flex';
+    var st=document.getElementById('subtabs'); if(st) st.style.display = (STATE.tab==='leads'||STATE.tab==='chats'||STATE.tab==='calls'||STATE.tab==='contacts') ? 'none' : 'flex';
     if(STATE.tab==='chats'){ renderChats(); return; }
     if(STATE.tab==='calls'){ renderCalls(); return; }
+    if(STATE.tab==='contacts'){ renderContacts(); return; }
     if(STATE.tab==='leads'){ renderLeads(); } else { renderFeed(); } }
   async function loadCalls(){
     STATE.callsError=false;
@@ -1381,12 +1382,13 @@
       var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
     function tab(id,label,badge){ return '<button class="tabbtn'+(STATE.tab===id?' on':'')+'" data-tab="'+id+'">'+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
     var due=STATE.leads.filter(isOverdueLead).length;
-    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chats.length?String(STATE.chats.length):'')+tab('calls','Calls','');
+    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chats.length?String(STATE.chats.length):'')+tab('calls','Calls','')+tab('contacts','Contacts','');
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){
       STATE.tab=b.getAttribute('data-tab');
       if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); }
       if(STATE.tab==='chats'&&!STATE.chatsLoaded){ loadChats(); }
       if(STATE.tab==='calls'&&!STATE.callsLoaded){ loadCalls(); }
+      if(STATE.tab==='contacts'&&!STATE.contactsLoaded){ loadContacts(); }
       renderAll();
     }; });
   }
