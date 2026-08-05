@@ -46,11 +46,12 @@ committed — it is third-party stock used for look/feel only.)
 | Outline | Retain the bold dark outline |
 | (added) Wardrobe | TY shop apron + forward cap; apron patch carries TY orange / `#B3D0D9` blue |
 
-**Render-style note:** the reference is 2D flat-vector; our locked decision is
-**stylized 3D, build-once**. Default: treat this reference as the 2D concept/attitude
-that the 3D model is sculpted from. Switching Rocky to a literal **2D flat-vector rig**
-(cheaper/faster to animate, closer to this reference) would change the plan's
-production method and must be owner-confirmed first.
+**Render-style decision (owner-confirmed 2026-08-05):** Rocky stays **stylized 3D,
+build-once**. The 2D flat-vector reference drives the **styling, theme, and overall
+feel** of the 3D build — the 3D model is sculpted to read like this mascot brought
+into 3D. No change to the plan's production method (Task 10 remains a rigged 3D
+model). Prompts below therefore target a 3D render that carries this 2D reference's
+bold-outline, flat-shaded mascot character.
 
 ### Prompt 0 — Signature Hero Pose (the money shot, reference-derived)
 
