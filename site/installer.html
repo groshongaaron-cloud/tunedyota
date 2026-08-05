@@ -365,6 +365,7 @@
     , leadTab:'active', followupPending:null
     , chats:[], chatOpen:null, chatsLoaded:false, chatSource:'open'
     , contacts:[], contactsLoaded:false, contactQ:'', contactSort:'last', contactTerritory:''
+    , nudgePerson:null, nudgeDate:'', nudgeMsg:''
     , calls:[], callsLoaded:false, callsError:false };
   var CHAT_POLL = null;
   var DEL_TOAST_TIMER = null;
@@ -652,6 +653,56 @@
     }finally{ clearTimeout(timer); }
   }
   function custClose(){ var ov=document.getElementById('custov'); if(ov) ov.style.display='none'; }
+  function nudgeAddDays(iso, n){ var d=new Date((iso||STATE.today)+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+  function nudgeAddMonths(iso, n){ var d=new Date((iso||STATE.today)+'T00:00:00'); d.setMonth(d.getMonth()+n); return d.toISOString().slice(0,10); }
+  function openNudgeDialog(person){
+    STATE.nudgePerson = person || {}; STATE.nudgeDate = nudgeAddDays(STATE.today,7); STATE.nudgeMsg = '';
+    var ov=document.getElementById('nudgeov');
+    if(!ov){ ov=document.createElement('div'); ov.id='nudgeov'; ov.className='reviewov';
+      ov.innerHTML='<div class="reviewbox" style="max-width:440px;width:92%;text-align:left"><div id="nudgebody"></div></div>';
+      document.body.appendChild(ov);
+      ov.addEventListener('click',function(e){ if(e.target===ov) ov.style.display='none'; }); }
+    ov.style.display='flex';
+    renderNudge();
+  }
+  function closeNudge(){ var ov=document.getElementById('nudgeov'); if(ov) ov.style.display='none'; }
+  function renderNudge(){
+    var b=document.getElementById('nudgebody'); if(!b) return;
+    var p=STATE.nudgePerson||{};
+    function chip(label,iso){ return '<button type="button" class="btn'+(STATE.nudgeDate===iso?' on':'')+'" data-nudgedate="'+iso+'" style="font-size:12px">'+label+'</button>'; }
+    b.innerHTML='<div class="reviewh" style="text-align:left">⏰ Set reminder</div>'+
+      '<div class="meta">'+esc(p.name||p.phone||p.email||'Customer')+(p.vehicle?' · '+esc(p.vehicle):'')+'</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">'+
+        chip('In 1 week', nudgeAddDays(STATE.today,7))+chip('In 2 weeks', nudgeAddDays(STATE.today,14))+
+        chip('In 1 month', nudgeAddMonths(STATE.today,1))+chip('In 2 months', nudgeAddMonths(STATE.today,2))+'</div>'+
+      '<div class="sec"><span class="lbl">Remind me on</span></div>'+
+      '<input id="nudgedate" type="date" value="'+esc(STATE.nudgeDate)+'" style="font:inherit;padding:6px;width:100%;box-sizing:border-box">'+
+      '<div class="sec" style="margin-top:10px"><span class="lbl">…or a set time before an event</span></div>'+
+      '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><input id="nudgeevent" type="date" style="font:inherit;padding:6px">'+
+        '<button type="button" class="btn" id="nudgeb7" style="font-size:12px">1 wk before</button><button type="button" class="btn" id="nudgeb14" style="font-size:12px">2 wk before</button></div>'+
+      '<div class="sec" style="margin-top:10px"><span class="lbl">Note (optional)</span></div>'+
+      '<textarea id="nudgemsg" rows="2" placeholder="e.g. check in about the supercharger build" style="font:inherit;padding:6px;width:100%;box-sizing:border-box">'+esc(STATE.nudgeMsg||'')+'</textarea>'+
+      '<div style="height:10px"></div><button class="btn" id="nudgesave" style="width:100%">Set reminder</button>'+
+      '<div style="height:6px"></div><button class="btn" id="nudgecancel" style="width:100%">Cancel</button>';
+    Array.prototype.forEach.call(b.querySelectorAll('[data-nudgedate]'),function(el){ el.onclick=function(){ STATE.nudgeMsg=(document.getElementById('nudgemsg')||{}).value||STATE.nudgeMsg; STATE.nudgeDate=el.getAttribute('data-nudgedate'); renderNudge(); }; });
+    var di=document.getElementById('nudgedate'); if(di) di.onchange=function(){ STATE.nudgeDate=di.value; };
+    var ev=document.getElementById('nudgeevent');
+    document.getElementById('nudgeb7').onclick=function(){ if(ev&&ev.value){ STATE.nudgeMsg=(document.getElementById('nudgemsg')||{}).value||STATE.nudgeMsg; STATE.nudgeDate=nudgeAddDays(ev.value,-7); renderNudge(); } };
+    document.getElementById('nudgeb14').onclick=function(){ if(ev&&ev.value){ STATE.nudgeMsg=(document.getElementById('nudgemsg')||{}).value||STATE.nudgeMsg; STATE.nudgeDate=nudgeAddDays(ev.value,-14); renderNudge(); } };
+    document.getElementById('nudgecancel').onclick=closeNudge;
+    document.getElementById('nudgesave').onclick=async function(){
+      var msg=(document.getElementById('nudgemsg')||{}).value||'';
+      var save=document.getElementById('nudgesave'); save.disabled=true; save.textContent='Saving…';
+      try{
+        var res=await fetch('/.netlify/functions/set-nudge',{method:'POST',
+          headers:{'Content-Type':'application/json','x-installer-token':tok()},
+          body:JSON.stringify({ leadId:p.leadId||'', name:p.name||'', phone:p.phone||'', email:p.email||'', vehicle:p.vehicle||'', city:p.city||'', date:STATE.nudgeDate, message:msg })});
+        var out=await res.json().catch(function(){return{};});
+        if(res.ok && out.status==='ok'){ closeNudge(); succeed('⏰ Reminder set for '+relDate(STATE.nudgeDate)+'.'); if(STATE.leadsLoaded) loadLeads(); }
+        else { save.disabled=false; save.textContent='Set reminder'; fail('Could not set reminder: '+((out&&out.error)||res.status)); }
+      }catch(e){ save.disabled=false; save.textContent='Set reminder'; fail('Network error — reminder not set.'); }
+    };
+  }
   function renderCustomer(body, p, d){
     var name=p.name||'', vehicle='', phone=p.phone||'', email=p.email||'';
     (d.bookings||[]).concat(d.leads||[]).forEach(function(x){
