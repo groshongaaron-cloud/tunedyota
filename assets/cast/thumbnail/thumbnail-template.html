@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<!--
+  TUNED YOTA — YouTube thumbnail template (1280x720)
+  Rocky hosts, pointing into the title. Octane reacts in the corner bubble.
+
+  TO MAKE A NEW THUMBNAIL, edit only the marked fields below:
+    [MODEL]     -> the year + model pill  (keep it short, e.g. "2007–2021 Tundra")
+    [TITLE-1]   -> big title line 1        (1 word reads best)
+    [TITLE-2]   -> big title line 2        (the accent/orange word)
+    [SUB]       -> subtitle under the title (e.g. "Pads & Rotors")
+    [TAG]       -> small tag               (e.g. "DIY • Step-by-Step")
+    img.host    -> Rocky pose (present / hold-rotor / thumbs-up)
+    img.reaction-> Octane reaction (question / celebrate / oops-drop / overtorque)
+  Then screenshot at exactly 1280x720 (or run scripts render).
+-->
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  .thumb {
+    width:1280px; height:720px; position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#3A2E26 0%, #211a15 100%);
+    font-family:"Arial Black","Arial Bold",Impact,sans-serif;
+  }
+  /* left light panel holding Rocky (his studio bg blends into it) */
+  .light {
+    position:absolute; left:0; top:0; height:100%; width:56%;
+    background:#EDECEB;
+    clip-path:polygon(0 0, 100% 0, 74% 100%, 0% 100%);
+  }
+  .host {
+    /* enlarged + shifted down so the baked-in "ROCKY" nameplate sits off-frame */
+    position:absolute; left:-4%; bottom:-15%; height:122%;
+    filter:drop-shadow(8px 8px 0 rgba(0,0,0,.12));
+  }
+  /* right content — lifted with bottom padding so the tag clears Octane's bubble */
+  .content {
+    position:absolute; right:0; top:0; width:47%; height:100%;
+    padding:48px 60px 168px 60px; display:flex; flex-direction:column; justify-content:center;
+  }
+  .pill {
+    align-self:flex-start; background:#E85D2A; color:#fff;
+    font-size:30px; letter-spacing:2px; padding:10px 22px; border-radius:10px;
+    text-transform:uppercase;
+  }
+  .title { margin-top:22px; color:#fff; text-transform:uppercase; line-height:.9;
+    text-shadow:0 7px 0 rgba(0,0,0,.35); -webkit-text-stroke:4px #191410; }
+  .title span { display:block; font-size:118px; }
+  .title .accent { color:#E85D2A; }
+  .sub { margin-top:22px; color:#fff; font-size:48px; text-transform:uppercase;
+    -webkit-text-stroke:2px #191410; }
+  .tag { margin-top:26px; color:#B3D0D9; font-size:30px; letter-spacing:3px;
+    text-transform:uppercase; }
+  .logo { position:absolute; top:34px; right:40px; width:96px; height:96px; border-radius:18px; }
+  .reaction {
+    position:absolute; right:36px; bottom:30px; width:178px; height:178px;
+    border-radius:50%; object-fit:cover; object-position:top center;
+    border:9px solid #E85D2A; background:#EDECEB;
+    box-shadow:0 10px 26px rgba(0,0,0,.45);
+  }
+</style>
+</head>
+<body>
+  <div class="thumb">
+    <div class="light"></div>
+    <!-- HOST: swap src for a different Rocky pose -->
+    <img class="host" src="../../rocky/poses/rocky-present.png" alt="Rocky" />
+
+    <img class="logo" src="../../../site/logo.png" alt="Tuned Yota" />
+
+    <div class="content">
+      <div class="pill">2007–2021 Tundra</div>            <!-- [MODEL] -->
+      <div class="title">
+        <span>Front</span>                                 <!-- [TITLE-1] -->
+        <span class="accent">Brakes</span>                 <!-- [TITLE-2] -->
+      </div>
+      <div class="sub">Pads &amp; Rotors</div>             <!-- [SUB] -->
+      <div class="tag">DIY • Step-by-Step</div>            <!-- [TAG] -->
+    </div>
+
+    <!-- REACTION: swap src for a different Octane reaction -->
+    <img class="reaction" src="../../octane/poses/octane-question.png" alt="Octane" />
+  </div>
+</body>
+</html>

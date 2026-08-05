@@ -76,6 +76,10 @@ orange accent `#E85D2A` · off-white `#F3EFEA` · earth/sage `#3A2E26` `#5B4B42`
 - Channel art: `assets/cast/channel/youtube-banner.png` (2560×1440),
   `youtube-avatar.png`. **Wordmark font is a placeholder** pending the official
   brand wordmark/font.
+- **Thumbnail template:** `assets/cast/thumbnail/thumbnail-template.html` — editable
+  1280×720 (swap MODEL / TITLE-1 / TITLE-2 / SUB / TAG text + the host & reaction
+  images, then screenshot). Rendered example: `thumbnail-example-tundra-brakes.png`.
+  Render helper: `C:/Users/grosh/thumbnail-render.cjs` (Playwright).
 
 ## Open / future
 - Official **wordmark font** to replace the banner placeholder.
