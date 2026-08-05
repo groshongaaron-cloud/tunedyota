@@ -40,8 +40,10 @@ Characters are named and colored from the Toyota paint deck — expandable:
 - Future candidates: Cavalry Blue ("Cav"), Barcelona Red ("Barca"), etc.
 
 ## Canonical asset
-`assets/octane/octane-master-v1.png` (owner-picked render, generated via Gemini
-Nano Banana Pro with Rocky's v2 master as the style anchor). **All** future Octane
+`assets/octane/octane-master-v1.png` (owner-picked: render #02's pose/outfit —
+planted stance, backwards cap, TY hoodie, socket wrench — recolored with render
+#01's warmer body and **tan tail tip** instead of white; generated via Gemini Nano
+Banana Pro). **All** future Octane
 turnaround/expression/3D/episode work derives from this single image — never
 re-prompt from scratch (same consistency rule as Rocky). See
 `docs/brand/rocky/concept-prompt-pack.md`.
