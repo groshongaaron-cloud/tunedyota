@@ -1198,15 +1198,10 @@
     host.onclick = function(e){ var c=e.target.closest('[data-chat]'); if(c){ STATE.chatOpen=c.getAttribute('data-chat'); renderAll(); } };
   }
   function contactTerritories(){ var t={}; STATE.contacts.forEach(function(c){ if(c.territory) t[c.territory]=1; }); return Object.keys(t).sort(); }
-  function renderContacts(){
-    var host = document.getElementById('feed');
+  function renderContactBody(){
+    var host = document.getElementById('contactbody');
+    if(!host) return;
     var terrs = contactTerritories();
-    var head = '<div class="search"><input id="contactq" type="search" autocomplete="off" placeholder="Search name, phone, email, vehicle, city…" value="'+esc(STATE.contactQ)+'"></div>'+
-      '<div class="mnav">'+
-        '<select id="contactterr" style="font:inherit;font-size:13px"><option value="">All territories</option>'+
-          terrs.map(function(k){ return '<option value="'+esc(k)+'"'+(STATE.contactTerritory===k?' selected':'')+'>'+esc(cap(k))+'</option>'; }).join('')+'</select> '+
-        '<select id="contactsort" style="font:inherit;font-size:13px"><option value="last"'+(STATE.contactSort==='last'?' selected':'')+'>Sort: Last name</option><option value="first"'+(STATE.contactSort==='first'?' selected':'')+'>Sort: First name</option></select>'+
-      '</div>';
     var q = STATE.contactQ.trim().toLowerCase();
     var rows = STATE.contacts.filter(function(c){
       if(STATE.contactTerritory && c.territory!==STATE.contactTerritory) return false;
@@ -1217,6 +1212,11 @@
       var kb = (STATE.contactSort==='first'?(b.firstName+' '+b.lastName):(b.lastName+' '+b.firstName)).toLowerCase();
       return ka<kb?-1:ka>kb?1:0;
     });
+    var controls = '<div class="mnav">'+
+        '<select id="contactterr" style="font:inherit;font-size:13px"><option value="">All territories</option>'+
+          terrs.map(function(k){ return '<option value="'+esc(k)+'"'+(STATE.contactTerritory===k?' selected':'')+'>'+esc(cap(k))+'</option>'; }).join('')+'</select> '+
+        '<select id="contactsort" style="font:inherit;font-size:13px"><option value="last"'+(STATE.contactSort==='last'?' selected':'')+'>Sort: Last name</option><option value="first"'+(STATE.contactSort==='first'?' selected':'')+'>Sort: First name</option></select>'+
+      '</div>';
     var listHtml = rows.length ? '<div class="card" style="padding:0;overflow:hidden">'+rows.map(function(c){
         var initial = (c.displayName||'?').trim().charAt(0).toUpperCase() || '?';
         return '<div class="crow" data-contact="'+esc(c.personKey)+'">'+
@@ -1227,15 +1227,25 @@
           '<div class="cwhen">'+esc(relTime(c.lastActivity))+'</div>'+
           '</div>';
       }).join('')+'</div>' : '<p class="muted" style="padding:14px">'+(STATE.contactsLoaded?'No contacts match.':'Loading contacts…')+'</p>';
-    host.innerHTML = head + '<div style="margin-top:6px">'+listHtml+'</div>';
-    var qi = document.getElementById('contactq');
-    if(qi){ qi.oninput = function(){ var pos = qi.selectionStart; STATE.contactQ = qi.value; renderContacts();
-      var qi2 = document.getElementById('contactq'); if(qi2){ qi2.focus(); try{ qi2.selectionStart=qi2.selectionEnd=pos; }catch(e){} } }; }
-    var ts = document.getElementById('contactterr'); if(ts) ts.onchange = function(){ STATE.contactTerritory=ts.value; renderContacts(); };
-    var ss = document.getElementById('contactsort'); if(ss) ss.onchange = function(){ STATE.contactSort=ss.value; renderContacts(); };
+    host.innerHTML = controls + '<div style="margin-top:6px">'+listHtml+'</div>';
+    var ts = document.getElementById('contactterr'); if(ts) ts.onchange = function(){ STATE.contactTerritory=ts.value; renderContactBody(); };
+    var ss = document.getElementById('contactsort'); if(ss) ss.onchange = function(){ STATE.contactSort=ss.value; renderContactBody(); };
     host.onclick = function(e){ var el = e.target.closest('[data-contact]'); if(el){
       var pk = el.getAttribute('data-contact'); var c = STATE.contacts.filter(function(x){ return x.personKey===pk; })[0];
       if(c) openCustomerView({ phone:c.phone||'', email:c.email||'', name:c.displayName||'' }); } };
+  }
+  function renderContacts(){
+    var host = document.getElementById('feed');
+    // Build the search input ONCE and never recreate it on keystroke — matches the
+    // buildHeaderOnce idiom (~L846); recreating the <input> mid-type aborts IME
+    // composition and drops the caret. Only #contactbody re-renders on input.
+    if(!document.getElementById('contactq')){
+      host.innerHTML = '<div class="search"><input id="contactq" type="search" autocomplete="off" placeholder="Search name, phone, email, vehicle, city…"></div>'+
+        '<div id="contactbody"></div>';
+      var qi = document.getElementById('contactq');
+      if(qi){ qi.value = STATE.contactQ; qi.oninput = function(){ STATE.contactQ = qi.value; renderContactBody(); }; }
+    }
+    renderContactBody();
   }
   async function renderChatThread(host){
     var openId = STATE.chatOpen;
