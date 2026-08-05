@@ -4,6 +4,29 @@
 **Status:** Ready to paste — use these to generate initial Rocky concepts for owner review
 **Related brief:** `docs/brand/rocky/character-brief.md`
 
+**CANONICAL — LOCKED 2026-08-05 (v2 — supersedes v1):** Rocky's master look is the
+**Tuned Yota hoodie**, owner-picked, built from the rocky-04 hero base.
+- Master: `assets/rocky/canonical-concept-v2.png` — dark TY pullover hoodie carrying
+  the real angular light-blue fox-head logo (from `site/fox.svg`) + the cursive
+  "Tuned Yota" script wordmark, cap on, both-paws-on-hips pose, "ROCKY" nameplate,
+  Lunar Rock body.
+- Approved wardrobe states (same character): `assets/rocky/wardrobe/rocky-hoodie-nocap.png`
+  (no cap, ears free) and `assets/rocky/wardrobe/rocky-hoodie-hoodup.png` (hood up,
+  ears through the hood).
+- Generated via Gemini Nano Banana Pro (`gemini-3-pro-image-preview`) by image-editing
+  the base render + the real fox mark.
+- The earlier apron concept `assets/rocky/canonical-concept-v1.png` is **archived/
+  superseded**.
+
+**Reference sheets (generated from the v2 master 2026-08-05):**
+`assets/rocky/turnaround/rocky-front.png`, `rocky-side-3q.png` (3/4 — a true 90°
+profile can be pulled later), `rocky-back.png` (shows the hoodie back-print), and
+`assets/rocky/expression-sheet.png` (6 faces: Neutral, Explaining, Reassuring,
+Focused, Grin, Thinking). These are the 3D-artist reference set.
+
+**All** turnaround views, expression sheets, the 3D sculpt, and episode assets derive
+from the **v2 master** — do not re-prompt Rocky from scratch (see Consistency Approach).
+
 ---
 
 ## How to Use This Pack
@@ -13,6 +36,51 @@
 3. Present a shortlist (3–5 candidates) to the owner for a single pick.
 4. **Once the owner approves one concept, that image becomes the canonical Rocky reference.**
 5. All subsequent work (turnaround, poses, expressions, episode renders) derives from that single approved reference — do not re-prompt from scratch. See the Consistency Approach section below.
+
+---
+
+## Reference-Derived Direction (v2 — 2026-08-05)
+
+The owner supplied a look-and-feel reference: a confident cartoon mascot fox in a
+"stylish pose." We take its **pose language, construction, and attitude** — NOT its
+color (the reference is orange) and NOT a literal copy. Rocky is an original design.
+(Reference kept locally at `C:/Users/grosh/rocky-inspiration.jpg`; it is not
+committed — it is third-party stock used for look/feel only.)
+
+**Capture from the reference:**
+- **Signature pose:** confident hero stance — a paw on the hip, chest out, weight on
+  one leg, three-quarter turn to camera, big bushy tail swishing upward behind.
+  Reads as "capable, done this 500 times."
+- **Construction:** bold clean outline, flat/cel shading, large expressive ears,
+  white muzzle + chest + belly + tail-tip, dark lower-legs ("boots") and paws,
+  prominent dark nose.
+- **Attitude (tuned):** keep the assured half-lidded eyes, one subtly raised brow,
+  and an easy closed-mouth smirk. **Dial DOWN** the reference's cocky fang/tongue —
+  Rocky is a confident, easygoing expert, not a trickster (master-tech mentor).
+
+**Recolor to the Tuned Yota Lunar Rock colorway** (the reference is orange; Rocky is not):
+
+| Reference part | Rocky color |
+|---|---|
+| Orange body / head / arms / legs / tail base | **Lunar Rock 6X3** (swatch / PPG 953058 match — no invented hex) |
+| White muzzle / cheeks / chest / belly / tail tip | Off-white `#F3EFEA` |
+| Dark-brown boots / paws / nose | Deep TY earth `#2a221c` |
+| Inner ears (reference red) | TY orange `#E85D2A` — the only warm accent, keeps a fox cue against the gray-green |
+| Outline | Retain the bold dark outline |
+| (added) Wardrobe | TY shop apron + forward cap; apron patch carries TY orange / `#B3D0D9` blue |
+
+**Render-style decision (owner-confirmed 2026-08-05):** Rocky stays **stylized 3D,
+build-once**. The 2D flat-vector reference drives the **styling, theme, and overall
+feel** of the 3D build — the 3D model is sculpted to read like this mascot brought
+into 3D. No change to the plan's production method (Task 10 remains a rigged 3D
+model). Prompts below therefore target a 3D render that carries this 2D reference's
+bold-outline, flat-shaded mascot character.
+
+### Prompt 0 — Signature Hero Pose (the money shot, reference-derived)
+
+```
+Original stylized fox mascot, full body, confident hero pose: one paw on hip, chest out, weight on one leg, three-quarter turn toward camera, large bushy tail swishing upward behind. Easygoing confident expression — half-lidded assured eyes, one slightly raised brow, relaxed closed-mouth smirk (NOT cocky, NOT goofy). Bold clean outline, flat cel shading. Body fur is muted gray-green Toyota Lunar Rock (NOT orange); off-white muzzle, chest, belly, and tail tip; deep dark-brown lower-legs and paws; warm orange inner-ears as the only warm accent. Wearing a Tuned Yota shop apron with a small chest patch and a forward baseball cap with fox ears through the sides; a torque wrench tucked at the hip. Clean studio background. Professional brand mascot, master-technician energy — capable and approachable, not a children's cartoon.
+```
 
 ---
 
@@ -70,6 +138,7 @@ After the owner reviews the concept shortlist and picks one:
 
 These apply to every Rocky concept, render, pose, and episode asset. No exceptions.
 
+- **Do not copy the supplied reference image.** It is look-and-feel only — Rocky's pose and attitude are inspired by it, but the design, construction, and coloring are original and recolored to Lunar Rock.
 - **Do not reproduce a verbatim likeness of any real person.** Rocky is an original stylized fox character.
 - **Do not reproduce a verbatim likeness of any existing mascot** (Firefox, Fantastic Mr. Fox, Zootopia characters, Arby's Oven Mitt, etc.). Rocky is an original design.
 - **Do not use an orange body.** The Lunar Rock 6X3 body color is gray-green. Orange appears on ear insides and tail tip only. A Rocky with an orange body is off-model and breaks the brand logic.
