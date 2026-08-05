@@ -44,6 +44,9 @@ async function handler(event, ctx = {}) {
   try { rec = await getImpl({ token: c.token, baseId: c.baseId, table: c.priority, id: leadId }); }
   catch (e) { return { statusCode: 502, body: JSON.stringify({ error: "store-unavailable" }) }; }
   const lead = toLeadView(rec);
+  // A nudge is a low-stakes reminder, so non-admins may nudge an UNASSIGNED lead
+  // (empty installer) — intentionally more permissive than lead-update.js, which
+  // blocks it. Do not "align" this with lead-update without re-deciding that.
   if (!admin && lead.installer && lead.installer !== key) return { statusCode: 400, body: JSON.stringify({ error: "not-your-market" }) };
 
   const built = applyLeadUpdate(lead, "setFollowup", { date, message }, now);

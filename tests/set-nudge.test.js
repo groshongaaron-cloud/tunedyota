@@ -51,3 +51,24 @@ test("set-nudge blocks a non-admin from nudging another installer's lead", async
   assert.equal(res.statusCode, 400);
   assert.equal(JSON.parse(res.body).error, "not-your-market");
 });
+
+test("set-nudge returns 502 when the store is unavailable", async () => {
+  const res = await handler({ httpMethod: "POST", headers: H, body: JSON.stringify({ leadId: "ld1", date: "2026-10-01" }) },
+    ctx({ getImpl: async () => { throw new Error("boom"); } }));
+  assert.equal(res.statusCode, 502);
+  assert.equal(JSON.parse(res.body).error, "store-unavailable");
+});
+
+test("set-nudge returns 400 when find-or-create yields no lead", async () => {
+  const res = await handler({ httpMethod: "POST", headers: H, body: JSON.stringify({ name: "No Contact", date: "2026-10-01" }) },
+    ctx({ ingestImpl: async () => ({ status: "error", error: "missing-contact" }) }));
+  assert.equal(res.statusCode, 400);
+  assert.equal(JSON.parse(res.body).error, "missing-contact");
+});
+
+test("set-nudge lets a non-admin nudge an UNASSIGNED lead", async () => {
+  const c = ctx({ getImpl: async () => REC({ Installer: "" }) });
+  const res = await handler({ httpMethod: "POST", headers: { "x-installer-token": "CODYTOK" },
+    body: JSON.stringify({ leadId: "ld1", date: "2026-10-01" }) }, c);
+  assert.equal(res.statusCode, 200);
+});
