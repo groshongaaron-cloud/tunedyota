@@ -13,6 +13,7 @@ function cfg(env = process.env) {
     bookings: env.AIRTABLE_BOOKINGS_TABLE || "Bookings",
     priority: env.AIRTABLE_PRIORITY_TABLE || "Priority List",
     clients: env.AIRTABLE_CLIENTS_TABLE || "Clients",
+    purchases: env.AIRTABLE_PURCHASES_TABLE || "Purchases",
   };
 }
 async function listRecords({ fetchImpl = fetch, token, baseId, table, filterByFormula, fields }) {
