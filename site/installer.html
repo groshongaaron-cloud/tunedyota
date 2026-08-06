@@ -1362,6 +1362,14 @@
     if(isFreshAi(s)) return '<div class="cdot cdot-new cn-'+CHAN_META[chanKey(s.id)].cls+'" title="New — AI handling"></div>';
     return '';
   }
+  // Match a chat to its lead by phone (last 10 digits) so the thread header's Status
+  // selector can show the current pipeline stage from the already-loaded Leads data.
+  function leadForChat(j){
+    var d = String((j&&j.phone)||'').replace(/\D/g,'').slice(-10);
+    if(!d) return null;
+    for(var i=0;i<STATE.leads.length;i++){ var lp=String(STATE.leads[i].phone||'').replace(/\D/g,'').slice(-10); if(lp && lp===d) return STATE.leads[i]; }
+    return null;
+  }
   function relTime(iso){
     if(!iso) return '';
     var d = new Date(iso), now = new Date(), diff = (now - d)/60000;
@@ -1503,12 +1511,21 @@
       assignHtml = j.installer===STATE.me ? ' · <span class="cbadge">mine</span>'
         : ' · <a href="#" id="chatclaim">'+(j.installer?'take over ('+esc(j.installer)+'’s)':'claim chat')+'</a>';
     }
+    // Status selector — sets the customer's LEAD stage (the Leads tab is the single
+    // source of truth). Current value is matched from the loaded leads by phone; kick
+    // a leads load if we don't have them yet so the header can show the real stage.
+    if(!STATE.leadsLoaded) loadLeads();
+    var chatLead = leadForChat(j), curStage = chatLead ? (chatLead.stage||'') : '';
+    var statusSel = ' · <select id="chatstage" style="font:inherit;font-size:12px" title="Lead status — syncs to the Leads tab">'+
+      '<option value="">Status…</option>'+
+      LEAD_STAGES.map(function(s){ return '<option value="'+esc(s)+'"'+(curStage===s?' selected':'')+'>'+esc(s)+'</option>'; }).join('')+'</select>';
     var html =
       '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <a href="#" id="chatcust" style="color:inherit"><b>'+esc(j.customerName||'Customer')+'</b></a> '+chanIconSm(j.id||'')+' '+esc(j.vehicle||'')+
       (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+
       assignHtml+
       ' · <a href="#" id="chatai" title="Toggle AI auto-replies for this chat">AI: '+(j.aiActive?'on':'off')+'</a>'+
       (j.aiMode && j.aiMode!=='auto' ? ' <a href="#" id="chataiauto" style="color:var(--muted,#8a8a8e);font-size:12px" title="Back to automatic — AI pauses 72h after you reply">(auto)</a>' : '')+
+      statusSel+
       ' · <a href="#" id="chatremind">⏰ remind</a>'+
       ' · <a href="#" id="chatclose" style="color:var(--muted,#8a8a8e)">close chat</a></p>'+
       '<div class="cthread"><div id="chatlog" class="clog">'+bubbles.join('')+'</div>'+
@@ -1543,6 +1560,19 @@
     if(cc) cc.onclick = function(e){ e.preventDefault(); openCustomerView({phone:j.phone||'',name:j.customerName||''}); };
     var crem=document.getElementById('chatremind');
     if(crem) crem.onclick=function(e){ e.preventDefault(); openNudgeDialog({ name:j.customerName||'', phone:j.phone||'', vehicle:j.vehicle||'' }); };
+    var cstage=document.getElementById('chatstage');
+    if(cstage) cstage.onchange=async function(){
+      var st=cstage.value; if(!st) return;
+      cstage.disabled=true;
+      try{
+        var res=await fetch('/.netlify/functions/set-lead-stage',{method:'POST',
+          headers:{'Content-Type':'application/json','x-installer-token':tok()},
+          body:JSON.stringify({ name:j.customerName||'', phone:j.phone||'', vehicle:j.vehicle||'', city:j.city||'', stage:st })});
+        if(res.ok){ succeed('✓ Status set to '+st+' — synced to Leads.'); STATE.leadsLoaded=false; loadLeads(); }
+        else { var e2=await res.json().catch(function(){return{};}); fail('Could not set status: '+((e2&&e2.error)||res.status)); }
+      }catch(err){ fail('Could not set the status — try again.'); }
+      finally{ cstage.disabled=false; }
+    };
     async function doAssign(target){
       try{
         var r=await chatApi({op:'assign', session:openId, installer:target});
