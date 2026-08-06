@@ -86,6 +86,18 @@ orange accent `#E85D2A` · off-white `#F3EFEA` · earth/sage `#3A2E26` `#5B4B42`
   think, thumbsup. Octane: grin, wow, confused, oops, celebrate. Pipeline:
   green-screen render → chroma-key → white border (`C:/Users/grosh/emote-process.cjs`).
 
+## Video
+- **First short:** `assets/cast/shorts/meet-the-duo.mp4` — 18s vertical (1080×1920)
+  "Meet the Duo" intro. Motion-graphics animatic built from our on-model stills
+  (Ken Burns motion + cuts), AI voiceover via **edge-tts**, burned captions.
+  Preview frames: `meet-the-duo-contact-sheet.png`. Build scripts:
+  `C:/Users/grosh/rocky-short/` (`compose-beats.cjs` + `build` ffmpeg steps) and
+  the VO lines.
+- **Provisional voice casting** (owner to confirm): Rocky = `en-US-AndrewNeural`
+  (calm), Octane = `en-US-GuyNeural` sped up (eager). This departs from the old
+  faceless Ava/Guy narration spec now that they're on-screen characters — recast
+  freely.
+
 ## Open / future
 - Official **wordmark font** to replace the banner placeholder.
 - Possible **third cast member** (Cav / Barca) once a role justifies it.
