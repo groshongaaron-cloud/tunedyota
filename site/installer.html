@@ -289,6 +289,12 @@
 .cchan-web{background:#6b7280}
 .cchansm{display:inline-flex;vertical-align:middle;width:20px;height:20px;border-radius:50%;color:#fff;align-items:center;justify-content:center}
 .cchansm svg{width:12px;height:12px}
+/* "new — AI handling" ring: hollow, channel-colored, distinct from the solid "needs reply" dot */
+.cdot-new{width:12px;height:12px;background:transparent;border:2.5px solid #8a8f98;box-sizing:border-box}
+.cdot-new.cn-facebook{border-color:#1877F2}
+.cdot-new.cn-instagram{border-color:#d6249f}
+.cdot-new.cn-text{border-color:#34C759}
+.cdot-new.cn-web{border-color:#8a8f98}
 /* ── dark theme scoped to the Chats inbox (owner ask 2026-08-05, matches ref) ── */
 .chatdark{background:#0f0f10;border-radius:16px;padding:6px;margin:2px 0;color:#e7e7ea}
 .chatdark .mnav{padding:4px 6px 8px}
@@ -1341,6 +1347,21 @@
   function chanIcon(id){ var k=chanKey(id),m=CHAN_META[k]; return '<div class="cchan cchan-'+m.cls+'" title="'+m.label+'">'+chanSvg(k)+'</div>'; }
   function chanIconSm(id){ var k=chanKey(id),m=CHAN_META[k]; return '<span class="cchansm cchan-'+m.cls+'" title="'+m.label+'">'+chanSvg(k)+'</span>'; }
   function chatUnreadCount(list){ return (list||[]).filter(function(s){ return s.lastRole==='user' && s.status!=='closed'; }).length; }
+  // Row status marker. Solid blue dot = a customer is waiting on a reply. Hollow
+  // channel-colored ring = a NEW, still-AI-handled conversation (never escalated,
+  // active in the last 24h) — so fresh Facebook/IG/text messages stand out on the
+  // list even though the AI already auto-answered and nobody's taken over yet.
+  function isFreshAi(s){
+    if(!s || s.status==='closed' || s.status==='escalated') return false;
+    if(!s.lastActivity) return false;
+    return (Date.now() - new Date(s.lastActivity).getTime()) < 24*60*60*1000;
+  }
+  function chatRowDot(s){
+    if(!s || s.status==='closed') return '';
+    if(s.lastRole==='user') return '<div class="cdot" title="Needs reply"></div>';
+    if(isFreshAi(s)) return '<div class="cdot cdot-new cn-'+CHAN_META[chanKey(s.id)].cls+'" title="New — AI handling"></div>';
+    return '';
+  }
   function relTime(iso){
     if(!iso) return '';
     var d = new Date(iso), now = new Date(), diff = (now - d)/60000;
@@ -1377,7 +1398,7 @@
             (STATE.admin?(s.installer?' <span class="installer-tag">'+esc(s.installer)+'</span>':' <span class="cbadge" style="opacity:.7">unassigned</span>'):'')+'</div>'+
           '<div class="csnip">'+(s.lastRole==='installer'?'You: ':'')+esc(s.lastText||(s.vehicle||''))+'</div></div>'+
           '<div class="cwhen">'+esc(relTime(s.lastActivity))+'</div>'+
-          (s.lastRole==='user' && s.status!=='closed'?'<div class="cdot" title="needs reply"></div>':'')+
+          chatRowDot(s)+
           '</div>';
       }).join('')+'</div>' : '<p class="muted" style="padding:14px">'+emptyMsg+'</p>';
     host.innerHTML = '<div class="chatdark">'+picker + listHtml+'</div>';
