@@ -1384,9 +1384,9 @@
     var picker = '<div class="mnav"><select id="chatsource" style="font:inherit;font-size:13px">'+
       CHAT_SOURCES.map(function(s){ return '<option value="'+s[0]+'"'+(STATE.chatSource===s[0]?' selected':'')+'>'+s[1]+'</option>'; }).join('')+
       '</select></div>';
-    var rows = STATE.chatSource==='open' ? STATE.chats.slice(0,10) : STATE.chats;
+    var rows = STATE.chatSource==='open' ? STATE.chats.slice(0,20) : STATE.chats;
     var emptyMsg = STATE.chatSource==='open'
-      ? 'No active chats. Escalations and Facebook/Instagram/text messages land here.'
+      ? 'No conversations yet. Every Facebook, Instagram, text, and web chat lives here — closed ones stay too.'
       : (STATE.chatSource==='completed' ? 'No completed chats in the last 90 days.' : 'No '+chatSourceLabel(STATE.chatSource)+' chats.');
     var listHtml = rows.length ? '<div class="card" style="padding:0;overflow:hidden">'+rows.map(function(s){
         var initial = (s.customerName||'?').trim().charAt(0).toUpperCase() || '?';

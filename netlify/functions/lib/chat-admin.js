@@ -62,18 +62,23 @@ const CHANNEL_PRED = {
   web: `AND(LEFT({Session ID},3)!="fb:", LEFT({Session ID},3)!="ig:", LEFT({Session ID},4)!="sms:")`,
 };
 
-// The inbox query per view. `scope` = mine-or-unassigned. "open" = every
-// escalated thread (any channel), plus — for Facebook/Instagram only — any
-// still-open (non-closed) thread. A channel view is that open set intersected
-// with the channel. "completed" = closed threads (bounded to the last 90 days
-// so the list stays finite).
+// The inbox query per view. `scope` = mine-or-unassigned. The Chats tab is an
+// all-encompassing home for conversations (owner spec 2026-08-06: "like an
+// iPhone — all chats live and fluid regardless of booking status"), so the
+// default "All" view surfaces every real conversation at ANY status — closing a
+// chat marks it done but never removes it from the list. That's every customer
+// channel thread (fb/ig/sms, any status incl closed) plus any web thread a human
+// touched or finished (escalated/closed); still-anonymous in-progress website AI
+// chats stay out of the main list as noise (they appear once escalated/closed, or
+// via the Web filter). A channel view is that channel at any status. "completed"
+// = closed only (last 90 days) for focused review. listSessions caps the
+// non-completed views to the 20 most recent so the list stays focused.
 function listFilter(view, scope) {
-  const open = `OR(AND({Status}="escalated", ${scope}),AND({Status}!="closed", OR(LEFT({Session ID},3)="fb:", LEFT({Session ID},3)="ig:"), ${scope}))`;
   if (view === "completed") {
     return `AND({Status}="closed", ${scope}, IS_AFTER({Last Activity}, DATEADD(TODAY(), -90, 'days')))`;
   }
-  if (CHANNEL_PRED[view]) return `AND(${open}, ${CHANNEL_PRED[view]})`;
-  return open;
+  if (CHANNEL_PRED[view]) return `AND(${scope}, ${CHANNEL_PRED[view]})`;
+  return `AND(${scope}, OR(LEFT({Session ID},3)="fb:", LEFT({Session ID},3)="ig:", LEFT({Session ID},4)="sms:", {Status}!="ai"))`;
 }
 
 async function listSessions(installerKey, { env = process.env, fetchImpl = fetch, view = "open" } = {}) {
@@ -84,6 +89,10 @@ async function listSessions(installerKey, { env = process.env, fetchImpl = fetch
     fetchImpl, token: c.token, baseId: c.baseId, table: TABLE(env),
     filterByFormula: listFilter(view, scope),
     fields: ["Session ID", "Status", "Customer Name", "Phone", "Vehicle", "City", "Installer", "Transcript", "Last Activity"],
+    // Newest-first, capped to a focused top-20 — Airtable does the ordering so the
+    // most-recent conversations are never lost behind its 100-record page cap.
+    sort: [{ field: "Last Activity", direction: "desc" }],
+    maxRecords: 20,
   };
   // Completed spans 90 days of closed threads — paginate so the newest aren't
   // lost behind Airtable's 100-record page cap, then keep the most recent 50.

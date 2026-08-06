@@ -16,10 +16,12 @@ function cfg(env = process.env) {
     purchases: env.AIRTABLE_PURCHASES_TABLE || "Purchases",
   };
 }
-async function listRecords({ fetchImpl = fetch, token, baseId, table, filterByFormula, fields }) {
+async function listRecords({ fetchImpl = fetch, token, baseId, table, filterByFormula, fields, sort, maxRecords }) {
   const params = new URLSearchParams();
   if (filterByFormula) params.set("filterByFormula", filterByFormula);
   (fields || []).forEach((f) => params.append("fields[]", f));
+  (sort || []).forEach((s, i) => { params.append(`sort[${i}][field]`, s.field); if (s.direction) params.append(`sort[${i}][direction]`, s.direction); });
+  if (maxRecords) params.set("maxRecords", String(maxRecords));
   const url = `${API}/${baseId}/${encodeURIComponent(table)}?${params.toString()}`;
   const res = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) throw new Error(`airtable list ${res.status}`);

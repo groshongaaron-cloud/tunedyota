@@ -21,7 +21,7 @@ test("listSessions filters escalated for installer OR unassigned, sorts newest f
     ] }) };
   };
   const out = await admin.listSessions("aaron", { env: ENV, fetchImpl });
-  assert.ok(gotFormula.includes('escalated'));
+  assert.ok(gotFormula.includes('{Status}!="ai"')); // escalated + closed both surface
   assert.ok(gotFormula.includes('aaron'));
   assert.equal(out[0].id, "s2"); // newer activity first
   assert.equal(out[1].lastRole, "user");
@@ -68,12 +68,12 @@ test("listSessions view=completed returns only closed threads (mine/unassigned)"
   assert.ok(formula.includes('{Installer}="aaron"'));
 });
 
-test("listSessions view=facebook scopes the open set to fb: threads", async () => {
+test("listSessions view=facebook scopes to fb: threads at any status", async () => {
   let formula = "";
   const fetchImpl = async (url) => { formula = decodeURIComponent(url).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
   await admin.listSessions("aaron", { env: ENV, fetchImpl, view: "facebook" });
   assert.ok(formula.includes('LEFT({Session ID},3)="fb:"'));
-  assert.ok(formula.includes('{Status}="escalated"')); // still the open set, intersected with the channel
+  assert.ok(formula.includes('{Installer}="aaron"')); // scoped to mine/unassigned; a channel view shows ALL statuses now
 });
 
 test("listSessions view=web excludes fb/ig/sms prefixes", async () => {
@@ -85,14 +85,34 @@ test("listSessions view=web excludes fb/ig/sms prefixes", async () => {
   assert.ok(formula.includes('LEFT({Session ID},4)!="sms:"'));
 });
 
-test("listSessions default view=open is unchanged (escalated + live fb/ig)", async () => {
+test("default view=All surfaces every conversation incl closed (closing never hides a chat)", async () => {
   let formula = "";
   const fetchImpl = async (url) => { formula = decodeURIComponent(url).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
   await admin.listSessions("aaron", { env: ENV, fetchImpl });
-  assert.ok(formula.includes('{Status}="escalated"'));
   assert.ok(formula.includes('LEFT({Session ID},3)="fb:"'));
   assert.ok(formula.includes('LEFT({Session ID},3)="ig:"'));
-  assert.ok(!formula.includes('{Status}="closed"'));
+  assert.ok(formula.includes('LEFT({Session ID},4)="sms:"'));
+  assert.ok(formula.includes('{Status}!="ai"'));            // escalated + closed both included
+  assert.ok(!formula.includes('{Status}!="closed"'));       // closed is NOT excluded any more
+});
+
+test("default view=All keeps a CLOSED channel thread in the list", async () => {
+  const fetchImpl = async () => ({ ok: true, json: async () => ({ records: [
+    { id: "r1", fields: { "Session ID": "fb:PSID9", Status: "closed", Installer: "", Transcript: '[{"role":"installer","text":"all set","at":9}]', "Last Activity": "2026-08-06T02:00:00Z" } },
+  ] }) });
+  const out = await admin.listSessions("aaron", { env: ENV, fetchImpl });
+  assert.equal(out.length, 1);
+  assert.equal(out[0].id, "fb:PSID9");
+  assert.equal(out[0].status, "closed");
+});
+
+test("default view=All requests newest-first, capped to a focused top-20", async () => {
+  let url = "";
+  const fetchImpl = async (u) => { url = decodeURIComponent(u).replace(/\+/g, " "); return { ok: true, json: async () => ({ records: [] }) }; };
+  await admin.listSessions("aaron", { env: ENV, fetchImpl });
+  assert.ok(url.includes('sort[0][field]=Last Activity'));
+  assert.ok(url.includes('sort[0][direction]=desc'));
+  assert.ok(url.includes('maxRecords=20'));
 });
 
 test("installerReply promotes a live (not-yet-escalated) Facebook thread and claims it", async () => {
