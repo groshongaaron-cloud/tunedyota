@@ -7,6 +7,8 @@
 const { verifySignature, sendDm, getProfile } = require("./lib/meta-graph.js");
 const { secretEquals } = require("./lib/secrets.js");
 const { notifyOwner } = require("./lib/alert.js");
+const { sendWebPush } = require("./lib/webpush.js");
+const { dispatcherKey } = require("./lib/routing.js");
 const { processChat } = require("./chat.js");
 const { loadActiveByPrefix, saveSession } = require("./lib/chat-store.js");
 
@@ -84,6 +86,7 @@ async function processDm(evt, deps = {}) {
   const findActive = deps.findActive || ((p) => loadActiveByPrefix(p, { env }));
   const send = deps.send || ((args) => sendDm(args, { env }));
   const notify = deps.notify || ((text) => notifyOwner({ webhookUrl: env.SLACK_WEBHOOK_URL, text }));
+  const push = deps.push || ((key, msg) => sendWebPush(key, msg, { env }));
   const profile = deps.profile || ((id) => getProfile(id, { env }));
   const now = deps.now || Date.now;
 
@@ -107,6 +110,7 @@ async function processDm(evt, deps = {}) {
   if (active && (active.turns || []).some((t) => t.mid === evt.mid)) return { skipped: "dup" };
 
   const isNew = !active;
+  const wasEscalated = !!(active && active.status === "escalated");
   let sessionId = active ? active.id : base;
   let out = await chat({ session: sessionId, message: evt.text, page: evt.platform });
 
@@ -129,10 +133,24 @@ async function processDm(evt, deps = {}) {
     }
   }
 
+  // Real-time console delivery (owner ask 2026-08-05): a customer's Meta DM must
+  // reach a human immediately — not wait for the console to happen to be polling
+  // the Chats list. Push to the dispatcher (same centralized intake as chat
+  // escalations) so the alert deep-links straight to the Chats tab. We ping on the
+  // FIRST message of a new conversation and on EVERY message of a thread a human
+  // has already taken over (escalated); the AI-auto middle is intentionally left
+  // to the console's unread badge so installers aren't pinged for chatter the AI
+  // is still handling on its own.
+  let name = null;
+  if (isNew) { try { name = await profile(evt.senderId); } catch (e) {} }
+  if (isNew || wasEscalated) {
+    const label = evt.platform === "instagram" ? "Instagram" : "Facebook";
+    const who = name || (active && active.customerName) || evt.senderId;
+    try { await push(dispatcherKey(env), { title: `New ${label} message`, body: `${who}: ${evt.text.slice(0, 90)}`, url: "/installer.html#chats" }); } catch (e) {}
+  }
+
   // Notify owner only on the first message of a new conversation.
   if (isNew) {
-    let name = null;
-    try { name = await profile(evt.senderId); } catch (e) {}
     try { await notify(`💬 New ${evt.platform} DM${name ? " from " + name : ""}: ${evt.text.slice(0, 120)}`); } catch (e) {}
   }
 

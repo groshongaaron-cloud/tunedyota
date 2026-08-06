@@ -280,6 +280,38 @@
 .ccompose textarea{flex:1;resize:none;border:1px solid rgba(91,75,66,.25);border-radius:18px;padding:9px 14px;font:inherit;font-size:15px;line-height:1.3;max-height:110px;background:var(--card,#fff)}
 .csend{border:none;border-radius:50%;width:36px;height:36px;background:#0b93f6;color:#fff;font-size:17px;cursor:pointer;flex:none}
 .csend:disabled{opacity:.4}
+/* ── real channel icons — same size as the client avatar, sat right beside it ── */
+.cchan{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff}
+.cchan svg{width:22px;height:22px;display:block}
+.cchan-facebook{background:#1877F2}
+.cchan-instagram{background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%)}
+.cchan-text{background:#34C759}
+.cchan-web{background:#6b7280}
+.cchansm{display:inline-flex;vertical-align:middle;width:20px;height:20px;border-radius:50%;color:#fff;align-items:center;justify-content:center}
+.cchansm svg{width:12px;height:12px}
+/* ── dark theme scoped to the Chats inbox (owner ask 2026-08-05, matches ref) ── */
+.chatdark{background:#0f0f10;border-radius:16px;padding:6px;margin:2px 0;color:#e7e7ea}
+.chatdark .mnav{padding:4px 6px 8px}
+.chatdark select{background:#1c1c20;color:#e7e7ea;border:1px solid #34343c;border-radius:9px;padding:7px 10px;font-size:13px}
+.chatdark .card{background:#161618;border:1px solid #26262b;border-radius:12px}
+.chatdark .crow{background:transparent;border-bottom-color:rgba(255,255,255,.06)}
+.chatdark .crow:hover{background:rgba(255,255,255,.045)}
+.chatdark .cava{background:linear-gradient(135deg,#3a3a42,#55555f);color:#fff}
+.chatdark .cname{color:#f3f3f5}
+.chatdark .csnip{color:#9a9aa3}
+.chatdark .cwhen{color:#82828b}
+.chatdark .cbadge{color:#c7c7cf}
+.chatdark .installer-tag{background:#26262b;color:#c7c7cf}
+.chatdark .muted,.chatdark p.muted{color:#9a9aa3}
+.chatdark a{color:#fab219}
+.chatdark .clog{background:#161618;border:1px solid #26262b}
+.chatdark .cthem{background:#26262b;color:#ececf0}
+.chatdark .cme{background:#fab219;color:#1a1503}
+.chatdark .cai{background:#1c2430;color:#cfe0f2;border-color:#2b3a4d}
+.chatdark .caitag{color:#7ea6cf}
+.chatdark .csys,.chatdark .ctime{color:#8a8a92}
+.chatdark .ccompose textarea{background:#1c1c20;color:#e7e7ea;border:1px solid #34343c}
+.chatdark .csend{background:#fab219;color:#1a1503}
 </style>
 </head>
 <body>
@@ -363,11 +395,13 @@
     , doneCity: ''       // optional city filter applied inside the Done view
     , theme: '', me: ''
     , leadTab:'active', followupPending:null
-    , chats:[], chatOpen:null, chatsLoaded:false, chatSource:'open'
+    , chats:[], chatOpen:null, chatsLoaded:false, chatSource:'open', chatUnread:0
     , contacts:[], contactsLoaded:false, contactQ:'', contactSort:'last', contactTerritory:''
     , nudgePerson:null, nudgeDate:'', nudgeMsg:''
     , calls:[], callsLoaded:false, callsError:false };
-  var CHAT_POLL = null;
+  var CHAT_POLL = null;         // per-channel list refresh (only for non-"open" channel views)
+  var CHAT_THREAD_POLL = null;  // open-conversation refresh (separate var so it can't clobber the list poll)
+  var CHAT_BG_POLL = null;      // always-on inbox poll: keeps the unread badge + open list live on EVERY tab
   var DEL_TOAST_TIMER = null;
   function Q(){ return window.OfflineQueue; }
   function store(){ return window.localStorage; }
@@ -803,7 +837,7 @@
       (l.nextFollowup?'<div class="meta">⏰ follow-up '+esc(l.nextFollowup)+(l.followupMessage?' — “'+esc(l.followupMessage)+'”':'')+'</div>':'')+
       (l.activity?'<div class="edate" style="white-space:pre-wrap;margin-top:4px">'+esc(l.activity)+'</div>':'')+'</div>'}); });
     (d.chats||[]).forEach(function(s){ items.push({t:(s.lastActivity||'').slice(0,10), html:
-      '<div class="card" style="cursor:pointer" data-custchat="'+esc(s.id)+'"><div class="top"><span class="who">'+chanBadge(s.id)+' Chat'+(s.status==='closed'?' · closed':'')+'</span><span class="edate">'+esc(relTime(s.lastActivity))+'</span></div>'+
+      '<div class="card" style="cursor:pointer" data-custchat="'+esc(s.id)+'"><div class="top"><span class="who">'+chanIconSm(s.id)+' Chat'+(s.status==='closed'?' · closed':'')+'</span><span class="edate">'+esc(relTime(s.lastActivity))+'</span></div>'+
       '<div class="csnip">'+esc(s.lastText||'')+'</div><div class="edate">tap to open ›</div></div>'}); });
     (d.calls||[]).forEach(function(cl){
       var missed=cl.direction==='inbound'&&['no-answer','busy','failed','canceled'].indexOf(cl.status)>=0;
@@ -929,6 +963,7 @@
     if(isNative()){ var ba=document.getElementById('backapp'); if(ba) ba.style.display=''; }
     renderAll();
     if(location.hash==='#chats'){ STATE.tab='chats'; loadChats(); }
+    startInboxPoll();
     registerPush();
   }
 
@@ -1147,6 +1182,7 @@
 
   function renderAll(){
     if(STATE.tab!=='chats' && CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; }
+    if((STATE.tab!=='chats' || !STATE.chatOpen) && CHAT_THREAD_POLL){ clearInterval(CHAT_THREAD_POLL); CHAT_THREAD_POLL=null; }
     renderTally(); renderSummary(); renderTabs();
     var st=document.getElementById('subtabs'); if(st) st.style.display = (STATE.tab==='leads'||STATE.tab==='chats'||STATE.tab==='calls'||STATE.tab==='contacts') ? 'none' : 'flex';
     if(STATE.tab==='chats'){ renderChats(); return; }
@@ -1254,9 +1290,34 @@
     var rf=document.getElementById('callsRefresh'); if(rf) rf.onclick=function(){ STATE.callsLoaded=false; renderCalls(); loadCalls(); };
   }
   async function loadChats(){
-    try{ var j = await chatApi({op:'list', view:STATE.chatSource}); STATE.chats = j.sessions||[]; STATE.chatsLoaded = true; }
+    try{ var j = await chatApi({op:'list', view:STATE.chatSource}); STATE.chats = j.sessions||[]; STATE.chatsLoaded = true;
+      if(STATE.chatSource==='open') STATE.chatUnread = chatUnreadCount(STATE.chats); }
     catch(e){ STATE.chats = []; STATE.chatsLoaded = true; }
     renderAll();
+  }
+  // Always-on inbox poll (owner ask 2026-08-05): a new Facebook/Instagram/text
+  // message must surface in real time no matter which tab the installer is on.
+  // This runs regardless of STATE.tab — it refreshes the unread badge everywhere,
+  // and live-refreshes the list when the installer is actually sitting on the
+  // default (All) Chats view. The per-tab list/thread polls stay as-is for the
+  // channel views and open conversations.
+  async function pollInbox(){
+    try{
+      var j = await chatApi({op:'list', view:'open'});
+      var sessions = j.sessions||[];
+      STATE.chatUnread = chatUnreadCount(sessions);
+      if(STATE.tab==='chats' && !STATE.chatOpen && STATE.chatSource==='open'){
+        STATE.chats = sessions; STATE.chatsLoaded = true; renderChats();
+      }
+      renderTabs();   // refresh the Chats unread badge on whatever tab is showing
+    }catch(e){ /* transient network/auth blip — next tick retries */ }
+  }
+  function startInboxPoll(){
+    if(CHAT_BG_POLL) return;
+    pollInbox();
+    CHAT_BG_POLL = setInterval(pollInbox, 15000);
+    // Returning to the console (unlock phone, refocus tab) should refresh at once.
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) pollInbox(); });
   }
   async function loadContacts(){
     try{
@@ -1266,10 +1327,20 @@
     }catch(e){ STATE.contacts = []; STATE.contactsLoaded = true; }
     renderAll();
   }
-  function chanBadge(id){
-    if(/^fb:/.test(id)) return '📘'; if(/^ig:/.test(id)) return '📸';
-    if(/^sms:/.test(id)) return '📱'; return '💬';
+  // Real, branded channel icons (owner ask 2026-08-05): the emoji read as a
+  // tablet/camera/phone. chanIcon() is avatar-sized for the list row; chanIconSm()
+  // is a small inline chip for the open-thread header.
+  var CHAN_META = { fb:{cls:'facebook',label:'Facebook'}, ig:{cls:'instagram',label:'Instagram'}, sms:{cls:'text',label:'Text'}, web:{cls:'web',label:'Web'} };
+  function chanKey(id){ return /^fb:/.test(id)?'fb':/^ig:/.test(id)?'ig':/^sms:/.test(id)?'sms':'web'; }
+  function chanSvg(k){
+    if(k==='fb') return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 22v-8h2.7l.4-3.1H13V8.9c0-.9.25-1.5 1.53-1.5H16.2V4.6c-.28-.04-1.25-.12-2.37-.12-2.35 0-3.96 1.43-3.96 4.07v2.27H7.16V14H9.9v8h3.1z"/></svg>';
+    if(k==='ig') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>';
+    if(k==='sms') return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4 3.5V17H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg>';
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.5 2.6 14.5 0 17M12 3.5c-2.6 2.5-2.6 14.5 0 17"/></svg>';
   }
+  function chanIcon(id){ var k=chanKey(id),m=CHAN_META[k]; return '<div class="cchan cchan-'+m.cls+'" title="'+m.label+'">'+chanSvg(k)+'</div>'; }
+  function chanIconSm(id){ var k=chanKey(id),m=CHAN_META[k]; return '<span class="cchansm cchan-'+m.cls+'" title="'+m.label+'">'+chanSvg(k)+'</span>'; }
+  function chatUnreadCount(list){ return (list||[]).filter(function(s){ return s.lastRole==='user' && s.status!=='closed'; }).length; }
   function relTime(iso){
     if(!iso) return '';
     var d = new Date(iso), now = new Date(), diff = (now - d)/60000;
@@ -1284,7 +1355,11 @@
   function renderChats(){
     var host = document.getElementById('feed');
     if(STATE.chatOpen) return renderChatThread(host);
-    if(!CHAT_POLL) CHAT_POLL = setInterval(loadChats, 15000);
+    // The "open" (All) view is refreshed by the always-on background poll; only the
+    // per-channel views need their own list poll here (clear it on the All view so
+    // the two pollers never double up).
+    if(STATE.chatSource==='open'){ if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; } }
+    else if(!CHAT_POLL){ CHAT_POLL = setInterval(loadChats, 15000); }
     var picker = '<div class="mnav"><select id="chatsource" style="font:inherit;font-size:13px">'+
       CHAT_SOURCES.map(function(s){ return '<option value="'+s[0]+'"'+(STATE.chatSource===s[0]?' selected':'')+'>'+s[1]+'</option>'; }).join('')+
       '</select></div>';
@@ -1295,9 +1370,9 @@
     var listHtml = rows.length ? '<div class="card" style="padding:0;overflow:hidden">'+rows.map(function(s){
         var initial = (s.customerName||'?').trim().charAt(0).toUpperCase() || '?';
         return '<div class="crow" data-chat="'+esc(s.id)+'">'+
+          chanIcon(s.id)+
           '<div class="cava">'+esc(initial)+'</div>'+
           '<div class="cmeta"><div class="cname">'+esc(s.customerName||'Customer')+
-            ' <span class="cbadge">'+chanBadge(s.id)+'</span>'+
             (s.status==='closed'?' <span class="cbadge" style="opacity:.6">done</span>':'')+
             (STATE.admin?(s.installer?' <span class="installer-tag">'+esc(s.installer)+'</span>':' <span class="cbadge" style="opacity:.7">unassigned</span>'):'')+'</div>'+
           '<div class="csnip">'+(s.lastRole==='installer'?'You: ':'')+esc(s.lastText||(s.vehicle||''))+'</div></div>'+
@@ -1305,7 +1380,7 @@
           (s.lastRole==='user' && s.status!=='closed'?'<div class="cdot" title="needs reply"></div>':'')+
           '</div>';
       }).join('')+'</div>' : '<p class="muted" style="padding:14px">'+emptyMsg+'</p>';
-    host.innerHTML = picker + listHtml;
+    host.innerHTML = '<div class="chatdark">'+picker + listHtml+'</div>';
     var sel = document.getElementById('chatsource');
     if(sel) sel.onchange = function(){ STATE.chatSource = sel.value; STATE.chats=[]; STATE.chatsLoaded=false; loadChats(); };
     host.onclick = function(e){ var c=e.target.closest('[data-chat]'); if(c){ STATE.chatOpen=c.getAttribute('data-chat'); renderAll(); } };
@@ -1408,7 +1483,7 @@
         : ' · <a href="#" id="chatclaim">'+(j.installer?'take over ('+esc(j.installer)+'’s)':'claim chat')+'</a>';
     }
     var html =
-      '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <a href="#" id="chatcust" style="color:inherit"><b>'+esc(j.customerName||'Customer')+'</b></a> '+chanBadge(j.id||'')+' '+esc(j.vehicle||'')+
+      '<p style="margin:0 0 8px"><a href="#" id="chatback">‹ Chats</a> · <a href="#" id="chatcust" style="color:inherit"><b>'+esc(j.customerName||'Customer')+'</b></a> '+chanIconSm(j.id||'')+' '+esc(j.vehicle||'')+
       (j.phone?' · <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a>':'')+
       assignHtml+
       ' · <a href="#" id="chatai" title="Toggle AI auto-replies for this chat">AI: '+(j.aiActive?'on':'off')+'</a>'+
@@ -1425,7 +1500,7 @@
     // already-armed poll and handlers stay live on the untouched DOM.
     if(prevLog && html === host.__chatHtml && host.__chatHtmlFor === openId && !STATE.chatPrefill) return;
     host.__chatHtml = html; host.__chatHtmlFor = openId;
-    host.innerHTML = html;
+    host.innerHTML = '<div class="chatdark">'+html+'</div>';
     var log = document.getElementById('chatlog');
     if(log) log.scrollTop = wasAtBottom ? log.scrollHeight : prevScroll;
     var ta = document.getElementById('chattext');
@@ -1436,10 +1511,13 @@
       if(ta.value) ta.oninput();
       ta.onkeydown = function(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); var f=document.getElementById('chatreply'); if(f) f.dispatchEvent(new Event('submit',{cancelable:true})); } };
     }
+    // Open-thread refresh runs on its OWN timer (CHAT_THREAD_POLL) so it can never
+    // clobber the inbox list poll. Stop any list poll while a thread is open.
     if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; }
-    if(!CHAT_POLL) CHAT_POLL = setInterval(function(){ if(STATE.tab==='chats' && STATE.chatOpen) renderChatThread(host); }, 5000);
+    if(CHAT_THREAD_POLL){ clearInterval(CHAT_THREAD_POLL); CHAT_THREAD_POLL=null; }
+    CHAT_THREAD_POLL = setInterval(function(){ if(STATE.tab==='chats' && STATE.chatOpen) renderChatThread(host); }, 5000);
     var back = document.getElementById('chatback');
-    if(back) back.onclick = function(e){ e.preventDefault(); STATE.chatOpen=null; if(CHAT_POLL){ clearInterval(CHAT_POLL); CHAT_POLL=null; } loadChats(); };
+    if(back) back.onclick = function(e){ e.preventDefault(); STATE.chatOpen=null; if(CHAT_THREAD_POLL){ clearInterval(CHAT_THREAD_POLL); CHAT_THREAD_POLL=null; } loadChats(); };
     var cc = document.getElementById('chatcust');
     if(cc) cc.onclick = function(e){ e.preventDefault(); openCustomerView({phone:j.phone||'',name:j.customerName||''}); };
     var crem=document.getElementById('chatremind');
@@ -1508,7 +1586,7 @@
       var feed=document.getElementById('feed'); feed.parentNode.insertBefore(host, feed); }
     function tab(id,label,badge){ return '<button class="tabbtn'+(STATE.tab===id?' on':'')+'" data-tab="'+id+'">'+esc(label)+(badge?' <span class="tabbadge">'+badge+'</span>':'')+'</button>'; }
     var due=STATE.leads.filter(isOverdueLead).length;
-    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chats.length?String(STATE.chats.length):'')+tab('calls','Calls','')+tab('contacts','Contacts','');
+    host.innerHTML=tab('jobs','Jobs','')+tab('leads','Leads', due? String(due):'')+tab('chats','Chats', STATE.chatUnread?String(STATE.chatUnread):'')+tab('calls','Calls','')+tab('contacts','Contacts','');
     Array.prototype.forEach.call(host.querySelectorAll('.tabbtn'),function(b){ b.onclick=function(){
       STATE.tab=b.getAttribute('data-tab');
       if(STATE.tab==='leads'&&!STATE.leadsLoaded){ loadLeads(); }

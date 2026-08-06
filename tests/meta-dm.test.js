@@ -71,15 +71,16 @@ test("POST with valid signature always returns 200 even when processing throws",
 const { processDm } = require("../netlify/functions/meta-dm.js");
 
 function bridgeDeps(over = {}) {
-  const sent = [], notified = [], saved = [];
+  const sent = [], notified = [], saved = [], pushed = [];
   return {
-    refs: { sent, notified, saved },
+    refs: { sent, notified, saved, pushed },
     deps: Object.assign({
       env: { META_PAGE_TOKEN: "tok", SLACK_WEBHOOK_URL: "https://hooks.example" },
       findActive: async () => null,
       chat: async (body) => ({ status: 200, body: { reply: "Happy to help!", escalated: false } }),
       send: async (args) => { sent.push(args); return { ok: true }; },
       notify: async (text) => { notified.push(text); },
+      push: async (key, msg) => { pushed.push({ key, msg }); },
       profile: async () => "Pat K",
       now: () => 1752900000000,
     }, over),
@@ -183,4 +184,40 @@ test("processDm: send returns {ok:false, skipped:true} -> NO send-failure alert"
   await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_alert2", text: "hi" }, deps);
   const sendFail = refs.notified.filter((t) => /send.fail/i.test(t) || /reply.*fail/i.test(t));
   assert.equal(sendFail.length, 0, `should NOT alert on skipped; notified=${JSON.stringify(refs.notified)}`);
+});
+
+const { dispatcherKey } = require("../netlify/functions/lib/routing.js");
+
+// Real-time console delivery (owner ask 2026-08-05): an inbound Meta DM must ping
+// a human immediately, not just wait for the console to happen to poll. Push goes
+// to the dispatcher (same centralized intake as chat escalations), deep-linking
+// straight to the Chats tab.
+test("processDm: a NEW facebook DM pushes the dispatcher, deep-linking to #chats", async () => {
+  const { deps, refs } = bridgeDeps();
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_1", text: "Do you tune 4Runners?" }, deps);
+  assert.equal(refs.pushed.length, 1, `expected one push; pushed=${JSON.stringify(refs.pushed)}`);
+  assert.equal(refs.pushed[0].key, dispatcherKey(deps.env));
+  assert.match(refs.pushed[0].msg.title, /Facebook/);
+  assert.match(refs.pushed[0].msg.body, /Do you tune 4Runners/);
+  assert.match(refs.pushed[0].msg.url, /#chats/);
+});
+
+test("processDm: a NEW instagram DM pushes with an Instagram title", async () => {
+  const { deps, refs } = bridgeDeps();
+  await processDm({ platform: "instagram", senderId: "IG7", mid: "m_ig", text: "price?" }, deps);
+  assert.equal(refs.pushed.length, 1);
+  assert.match(refs.pushed[0].msg.title, /Instagram/);
+});
+
+test("processDm: an escalated (human-attended) thread pushes on every inbound message", async () => {
+  const { deps, refs } = bridgeDeps({ findActive: async () => ({ id: "fb:PSID9", status: "escalated", customerName: "Aaron G", turns: [{ role: "user", text: "hi", at: 1, mid: "m_0" }] }) });
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_2", text: "you there?" }, deps);
+  assert.equal(refs.pushed.length, 1);
+  assert.match(refs.pushed[0].msg.body, /Aaron G/);
+});
+
+test("processDm: an ongoing AI-handled thread does NOT push (console badge covers it)", async () => {
+  const { deps, refs } = bridgeDeps({ findActive: async () => ({ id: "fb:PSID9", status: "ai", turns: [{ role: "user", text: "hi", at: 1, mid: "m_0" }] }) });
+  await processDm({ platform: "facebook", senderId: "PSID9", mid: "m_2", text: "and pricing?" }, deps);
+  assert.equal(refs.pushed.length, 0);
 });
