@@ -99,7 +99,12 @@ orange accent `#E85D2A` · off-white `#F3EFEA` · earth/sage `#3A2E26` `#5B4B42`
   - **v2** `meet-the-duo-v2.mp4` — TY's **live-approved primaries** (from the
     video-style-spec): Rocky = M1 Bill Sherck `AndrewNeural −2%`, Octane = F1
     Chloe Kuo `AvaNeural +0%`.
-  Owner comparing the two; final voice mapping TBD.
+  Owner chose **v2** voices.
+- **3D-animated cut:** `assets/cast/shorts/meet-the-duo-v2-3d.mp4` — the v2
+  (approved-voice) short with characters ANIMATED via Google **Veo 3.1**
+  image-to-video from our on-model stills, then captions/branding overlaid and
+  re-timed to the v2 VO. Proven that Veo keeps Rocky/Octane on-model. Pipeline in
+  `C:/Users/grosh/rocky-short/` (`veo-prep.cjs`, `veo-batch.py`, `build-3d.sh`).
 
 ## Open / future
 - Official **wordmark font** to replace the banner placeholder.
