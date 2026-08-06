@@ -93,10 +93,13 @@ orange accent `#E85D2A` · off-white `#F3EFEA` · earth/sage `#3A2E26` `#5B4B42`
   Preview frames: `meet-the-duo-contact-sheet.png`. Build scripts:
   `C:/Users/grosh/rocky-short/` (`compose-beats.cjs` + `build` ffmpeg steps) and
   the VO lines.
-- **Provisional voice casting** (owner to confirm): Rocky = `en-US-AndrewNeural`
-  (calm), Octane = `en-US-GuyNeural` sped up (eager). This departs from the old
-  faceless Ava/Guy narration spec now that they're on-screen characters — recast
-  freely.
+- **Voice versions to compare:**
+  - **v1** `meet-the-duo.mp4` — my casting: Rocky `AndrewNeural +0%`, Octane
+    `GuyNeural +20%` (both male).
+  - **v2** `meet-the-duo-v2.mp4` — TY's **live-approved primaries** (from the
+    video-style-spec): Rocky = M1 Bill Sherck `AndrewNeural −2%`, Octane = F1
+    Chloe Kuo `AvaNeural +0%`.
+  Owner comparing the two; final voice mapping TBD.
 
 ## Open / future
 - Official **wordmark font** to replace the banner placeholder.
