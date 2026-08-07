@@ -20,7 +20,7 @@
 | CrewMax 4WD | 3.60 L (3.8 US qt) |
 - Fill & drain plug torque: **49 N·m (36 ft·lbf)** (p.2984)
 
-**Interval:** UNVERIFIED in the repair section — lives in the owner/maintenance schedule; confirm before publish (Toyota severe-service is typically ~15k for diffs, but do not state until verified).
+**Interval (FSM maintenance schedule, verified 2026-08-06):** **Rear differential — replace every 30,000 mi** under the Special Operating Conditions (severe/tow/off-road) schedule; **normal service = inspect only** (no fixed replace interval). Front differential: schedule lists the rear explicitly; front replace interval to confirm (likely matches on 4WD).
 
 ## 2. Procedure Outline
 Clean fill/drain plugs → remove fill plug first (verify it opens) → drain → reinstall drain plug → fill to bottom of fill-plug hole with GL-5 75W-85 to spec capacity → torque plugs (front 39 N·m / rear 49 N·m). Front diff is on the 4WD only.
@@ -38,7 +38,7 @@ Clean fill/drain plugs → remove fill plug first (verify it opens) → drain �
 Rocky holds **AMSOIL SEVERE GEAR** bottle (`prop-severegear-9090`) + fill pump (`prop-fillpump`); Octane on the fill/drain plug with torque wrench.
 
 ## 5. Sign-Off Gate
-- [ ] Service INTERVAL confirmed (owner/maintenance schedule) — currently UNVERIFIED
+- [x] Rear-diff INTERVAL confirmed (30k mi severe / inspect on normal); [ ] confirm FRONT-diff replace interval
 - [ ] Limited-slip rear? confirm whether any 2nd-gen rear needs LSD additive / different fluid
 - [ ] Cross-variant: front/rear diff specs constant across engines/years? (front diff only on 4WD)
 - [ ] Confirm AMSOIL SEVERE GEAR grade vs FSM 75W-85 messaging + SKU

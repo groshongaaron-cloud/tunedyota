@@ -8,14 +8,14 @@
 - OEM part reference: **87139-07010** (p.980)
 - Location: HVAC case behind the glovebox (p.3631)
 - Replacement procedure: FSM page is **diagram-only** (p.8805) — no written steps; script from the standard glovebox-drop method + the diagrams.
-- Interval (p.2242/2244): **replace every 36 months / clean every 18 months, if equipped.**
+- Interval (FSM maintenance schedule, verified 2026-08-06): **replace every 20,000 mi, if equipped** (schedule lists it at 20k/40k/60k… on both normal and severe schedules); older schedule text also gives a time-based figure — lead with the 20,000-mi mileage interval.
 
 ## 2. Video Metadata
 **Title:** `Toyota Tundra Cabin Air Filter (2007–2021) — Do You Have One? + How to Change/Add It`
 **FAQ (source FSM):**
 - Q: Does my 2nd-gen Tundra have a cabin air filter? A: it's "if equipped" — early trucks often shipped without one but have the slot behind the glovebox. (FSM)
 - Q: What's the cabin filter part number? A: OEM 87139-07010. (FSM)
-- Q: How often replace it? A: every 36 months (clean at 18), if equipped. (FSM)
+- Q: How often replace the Tundra cabin filter? A: every 20,000 miles, if equipped. (FSM)
 **Tags:** tundra cabin air filter, tundra cabin filter location, 87139-07010, tundra cabin filter install, does tundra have cabin filter
 **Parts (TY-orderable):** confirm whether TY stocks a cabin filter (partner/affiliate) before listing.
 

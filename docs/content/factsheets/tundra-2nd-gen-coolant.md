@@ -6,7 +6,7 @@
 ## 1. FSM-Verified Specs (verbatim + page)
 - Type (p.5700/12099): **Toyota Super Long Life Coolant (SLLC)** — ethylene-glycol, non-silicate/amine/nitrite/borate, hybrid-organic-acid (pink). Factory-filled with SLLC. **Do not use plain water; follow label dilution; do not mix coolant types.**
 - Capacity (p.5682): **with towing package 13.1 L (13.8 US qt)** · **without towing 12.1 L (12.8 US qt)**
-- Interval (p.2234): **first change 100,000 mi / 120 months**, then **every 50,000 mi**
+- Interval (p.2234): **first change 100,000 mi / 120 months**, then **every 50,000 mi**; the maintenance schedule also lists a coolant **inspection every 15,000 mi**
 - Cylinder-block drain plug torque (p.12099): **13 N·m (10 ft·lbf)**; radiator drain cock hand-tight
 
 ## 2. Procedure Outline
