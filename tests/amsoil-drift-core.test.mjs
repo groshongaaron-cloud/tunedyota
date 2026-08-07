@@ -34,6 +34,12 @@ test("driftedVariants flags only beyond-tolerance mismatches", () => {
   assert.equal(out[0].live, 11.5);
 });
 
+test("driftedVariants does not fire at exactly the tolerance boundary", () => {
+  const product = { category: "Oil", variants: [{ stockNo: "BND-EA", retail: 10.0 }] };
+  const live = new Map([["BND-EA", 10.01]]); // exactly TOLERANCE away — must NOT flag
+  assert.equal(driftedVariants(product, live).length, 0);
+});
+
 test("driftedVariants matches a sold-each sku when page drops the -EA suffix", () => {
   const product = { category: "Oil", variants: [{ stockNo: "XYZ-EA", retail: 9.0 }] };
   const live = new Map([["XYZ", 9.99]]); // page listed base sku, no -EA

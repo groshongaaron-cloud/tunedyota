@@ -9,7 +9,8 @@ export const TOLERANCE = 0.01; // dollars — anything past a rounding hair is d
 // Every per-SKU offer price found anywhere in the page's JSON-LD, keyed by
 // uppercased sku. amsoil.com's shape (2026-08): ProductGroup → hasVariant[] →
 // Product{sku, offers:{price}} — walked generically so template drift (Offer[],
-// AggregateOffer.offers, @graph, price directly on the node) still parses.
+// @graph, price directly on the node) still parses. (A pure AggregateOffer wrapper
+// with no per-node price is not yet observed on amsoil.com and would be skipped.)
 export function parseOfferPrices(html) {
   const bySku = new Map();
   const blocks = [...String(html).matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
