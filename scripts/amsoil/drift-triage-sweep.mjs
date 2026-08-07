@@ -69,9 +69,11 @@ async function main() {
       const live = parseOfferPrices(html);
       if (!live.size) { errors.push({ stockNo: p.stockNo, error: "no JSON-LD offers parsed" }); continue; }
       checkedPages++;
-      for (const d of driftedVariants(p, live)) { drifted.push(d); comparedVariants++; }
-      // Count comparisons even when not drifted, for the coverage denominator.
-      comparedVariants += p.variants.filter((v) => live.has(v.stockNo.toUpperCase())).length - driftedVariants(p, live).length;
+      const dv = driftedVariants(p, live);
+      for (const d of dv) drifted.push(d);
+      // Coverage denominator: every variant whose sku resolved on the live page
+      // (drifted or not). Computed once — driftedVariants is called a single time.
+      comparedVariants += p.variants.filter((v) => live.has(v.stockNo.toUpperCase())).length;
     } catch (e) {
       errors.push({ stockNo: p.stockNo, error: String(e.message || e).split("\n")[0].slice(0, 120) });
     }
@@ -98,6 +100,7 @@ async function main() {
     ``,
     `## Unreadable pages (${errors.length}):`,
     ...errors.slice(0, 50).map((e) => `- ${e.stockNo}: ${e.error}`),
+    ...(errors.length > 50 ? [`- …and ${errors.length - 50} more — see the JSON report for the full list.`] : []),
   ].join("\n");
   fs.writeFileSync(REPORT_MD, md);
 
