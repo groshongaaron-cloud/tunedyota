@@ -26,7 +26,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import { fetchProductHtmlViaFirecrawl } from "./lib/firecrawl-fetch.mjs";
-import { parseOfferPrices, driftedVariants, TOLERANCE } from "./lib/drift-core.mjs";
+import { parseOfferPrices, driftedVariants } from "./lib/drift-core.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const BASE = "https://www.amsoil.com";
@@ -97,6 +97,7 @@ async function main() {
       const live = parseOfferPrices(html);
       if (!live.size) { errors.push(`${p.stockNo}: no JSON-LD offers parsed`); continue; }
       checkedPages++;
+      // Count variants whose sku resolved in the live prices (mirrors the -EA fallback inside driftedVariants).
       comparedVariants += p.variants.filter((v) => live.has(v.stockNo.toUpperCase()) || (v.stockNo.toUpperCase().endsWith("-EA") && live.has(v.stockNo.toUpperCase().slice(0, -3)))).length;
       for (const d of driftedVariants(p, live)) {
         drifted.push(`${d.stockNo} (${d.category}): catalog $${d.catalog.toFixed(2)} vs live $${d.live.toFixed(2)}`);
