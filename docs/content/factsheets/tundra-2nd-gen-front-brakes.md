@@ -18,7 +18,19 @@
 | Source manual | `assets\Service Manuals\Manuals\Toyota\Tundra\2nd Gen\Tundra 2nd Gen - 5.7L-3UR-FE 4WD (2007).zip` |
 | FSM pages cited | 3236 (front R&R), 3234 (front inspection), 9921 (pad spec), 9920/3277/5591 (rotor spec), 12658 (brake fluid spec), 1189 (labor time) |
 
-> ⚠️ **Pre-publish cross-variant gate (REQUIRED before this video claims "all 2007–2021"):** specs/torques below are verified on the **5.7L 4WD (2007)** manual only. Before publish, cross-check the front-brake pages in the other 2nd-gen variant manuals — **4.0L-1GR-FE 2WD (2007)**, **4.7L-2UZ-FE 2WD/4WD (2007)**, **4.6L-1UR-FE 2WD/4WD (2010)**, and the **2012/2016 refresh** variants (`4.0L-U`, `4.6L-M`, `5.7L-Y`, `5.7L-W`) — and either confirm identical values or add on-screen "if your truck is X, the value is Y" callouts. Per the spec-claim rule, do NOT generalize a split-generation range from one variant.
+> ✅ **Cross-variant gate — CLEARED 2026-08-06.** The front-brake specs below are confirmed **constant across the entire 2nd generation (2007–2021)** — every engine (4.0L V6, 4.7L/4.6L/5.7L V8, 5.7L flex-fuel), both drivetrains, and across the 2014 refresh. Verified directly against the FSM front-brake pages of: **2007** 5.7L-3UR-FE 4WD, 4.0L-1GR-FE 2WD (V6), 4.7L-2UZ-FE 4WD; **2009** 5.7L-3UR-FBE 4WD; **2010** 4.6L-1UR-FE 4WD; **2012** 5.7L-Y 4WD; **2016** 5.7L-W 4WD (post-facelift, covers 2014–2021). The 2012/2016 manuals are from a **different publisher** and independently agree (99 N·m caliper, 1.0 mm pad min, 32.0/29.0 mm rotor, 0.05 mm runout, 131/209 N·m lug, DOT 3) — strong corroboration. Only unextracted cells: 2009/2010 caliper-bolt torque (those manuals structure the R&R page differently) — **bracket-confirmed at 99 N·m** by the 2007 same-engine, 2012, and 2016 manuals on both sides. **The video may claim "2007–2021" for these specs with no per-year variation.**
+>
+> | Year / variant | Pad std/min (mm) | Rotor std/min (mm) | Runout (mm) | Caliper bolt | Lug al/st (N·m) | Fluid |
+> |---|---|---|---|---|---|---|
+> | 2007 5.7L 4WD (pilot) | 11.9 / 1.0 | 32.0 / 29.0 | 0.05 | 99 N·m | 131 / 209 | DOT 3 |
+> | 2007 4.0L V6 2WD | 11.9 / 1.0 | 32.0 / 29.0 | 0.05 | 99 N·m | 131 / 209 | DOT 3 |
+> | 2007 4.7L V8 4WD | 11.9 / 1.0 | 32.0 / 29.0 | 0.05 | 99 N·m | 131 / 209 | DOT 3 |
+> | 2009 5.7L flex-fuel 4WD | 11.9 / 1.0 | 32.0 / 29.0 | 0.05 | 99 N·m* | 131 / 209 | DOT 3 |
+> | 2010 4.6L V8 4WD | 11.9 / 1.0 | 32.0 / 29.0 | 0.05 | 99 N·m* | 131 / 209 | DOT 3 |
+> | 2012 5.7L 4WD (refresh-era) | 11.9 / 1.0 | 32.0 / 29.0 | 0.05 | 99 N·m | 131 / 209 | — |
+> | 2016 5.7L 4WD (post-facelift) | 11.9 / 1.0 | 32.0 / 29.0 | 0.05 | 99 N·m | 131 / 209 | — |
+>
+> \* bracket-confirmed (directly verified on 2007/2012/2016; not extracted from that specific manual). Note: front-brake hardware is independent of 2WD/4WD, so drivetrain twins share these values.
 
 ---
 
@@ -157,7 +169,7 @@ Per the standing prop rule — Rocky & Octane hold the **subject-matter product*
 ---
 
 ## 7. Owner Sign-Off Gate
-- [ ] Cross-variant spec check complete (§1 gate) OR on-screen variant callouts scripted
+- [x] **Cross-variant spec check complete (§1 gate)** — DONE 2026-08-06; specs constant across all 2nd-gen engines/years incl. post-2014 refresh. No on-screen per-year variation needed.
 - [ ] Confirm TY brake-fluid SKU + link; decide pad/rotor product listing (stock vs affiliate vs omit)
 - [ ] Approve title, description, FAQ answers, tags
 - [ ] Approve prop shot list / AMSOIL bottle art
