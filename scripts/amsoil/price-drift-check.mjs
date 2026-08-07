@@ -26,13 +26,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import { fetchProductHtmlViaFirecrawl } from "./lib/firecrawl-fetch.mjs";
+import { parseOfferPrices, driftedVariants, TOLERANCE } from "./lib/drift-core.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const BASE = "https://www.amsoil.com";
 const TODAY = new Date().toISOString().slice(0, 10);
 const STATE_FILE = path.join(os.homedir(), ".tunedyota", "amsoil-drift-state.json");
 const MAX_SENTINELS = Number((process.argv.find((a) => a.startsWith("--sentinels=")) || "").split("=")[1]) || 24;
-const TOLERANCE = 0.01; // dollars — anything beyond a rounding hair is drift
 
 async function notify(text) {
   // Full functions path — there is NO /notify redirect; the short URL 404s
@@ -48,34 +48,6 @@ async function notify(text) {
 
 function gitShow(repoPath) {
   return execSync(`git show origin/master:${repoPath}`, { cwd: ROOT, maxBuffer: 32 * 1024 * 1024 }).toString("utf8");
-}
-
-// Every per-SKU offer price found anywhere in the page's JSON-LD, keyed by
-// uppercased sku. amsoil.com's shape (2026-08): ProductGroup → hasVariant[] →
-// Product{sku, offers:{price}} — but walk generically so template drift
-// (Offer[], AggregateOffer.offers, @graph, price directly on the node) still parses.
-function parseOfferPrices(html) {
-  const bySku = new Map();
-  const blocks = [...String(html).matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
-  const priceOf = (n) => {
-    if (n.price != null) return parseFloat(n.price);
-    const offers = Array.isArray(n.offers) ? n.offers : n.offers ? [n.offers] : [];
-    for (const o of offers) if (o && o.price != null) return parseFloat(o.price);
-    return NaN;
-  };
-  const walk = (n) => {
-    if (!n || typeof n !== "object") return;
-    if (Array.isArray(n)) return n.forEach(walk);
-    if (n.sku) {
-      const price = priceOf(n);
-      if (!isNaN(price)) bySku.set(String(n.sku).toUpperCase().trim(), price);
-    }
-    for (const v of Object.values(n)) if (v && typeof v === "object") walk(v);
-  };
-  for (const b of blocks) {
-    try { walk(JSON.parse(b)); } catch { /* non-JSON block */ }
-  }
-  return bySku;
 }
 
 // One sentinel per category (categories ordered by variant volume), largest
@@ -125,15 +97,9 @@ async function main() {
       const live = parseOfferPrices(html);
       if (!live.size) { errors.push(`${p.stockNo}: no JSON-LD offers parsed`); continue; }
       checkedPages++;
-      for (const v of p.variants) {
-        const sku = v.stockNo.toUpperCase();
-        // Pages list the sold-each sku sometimes without the -EA suffix.
-        const livePrice = live.get(sku) ?? (sku.endsWith("-EA") ? live.get(sku.slice(0, -3)) : undefined);
-        if (livePrice == null) continue;
-        comparedVariants++;
-        if (Math.abs(livePrice - v.retail) > TOLERANCE) {
-          drifted.push(`${v.stockNo} (${p.category}): catalog $${v.retail.toFixed(2)} vs live $${livePrice.toFixed(2)}`);
-        }
+      comparedVariants += p.variants.filter((v) => live.has(v.stockNo.toUpperCase()) || (v.stockNo.toUpperCase().endsWith("-EA") && live.has(v.stockNo.toUpperCase().slice(0, -3)))).length;
+      for (const d of driftedVariants(p, live)) {
+        drifted.push(`${d.stockNo} (${d.category}): catalog $${d.catalog.toFixed(2)} vs live $${d.live.toFixed(2)}`);
       }
     } catch (e) {
       errors.push(`${p.stockNo}: ${String(e.message || e).split("\n")[0].slice(0, 100)}`);
