@@ -113,6 +113,24 @@ Every video, both series, follows the identical three-act shell:
 
 **Every video carries:** on-screen FSM/Wikipedia source citation (authority signal), burned-in captions + `.srt`, brand colorway, and the disclaimer that specs are FSM-verified for the stated variant. Voices per locked A/V spec.
 
+### 4.1 Prop / Product Art System (topic-specific characters)
+Rocky & Octane hold the **subject-matter product** for the video — and when TY sells that product, the prop is a **cartoon of the real item** (matching trade dress). This reinforces the topic *and* the outro CTA. Examples:
+
+| Service topic | Prop in Rocky/Octane's hands |
+|---|---|
+| Oil change | **AMSOIL Signature Series 0W-20** bottle + oil filter |
+| Brake job | Brake pad + **AMSOIL DOT 3/DOT 4 Synthetic Brake Fluid** + torque wrench |
+| Diff / gear fluid | **AMSOIL SEVERE GEAR 75W-90 / 75W-140** bottle |
+| Transfer case | AMSOIL synthetic fluid + fill pump |
+| Coolant | Coolant jug (confirm TY-sold product) |
+| Air / cabin filter | The filter element |
+
+**Two-layer asset model (build once, reuse):**
+1. **Character layer** — Rocky & Octane poses come from the established brand character rig / turnaround + expression sheets (on-model; never AI-generated from scratch, or they drift off-brand).
+2. **Product-prop layer** — a reusable library of cartoon product props (AMSOIL bottles per fluid, brake pad, rotor, oil filter, torque wrench, fill pump) composited into the character's hands. Props are drawn/generated ONCE and reused across every relevant video.
+
+Each fact sheet includes a **Prop Shot List** (see the pilot fact sheet) mapping each scene to its character + prop, and the product prop must match the AMSOIL/OEM trade dress so viewers recognize the exact item to order at TunedYota.com. Never depict a product TY doesn't actually sell as an orderable prop — confirm the SKU first (fact-based rule).
+
 ---
 
 ## 5. The SEO/AEO Engine — making TY the cited source
