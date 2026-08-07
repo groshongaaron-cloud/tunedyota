@@ -92,11 +92,13 @@ These override any perceived efficiency:
 - **Loop 1** — every interactive Tuned Yota turn. The default.
 - **Loop 2** — multi-step work with a fixed objective (site overhauls, launches, migrations).
   Goal + criteria stated up front and checked to close.
-- **Loop 3** — `TunedYota AMSOIL Drift Check` (Wed 3:15am), Search Visibility, price-sync;
-  the seo-monitor / aeo-monitor agents when run on cadence. All PS-hosted hidden tasks.
-- **Loop 4** — the target state for the monitors above: not just *detect* drift but
-  *triage → fix → review → test → stage*, escalating anything live-facing. Built as
-  `/schedule` routines that invoke a fan-out workflow.
+- **Loop 3** — Search Visibility, price-sync; the seo-monitor / aeo-monitor agents when
+  run on cadence. All PS-hosted hidden tasks.
+- **Loop 4 (live pilot)** — `TunedYota AMSOIL Drift Check` (Wed 3:15am): the sentinel
+  detector (`price-drift-check.mjs`) escalates on drift, then `drift-triage-sweep.mjs
+  --if-drift` auto-stages the full-catalog remediation package to `~/.tunedyota/`. Fix
+  stays human — pricing is live-facing, so it halts at the autonomy boundary and escalates
+  rather than shipping. The remaining monitors are the next candidates for the same upgrade.
 
 ## Rules for new loops
 

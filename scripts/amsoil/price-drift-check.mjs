@@ -14,8 +14,9 @@
 // Strategy: fetch ~2 dozen sentinel product pages (one per category, largest
 // product first), compare per-variant JSON-LD offer prices against the catalog.
 // On drift: Slack alert via /notify with examples + the remediation runbook.
-// For a full 272-page damage report, run the Ultimate Web Scraper sweep over
-// the enrichment.json paths from any Claude session (alert text says so).
+// The full-catalog damage report is then staged automatically by the Loop-4
+// triage step (drift-triage-sweep.mjs --if-drift), chained after this in the
+// scheduled task — see docs/operations/verification-loops.md.
 //
 // Reads catalog/enrichment from origin/master (git show) so the check is
 // branch-independent and safe while dev sessions branch-switch this repo.
@@ -125,7 +126,7 @@ async function main() {
       `ACTION (P.C. prices are stale too — they only exist in the official sheet):\n` +
       `1. Download a fresh U.S. Pricing CSV from dz.amsoil.com → replace scripts/amsoil/data/us-pricing.csv\n` +
       `2. npm run build:seo, ship per the ship skill\n` +
-      `Full 272-page damage report: ask Claude to run the Ultimate Web Scraper sweep over enrichment.json paths.`
+      `Full-catalog damage report is being staged automatically (Loop-4 triage sweep) — watch for the "TRIAGE complete" ping with the remediation package.`
     );
   } else {
     if (state.driftSince) {
