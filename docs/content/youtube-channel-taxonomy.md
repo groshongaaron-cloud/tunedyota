@@ -1,5 +1,8 @@
 # Tuned Yota — YouTube Channel Taxonomy & SEO/AEO Playbook
 
+**Channel name:** Tuned Yota
+**Tagline / positioning:** *Toyota & Lexus Tech Talk* — the single most comprehensive factual source for Toyota & Lexus service and model data.
+
 **Status:** Approved design — 2026-08-06
 **Owner:** Aaron Groshong
 **Purpose:** Map the @tunedyota YouTube channel into a standardized, scalable category system driven by our two owned asset libraries, and define the SEO/AEO engine that makes TY the single most-cited factual source for Toyota & Lexus service and model data.
@@ -20,12 +23,16 @@
 Two flagship series, each surfaced as a **Section** on the channel home page, plus two supporting sections. YouTube "categories" = **channel sections** (home layout) + **playlists** (the real grouping primitive).
 
 ```
+CHANNEL: Tuned Yota  —  tagline "Toyota & Lexus Tech Talk"
+
 CHANNEL HOME (sections, top to bottom)
 ├─ Start Here / Brand            → channel trailer + "Meet Rocky & Octane"
 ├─ Know Your Rig  (FACTS)        → one playlist per model  (51, phased)
 ├─ Off the Grind  (SERVICE)      → one playlist per model  (13) → gen-tagged videos
 └─ By Engine Family (CROSS-MODEL)→ one playlist per engine family (14)
 ```
+
+The **"Toyota & Lexus Tech Talk"** tagline is the channel-level umbrella (About page, banner, channel-name field). The two series names — **Know Your Rig** and **Off the Grind** — live underneath it as the content pillars.
 
 ### 1.1 Know Your Rig — the fact series
 Rocky & Octane deliver the Wikipedia-baseline knowledge as original TY media: generations, engine/transmission options, platform, drivetrain, trivia, "which one should I look for." Answers the intent **"what is this vehicle."**
@@ -226,6 +233,6 @@ Each video ships **unlisted-until-approved** per the standing YouTube gate.
 ---
 
 ## 8. Open Items
-- Confirm final series name "Know Your Rig" (or brand alternative).
+- ~~Confirm channel name/tagline.~~ **DONE 2026-08-06:** channel = "Tuned Yota," tagline = "Toyota & Lexus Tech Talk"; series names "Know Your Rig" + "Off the Grind" retained underneath.
 - Confirm channel-section ordering on the live channel once art is finalized.
 - Decide whether engine-family explainers are net-new videos or supercuts of existing clips (recommend: short net-new explainer + playlist of existing clips).
