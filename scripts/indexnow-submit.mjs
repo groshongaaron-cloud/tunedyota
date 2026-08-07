@@ -1,5 +1,6 @@
-// Submit URLs to IndexNow — instantly notifies Bing, Yandex, Seznam, etc. (NOT Google;
-// Google discovers via normal crawl + Search Console). The API key is the public
+// Submit URLs to IndexNow — instantly notifies Bing, Yandex, Naver, Seznam, etc. (NOT Google;
+// Google discovers via normal crawl + Search Console). These indexes also feed AI answer
+// engines (ChatGPT search, Copilot), so this doubles as an AEO ping. The API key is the public
 // verification file at site/<hex>.txt, hosted at the site root; engines fetch it to
 // confirm we own the host. The key is NOT a secret.
 //
