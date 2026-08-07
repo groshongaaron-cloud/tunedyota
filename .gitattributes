@@ -1,0 +1,16 @@
+# Normalize line endings: store LF in git, check out LF everywhere.
+# Ends the phantom CRLF churn that core.autocrlf=true produced on generated
+# files (sitemap.xml, _redirects, built HTML) showing as modified after every build.
+* text=auto eol=lf
+
+# Binary assets — leave bytes untouched
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.ico  binary
+*.woff  binary
+*.woff2 binary
+*.pdf  binary
+*.xlsx binary
